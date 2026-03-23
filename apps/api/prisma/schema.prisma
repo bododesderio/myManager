@@ -1,0 +1,1811 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════
+
+enum UserStatus {
+  PENDING_PAYMENT
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum WorkspaceAccountType {
+  INDIVIDUAL
+  COMPANY
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum MemberStatus {
+  ACTIVE
+  SOFT_LOCKED
+  REMOVED
+}
+
+enum SubStatus {
+  ACTIVE
+  PAST_DUE
+  GRACE_PERIOD
+  CANCELLING
+  CANCELLED
+  SUPERSEDED
+  PENDING_PAYMENT
+}
+
+enum BillingCycle {
+  MONTHLY
+  ANNUAL
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REVISION_REQUESTED
+  PENDING_CLIENT_APPROVAL
+  APPROVED_BY_CLIENT
+  SCHEDULED
+  QUEUED
+  PUBLISHING
+  PUBLISHED
+  PARTIALLY_PUBLISHED
+  FAILED
+  CANCELLED
+  DELETED
+}
+
+enum CmsFieldType {
+  TEXT
+  TEXTAREA
+  RICHTEXT
+  URL
+  IMAGE_URL
+  COLOR
+  BOOLEAN
+  NUMBER
+  JSON
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+  OS
+  USER
+}
+
+// ═══════════════════════════════════════════════════════════
+// CORE IDENTITY & AUTH
+// ═══════════════════════════════════════════════════════════
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  name              String
+  first_name        String     @default("")
+  last_name         String     @default("")
+  password_hash     String?
+  avatar_url        String?
+  email_verified    Boolean    @default(false)
+  is_superadmin     Boolean    @default(false)
+  is_suspended      Boolean    @default(false)
+  status            UserStatus @default(PENDING_VERIFICATION)
+  last_workspace_id String?
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
+
+  preferences              UserPreferences?
+  push_tokens              UserPushToken[]
+  totp_backup_codes        TotpBackupCode[]
+  sessions                 Session[]
+  accounts                 Account[]
+  workspace_members        WorkspaceMember[]
+  project_members          ProjectMember[]
+  posts                    Post[]
+  notifications            Notification[]
+  notification_prefs       NotificationPreference[]
+  ai_credit_usage          AiCreditUsage[]
+  audit_logs               AuditLog[]
+  subscriptions            Subscription[]
+  plan_overrides_received  PlanOverride[]          @relation("OverrideUser")
+  plan_overrides_given     PlanOverride[]          @relation("OverrideAdmin")
+  comment_assignments      CommentAssignment[]     @relation("AssignedTo")
+  comment_assignments_by   CommentAssignment[]     @relation("AssignedBy")
+  data_export_requests     DataExportRequest[]
+  deletion_requests        DeletionRequest[]
+  cookie_consents          CookieConsent[]
+  email_preferences        UserEmailPreference[]
+  password_reset_tokens    PasswordResetToken[]
+  email_verification_tokens EmailVerificationToken[]
+  workspace_invitations    WorkspaceInvitation[]
+  refresh_tokens           RefreshToken[]
+  blog_posts               BlogPost[]
+  owned_workspaces         Workspace[]             @relation("WorkspaceOwner")
+  portal_tokens_created    PortalAccessToken[]     @relation("PortalTokenCreator")
+  post_comments            PostComment[]
+  approval_events          ApprovalEvent[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model UserPreferences {
+  id                  String   @id @default(uuid())
+  user_id             String   @unique
+  language            String   @default("en")
+  currency            String   @default("USD")
+  timezone            String   @default("Africa/Kampala")
+  theme               String   @default("system")
+  theme_preference    String?
+  totp_enabled        Boolean  @default(false)
+  totp_secret         String?
+  lang_source         String   @default("default")
+  notifications_email Boolean  @default(true)
+  notifications_push  Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model UserPushToken {
+  id          String   @id @default(uuid())
+  user_id     String
+  token       String
+  platform    String
+  device_name String?
+  created_at  DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, token])
+  @@map("user_push_tokens")
+}
+
+model TotpBackupCode {
+  id         String    @id @default(uuid())
+  user_id    String
+  code_hash  String
+  used       Boolean   @default(false)
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("totp_backup_codes")
+}
+
+model Session {
+  id            String   @id @default(uuid())
+  session_token String   @unique
+  user_id       String
+  expires       DateTime
+  created_at    DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                  String   @id @default(uuid())
+  user_id             String
+  type                String
+  provider            String
+  provider_account_id String
+  refresh_token       String?
+  access_token        String?
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?
+  session_state       String?
+  created_at          DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider, provider_account_id])
+  @@map("accounts")
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH TOKENS
+// ═══════════════════════════════════════════════════════════
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  user_id    String
+  token_hash String    @unique
+  expires_at DateTime
+  used_at    DateTime?
+  revoked_at DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token_hash])
+  @@index([user_id])
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid())
+  user_id    String
+  token_hash String    @unique
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token_hash])
+  @@index([user_id])
+  @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id         String    @id @default(uuid())
+  user_id    String
+  token_hash String    @unique
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token_hash])
+  @@index([user_id])
+  @@map("email_verification_tokens")
+}
+
+// ═══════════════════════════════════════════════════════════
+// PLANS & BILLING
+// ═══════════════════════════════════════════════════════════
+
+model Plan {
+  id                String   @id @default(uuid())
+  name              String
+  slug              String   @unique
+  description       String   @default("")
+  price_monthly_usd Decimal  @default(0) @db.Decimal(10, 2)
+  price_annual_usd  Decimal  @default(0) @db.Decimal(10, 2)
+  seat_price_usd    Float    @default(0)
+  limits            Json
+  features          Json
+  is_active         Boolean  @default(true)
+  is_custom         Boolean  @default(false)
+  sort_order        Int      @default(0)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  subscriptions  Subscription[]
+  plan_overrides PlanOverride[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                          String       @id @default(uuid())
+  user_id                     String
+  workspace_id                String       @unique
+  plan_id                     String
+  flutterwave_subscription_id String?
+  status                      SubStatus    @default(ACTIVE)
+  billing_cycle               BillingCycle @default(MONTHLY)
+  billing_currency            String       @default("USD")
+  billing_amount              Float        @default(0)
+  locked_limits               Json
+  locked_features             Json
+  current_period_start        DateTime
+  current_period_end          DateTime
+  grace_period_ends_at        DateTime?
+  extra_seats                 Int          @default(0)
+  cancel_at_period_end        Boolean      @default(false)
+  created_at                  DateTime     @default(now())
+  updated_at                  DateTime     @updatedAt
+
+  user               User               @relation(fields: [user_id], references: [id])
+  workspace          Workspace          @relation(fields: [workspace_id], references: [id])
+  plan               Plan               @relation(fields: [plan_id], references: [id])
+  subscription_items SubscriptionItem[]
+
+  @@map("subscriptions")
+}
+
+model SubscriptionItem {
+  id              String   @id @default(uuid())
+  subscription_id String
+  type            String
+  quantity        Int      @default(1)
+  unit_price      Float
+  created_at      DateTime @default(now())
+
+  subscription Subscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+
+  @@map("subscription_items")
+}
+
+model BillingHistory {
+  id              String   @id @default(uuid())
+  workspace_id    String
+  user_id         String
+  plan_name       String
+  amount          Float
+  currency        String
+  status          String
+  flutterwave_ref String?
+  invoice_url     String?
+  billing_period  String?
+  created_at      DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("billing_history")
+}
+
+model PlanOverride {
+  id             String    @id @default(uuid())
+  user_id        String
+  plan_id        String
+  admin_id       String
+  reason         String
+  override_until DateTime?
+  created_at     DateTime  @default(now())
+
+  user  User @relation("OverrideUser", fields: [user_id], references: [id])
+  admin User @relation("OverrideAdmin", fields: [admin_id], references: [id])
+  plan  Plan @relation(fields: [plan_id], references: [id])
+
+  @@map("plan_overrides")
+}
+
+model SalesLead {
+  id           String   @id @default(uuid())
+  name         String
+  email        String
+  company      String?
+  message      String
+  source       String   @default("contact_form")
+  status       String   @default("new")
+  responded_at DateTime?
+  created_at   DateTime @default(now())
+
+  @@map("sales_leads")
+}
+
+// ═══════════════════════════════════════════════════════════
+// WORKSPACES & TEAMS
+// ═══════════════════════════════════════════════════════════
+
+model Workspace {
+  id              String               @id @default(uuid())
+  name            String
+  slug            String               @unique
+  description     String?
+  owner_id        String?
+  account_type    WorkspaceAccountType @default(INDIVIDUAL)
+  industry        String?
+  team_size       String?
+  referral_source String?
+  created_at      DateTime             @default(now())
+  updated_at      DateTime             @updatedAt
+
+  owner               User?                    @relation("WorkspaceOwner", fields: [owner_id], references: [id])
+  members             WorkspaceMember[]
+  projects            Project[]
+  social_accounts     SocialAccount[]
+  posts               Post[]
+  subscriptions       Subscription[]
+  billing_history     BillingHistory[]
+  media_assets        MediaAsset[]
+  campaigns           Campaign[]
+  notifications       Notification[]
+  approval_config     WorkspaceApprovalConfig?
+  brand_config        WorkspaceBrandConfig?
+  analytics_daily     WorkspaceAnalyticsDaily[]
+  best_times          BestTime[]
+  hashtag_sets        HashtagSet[]
+  hashtags            Hashtag[]
+  reports             Report[]
+  report_configs      ReportConfig[]
+  utm_configs         UtmConfig[]
+  bio_pages           BioPage[]
+  rss_feeds           RssFeed[]
+  listening_terms     ListeningTerm[]
+  competitor_profiles CompetitorProfile[]
+  webhook_endpoints   WebhookEndpoint[]
+  api_keys            ApiKey[]
+  whatsapp_lists      WhatsAppContactList[]
+  post_templates      PostTemplate[]
+  invitations         WorkspaceInvitation[]
+
+  @@index([owner_id])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id             String       @id @default(uuid())
+  user_id        String
+  workspace_id   String
+  role           WorkspaceRole @default(MEMBER)
+  status         MemberStatus  @default(ACTIVE)
+  invited_by_id  String?
+  joined_at      DateTime     @default(now())
+  last_active_at DateTime?
+
+  user      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, workspace_id])
+  @@index([workspace_id, role])
+  @@index([user_id, workspace_id])
+  @@map("workspace_members")
+}
+
+model WorkspaceInvitation {
+  id            String        @id @default(uuid())
+  workspace_id  String
+  email         String
+  role          WorkspaceRole @default(MEMBER)
+  token         String
+  invited_by_id String
+  expires_at    DateTime
+  accepted_at   DateTime?
+  cancelled_at  DateTime?
+  created_at    DateTime      @default(now())
+
+  workspace  Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  invited_by User      @relation(fields: [invited_by_id], references: [id])
+
+  @@index([workspace_id, email])
+  @@index([token])
+  @@map("workspace_invitations")
+}
+
+model WorkspaceApprovalConfig {
+  id                    String   @id @default(uuid())
+  workspace_id          String   @unique
+  require_approval      Boolean  @default(false)
+  auto_approve_admins   Boolean  @default(true)
+  require_client_review Boolean  @default(false)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("workspace_approval_configs")
+}
+
+model WorkspaceBrandConfig {
+  id           String   @id @default(uuid())
+  workspace_id String   @unique
+  config       Json
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("workspace_brand_configs")
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROJECTS (Enterprise)
+// ═══════════════════════════════════════════════════════════
+
+model Project {
+  id                  String   @id @default(uuid())
+  workspace_id        String
+  name                String
+  slug                String
+  description         String?
+  client_name         String?
+  client_email        String?
+  monthly_post_target Int      @default(0)
+  status              String   @default("active")
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  workspace      Workspace          @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  members        ProjectMember[]
+  brand_config   ProjectBrandConfig?
+  portal_tokens  PortalAccessToken[]
+  portal_actions PortalAction[]
+  posts          Post[]
+
+  @@unique([workspace_id, slug])
+  @@map("projects")
+}
+
+model ProjectMember {
+  id          String   @id @default(uuid())
+  project_id  String
+  user_id     String
+  role        String   @default("contributor")
+  assigned_at DateTime @default(now())
+
+  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([project_id, user_id])
+  @@map("project_members")
+}
+
+model ProjectBrandConfig {
+  id         String   @id @default(uuid())
+  project_id String   @unique
+  config     Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@map("project_brand_configs")
+}
+
+model PortalAccessToken {
+  id            String    @id @default(uuid())
+  project_id    String
+  token         String    @unique
+  token_hash    String?
+  label         String
+  client_email  String?
+  client_name   String?
+  created_by_id String?
+  expires_at    DateTime?
+  revoked_at    DateTime?
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+
+  project    Project       @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  created_by User?         @relation("PortalTokenCreator", fields: [created_by_id], references: [id])
+  actions    PortalAction[]
+  audit_logs PortalAuditLog[]
+
+  @@index([project_id])
+  @@index([token_hash])
+  @@map("portal_access_tokens")
+}
+
+model PortalAction {
+  id              String   @id @default(uuid())
+  portal_token_id String
+  project_id      String
+  action          String
+  metadata        Json     @default("{}")
+  ip_address      String?
+  created_at      DateTime @default(now())
+
+  portal_token PortalAccessToken @relation(fields: [portal_token_id], references: [id])
+  project      Project           @relation(fields: [project_id], references: [id])
+
+  @@map("portal_actions")
+}
+
+model PortalAuditLog {
+  id              String   @id @default(uuid())
+  portal_token_id String
+  action          String
+  post_id         String?
+  comment         String?
+  ip_address      String?
+  user_agent      String?
+  created_at      DateTime @default(now())
+
+  portal_token PortalAccessToken @relation(fields: [portal_token_id], references: [id])
+
+  @@map("portal_audit_logs")
+}
+
+// ═══════════════════════════════════════════════════════════
+// PLATFORMS
+// ═══════════════════════════════════════════════════════════
+
+model Platform {
+  id                     String   @id @default(uuid())
+  slug                   String   @unique
+  name                   String   @default("")
+  display_name           String
+  color                  String   @default("#111111")
+  api_version            String
+  auth_type              String
+  phase                  Int      @default(1)
+  max_caption_chars      Int
+  max_images             Int
+  max_file_size_mb       Int
+  max_video_duration_sec Int
+  min_image_width        Int
+  min_image_height       Int
+  content_types          Json     @default("[]")
+  limits                 Json     @default("{}")
+  is_active              Boolean  @default(true)
+  created_at             DateTime @default(now())
+
+  platform_content_types PlatformContentType[]
+  social_accounts        SocialAccount[]
+  board_cache            PlatformBoardCache[]
+
+  @@map("platforms")
+}
+
+model ContentTypeModel {
+  id             String   @id @default(uuid())
+  slug           String   @unique
+  display_name   String
+  requires_media Boolean  @default(false)
+  created_at     DateTime @default(now())
+
+  platform_content_types PlatformContentType[]
+
+  @@map("content_types")
+}
+
+model PlatformContentType {
+  id              String @id @default(uuid())
+  platform_id     String
+  content_type_id String
+
+  platform     Platform         @relation(fields: [platform_id], references: [id])
+  content_type ContentTypeModel @relation(fields: [content_type_id], references: [id])
+
+  @@unique([platform_id, content_type_id])
+  @@map("platform_content_types")
+}
+
+model SocialAccount {
+  id                      String    @id @default(uuid())
+  workspace_id            String
+  platform_id             String
+  platform_user_id        String
+  platform_username       String
+  display_name            String
+  avatar_url              String?
+  access_token_encrypted  String
+  refresh_token_encrypted String?
+  token_expires_at        DateTime?
+  scopes                  String[]
+  metadata                Json      @default("{}")
+  is_active               Boolean   @default(true)
+  connected_at            DateTime  @default(now())
+  last_used_at            DateTime?
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  platform  Platform  @relation(fields: [platform_id], references: [id])
+
+  @@unique([workspace_id, platform_id, platform_user_id])
+  @@map("social_accounts")
+}
+
+model PlatformBoardCache {
+  id           String   @id @default(uuid())
+  platform_id  String
+  workspace_id String
+  board_id     String
+  board_name   String
+  cached_at    DateTime @default(now())
+
+  platform Platform @relation(fields: [platform_id], references: [id])
+
+  @@map("platform_board_cache")
+}
+
+model WhatsAppContactList {
+  id            String   @id @default(uuid())
+  workspace_id  String
+  name          String
+  description   String?
+  contact_count Int      @default(0)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("whatsapp_contact_lists")
+}
+
+// ═══════════════════════════════════════════════════════════
+// POSTS & CONTENT
+// ═══════════════════════════════════════════════════════════
+
+model Post {
+  id                    String     @id @default(uuid())
+  workspace_id          String
+  project_id            String?
+  campaign_id           String?
+  user_id               String
+  caption               String     @db.Text
+  content_type          String
+  platforms             String[]
+  status                PostStatus @default(DRAFT)
+  scheduled_at          DateTime?
+  published_at          DateTime?
+  link_url              String?
+  link_preview_override Json?
+  first_comment_text    String?
+  failure_reason        String?
+  platform_options      Json       @default("{}")
+  created_at            DateTime   @default(now())
+  updated_at            DateTime   @updatedAt
+
+  user             User                @relation(fields: [user_id], references: [id])
+  workspace        Workspace           @relation(fields: [workspace_id], references: [id])
+  project          Project?            @relation(fields: [project_id], references: [id])
+  campaign         Campaign?           @relation(fields: [campaign_id], references: [id])
+  platform_results PostPlatformResult[]
+  versions         PostVersion[]
+  media            PostMedia[]
+  post_hashtags    PostHashtag[]
+  analytics        PostAnalytics[]
+  post_comments    PostComment[]
+  approval_events  ApprovalEvent[]
+  recurrence_plan  RecurrencePlan?
+  campaign_posts   CampaignPost[]
+
+  @@index([workspace_id, status])
+  @@index([scheduled_at])
+  @@index([workspace_id, scheduled_at])
+  @@index([workspace_id, published_at])
+  @@index([project_id, status])
+  @@map("posts")
+}
+
+model PostPlatformResult {
+  id                String    @id @default(uuid())
+  post_id           String
+  platform          String
+  status            String    @default("pending")
+  platform_post_id  String?
+  platform_post_url String?
+  error_message     String?
+  published_at      DateTime?
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, platform])
+  @@map("post_platform_results")
+}
+
+model PostVersion {
+  id         String   @id @default(uuid())
+  post_id    String
+  version    Int
+  caption    String
+  media_ids  String[]
+  metadata   Json     @default("{}")
+  created_at DateTime @default(now())
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@map("post_versions")
+}
+
+model PostMedia {
+  id             String @id @default(uuid())
+  post_id        String
+  media_asset_id String
+  sort_order     Int    @default(0)
+
+  post        Post       @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  media_asset MediaAsset @relation(fields: [media_asset_id], references: [id])
+
+  @@unique([post_id, media_asset_id])
+  @@map("post_media")
+}
+
+model Hashtag {
+  id           String   @id @default(uuid())
+  text         String
+  workspace_id String
+  platform     String?
+  created_at   DateTime @default(now())
+
+  workspace     Workspace     @relation(fields: [workspace_id], references: [id])
+  post_hashtags PostHashtag[]
+
+  @@unique([workspace_id, text, platform])
+  @@map("hashtags")
+}
+
+model PostHashtag {
+  id         String @id @default(uuid())
+  post_id    String
+  hashtag_id String
+
+  post    Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  hashtag Hashtag @relation(fields: [hashtag_id], references: [id])
+
+  @@unique([post_id, hashtag_id])
+  @@map("post_hashtags")
+}
+
+model PostTemplate {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  caption      String
+  content_type String?
+  platforms    String[]
+  media_urls   String[]
+  metadata     Json     @default("{}")
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("post_templates")
+}
+
+model RecurrencePlan {
+  id           String    @id @default(uuid())
+  post_id      String    @unique
+  frequency    String
+  interval     Int       @default(1)
+  day_of_week  Int?
+  day_of_month Int?
+  ends_at      DateTime?
+  next_run_at  DateTime?
+  is_active    Boolean   @default(true)
+  created_at   DateTime  @default(now())
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@map("recurrence_plans")
+}
+
+model PostComment {
+  id         String   @id @default(uuid())
+  post_id    String
+  user_id    String
+  text       String
+  char_start Int?
+  char_end   Int?
+  resolved   Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([post_id])
+  @@map("post_comments")
+}
+
+model ApprovalEvent {
+  id         String   @id @default(uuid())
+  post_id    String
+  user_id    String
+  action     String
+  comment    String?
+  created_at DateTime @default(now())
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([post_id])
+  @@map("approval_events")
+}
+
+// ═══════════════════════════════════════════════════════════
+// CAMPAIGNS
+// ═══════════════════════════════════════════════════════════
+
+model Campaign {
+  id           String    @id @default(uuid())
+  workspace_id String
+  name         String
+  description  String?
+  color        String    @default("#7F77DD")
+  start_date   DateTime?
+  end_date     DateTime?
+  status       String    @default("active")
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  workspace      Workspace      @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  posts          Post[]
+  campaign_posts CampaignPost[]
+
+  @@map("campaigns")
+}
+
+model CampaignPost {
+  id          String @id @default(uuid())
+  campaign_id String
+  post_id     String
+
+  campaign Campaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  post     Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, post_id])
+  @@map("campaign_posts")
+}
+
+// ═══════════════════════════════════════════════════════════
+// MEDIA
+// ═══════════════════════════════════════════════════════════
+
+model MediaAsset {
+  id               String   @id @default(uuid())
+  workspace_id     String
+  user_id          String
+  filename         String
+  mime_type        String
+  size_bytes       BigInt
+  width            Int?
+  height           Int?
+  duration_seconds Float?
+  r2_key           String   @unique
+  url              String
+  variants         Json     @default("{}")
+  alt_text         String?
+  folder           String?
+  tags             String[]
+  created_at       DateTime @default(now())
+
+  workspace Workspace   @relation(fields: [workspace_id], references: [id])
+  posts     PostMedia[]
+
+  @@index([workspace_id])
+  @@map("media_assets")
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════════════════════════
+
+model PostAnalytics {
+  id                    String   @id @default(uuid())
+  post_id               String
+  platform              String
+  reach                 Int      @default(0)
+  impressions           Int      @default(0)
+  likes                 Int      @default(0)
+  comments              Int      @default(0)
+  shares                Int      @default(0)
+  saves                 Int      @default(0)
+  clicks                Int      @default(0)
+  views                 Int      @default(0)
+  play_duration_seconds Float    @default(0)
+  avg_view_percentage   Float    @default(0)
+  engagement_rate       Float    @default(0)
+  synced_at             DateTime @default(now())
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, platform])
+  @@map("post_analytics")
+}
+
+model WorkspaceAnalyticsDaily {
+  id                String   @id @default(uuid())
+  workspace_id      String
+  platform          String
+  date              DateTime @db.Date
+  posts_count       Int      @default(0)
+  total_reach       Int      @default(0)
+  total_impressions Int      @default(0)
+  total_engagements Int      @default(0)
+  follower_count    Int      @default(0)
+  engagement_rate   Float    @default(0)
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@unique([workspace_id, platform, date])
+  @@index([workspace_id, date])
+  @@map("workspace_analytics_daily")
+}
+
+model BestTime {
+  id            String   @id @default(uuid())
+  workspace_id  String
+  platform      String
+  day_of_week   Int
+  hour          Int
+  score         Float    @default(0)
+  sample_size   Int      @default(0)
+  calculated_at DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@unique([workspace_id, platform, day_of_week, hour])
+  @@map("best_times")
+}
+
+model HashtagSet {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  hashtags     String[]
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("hashtag_sets")
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════
+
+model Notification {
+  id           String    @id @default(uuid())
+  user_id      String
+  workspace_id String?
+  type         String
+  title        String
+  body         String
+  data         Json      @default("{}")
+  read         Boolean   @default(false)
+  read_at      DateTime?
+  created_at   DateTime  @default(now())
+
+  user      User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspace_id], references: [id])
+
+  @@index([user_id, read])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id         String  @id @default(uuid())
+  user_id    String
+  event_type String
+  channel    String
+  enabled    Boolean @default(true)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, event_type, channel])
+  @@map("notification_preferences")
+}
+
+// ═══════════════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════════════
+
+model Report {
+  id           String    @id @default(uuid())
+  workspace_id String
+  project_id   String?
+  type         String
+  title        String
+  status       String    @default("pending")
+  file_url     String?
+  file_format  String?
+  date_from    DateTime
+  date_to      DateTime
+  platforms    String[]
+  metadata     Json      @default("{}")
+  generated_at DateTime?
+  created_at   DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("reports")
+}
+
+model ReportConfig {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  type         String
+  schedule     String?
+  recipients   String[]
+  platforms    String[]
+  metrics      String[]
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("report_configs")
+}
+
+// ═══════════════════════════════════════════════════════════
+// BRAND CONFIG (platform-level)
+// ═══════════════════════════════════════════════════════════
+
+model BrandConfig {
+  id                   String   @id @default(uuid())
+  app_name             String   @default("myManager")
+  app_tagline          String   @default("Post once. Reach everywhere.")
+  logo_url             String?
+  favicon_url          String?
+  support_email        String   @default("support@mymanager.app")
+  sales_email          String   @default("sales@mymanager.app")
+  footer_made_in       String   @default("Made with care in Kampala, Uganda")
+  footer_copyright     String   @default("© 2025–2026 MyManager Ltd. All rights reserved.")
+  meta_title_suffix    String   @default("— myManager")
+  google_analytics_id  String?
+  maintenance_mode     Boolean  @default(false)
+  maintenance_message  String?
+  social_twitter       String?
+  social_linkedin      String?
+  social_instagram     String?
+  social_facebook      String?
+  config               Json     @default("{}")
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  @@map("brand_configs")
+}
+
+// ═══════════════════════════════════════════════════════════
+// CMS
+// ═══════════════════════════════════════════════════════════
+
+model CmsPage {
+  id           String   @id @default(uuid())
+  slug         String   @unique
+  title        String
+  meta_title   String?
+  meta_desc    String?
+  og_image     String?
+  is_published Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  sections CmsSection[]
+
+  @@map("cms_pages")
+}
+
+model CmsSection {
+  id          String   @id @default(uuid())
+  page_id     String
+  section_key String
+  order_index Int      @default(0)
+  is_visible  Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  page   CmsPage    @relation(fields: [page_id], references: [id], onDelete: Cascade)
+  fields CmsField[]
+
+  @@unique([page_id, section_key])
+  @@map("cms_sections")
+}
+
+model CmsField {
+  id          String      @id @default(uuid())
+  section_id  String
+  field_key   String
+  field_type  CmsFieldType @default(TEXT)
+  value       String      @db.Text
+  order_index Int         @default(0)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+
+  section CmsSection @relation(fields: [section_id], references: [id], onDelete: Cascade)
+
+  @@unique([section_id, field_key])
+  @@map("cms_fields")
+}
+
+// ═══════════════════════════════════════════════════════════
+// BLOG
+// ═══════════════════════════════════════════════════════════
+
+model BlogPost {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  excerpt       String    @db.Text
+  body          String    @db.Text
+  cover_image   String?
+  category      String
+  tags          String[]
+  author_id     String
+  read_time_min Int       @default(5)
+  is_published  Boolean   @default(false)
+  is_featured   Boolean   @default(false)
+  published_at  DateTime?
+  meta_title    String?
+  meta_desc     String?
+  og_image      String?
+  view_count    Int       @default(0)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  author User @relation(fields: [author_id], references: [id])
+
+  @@index([slug])
+  @@index([category, is_published])
+  @@index([is_featured, published_at])
+  @@map("blog_posts")
+}
+
+model BlogCategory {
+  id          String @id @default(uuid())
+  slug        String @unique
+  name        String
+  description String @default("")
+  color       String @default("#7F77DD")
+  order_index Int    @default(0)
+  post_count  Int    @default(0)
+
+  @@map("blog_categories")
+}
+
+// ═══════════════════════════════════════════════════════════
+// NEWSLETTER, TESTIMONIALS, FAQ, CONTACT, NAV
+// ═══════════════════════════════════════════════════════════
+
+model NewsletterSubscriber {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  source          String    @default("website")
+  confirmed       Boolean   @default(false)
+  confirm_token   String?
+  subscribed_at   DateTime  @default(now())
+  unsubscribed_at DateTime?
+
+  @@map("newsletter_subscribers")
+}
+
+model Testimonial {
+  id                  String   @id @default(uuid())
+  author_name         String
+  author_role         String
+  author_initials     String
+  author_avatar_color String   @default("#7F77DD")
+  company             String
+  quote               String   @db.Text
+  rating              Int      @default(5)
+  is_visible          Boolean  @default(true)
+  order_index         Int      @default(0)
+  placement           String   @default("landing")
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+model FaqItem {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String   @db.Text
+  category    String   @default("general")
+  page        String   @default("pricing")
+  is_visible  Boolean  @default(true)
+  order_index Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("faq_items")
+}
+
+model ContactLead {
+  id          String     @id @default(uuid())
+  name        String
+  email       String
+  company     String?
+  team_size   String?
+  message     String     @db.Text
+  source      String     @default("contact_form")
+  status      LeadStatus @default(NEW)
+  assigned_to String?
+  notes       String?    @db.Text
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  @@map("contact_leads")
+}
+
+model NavLink {
+  id          String   @id @default(uuid())
+  label       String
+  href        String
+  placement   String
+  order_index Int      @default(0)
+  is_external Boolean  @default(false)
+  is_visible  Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  @@map("nav_links")
+}
+
+// ═══════════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════════
+
+model ThemeConfig {
+  id                      String    @id @default(uuid())
+  // Light colors
+  color_primary           String    @default("#7F77DD")
+  color_primary_dark      String    @default("#534AB7")
+  color_primary_light     String    @default("#EEEDFE")
+  color_accent            String    @default("#1D9E75")
+  color_accent_light      String    @default("#EAF3DE")
+  color_text_primary      String    @default("#111111")
+  color_text_secondary    String    @default("#555555")
+  color_text_muted        String    @default("#aaaaaa")
+  color_bg_primary        String    @default("#ffffff")
+  color_bg_secondary      String    @default("#f5f4ef")
+  color_bg_card           String    @default("#f7f6f2")
+  color_border            String    @default("#e8e6e0")
+  color_border_light      String    @default("#f0efe8")
+  color_error             String    @default("#E24B4A")
+  color_warning           String    @default("#EF9F27")
+  // Dark mode colors
+  dark_bg_primary         String    @default("#0F172A")
+  dark_bg_secondary       String    @default("#1E293B")
+  dark_border             String    @default("#334155")
+  dark_border_light       String    @default("#1E293B")
+  dark_text_primary       String    @default("#F1F5F9")
+  dark_text_secondary     String    @default("#CBD5E1")
+  dark_text_muted         String    @default("#475569")
+  dark_color_primary      String    @default("#A78BFA")
+  dark_color_primary_light String   @default("#2D1B69")
+  // Typography
+  font_heading            String    @default("system-ui, -apple-system, sans-serif")
+  font_body               String    @default("system-ui, -apple-system, sans-serif")
+  font_mono               String    @default("ui-monospace, monospace")
+  font_size_base          String    @default("13px")
+  // Shape
+  radius_card             String    @default("12px")
+  radius_button           String    @default("8px")
+  radius_input            String    @default("7px")
+  radius_badge            String    @default("5px")
+  radius_icon_bg          String    @default("7px")
+  // Mode
+  ui_density              String    @default("default")
+  default_mode            ThemeMode @default(LIGHT)
+  allow_user_override     Boolean   @default(false)
+  // Overrides
+  stats_bg_color          String    @default("#534AB7")
+  stats_text_color        String    @default("#ffffff")
+  sidebar_style           String    @default("light")
+  created_at              DateTime  @default(now())
+  updated_at              DateTime  @updatedAt
+
+  @@map("theme_configs")
+}
+
+model ThemePreset {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  label       String
+  description String   @default("")
+  is_built_in Boolean  @default(false)
+  is_active   Boolean  @default(false)
+  config      Json
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("theme_presets")
+}
+
+// ═══════════════════════════════════════════════════════════
+// MULTILINGUAL & CURRENCY
+// ═══════════════════════════════════════════════════════════
+
+model Currency {
+  id             String  @id @default(uuid())
+  code           String  @unique
+  symbol         String
+  name           String
+  decimal_places Int     @default(2)
+  rounding       Int     @default(1)
+  is_active      Boolean @default(true)
+
+  @@map("currencies")
+}
+
+model ExchangeRate {
+  id            String   @id @default(uuid())
+  from_currency String   @default("USD")
+  to_currency   String
+  rate          Float
+  fetched_at    DateTime @default(now())
+
+  @@index([to_currency, fetched_at])
+  @@map("exchange_rates")
+}
+
+model Translation {
+  id         String   @id @default(uuid())
+  locale     String
+  namespace  String
+  key        String
+  value      String
+  updated_at DateTime @updatedAt
+
+  @@unique([locale, namespace, key])
+  @@map("translations")
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI FEATURES
+// ═══════════════════════════════════════════════════════════
+
+model AiCreditUsage {
+  id           String   @id @default(uuid())
+  user_id      String
+  workspace_id String?
+  feature      String
+  credits      Int      @default(1)
+  metadata     Json     @default("{}")
+  created_at   DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, created_at])
+  @@map("ai_credit_usage")
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTM TRACKING
+// ═══════════════════════════════════════════════════════════
+
+model UtmConfig {
+  id           String   @id @default(uuid())
+  workspace_id String
+  platform     String
+  source       String
+  medium       String   @default("social")
+  campaign     String?
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@unique([workspace_id, platform])
+  @@map("utm_configs")
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMMENT INBOX
+// ═══════════════════════════════════════════════════════════
+
+model SocialComment {
+  id                  String    @id @default(uuid())
+  workspace_id        String
+  social_account_id   String
+  platform            String
+  platform_comment_id String
+  platform_post_id    String
+  author_name         String
+  author_avatar_url   String?
+  text                String
+  sentiment           String?
+  is_reply            Boolean   @default(false)
+  replied_at          DateTime?
+  fetched_at          DateTime  @default(now())
+
+  assignments CommentAssignment[]
+
+  @@unique([platform, platform_comment_id])
+  @@map("social_comments")
+}
+
+model CommentAssignment {
+  id                  String   @id @default(uuid())
+  social_comment_id   String
+  assigned_to_user_id String
+  assigned_by_user_id String
+  status              String   @default("pending")
+  assigned_at         DateTime @default(now())
+
+  comment     SocialComment @relation(fields: [social_comment_id], references: [id], onDelete: Cascade)
+  assigned_to User          @relation("AssignedTo", fields: [assigned_to_user_id], references: [id])
+  assigned_by User          @relation("AssignedBy", fields: [assigned_by_user_id], references: [id])
+
+  @@map("comment_assignments")
+}
+
+// ═══════════════════════════════════════════════════════════
+// LINK IN BIO
+// ═══════════════════════════════════════════════════════════
+
+model BioPage {
+  id            String   @id @default(uuid())
+  workspace_id  String
+  project_id    String?
+  slug          String   @unique
+  title         String
+  bio           String?
+  avatar_url    String?
+  theme         Json     @default("{}")
+  links         Json     @default("[]")
+  is_published  Boolean  @default(false)
+  custom_domain String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  workspace   Workspace      @relation(fields: [workspace_id], references: [id])
+  link_events BioLinkEvent[]
+
+  @@map("bio_pages")
+}
+
+model BioLinkEvent {
+  id          String   @id @default(uuid())
+  bio_page_id String
+  link_index  Int
+  clicks      Int      @default(0)
+  date        DateTime @db.Date
+  referrer    String?
+
+  bio_page BioPage @relation(fields: [bio_page_id], references: [id], onDelete: Cascade)
+
+  @@unique([bio_page_id, link_index, date])
+  @@map("bio_link_events")
+}
+
+// ═══════════════════════════════════════════════════════════
+// RSS
+// ═══════════════════════════════════════════════════════════
+
+model RssFeed {
+  id           String    @id @default(uuid())
+  workspace_id String
+  url          String
+  name         String
+  is_active    Boolean   @default(true)
+  last_fetched DateTime?
+  created_at   DateTime  @default(now())
+
+  workspace      Workspace         @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  imported_items RssImportedItem[]
+
+  @@map("rss_feeds")
+}
+
+model RssImportedItem {
+  id          String   @id @default(uuid())
+  rss_feed_id String
+  guid        String
+  title       String
+  url         String
+  imported_at DateTime @default(now())
+
+  rss_feed RssFeed @relation(fields: [rss_feed_id], references: [id], onDelete: Cascade)
+
+  @@unique([rss_feed_id, guid])
+  @@map("rss_imported_items")
+}
+
+// ═══════════════════════════════════════════════════════════
+// SOCIAL LISTENING
+// ═══════════════════════════════════════════════════════════
+
+model ListeningTerm {
+  id           String   @id @default(uuid())
+  workspace_id String
+  term         String
+  platforms    String[]
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+
+  workspace      Workspace      @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  mention_events MentionEvent[]
+
+  @@map("listening_terms")
+}
+
+model MentionEvent {
+  id                String   @id @default(uuid())
+  listening_term_id String
+  platform          String
+  author_name       String
+  author_url        String?
+  text              String
+  url               String?
+  sentiment         String?
+  fetched_at        DateTime @default(now())
+
+  listening_term ListeningTerm @relation(fields: [listening_term_id], references: [id], onDelete: Cascade)
+
+  @@map("mention_events")
+}
+
+model MentionAnalyticsDaily {
+  id                String   @id @default(uuid())
+  listening_term_id String
+  date              DateTime @db.Date
+  mention_count     Int      @default(0)
+  positive_count    Int      @default(0)
+  neutral_count     Int      @default(0)
+  negative_count    Int      @default(0)
+
+  @@unique([listening_term_id, date])
+  @@map("mention_analytics_daily")
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMPETITOR BENCHMARKING
+// ═══════════════════════════════════════════════════════════
+
+model CompetitorProfile {
+  id           String   @id @default(uuid())
+  workspace_id String
+  platform     String
+  platform_id  String
+  username     String
+  display_name String
+  avatar_url   String?
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+
+  workspace Workspace            @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  snapshots CompetitorSnapshot[]
+
+  @@unique([workspace_id, platform, platform_id])
+  @@map("competitor_profiles")
+}
+
+model CompetitorSnapshot {
+  id                    String   @id @default(uuid())
+  competitor_profile_id String
+  date                  DateTime @db.Date
+  follower_count        Int      @default(0)
+  post_count            Int      @default(0)
+  avg_engagement_rate   Float    @default(0)
+  metadata              Json     @default("{}")
+
+  profile CompetitorProfile @relation(fields: [competitor_profile_id], references: [id], onDelete: Cascade)
+
+  @@unique([competitor_profile_id, date])
+  @@map("competitor_snapshots")
+}
+
+// ═══════════════════════════════════════════════════════════
+// WEBHOOKS & PUBLIC API
+// ═══════════════════════════════════════════════════════════
+
+model WebhookEndpoint {
+  id           String   @id @default(uuid())
+  workspace_id String
+  url          String
+  events       String[]
+  secret       String
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  workspace  Workspace          @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  deliveries WebhookDelivery[]
+
+  @@map("webhook_endpoints")
+}
+
+model WebhookDelivery {
+  id                  String    @id @default(uuid())
+  webhook_endpoint_id String
+  event               String
+  payload             Json
+  response_status     Int?
+  response_body       String?
+  attempts            Int       @default(0)
+  max_attempts        Int       @default(6)
+  next_retry_at       DateTime?
+  delivered_at        DateTime?
+  created_at          DateTime  @default(now())
+
+  endpoint WebhookEndpoint @relation(fields: [webhook_endpoint_id], references: [id], onDelete: Cascade)
+
+  @@map("webhook_deliveries")
+}
+
+model ApiKey {
+  id           String    @id @default(uuid())
+  workspace_id String
+  name         String
+  key_hash     String    @unique
+  key_prefix   String
+  scopes       String[]
+  last_used_at DateTime?
+  expires_at   DateTime?
+  is_active    Boolean   @default(true)
+  created_at   DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+// ═══════════════════════════════════════════════════════════
+// GDPR & COMPLIANCE
+// ═══════════════════════════════════════════════════════════
+
+model DataExportRequest {
+  id           String    @id @default(uuid())
+  user_id      String
+  status       String    @default("pending")
+  file_url     String?
+  completed_at DateTime?
+  created_at   DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("data_export_requests")
+}
+
+model DeletionRequest {
+  id           String    @id @default(uuid())
+  user_id      String
+  status       String    @default("pending")
+  reason       String?
+  scheduled_at DateTime
+  completed_at DateTime?
+  created_at   DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("deletion_requests")
+}
+
+model CookieConsent {
+  id           String   @id @default(uuid())
+  user_id      String
+  necessary    Boolean  @default(true)
+  analytics    Boolean  @default(false)
+  marketing    Boolean  @default(false)
+  ip_address   String?
+  consented_at DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("cookie_consents")
+}
+
+model UserEmailPreference {
+  id         String  @id @default(uuid())
+  user_id    String
+  email_type String
+  subscribed Boolean @default(true)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, email_type])
+  @@map("user_email_preferences")
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUDIT
+// ═══════════════════════════════════════════════════════════
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  user_id      String?
+  workspace_id String?
+  action       String
+  entity_type  String?
+  entity_id    String?
+  metadata     Json     @default("{}")
+  ip_address   String?
+  user_agent   String?
+  created_at   DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id])
+
+  @@index([workspace_id, created_at])
+  @@index([user_id, created_at])
+  @@map("audit_logs")
+}

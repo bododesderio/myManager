@@ -1,0 +1,22 @@
+{
+  "emails.welcome_subject": "",
+  "emails.welcome_body": "",
+  "emails.verify_subject": "",
+  "emails.verify_body": "",
+  "emails.verify_button": "",
+  "emails.reset_subject": "",
+  "emails.reset_body": "",
+  "emails.reset_button": "",
+  "emails.invite_subject": "",
+  "emails.invite_body": "",
+  "emails.invite_button": "",
+  "emails.invoice_subject": "",
+  "emails.post_failed_subject": "",
+  "emails.post_failed_body": "",
+  "emails.report_ready_subject": "",
+  "emails.report_ready_body": "",
+  "emails.approval_subject": "",
+  "emails.approval_body": "",
+  "emails.token_expired_subject": "",
+  "emails.token_expired_body": ""
+}

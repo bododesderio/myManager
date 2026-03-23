@@ -1,0 +1,521 @@
+ Image mymanager-web Building 
+ Image mymanager-api Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 917B done
+#1 DONE 0.0s
+
+#2 [web internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.56kB 0.0s done
+#2 DONE 0.0s
+
+#3 [api internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.79kB 0.0s done
+#3 DONE 0.1s
+
+#4 [api internal] load metadata for docker.io/library/node:20-alpine
+#4 DONE 1.2s
+
+#5 [api internal] load .dockerignore
+#5 transferring context: 200B done
+#5 DONE 0.0s
+
+#6 [web internal] load build context
+#6 DONE 0.0s
+
+#7 [api internal] load build context
+#7 DONE 0.0s
+
+#8 [api builder 1/8] FROM docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa
+#8 resolve docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa 0.1s done
+#8 resolve docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa 0.1s done
+#8 DONE 0.1s
+
+#7 [api internal] load build context
+#7 transferring context: 65.91kB 0.2s done
+#7 DONE 0.2s
+
+#6 [web internal] load build context
+#6 ...
+
+#9 [api runner 11/13] COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+#9 CACHED
+
+#10 [api runner  2/13] RUN apk add --no-cache dumb-init
+#10 CACHED
+
+#11 [api builder  7/10] RUN pnpm install --frozen-lockfile
+#11 CACHED
+
+#12 [api runner 10/13] COPY --from=builder /app/package.json ./package.json
+#12 CACHED
+
+#13 [api runner  7/13] COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+#13 CACHED
+
+#14 [api runner  4/13] COPY --from=builder /app/node_modules ./node_modules
+#14 CACHED
+
+#15 [api runner  3/13] WORKDIR /app
+#15 CACHED
+
+#16 [api runner  8/13] COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+#16 CACHED
+
+#17 [api runner  9/13] COPY --from=builder /app/packages ./packages
+#17 CACHED
+
+#18 [api builder  5/10] COPY apps/api/package.json ./apps/api/
+#18 CACHED
+
+#19 [api runner 12/13] WORKDIR /app/apps/api
+#19 CACHED
+
+#20 [api builder  4/10] COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+#20 CACHED
+
+#21 [api builder  9/10] RUN cd apps/api && npx --yes prisma@6.19.2 generate
+#21 CACHED
+
+#22 [api runner  6/13] COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+#22 CACHED
+
+#23 [api builder  6/10] COPY packages/ ./packages/
+#23 CACHED
+
+#24 [api builder 2/8] RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+#24 CACHED
+
+#25 [api builder 3/8] WORKDIR /app
+#25 CACHED
+
+#26 [api builder  8/10] COPY apps/api/ ./apps/api/
+#26 CACHED
+
+#27 [api builder 10/10] RUN pnpm --filter @mymanager/api run build
+#27 CACHED
+
+#28 [api runner  5/13] COPY --from=builder /app/apps/api/dist ./apps/api/dist
+#28 CACHED
+
+#29 [api runner 13/13] RUN mkdir -p ./uploads && chown node:node ./uploads
+#29 CACHED
+
+#6 [web internal] load build context
+#6 transferring context: 185.22kB 0.4s done
+#6 DONE 0.4s
+
+#24 [web builder 2/8] RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+#24 CACHED
+
+#25 [web builder 3/8] WORKDIR /app
+#25 CACHED
+
+#30 [web builder 4/8] COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json ./
+#30 CACHED
+
+#31 [web builder 5/8] COPY packages/ ./packages/
+#31 CACHED
+
+#32 [api] exporting to image
+#32 exporting layers 0.0s done
+#32 exporting manifest sha256:5a0c445735019c392628c616f5bda87c6202fa35119879d133a9d4df97b2832b done
+#32 exporting config sha256:ac63603d38116a00f7773c81bb0fb4701b1ebb5e67cf3a8dcb1c93097f33cda6 done
+#32 exporting attestation manifest sha256:bdea2eb21da61ff3287a1b677cdbe293dda34a50d5768f362946d3edb2e87fdf 0.1s done
+#32 exporting manifest list sha256:473cd69f378f874efa5a85b65a33a31eb93936d96ebf02de69c8e17e66daeb3d
+#32 exporting manifest list sha256:473cd69f378f874efa5a85b65a33a31eb93936d96ebf02de69c8e17e66daeb3d 0.1s done
+#32 naming to docker.io/library/mymanager-api:latest done
+#32 unpacking to docker.io/library/mymanager-api:latest 0.0s done
+#32 DONE 0.4s
+
+#33 [web builder 6/8] COPY apps/web/ ./apps/web/
+#33 ...
+
+#34 [api] resolving provenance for metadata file
+#34 DONE 0.0s
+
+#33 [web builder 6/8] COPY apps/web/ ./apps/web/
+#33 DONE 2.3s
+
+#35 [web builder 7/8] RUN pnpm install --frozen-lockfile
+#35 1.385 Scope: all 11 workspace projects
+#35 1.665 Lockfile is up to date, resolution step is skipped
+#35 1.974 Progress: resolved 1, reused 0, downloaded 0, added 0
+#35 2.489 Packages: +772
+#35 2.489 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#35 2.977 Progress: resolved 772, reused 0, downloaded 0, added 0
+#35 3.978 Progress: resolved 772, reused 0, downloaded 7, added 7
+#35 4.979 Progress: resolved 772, reused 0, downloaded 15, added 15
+#35 5.981 Progress: resolved 772, reused 0, downloaded 18, added 18
+#35 6.981 Progress: resolved 772, reused 0, downloaded 23, added 23
+#35 7.982 Progress: resolved 772, reused 0, downloaded 29, added 29
+#35 8.983 Progress: resolved 772, reused 0, downloaded 32, added 32
+#35 9.984 Progress: resolved 772, reused 0, downloaded 37, added 37
+#35 10.98 Progress: resolved 772, reused 0, downloaded 43, added 43
+#35 11.99 Progress: resolved 772, reused 0, downloaded 50, added 50
+#35 12.99 Progress: resolved 772, reused 0, downloaded 57, added 57
+#35 13.99 Progress: resolved 772, reused 0, downloaded 73, added 72
+#35 14.99 Progress: resolved 772, reused 0, downloaded 77, added 77
+#35 15.99 Progress: resolved 772, reused 0, downloaded 80, added 80
+#35 16.99 Progress: resolved 772, reused 0, downloaded 88, added 87
+#35 17.99 Progress: resolved 772, reused 0, downloaded 91, added 91
+#35 18.99 Progress: resolved 772, reused 0, downloaded 93, added 93
+#35 19.99 Progress: resolved 772, reused 0, downloaded 95, added 95
+#35 20.99 Progress: resolved 772, reused 0, downloaded 99, added 99
+#35 21.99 Progress: resolved 772, reused 0, downloaded 107, added 107
+#35 22.99 Progress: resolved 772, reused 0, downloaded 114, added 114
+#35 23.39 
+#35 23.39    ╭───────────────────────────────────────────────────────────────────╮
+#35 23.39    │                                                                   │
+#35 23.39    │                Update available! 9.15.4 → 10.32.1.                │
+#35 23.39    │   Changelog: https://github.com/pnpm/pnpm/releases/tag/v10.32.1   │
+#35 23.39    │         Run "corepack install -g pnpm@10.32.1" to update.         │
+#35 23.39    │                                                                   │
+#35 23.39    ╰───────────────────────────────────────────────────────────────────╯
+#35 23.39 
+#35 23.99 Progress: resolved 772, reused 0, downloaded 119, added 119
+#35 24.99 Progress: resolved 772, reused 0, downloaded 129, added 129
+#35 25.99 Progress: resolved 772, reused 0, downloaded 140, added 139
+#35 26.99 Progress: resolved 772, reused 0, downloaded 158, added 158
+#35 27.99 Progress: resolved 772, reused 0, downloaded 165, added 165
+#35 28.99 Progress: resolved 772, reused 0, downloaded 171, added 171
+#35 29.99 Progress: resolved 772, reused 0, downloaded 179, added 179
+#35 30.99 Progress: resolved 772, reused 0, downloaded 197, added 197
+#35 31.99 Progress: resolved 772, reused 0, downloaded 224, added 225
+#35 32.99 Progress: resolved 772, reused 0, downloaded 247, added 248
+#35 34.00 Progress: resolved 772, reused 0, downloaded 259, added 260
+#35 35.00 Progress: resolved 772, reused 0, downloaded 269, added 270
+#35 36.00 Progress: resolved 772, reused 0, downloaded 283, added 284
+#35 37.00 Progress: resolved 772, reused 0, downloaded 292, added 293
+#35 38.00 Progress: resolved 772, reused 0, downloaded 298, added 299
+#35 39.00 Progress: resolved 772, reused 0, downloaded 304, added 305
+#35 40.00 Progress: resolved 772, reused 0, downloaded 310, added 311
+#35 41.00 Progress: resolved 772, reused 0, downloaded 317, added 318
+#35 42.00 Progress: resolved 772, reused 0, downloaded 320, added 321
+#35 43.00 Progress: resolved 772, reused 0, downloaded 322, added 323
+#35 44.00 Progress: resolved 772, reused 0, downloaded 324, added 325
+#35 45.00 Progress: resolved 772, reused 0, downloaded 327, added 328
+#35 46.00 Progress: resolved 772, reused 0, downloaded 331, added 332
+#35 47.00 Progress: resolved 772, reused 0, downloaded 335, added 336
+#35 48.00 Progress: resolved 772, reused 0, downloaded 339, added 340
+#35 49.00 Progress: resolved 772, reused 0, downloaded 342, added 343
+#35 50.00 Progress: resolved 772, reused 0, downloaded 345, added 346
+#35 51.00 Progress: resolved 772, reused 0, downloaded 350, added 351
+#35 52.00 Progress: resolved 772, reused 0, downloaded 351, added 352
+#35 53.00 Progress: resolved 772, reused 0, downloaded 353, added 353
+#35 54.00 Progress: resolved 772, reused 0, downloaded 354, added 355
+#35 55.00 Progress: resolved 772, reused 0, downloaded 356, added 357
+#35 56.00 Progress: resolved 772, reused 0, downloaded 358, added 359
+#35 57.65 Progress: resolved 772, reused 0, downloaded 359, added 359
+#35 58.66 Progress: resolved 772, reused 0, downloaded 360, added 361
+#35 59.67 Progress: resolved 772, reused 0, downloaded 361, added 361
+#35 60.67 Progress: resolved 772, reused 0, downloaded 362, added 363
+#35 61.67 Progress: resolved 772, reused 0, downloaded 364, added 365
+#35 62.67 Progress: resolved 772, reused 0, downloaded 365, added 366
+#35 63.67 Progress: resolved 772, reused 0, downloaded 366, added 367
+#35 64.67 Progress: resolved 772, reused 0, downloaded 367, added 368
+#35 65.67 Progress: resolved 772, reused 0, downloaded 368, added 369
+#35 66.67 Progress: resolved 772, reused 0, downloaded 369, added 370
+#35 67.67 Progress: resolved 772, reused 0, downloaded 371, added 372
+#35 68.68 Progress: resolved 772, reused 0, downloaded 372, added 373
+#35 69.68 Progress: resolved 772, reused 0, downloaded 375, added 376
+#35 70.68 Progress: resolved 772, reused 0, downloaded 378, added 379
+#35 71.68 Progress: resolved 772, reused 0, downloaded 380, added 381
+#35 72.68 Progress: resolved 772, reused 0, downloaded 383, added 384
+#35 73.68 Progress: resolved 772, reused 0, downloaded 386, added 387
+#35 74.68 Progress: resolved 772, reused 0, downloaded 388, added 389
+#35 75.68 Progress: resolved 772, reused 0, downloaded 392, added 392
+#35 76.68 Progress: resolved 772, reused 0, downloaded 396, added 397
+#35 77.75 Progress: resolved 772, reused 0, downloaded 397, added 397
+#35 78.75 Progress: resolved 772, reused 0, downloaded 399, added 399
+#35 79.76 Progress: resolved 772, reused 0, downloaded 404, added 405
+#35 80.76 Progress: resolved 772, reused 0, downloaded 410, added 411
+#35 81.76 Progress: resolved 772, reused 0, downloaded 416, added 417
+#35 82.76 Progress: resolved 772, reused 0, downloaded 421, added 422
+#35 83.76 Progress: resolved 772, reused 0, downloaded 423, added 423
+#35 84.76 Progress: resolved 772, reused 0, downloaded 426, added 427
+#35 85.76 Progress: resolved 772, reused 0, downloaded 429, added 430
+#35 86.75 Progress: resolved 772, reused 0, downloaded 432, added 433
+#35 87.75 Progress: resolved 772, reused 0, downloaded 439, added 440
+#35 88.75 Progress: resolved 772, reused 0, downloaded 447, added 448
+#35 89.75 Progress: resolved 772, reused 0, downloaded 457, added 458
+#35 90.75 Progress: resolved 772, reused 0, downloaded 458, added 459
+#35 91.76 Progress: resolved 772, reused 0, downloaded 459, added 460
+#35 92.76 Progress: resolved 772, reused 0, downloaded 461, added 462
+#35 95.09 Progress: resolved 772, reused 0, downloaded 462, added 462
+#35 96.09 Progress: resolved 772, reused 0, downloaded 464, added 465
+#35 97.09 Progress: resolved 772, reused 0, downloaded 467, added 468
+#35 98.09 Progress: resolved 772, reused 0, downloaded 471, added 472
+#35 99.09 Progress: resolved 772, reused 0, downloaded 474, added 475
+#35 100.1 Progress: resolved 772, reused 0, downloaded 477, added 478
+#35 101.1 Progress: resolved 772, reused 0, downloaded 480, added 481
+#35 102.1 Progress: resolved 772, reused 0, downloaded 484, added 485
+#35 103.1 Progress: resolved 772, reused 0, downloaded 487, added 488
+#35 104.1 Progress: resolved 772, reused 0, downloaded 489, added 490
+#35 105.1 Progress: resolved 772, reused 0, downloaded 493, added 494
+#35 106.1 Progress: resolved 772, reused 0, downloaded 495, added 496
+#35 107.1 Progress: resolved 772, reused 0, downloaded 497, added 498
+#35 108.1 Progress: resolved 772, reused 0, downloaded 500, added 501
+#35 109.1 Progress: resolved 772, reused 0, downloaded 502, added 503
+#35 110.1 Progress: resolved 772, reused 0, downloaded 508, added 509
+#35 111.1 Progress: resolved 772, reused 0, downloaded 514, added 515
+#35 112.1 Progress: resolved 772, reused 0, downloaded 520, added 521
+#35 113.1 Progress: resolved 772, reused 0, downloaded 524, added 525
+#35 114.1 Progress: resolved 772, reused 0, downloaded 527, added 528
+#35 115.1 Progress: resolved 772, reused 0, downloaded 528, added 529
+#35 116.1 Progress: resolved 772, reused 0, downloaded 530, added 531
+#35 117.1 Progress: resolved 772, reused 0, downloaded 531, added 532
+#35 118.1 Progress: resolved 772, reused 0, downloaded 534, added 535
+#35 119.1 Progress: resolved 772, reused 0, downloaded 537, added 538
+#35 120.1 Progress: resolved 772, reused 0, downloaded 544, added 545
+#35 121.1 Progress: resolved 772, reused 0, downloaded 551, added 552
+#35 122.1 Progress: resolved 772, reused 0, downloaded 559, added 560
+#35 123.1 Progress: resolved 772, reused 0, downloaded 568, added 569
+#35 124.1 Progress: resolved 772, reused 0, downloaded 576, added 577
+#35 125.1 Progress: resolved 772, reused 0, downloaded 581, added 582
+#35 126.1 Progress: resolved 772, reused 0, downloaded 587, added 587
+#35 127.1 Progress: resolved 772, reused 0, downloaded 590, added 591
+#35 128.1 Progress: resolved 772, reused 0, downloaded 599, added 599
+#35 129.1 Progress: resolved 772, reused 0, downloaded 606, added 607
+#35 130.1 Progress: resolved 772, reused 0, downloaded 612, added 613
+#35 131.1 Progress: resolved 772, reused 0, downloaded 616, added 617
+#35 132.1 Progress: resolved 772, reused 0, downloaded 620, added 621
+#35 133.1 Progress: resolved 772, reused 0, downloaded 628, added 629
+#35 134.1 Progress: resolved 772, reused 0, downloaded 641, added 642
+#35 135.1 Progress: resolved 772, reused 0, downloaded 661, added 662
+#35 136.1 Progress: resolved 772, reused 0, downloaded 675, added 676
+#35 137.1 Progress: resolved 772, reused 0, downloaded 691, added 690
+#35 138.1 Progress: resolved 772, reused 0, downloaded 698, added 699
+#35 139.1 Progress: resolved 772, reused 0, downloaded 704, added 705
+#35 140.1 Progress: resolved 772, reused 0, downloaded 713, added 714
+#35 141.1 Progress: resolved 772, reused 0, downloaded 718, added 719
+#35 142.1 Progress: resolved 772, reused 0, downloaded 731, added 732
+#35 143.1 Progress: resolved 772, reused 0, downloaded 737, added 738
+#35 144.1 Progress: resolved 772, reused 0, downloaded 743, added 744
+#35 145.1 Progress: resolved 772, reused 0, downloaded 748, added 749
+#35 146.1 Progress: resolved 772, reused 0, downloaded 754, added 755
+#35 147.1 Progress: resolved 772, reused 0, downloaded 758, added 759
+#35 148.1 Progress: resolved 772, reused 0, downloaded 759, added 759
+#35 149.1 Progress: resolved 772, reused 0, downloaded 759, added 760
+#35 150.5 Progress: resolved 772, reused 0, downloaded 760, added 760
+#35 151.5 Progress: resolved 772, reused 0, downloaded 760, added 761
+#35 158.0 Progress: resolved 772, reused 0, downloaded 761, added 761
+#35 159.0 Progress: resolved 772, reused 0, downloaded 761, added 762
+#35 160.0 Progress: resolved 772, reused 0, downloaded 763, added 764
+#35 164.0 Progress: resolved 772, reused 0, downloaded 764, added 764
+#35 165.0 Progress: resolved 772, reused 0, downloaded 764, added 765
+#35 167.0 Progress: resolved 772, reused 0, downloaded 765, added 765
+#35 168.0 Progress: resolved 772, reused 0, downloaded 765, added 766
+#35 170.4 Progress: resolved 772, reused 0, downloaded 766, added 766
+#35 171.4 Progress: resolved 772, reused 0, downloaded 766, added 767
+#35 176.3 Progress: resolved 772, reused 0, downloaded 767, added 767
+#35 177.3 Progress: resolved 772, reused 0, downloaded 767, added 768
+#35 181.2 Progress: resolved 772, reused 0, downloaded 768, added 768
+#35 182.2 Progress: resolved 772, reused 0, downloaded 770, added 771
+#35 217.1  WARN  GET https://registry.npmjs.org/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-15.5.14.tgz error (ECONNRESET). Will retry in 10 seconds. 2 retries left.
+#35 227.4  WARN  GET https://registry.npmjs.org/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-15.5.14.tgz error (ECONNRESET). Will retry in 1 minute. 1 retries left.
+#35 287.8 Progress: resolved 772, reused 0, downloaded 770, added 771, done
+#35 288.7 .../node_modules/protobufjs postinstall$ node scripts/postinstall
+#35 288.7 .../node_modules/@prisma/engines postinstall$ node scripts/postinstall.js
+#35 288.7 .../node_modules/unrs-resolver postinstall$ napi-postinstall unrs-resolver 1.11.1 check
+#35 288.7 .../node_modules/@sentry/cli postinstall$ node ./scripts/install.js
+#35 288.8 .../sharp@0.34.5/node_modules/sharp install$ node install/check.js || npm run build
+#35 288.8 .../node_modules/protobufjs postinstall: Done
+#35 288.9 .../node_modules/unrs-resolver postinstall: Done
+#35 288.9 .../core-js@3.49.0/node_modules/core-js postinstall$ node -e "try{require('./postinstall')}catch(e){}"
+#35 289.0 .../esbuild@0.23.0/node_modules/esbuild postinstall$ node install.js
+#35 289.0 .../node_modules/@sentry/cli postinstall: Done
+#35 289.0 .../core-js@3.49.0/node_modules/core-js postinstall: Thank you for using core-js ( https://github.com/zloirock/core-js ) for polyfilling JavaScript standard library!
+#35 289.0 .../core-js@3.49.0/node_modules/core-js postinstall: The project needs your help! Please consider supporting core-js:
+#35 289.1 .../core-js@3.49.0/node_modules/core-js postinstall: > https://opencollective.com/core-js 
+#35 289.1 .../core-js@3.49.0/node_modules/core-js postinstall: > https://patreon.com/zloirock 
+#35 289.1 .../core-js@3.49.0/node_modules/core-js postinstall: > https://boosty.to/zloirock 
+#35 289.1 .../core-js@3.49.0/node_modules/core-js postinstall: > bitcoin: bc1qlea7544qtsmj2rayg0lthvza9fau63ux0fstcz 
+#35 289.1 .../core-js@3.49.0/node_modules/core-js postinstall: I highly recommend reading this: https://github.com/zloirock/core-js/blob/master/docs/2023-02-14-so-whats-next.md 
+#35 289.1 .../core-js@3.49.0/node_modules/core-js postinstall: Done
+#35 289.1 .../sharp@0.34.5/node_modules/sharp install: Done
+#35 289.2 .../esbuild@0.23.0/node_modules/esbuild postinstall: Done
+#35 317.7 .../node_modules/@prisma/engines postinstall: Done
+#35 317.7 .../node_modules/prisma preinstall$ node scripts/preinstall-entry.js
+#35 317.9 .../node_modules/prisma preinstall: Done
+#35 318.1 .../node_modules/@prisma/client postinstall$ node scripts/postinstall.js
+#35 338.7 .../node_modules/@prisma/client postinstall: [33mwarning[39m In order to use "@prisma/client", please install Prisma CLI. You can install it with "npm add -D prisma".
+#35 338.7 .../node_modules/@prisma/client postinstall: Done
+#35 339.7 
+#35 339.7 devDependencies:
+#35 339.7 + prettier 3.8.1
+#35 339.7 + turbo 2.8.20
+#35 339.7 + typescript 5.9.3
+#35 339.7 
+#35 339.8 Done in 5m 39.2s
+#35 DONE 340.2s
+
+#36 [web builder 8/8] RUN pnpm --filter @mymanager/web run build
+#36 2.398 
+#36 2.398 > @mymanager/web@0.1.0 build /app/apps/web
+#36 2.398 > next build
+#36 2.398 
+#36 4.253    ▲ Next.js 15.5.14
+#36 4.253    - Environments: .env.local
+#36 4.254 
+#36 4.942    Creating an optimized production build ...
+#36 61.94  ✓ Compiled successfully in 51s
+#36 61.95    Linting and checking validity of types ...
+#36 73.33 
+#36 73.33 ./app/(dashboard)/bio/BioContent.tsx
+#36 73.33 447:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 
+#36 73.33 ./app/(dashboard)/calendar/CalendarContent.tsx
+#36 73.33 49:9  Warning: The 'posts' logical expression could make the dependencies of useMemo Hook (at line 61) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'posts' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+#36 73.33 
+#36 73.33 ./app/(dashboard)/compose/ComposeContent.tsx
+#36 73.33 242:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 344:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 479:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 513:33  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 
+#36 73.33 ./app/(dashboard)/media/MediaContent.tsx
+#36 73.33 195:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 
+#36 73.33 ./app/(dashboard)/settings/brand/BrandContent.tsx
+#36 73.33 52:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+#36 73.33 
+#36 73.33 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+#36 85.35    Collecting page data ...
+#36 87.99  ⚠ Using edge runtime on a page currently disables static generation for that page
+#36 92.52    Generating static pages (0/67) ...
+#36 94.67    Generating static pages (16/67) 
+#36 95.13    Generating static pages (33/67) 
+#36 95.38    Generating static pages (50/67) 
+#36 95.80  ✓ Generating static pages (67/67)
+#36 98.54    Finalizing page optimization ...
+#36 98.54    Collecting build traces ...
+#36 160.8 
+#36 160.8 Route (app)                                 Size  First Load JS  Revalidate  Expire
+#36 160.8 ┌ ○ /                                    1.22 kB         107 kB          5m      1y
+#36 160.8 ├ ○ /_not-found                            191 B         102 kB
+#36 160.8 ├ ○ /about                                 191 B         102 kB          5m      1y
+#36 160.8 ├ ○ /admin                                 191 B         102 kB
+#36 160.8 ├ ○ /admin/api-health                    1.22 kB         135 kB
+#36 160.8 ├ ○ /admin/billing                        1.4 kB         138 kB
+#36 160.8 ├ ○ /admin/billing/leads                 1.08 kB         138 kB
+#36 160.8 ├ ○ /admin/billing/overrides             2.16 kB         139 kB
+#36 160.8 ├ ○ /admin/brand                         1.78 kB         104 kB
+#36 160.8 ├ ○ /admin/content/emails                1.36 kB         103 kB
+#36 160.8 ├ ○ /admin/content/legal                 1.34 kB         103 kB
+#36 160.8 ├ ○ /admin/content/pages                 1.35 kB         103 kB
+#36 160.8 ├ ○ /admin/content/translations          1.38 kB         103 kB
+#36 160.8 ├ ○ /admin/dashboard                     1.47 kB         103 kB
+#36 160.8 ├ ○ /admin/plans                           901 B         138 kB
+#36 160.8 ├ ƒ /admin/plans/[id]                    2.61 kB         140 kB
+#36 160.8 ├ ○ /admin/plans/new                     2.13 kB         139 kB
+#36 160.8 ├ ○ /admin/queue                         1.37 kB         135 kB
+#36 160.8 ├ ○ /admin/seo                           1.86 kB         104 kB
+#36 160.8 ├ ○ /admin/users                         1.95 kB         139 kB
+#36 160.8 ├ ƒ /admin/users/[id]                    2.16 kB         139 kB
+#36 160.8 ├ ○ /admin/workspaces                      886 B         134 kB
+#36 160.8 ├ ○ /analytics                           3.12 kB         242 kB
+#36 160.8 ├ ƒ /analytics/[platform]                2.93 kB         242 kB
+#36 160.8 ├ ○ /analytics/benchmarks                2.83 kB         242 kB
+#36 160.8 ├ ○ /analytics/hashtags                  3.46 kB         137 kB
+#36 160.8 ├ ƒ /api/auth/[...nextauth]                191 B         102 kB
+#36 160.8 ├ ƒ /api/email/unsubscribe                 191 B         102 kB
+#36 160.8 ├ ƒ /api/upload                            191 B         102 kB
+#36 160.8 ├ ƒ /api/webhooks/flutterwave              191 B         102 kB
+#36 160.8 ├ ƒ /api/webhooks/social/[platform]        191 B         102 kB
+#36 160.8 ├ ○ /approvals                           6.56 kB         137 kB
+#36 160.8 ├ ○ /bio                                 7.63 kB         138 kB
+#36 160.8 ├ ○ /blog                                  170 B         106 kB          5m      1y
+#36 160.8 ├ ƒ /blog/[slug]                           170 B         106 kB
+#36 160.8 ├ ○ /calendar                            3.93 kB         140 kB
+#36 160.8 ├ ○ /campaigns                           6.28 kB         140 kB
+#36 160.8 ├ ƒ /campaigns/[id]                      3.98 kB         140 kB
+#36 160.8 ├ ○ /compose                             6.23 kB         139 kB
+#36 160.8 ├ ○ /contact                               191 B         102 kB          5m      1y
+#36 160.8 ├ ○ /conversations                       5.09 kB         138 kB
+#36 160.8 ├ ○ /drafts                              4.62 kB         141 kB
+#36 160.8 ├ ○ /features                              191 B         102 kB          5m      1y
+#36 160.8 ├ ○ /forgot-password                     2.57 kB         136 kB
+#36 160.8 ├ ○ /home                                5.74 kB         146 kB
+#36 160.8 ├ ƒ /internal/report-render/[jobId]        191 B         102 kB
+#36 160.8 ├ ○ /legal/privacy                         191 B         102 kB          5m      1y
+#36 160.8 ├ ○ /legal/terms                           191 B         102 kB          5m      1y
+#36 160.8 ├ ○ /login                               5.04 kB         138 kB
+#36 160.8 ├ ○ /manifest.webmanifest                  191 B         102 kB
+#36 160.8 ├ ○ /media                               7.12 kB         138 kB
+#36 160.8 ├ ƒ /opengraph-image                       191 B         102 kB
+#36 160.8 ├ ƒ /portal/[token]                        830 B         103 kB
+#36 160.8 ├ ○ /portal/invalid                        191 B         102 kB
+#36 160.8 ├ ƒ /posts/[id]                          4.77 kB         141 kB
+#36 160.8 ├ ○ /pricing                             2.49 kB         140 kB          5m      1y
+#36 160.8 ├ ○ /projects                            6.07 kB         140 kB
+#36 160.8 ├ ƒ /projects/[id]                       4.18 kB         140 kB
+#36 160.8 ├ ƒ /projects/[id]/analytics             3.56 kB         138 kB
+#36 160.8 ├ ƒ /projects/[id]/settings              6.21 kB         140 kB
+#36 160.8 ├ ○ /reports                             4.02 kB         141 kB
+#36 160.8 ├ ƒ /reports/[id]                        3.17 kB         140 kB
+#36 160.8 ├ ○ /reset-password                       3.8 kB         137 kB
+#36 160.8 ├ ○ /robots.txt                            191 B         102 kB
+#36 160.8 ├ ○ /settings                            4.56 kB         139 kB
+#36 160.8 ├ ○ /settings/accounts                   5.31 kB         139 kB
+#36 160.8 ├ ○ /settings/billing                    3.27 kB         140 kB
+#36 160.8 ├ ○ /settings/brand                       4.1 kB         140 kB
+#36 160.8 ├ ○ /settings/integrations               2.23 kB         108 kB
+#36 160.8 ├ ○ /settings/language                   4.13 kB         138 kB
+#36 160.8 ├ ○ /settings/notifications              4.08 kB         138 kB
+#36 160.8 ├ ○ /settings/privacy                    2.02 kB         107 kB
+#36 160.8 ├ ○ /settings/security                   4.51 kB         139 kB
+#36 160.8 ├ ○ /settings/workspace                  3.76 kB         140 kB
+#36 160.8 ├ ○ /signup                              3.66 kB         109 kB
+#36 160.8 ├ ○ /sitemap.xml                           191 B         102 kB
+#36 160.8 ├ ○ /team                                4.65 kB         137 kB
+#36 160.8 ├ ○ /templates                           6.17 kB         140 kB
+#36 160.8 ├ ○ /user/dashboard                       1.5 kB         107 kB
+#36 160.8 └ ○ /verify-email                        2.79 kB         136 kB
+#36 160.8 + First Load JS shared by all             102 kB
+#36 160.8   ├ chunks/755-7610e576526b992c.js       45.8 kB
+#36 160.8   ├ chunks/cc01d115-6f2d1cca9115d51d.js  54.2 kB
+#36 160.8   └ other shared chunks (total)          1.98 kB
+#36 160.8 
+#36 160.8 
+#36 160.8 ƒ Middleware                               34 kB
+#36 160.8 
+#36 160.8 ○  (Static)   prerendered as static content
+#36 160.8 ƒ  (Dynamic)  server-rendered on demand
+#36 160.8 
+#36 DONE 161.1s
+
+#37 [web runner 2/7] WORKDIR /app
+#37 CACHED
+
+#38 [web runner 3/7] RUN addgroup --system --gid 1001 nodejs
+#38 CACHED
+
+#39 [web runner 4/7] RUN adduser --system --uid 1001 nextjs
+#39 CACHED
+
+#40 [web runner 5/7] COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+#40 DONE 1.5s
+
+#41 [web runner 6/7] COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+#41 DONE 0.3s
+
+#42 [web runner 7/7] COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+#42 DONE 0.1s
+
+#43 [web] exporting to image
+#43 exporting layers
+#43 exporting layers 5.9s done
+#43 exporting manifest sha256:9226b1a6d731d6f75b7a6569e6a7a9475a23c0ca3022d1aac83f1219d4d70303 0.0s done
+#43 exporting config sha256:2ccbe1578e90ad0ae42899a1dc77720f0d12b06e5f988c6d9f84a4639a2155f2 0.0s done
+#43 exporting attestation manifest sha256:59c5ae32aacc0da38ae6f071f6d777add1c06cd6a74b79218d5978f64540e4b3
+#43 exporting attestation manifest sha256:59c5ae32aacc0da38ae6f071f6d777add1c06cd6a74b79218d5978f64540e4b3 0.1s done
+#43 exporting manifest list sha256:cc7880455d5f24aba8c401f9d168fea41549d4ca8d0ffa7a884b49269e0c11d4 0.0s done
+#43 naming to docker.io/library/mymanager-web:latest done
+#43 unpacking to docker.io/library/mymanager-web:latest
+#43 unpacking to docker.io/library/mymanager-web:latest 2.6s done
+#43 DONE 8.8s
+
+#44 [web] resolving provenance for metadata file
+#44 DONE 0.0s
+ Image mymanager-web Built 
+ Image mymanager-api Built 

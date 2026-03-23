@@ -1,0 +1,44 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../prisma.service';
+
+@Injectable()
+export class CommentsRepository {
+  constructor(private readonly prisma: PrismaService) {}
+  async findByWorkspace(workspaceId: string, filters: { platform?: string; sentiment?: string }, offset: number, limit: number): Promise<[unknown[], number]> {
+    const where: Record<string, unknown> = { workspace_id: workspaceId };
+    if (filters.platform) where.platform = filters.platform;
+    if (filters.sentiment) where.sentiment = filters.sentiment;
+    const [comments, total] = await Promise.all([
+      this.prisma.socialComment.findMany({ where, skip: offset, take: limit, orderBy: { fetched_at: 'desc' }, include: { assignments: { include: { assigned_to: { select: { id: true, name: true, avatar_url: true } } } } } }),
+      this.prisma.socialComment.count({ where }),
+    ]);
+    return [comments, total];
+  }
+
+  async findById(id: string) {
+    return this.prisma.socialComment.findUnique({ where: { id }, include: { assignments: true } });
+  }
+
+  async createReply(commentId: string, _userId: string, _text: string) {
+    return this.prisma.socialComment.update({ where: { id: commentId }, data: { replied_at: new Date() } });
+  }
+
+  async assign(commentId: string, assigneeId: string, assignerId: string) {
+    return this.prisma.commentAssignment.create({
+      data: { social_comment_id: commentId, assigned_to_user_id: assigneeId, assigned_by_user_id: assignerId },
+    });
+  }
+
+  async updateAssignmentStatus(assignmentId: string, status: string) {
+    return this.prisma.commentAssignment.update({ where: { id: assignmentId }, data: { status } });
+  }
+
+  async getInboxStats(workspaceId: string) {
+    const [total, pending, unassigned] = await Promise.all([
+      this.prisma.socialComment.count({ where: { workspace_id: workspaceId } }),
+      this.prisma.socialComment.count({ where: { workspace_id: workspaceId, replied_at: null } }),
+      this.prisma.socialComment.count({ where: { workspace_id: workspaceId, assignments: { none: {} } } }),
+    ]);
+    return { total, pending, unassigned };
+  }
+}

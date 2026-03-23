@@ -1,0 +1,23 @@
+{
+  "dashboard.welcome": "",
+  "dashboard.quick_compose": "",
+  "dashboard.recent_posts": "",
+  "dashboard.scheduled_posts": "",
+  "dashboard.post_performance": "",
+  "dashboard.total_reach": "",
+  "dashboard.total_impressions": "",
+  "dashboard.engagement_rate": "",
+  "dashboard.top_posts": "",
+  "dashboard.content_calendar": "",
+  "dashboard.media_library": "",
+  "dashboard.team_activity": "",
+  "dashboard.approval_queue": "",
+  "dashboard.connected_accounts": "",
+  "dashboard.storage_used": "",
+  "dashboard.posts_this_month": "",
+  "dashboard.no_posts_yet": "",
+  "dashboard.view_all": "",
+  "dashboard.analytics_summary": "",
+  "dashboard.best_time_to_post": "",
+  "dashboard.campaigns": ""
+}

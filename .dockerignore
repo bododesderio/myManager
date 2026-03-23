@@ -1,0 +1,16 @@
+node_modules
+.next
+.expo
+dist
+build
+*.tsbuildinfo
+.turbo
+.git
+.env.local
+.env.*.local
+coverage
+.nyc_output
+npm-debug.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db

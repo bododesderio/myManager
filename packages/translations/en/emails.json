@@ -1,0 +1,22 @@
+{
+  "emails.welcome_subject": "Welcome to {app_name}",
+  "emails.welcome_body": "Thanks for signing up! You're all set to start managing your social media.",
+  "emails.verify_subject": "Verify your email address",
+  "emails.verify_body": "Click the button below to verify your email and get started.",
+  "emails.verify_button": "Verify email",
+  "emails.reset_subject": "Reset your password",
+  "emails.reset_body": "Click the button below to reset your password. This link expires in 1 hour.",
+  "emails.reset_button": "Reset password",
+  "emails.invite_subject": "You've been invited to join {workspace}",
+  "emails.invite_body": "{inviter} has invited you to join their workspace on {app_name}.",
+  "emails.invite_button": "Accept invitation",
+  "emails.invoice_subject": "Your invoice from {app_name}",
+  "emails.post_failed_subject": "Post failed to publish",
+  "emails.post_failed_body": "Your post to {platform} failed to publish. Reason: {reason}",
+  "emails.report_ready_subject": "Your report is ready",
+  "emails.report_ready_body": "Your {report_type} report for {period} is ready to download.",
+  "emails.approval_subject": "Post needs your approval",
+  "emails.approval_body": "{author} has submitted a post for your review.",
+  "emails.token_expired_subject": "Reconnect your {platform} account",
+  "emails.token_expired_body": "Your {platform} connection has expired. Reconnect to continue publishing."
+}

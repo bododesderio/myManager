@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════
+   PHASE 0 — DESIGN SYSTEM (Purple Dawn default preset)
+   All colors/radii/fonts via CSS custom properties.
+   Zero hardcoded hex in any component.
+   ═══════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="light"] {
+  /* ── Primary ────────────────────────────────── */
+  --color-primary:        #7F77DD;
+  --color-primary-dark:   #534AB7;
+  --color-primary-light:  #EEEDFE;
+  --color-primary-border: #D8D5F9;
+
+  /* ── Accent ─────────────────────────────────── */
+  --color-accent:         #1D9E75;
+  --color-accent-light:   #EAF3DE;
+  --color-accent-border:  #97C459;
+
+  /* ── Text ───────────────────────────────────── */
+  --color-text:           #111111;
+  --color-text-2:         #555555;
+  --color-text-muted:     #aaaaaa;
+
+  /* ── Backgrounds ────────────────────────────── */
+  --color-bg:             #ffffff;
+  --color-bg-2:           #f5f4ef;
+  --color-bg-card:        #f7f6f2;
+
+  /* ── Borders ────────────────────────────────── */
+  --color-border:         #e8e6e0;
+  --color-border-light:   #f0efe8;
+
+  /* ── Semantic ───────────────────────────────── */
+  --color-error:          #E24B4A;
+  --color-error-light:    #FCEBEB;
+  --color-warning:        #EF9F27;
+  --color-warning-light:  #FAEEDA;
+
+  /* ── Special ────────────────────────────────── */
+  --color-stats-bg:       #534AB7;
+  --color-stats-text:     #ffffff;
+
+  /* ── Border Radii ───────────────────────────── */
+  --radius-card:          12px;
+  --radius-btn:           8px;
+  --radius-input:         7px;
+  --radius-badge:         5px;
+  --radius-icon:          7px;
+
+  /* ── Typography ─────────────────────────────── */
+  --font-body:            system-ui, -apple-system, sans-serif;
+  --font-heading:         system-ui, -apple-system, sans-serif;
+  --font-mono:            ui-monospace, monospace;
+}
+
+[data-theme="dark"] {
+  /* ── Primary ────────────────────────────────── */
+  --color-primary:        #A78BFA;
+  --color-primary-dark:   #7C3AED;
+  --color-primary-light:  #2D1B69;
+  --color-primary-border: #4C1D95;
+
+  /* ── Accent ─────────────────────────────────── */
+  --color-accent:         #34D399;
+  --color-accent-light:   #064E3B;
+  --color-accent-border:  #059669;
+
+  /* ── Text ───────────────────────────────────── */
+  --color-text:           #F1F5F9;
+  --color-text-2:         #CBD5E1;
+  --color-text-muted:     #475569;
+
+  /* ── Backgrounds ────────────────────────────── */
+  --color-bg:             #0F172A;
+  --color-bg-2:           #1E293B;
+  --color-bg-card:        #1E293B;
+
+  /* ── Borders ────────────────────────────────── */
+  --color-border:         #334155;
+  --color-border-light:   #1E293B;
+
+  /* ── Semantic ───────────────────────────────── */
+  --color-error:          #F87171;
+  --color-error-light:    #450A0A;
+  --color-warning:        #FBBF24;
+  --color-warning-light:  #451A03;
+
+  /* ── Special ────────────────────────────────── */
+  --color-stats-bg:       #4C1D95;
+  --color-stats-text:     #ffffff;
+}
+
+/* ── Body defaults ──────────────────────────────── */
+body {
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--font-mono);
+}

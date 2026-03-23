@@ -1,0 +1,23 @@
+{
+  "dashboard.welcome": "Welcome back, {name}",
+  "dashboard.quick_compose": "Quick compose",
+  "dashboard.recent_posts": "Recent posts",
+  "dashboard.scheduled_posts": "Scheduled posts",
+  "dashboard.post_performance": "Post performance",
+  "dashboard.total_reach": "Total reach",
+  "dashboard.total_impressions": "Total impressions",
+  "dashboard.engagement_rate": "Engagement rate",
+  "dashboard.top_posts": "Top performing posts",
+  "dashboard.content_calendar": "Content calendar",
+  "dashboard.media_library": "Media library",
+  "dashboard.team_activity": "Team activity",
+  "dashboard.approval_queue": "Approval queue",
+  "dashboard.connected_accounts": "Connected accounts",
+  "dashboard.storage_used": "{used} of {total} storage used",
+  "dashboard.posts_this_month": "{count}/{limit} posts this month",
+  "dashboard.no_posts_yet": "No posts yet. Create your first post to get started.",
+  "dashboard.view_all": "View all",
+  "dashboard.analytics_summary": "Analytics summary",
+  "dashboard.best_time_to_post": "Best time to post",
+  "dashboard.campaigns": "Campaigns"
+}
