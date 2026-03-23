@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useUpdateWorkspace } from '@/lib/hooks/useWorkspaces';
 import { useToast } from '@/providers/ToastProvider';
+import { FileUpload } from '@/components/FileUpload';
 
 export default function BrandContent() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -56,14 +57,11 @@ export default function BrandContent() {
               )}
             </div>
             <div className="flex-1">
-              <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700">Logo URL</label>
-              <input
-                id="logoUrl"
-                type="url"
+              <FileUpload
+                label="Logo"
                 value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://example.com/logo.png"
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                onChange={setLogoUrl}
+                accept="image/*"
               />
             </div>
           </div>

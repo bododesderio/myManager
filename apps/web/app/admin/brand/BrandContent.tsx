@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { FileUpload } from '@/components/FileUpload';
 
 interface BrandConfig {
   app_name: string;
@@ -111,26 +112,18 @@ export function BrandContent() {
                 className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
-            <div>
-              <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700">Logo URL</label>
-              <input
-                id="logoUrl"
-                type="text"
-                value={brand.logo_url ?? ''}
-                onChange={(e) => setBrand({ ...brand, logo_url: e.target.value || null })}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
-              />
-            </div>
-            <div>
-              <label htmlFor="faviconUrl" className="block text-sm font-medium text-gray-700">Favicon URL</label>
-              <input
-                id="faviconUrl"
-                type="text"
-                value={brand.favicon_url ?? ''}
-                onChange={(e) => setBrand({ ...brand, favicon_url: e.target.value || null })}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
-              />
-            </div>
+            <FileUpload
+              label="Logo"
+              value={brand.logo_url ?? ''}
+              onChange={(url) => setBrand({ ...brand, logo_url: url || null })}
+              accept="image/*"
+            />
+            <FileUpload
+              label="Favicon"
+              value={brand.favicon_url ?? ''}
+              onChange={(url) => setBrand({ ...brand, favicon_url: url || null })}
+              accept="image/*"
+            />
           </div>
         </div>
 

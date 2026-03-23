@@ -65,6 +65,7 @@ services:
       AUTH_TRUST_HOST: "true"
       AUTH_URL: http://localhost:3000
       API_URL: http://api:3001
+      NEXT_PUBLIC_API_URL: http://localhost:3001
       NODE_ENV: production
       PORT: 3000
       HOSTNAME: "0.0.0.0"

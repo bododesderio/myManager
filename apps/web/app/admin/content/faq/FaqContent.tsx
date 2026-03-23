@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 interface FaqItem {
   id: string;
@@ -263,11 +264,11 @@ export function FaqContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Answer</label>
-                  <textarea
-                    rows={3}
+                  <RichTextEditor
                     value={editForm.answer}
-                    onChange={(e) => setEditForm((prev) => ({ ...prev, answer: e.target.value }))}
-                    className={inputCls}
+                    onChange={(html) => setEditForm((prev) => ({ ...prev, answer: html }))}
+                    placeholder="Write the answer..."
+                    minHeight={120}
                   />
                 </div>
                 <div>

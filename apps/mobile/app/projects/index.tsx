@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
 
 interface Project {
   id: string;
@@ -10,9 +12,28 @@ interface Project {
   membersCount: number;
 }
 
-const mockProjects: Project[] = [];
-
 export default function ProjectsScreen() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ projects: Project[] }>('/v1/projects');
+      setProjects(data.projects ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
   const renderItem = ({ item }: { item: Project }) => (
     <TouchableOpacity
       style={styles.card}
@@ -39,7 +60,18 @@ export default function ProjectsScreen() {
         </TouchableOpacity>
       </View>
 
-      {mockProjects.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchProjects}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : projects.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No Projects</Text>
           <Text style={styles.emptyText}>
@@ -51,7 +83,7 @@ export default function ProjectsScreen() {
         </View>
       ) : (
         <FlatList
-          data={mockProjects}
+          data={projects}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
@@ -146,6 +178,17 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
     fontWeight: '600',
   },
 });

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { writeFile, mkdir } from 'fs/promises';
+import path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,17 +44,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In production: upload to R2/S3 and return the URL
     const fileId = crypto.randomUUID();
+    const ext = file.name.split('.').pop() || 'bin';
+    const filename = `${fileId}.${ext}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const storageDriver = process.env.STORAGE_DRIVER || 'local';
+
+    if (storageDriver === 'r2' && process.env.CLOUDFLARE_R2_ACCESS_KEY) {
+      // Upload to Cloudflare R2
+      const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+      const s3 = new S3Client({
+        region: 'auto',
+        endpoint: `https://${process.env.CLOUDFLARE_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY!,
+          secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_KEY!,
+        },
+      });
+
+      await s3.send(new PutObjectCommand({
+        Bucket: process.env.CLOUDFLARE_R2_BUCKET,
+        Key: `uploads/${filename}`,
+        Body: buffer,
+        ContentType: file.type,
+      }));
+
+      const publicUrl = process.env.CLOUDFLARE_R2_PUBLIC_URL || `https://${process.env.CLOUDFLARE_R2_BUCKET}.r2.dev`;
+
+      return NextResponse.json({
+        id: fileId,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: `${publicUrl}/uploads/${filename}`,
+      });
+    }
+
+    // Local storage fallback
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(path.join(uploadDir, filename), buffer);
 
     return NextResponse.json({
       id: fileId,
       name: file.name,
       size: file.size,
       type: file.type,
-      url: `https://cdn.example.com/uploads/${fileId}`,
+      url: `/uploads/${filename}`,
     });
-  } catch {
+  } catch (err) {
+    console.error('Upload failed:', err);
     return NextResponse.json(
       { error: 'Upload failed' },
       { status: 500 },

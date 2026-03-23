@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 
 interface CameraPickerProps {
   onCapture?: (uri: string) => void;
@@ -7,19 +8,63 @@ interface CameraPickerProps {
 }
 
 export default function CameraPicker({ onCapture, onClose }: CameraPickerProps) {
-  const [hasPermission, _setHasPermission] = useState<boolean | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [isCapturing, setIsCapturing] = useState(false);
+  const cameraRef = useRef<CameraView>(null);
 
-  const handleCapture = () => {
-    // TODO: implement camera capture with expo-camera
-    onCapture?.('captured-photo-uri');
-  };
+  useEffect(() => {
+    if (!permission?.granted && permission?.canAskAgain) {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
 
-  if (hasPermission === false) {
+  const handleCapture = useCallback(async () => {
+    if (!cameraRef.current || isCapturing) return;
+
+    setIsCapturing(true);
+    try {
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.85,
+      });
+      if (photo?.uri) {
+        onCapture?.(photo.uri);
+      }
+    } catch (error) {
+      console.error('Failed to capture photo:', error);
+    } finally {
+      setIsCapturing(false);
+    }
+  }, [isCapturing, onCapture]);
+
+  const handleFlip = useCallback(() => {
+    setFacing((prev) => (prev === 'back' ? 'front' : 'back'));
+  }, []);
+
+  if (!permission) {
+    // Permissions are still loading
+    return (
+      <View style={styles.container}>
+        <Text style={styles.permissionText}>Requesting camera permission...</Text>
+      </View>
+    );
+  }
+
+  if (!permission.granted) {
     return (
       <View style={styles.container}>
         <Text style={styles.permissionText}>
           Camera permission is required to take photos
         </Text>
+        {permission.canAskAgain ? (
+          <TouchableOpacity style={styles.button} onPress={requestPermission}>
+            <Text style={styles.buttonText}>Grant Permission</Text>
+          </TouchableOpacity>
+        ) : (
+          <Text style={styles.settingsHint}>
+            Please enable camera access in your device settings
+          </Text>
+        )}
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Go Back</Text>
         </TouchableOpacity>
@@ -29,20 +74,27 @@ export default function CameraPicker({ onCapture, onClose }: CameraPickerProps) 
 
   return (
     <View style={styles.container}>
-      <View style={styles.cameraPreview}>
-        <Text style={styles.previewText}>Camera Preview</Text>
-      </View>
-      <View style={styles.controls}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeText}>X</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
-          <View style={styles.captureInner} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.flipButton}>
-          <Text style={styles.flipText}>Flip</Text>
-        </TouchableOpacity>
-      </View>
+      <CameraView
+        ref={cameraRef}
+        style={styles.camera}
+        facing={facing}
+      >
+        <View style={styles.controls}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeText}>X</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.captureButton, isCapturing && styles.captureButtonDisabled]}
+            onPress={handleCapture}
+            disabled={isCapturing}
+          >
+            <View style={[styles.captureInner, isCapturing && styles.captureInnerActive]} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.flipButton} onPress={handleFlip}>
+            <Text style={styles.flipText}>Flip</Text>
+          </TouchableOpacity>
+        </View>
+      </CameraView>
     </View>
   );
 }
@@ -52,14 +104,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  cameraPreview: {
+  camera: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  previewText: {
-    color: '#fff',
-    fontSize: 16,
+    justifyContent: 'flex-end',
   },
   controls: {
     flexDirection: 'row',
@@ -90,11 +137,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  captureButtonDisabled: {
+    opacity: 0.5,
+  },
   captureInner: {
     width: 58,
     height: 58,
     borderRadius: 29,
     backgroundColor: '#fff',
+  },
+  captureInnerActive: {
+    backgroundColor: '#ccc',
   },
   flipButton: {
     width: 44,
@@ -117,12 +170,19 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     paddingHorizontal: 32,
   },
+  settingsHint: {
+    color: '#999',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 32,
+  },
   button: {
     backgroundColor: '#7F77DD',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 32,
-    marginBottom: 'auto',
+    marginBottom: 16,
     alignItems: 'center',
   },
   buttonText: {

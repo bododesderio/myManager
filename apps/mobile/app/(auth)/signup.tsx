@@ -1,17 +1,35 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SignupScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const { signup } = useAuth();
 
-  const handleSignup = () => {
-    // TODO: implement signup logic
-    router.replace('/(tabs)/home');
+  const handleSignup = async () => {
+    if (!name || !email || !password) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await signup(name, email, password);
+      router.replace('/(tabs)/home');
+    } catch (error) {
+      Alert.alert('Signup Failed', error instanceof Error ? error.message : 'An error occurred.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -61,8 +79,8 @@ export default function SignupScreen() {
               secureTextEntry
             />
 
-            <TouchableOpacity style={styles.button} onPress={handleSignup}>
-              <Text style={styles.buttonText}>Create Account</Text>
+            <TouchableOpacity style={[styles.button, submitting && { opacity: 0.6 }]} onPress={handleSignup} disabled={submitting}>
+              <Text style={styles.buttonText}>{submitting ? 'Creating Account...' : 'Create Account'}</Text>
             </TouchableOpacity>
           </View>
 

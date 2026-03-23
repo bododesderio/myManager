@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
 
 interface Conversation {
   id: string;
@@ -11,9 +13,28 @@ interface Conversation {
   unread: boolean;
 }
 
-const mockConversations: Conversation[] = [];
-
 export default function ConversationsScreen() {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchConversations = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ comments: Conversation[] }>('/v1/comments');
+      setConversations(data.comments ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load conversations');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
   const renderItem = ({ item }: { item: Conversation }) => (
     <TouchableOpacity style={styles.conversationRow}>
       <View style={styles.avatar}>
@@ -44,7 +65,18 @@ export default function ConversationsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      {mockConversations.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchConversations}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : conversations.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No Conversations</Text>
           <Text style={styles.emptyText}>
@@ -53,7 +85,7 @@ export default function ConversationsScreen() {
         </View>
       ) : (
         <FlatList
-          data={mockConversations}
+          data={conversations}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
@@ -152,5 +184,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
+    fontWeight: '600',
   },
 });

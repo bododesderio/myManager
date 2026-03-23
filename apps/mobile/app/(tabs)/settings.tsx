@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthStore } from '@/store/authStore';
 
 interface SettingsItem {
   label: string;
@@ -18,6 +19,17 @@ const settingsItems: SettingsItem[] = [
 ];
 
 export default function SettingsScreen() {
+  const { user, clearAuth } = useAuthStore();
+
+  const displayName = user?.name || 'User';
+  const displayEmail = user?.email || 'Not signed in';
+  const avatarInitial = displayName.charAt(0).toUpperCase();
+
+  const handleSignOut = () => {
+    clearAuth();
+    router.replace('/');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -27,11 +39,11 @@ export default function SettingsScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.profileSection}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>U</Text>
+            <Text style={styles.avatarText}>{avatarInitial}</Text>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>User Name</Text>
-            <Text style={styles.profileEmail}>user@example.com</Text>
+            <Text style={styles.profileName}>{displayName}</Text>
+            <Text style={styles.profileEmail}>{displayEmail}</Text>
           </View>
         </View>
 
@@ -49,7 +61,7 @@ export default function SettingsScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
           <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>
 

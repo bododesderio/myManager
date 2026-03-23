@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { FileUpload } from '@/components/FileUpload';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 type FieldType =
   | 'TEXT'
@@ -91,48 +93,14 @@ function FieldRenderer({
       return <textarea rows={3} value={field.value} onChange={(e) => onChange(e.target.value)} className={baseInput} />;
     case 'RICHTEXT':
       return (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setMdPreview(false)}
-              className={`rounded px-2 py-1 text-xs font-medium ${!mdPreview ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-600'}`}
-            >
-              Write
-            </button>
-            <button
-              type="button"
-              onClick={() => setMdPreview(true)}
-              className={`rounded px-2 py-1 text-xs font-medium ${mdPreview ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-600'}`}
-            >
-              Preview
-            </button>
-          </div>
-          {mdPreview ? (
-            <div
-              className="prose prose-sm max-w-none rounded-brand border bg-gray-50 p-3"
-              dangerouslySetInnerHTML={{
-                __html: field.value
-                  .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                  .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-                  .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                  .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                  .replace(/\n/g, '<br />'),
-              }}
-            />
-          ) : (
-            <textarea
-              rows={6}
-              value={field.value}
-              onChange={(e) => onChange(e.target.value)}
-              className={`${baseInput} font-mono text-xs`}
-            />
-          )}
-        </div>
+        <RichTextEditor
+          value={field.value}
+          onChange={onChange}
+          placeholder="Start writing..."
+          minHeight={180}
+        />
       );
     case 'URL':
-    case 'IMAGE_URL':
       return (
         <input
           type="url"
@@ -140,6 +108,14 @@ function FieldRenderer({
           onChange={(e) => onChange(e.target.value)}
           className={baseInput}
           placeholder="https://..."
+        />
+      );
+    case 'IMAGE_URL':
+      return (
+        <FileUpload
+          value={field.value}
+          onChange={onChange}
+          accept="image/*"
         />
       );
     case 'COLOR':

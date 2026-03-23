@@ -30,7 +30,9 @@ ENV NEXTAUTH_URL=http://localhost:3000
 ENV NEXTAUTH_SECRET=build-time-placeholder-secret-32chars-min
 ENV NEXT_PUBLIC_API_URL=http://localhost:3001
 
-RUN echo "shamefully-hoist=true" >> .npmrc && pnpm install --frozen-lockfile --ignore-scripts && pnpm --filter @mymanager/web run build
+# Re-link workspace packages after source code copy
+RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm --filter @mymanager/web run build
 
 # ── Stage 2: Production runtime ──────────────────────────────────────
 FROM node:20-alpine AS runner

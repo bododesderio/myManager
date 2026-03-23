@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useProfile, useUpdateProfile } from '@/lib/hooks/useUser';
 import { useToast } from '@/providers/ToastProvider';
+import { FileUpload } from '@/components/FileUpload';
 
 const settingsLinks = [
   { href: '/settings/accounts', label: 'Connected Accounts', description: 'Manage your social media connections.' },
@@ -81,17 +82,12 @@ export default function ProfileContent() {
             />
             <p className="mt-1 text-xs text-gray-400">Email cannot be changed.</p>
           </div>
-          <div>
-            <label htmlFor="profileAvatar" className="block text-sm font-medium text-gray-700">Avatar URL</label>
-            <input
-              id="profileAvatar"
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
-              className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
-            />
-          </div>
+          <FileUpload
+            label="Avatar"
+            value={avatarUrl}
+            onChange={setAvatarUrl}
+            accept="image/*"
+          />
           <div>
             <label htmlFor="profileTimezone" className="block text-sm font-medium text-gray-700">Timezone</label>
             <select

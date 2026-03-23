@@ -6,11 +6,17 @@ build
 *.tsbuildinfo
 .turbo
 .git
+.claude
+.corepack
 .env.local
 .env.*.local
 coverage
 .nyc_output
 npm-debug.log*
 pnpm-debug.log*
+build.log
+*.log
 .DS_Store
 Thumbs.db
+apps/mobile
+uploads

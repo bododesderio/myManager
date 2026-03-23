@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
 
 interface Draft {
   id: string;
@@ -9,9 +11,30 @@ interface Draft {
   updatedAt: string;
 }
 
-const mockDrafts: Draft[] = [];
-
 export default function ComposeTabScreen() {
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDrafts = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ posts: Draft[] }>('/v1/posts', {
+        params: { status: 'draft' },
+      });
+      setDrafts(data.posts ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load drafts');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDrafts();
+  }, [fetchDrafts]);
+
   const renderDraft = ({ item }: { item: Draft }) => (
     <TouchableOpacity style={styles.draftCard}>
       <View style={styles.draftInfo}>
@@ -45,7 +68,18 @@ export default function ComposeTabScreen() {
         </TouchableOpacity>
       </View>
 
-      {mockDrafts.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchDrafts}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : drafts.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyIcon}>📝</Text>
           <Text style={styles.emptyTitle}>No drafts yet</Text>
@@ -59,7 +93,7 @@ export default function ComposeTabScreen() {
         </View>
       ) : (
         <FlatList
-          data={mockDrafts}
+          data={drafts}
           renderItem={renderDraft}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
@@ -176,6 +210,17 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
     fontWeight: '600',
   },
 });

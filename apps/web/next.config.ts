@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // output: 'standalone', // Enable for Docker/production; requires symlink support (Windows: Developer Mode)
+  output: 'standalone',
   transpilePackages: [
     '@mymanager/config',
     '@mymanager/types',

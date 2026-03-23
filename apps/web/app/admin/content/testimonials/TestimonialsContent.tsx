@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 interface Testimonial {
   id: string;
@@ -276,11 +277,11 @@ export function TestimonialsContent() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Quote</label>
-                <textarea
-                  rows={3}
+                <RichTextEditor
                   value={editItem.quote}
-                  onChange={(e) => setEditItem({ ...editItem, quote: e.target.value })}
-                  className={inputCls}
+                  onChange={(html) => setEditItem({ ...editItem, quote: html })}
+                  placeholder="Customer testimonial..."
+                  minHeight={100}
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">

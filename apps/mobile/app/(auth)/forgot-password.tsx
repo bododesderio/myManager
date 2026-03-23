@@ -1,15 +1,29 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { forgotPassword } = useAuth();
 
-  const handleReset = () => {
-    // TODO: implement password reset logic
-    setSubmitted(true);
+  const handleReset = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await forgotPassword(email);
+      setSubmitted(true);
+    } catch (error) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'An error occurred.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -42,8 +56,8 @@ export default function ForgotPasswordScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            <TouchableOpacity style={styles.button} onPress={handleReset}>
-              <Text style={styles.buttonText}>Send Reset Link</Text>
+            <TouchableOpacity style={[styles.button, submitting && { opacity: 0.6 }]} onPress={handleReset} disabled={submitting}>
+              <Text style={styles.buttonText}>{submitting ? 'Sending...' : 'Send Reset Link'}</Text>
             </TouchableOpacity>
           </View>
         ) : (

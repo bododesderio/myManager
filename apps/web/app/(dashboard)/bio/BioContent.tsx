@@ -8,6 +8,7 @@ import {
   useCreateBioPage,
   useUpdateBioPage,
 } from '@/lib/hooks/useBioPages';
+import { FileUpload } from '@/components/FileUpload';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
@@ -245,19 +246,12 @@ export function BioContent() {
                   className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
                 />
               </div>
-              <div>
-                <label htmlFor="bioAvatar" className="block text-sm font-medium text-gray-700">
-                  Avatar URL
-                </label>
-                <input
-                  id="bioAvatar"
-                  type="text"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  placeholder="https://example.com/avatar.jpg"
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
-                />
-              </div>
+              <FileUpload
+                label="Avatar"
+                value={avatarUrl}
+                onChange={setAvatarUrl}
+                accept="image/*"
+              />
             </div>
           </div>
 

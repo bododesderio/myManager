@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default async function AdminLayout({
   children,
@@ -16,5 +17,10 @@ export default async function AdminLayout({
     redirect('/home');
   }
 
-  return <>{children}</>;
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebar />
+      <main className="ml-56 flex-1 p-6">{children}</main>
+    </div>
+  );
 }

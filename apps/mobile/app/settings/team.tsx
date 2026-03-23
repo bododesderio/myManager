@@ -1,6 +1,9 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
+import { useWorkspaceStore } from '@/store/workspaceStore';
 
 interface TeamMember {
   id: string;
@@ -9,11 +12,35 @@ interface TeamMember {
   role: 'owner' | 'admin' | 'editor' | 'viewer';
 }
 
-const mockMembers: TeamMember[] = [
-  { id: '1', name: 'You', email: 'user@example.com', role: 'owner' },
-];
-
 export default function TeamSettingsScreen() {
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const currentWorkspace = useWorkspaceStore((s) => s.currentWorkspace);
+
+  const fetchMembers = useCallback(async () => {
+    if (!currentWorkspace?.id) {
+      setLoading(false);
+      return;
+    }
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ members: TeamMember[] }>(
+        `/v1/workspaces/${currentWorkspace.id}/members`
+      );
+      setMembers(data.members ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load team members');
+    } finally {
+      setLoading(false);
+    }
+  }, [currentWorkspace?.id]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
+
   const renderItem = ({ item }: { item: TeamMember }) => (
     <View style={styles.memberRow}>
       <View style={styles.avatar}>
@@ -41,17 +68,35 @@ export default function TeamSettingsScreen() {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={mockMembers}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ListFooterComponent={
-          <TouchableOpacity style={styles.inviteButton}>
-            <Text style={styles.inviteButtonText}>+ Invite Team Member</Text>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchMembers}>
+            <Text style={styles.retryText}>Tap to retry</Text>
           </TouchableOpacity>
-        }
-        contentContainerStyle={styles.list}
-      />
+        </View>
+      ) : (
+        <FlatList
+          data={members}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <View style={styles.loadingContainer}>
+              <Text style={styles.emptyText}>No team members found</Text>
+            </View>
+          }
+          ListFooterComponent={
+            <TouchableOpacity style={styles.inviteButton}>
+              <Text style={styles.inviteButtonText}>+ Invite Team Member</Text>
+            </TouchableOpacity>
+          }
+          contentContainerStyle={styles.list}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -149,5 +194,26 @@ const styles = StyleSheet.create({
     color: '#7F77DD',
     fontSize: 15,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
+    fontWeight: '600',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#999',
   },
 });

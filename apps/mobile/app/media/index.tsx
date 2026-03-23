@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
 
 type MediaFilter = 'all' | 'images' | 'videos';
 
@@ -15,10 +16,35 @@ interface MediaItem {
 const screenWidth = Dimensions.get('window').width;
 const itemSize = (screenWidth - 48 - 8) / 3;
 
-const mockMedia: MediaItem[] = [];
-
 export default function MediaScreen() {
   const [filter, setFilter] = useState<MediaFilter>('all');
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchMedia = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ media: MediaItem[] }>('/v1/media');
+      setMedia(data.media ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load media');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMedia();
+  }, [fetchMedia]);
+
+  const filteredMedia = media.filter((item) => {
+    if (filter === 'all') return true;
+    if (filter === 'images') return item.type === 'image';
+    if (filter === 'videos') return item.type === 'video';
+    return true;
+  });
 
   const renderItem = ({ item }: { item: MediaItem }) => (
     <TouchableOpacity style={[styles.mediaItem, { width: itemSize, height: itemSize }]}>
@@ -54,7 +80,18 @@ export default function MediaScreen() {
         ))}
       </View>
 
-      {mockMedia.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchMedia}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : filteredMedia.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No Media</Text>
           <Text style={styles.emptyText}>
@@ -66,7 +103,7 @@ export default function MediaScreen() {
         </View>
       ) : (
         <FlatList
-          data={mockMedia}
+          data={filteredMedia}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           numColumns={3}
@@ -179,6 +216,17 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
     fontWeight: '600',
   },
 });

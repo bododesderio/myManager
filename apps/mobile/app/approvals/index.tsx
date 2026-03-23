@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
 
 interface ApprovalItem {
   id: string;
@@ -10,9 +12,30 @@ interface ApprovalItem {
   status: 'pending' | 'approved' | 'rejected';
 }
 
-const mockApprovals: ApprovalItem[] = [];
-
 export default function ApprovalsScreen() {
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchApprovals = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ approvals: ApprovalItem[] }>('/v1/approvals', {
+        params: { status: 'pending' },
+      });
+      setApprovals(data.approvals ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load approvals');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchApprovals();
+  }, [fetchApprovals]);
+
   const renderItem = ({ item }: { item: ApprovalItem }) => (
     <TouchableOpacity style={styles.card}>
       <View style={styles.cardHeader}>
@@ -37,7 +60,18 @@ export default function ApprovalsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      {mockApprovals.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchApprovals}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : approvals.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No Approvals</Text>
           <Text style={styles.emptyText}>
@@ -46,7 +80,7 @@ export default function ApprovalsScreen() {
         </View>
       ) : (
         <FlatList
-          data={mockApprovals}
+          data={approvals}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
@@ -141,5 +175,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
+    fontWeight: '600',
   },
 });

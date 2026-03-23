@@ -1,4 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
+import { apiClient } from '@/services/apiClient';
+import { useAuthStore } from '@/store/authStore';
 
 export type PlanTier = 'free' | 'starter' | 'professional' | 'enterprise';
 
@@ -51,8 +53,40 @@ const PLANS: Record<PlanTier, PlanInfo> = {
   },
 };
 
+interface SubscriptionResponse {
+  tier: PlanTier;
+}
+
 export function usePlan() {
-  const currentTier: PlanTier = 'free'; // TODO: fetch from user subscription
+  const [currentTier, setCurrentTier] = useState<PlanTier>('free');
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setCurrentTier('free');
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchSubscription() {
+      try {
+        const data = await apiClient.get<SubscriptionResponse>(
+          '/v1/users/me/subscription'
+        );
+        if (!cancelled && data.tier && PLANS[data.tier]) {
+          setCurrentTier(data.tier);
+        }
+      } catch {
+        // Fall back to free tier on error
+      }
+    }
+
+    fetchSubscription();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
 
   const plan = useMemo(() => PLANS[currentTier], [currentTier]);
 

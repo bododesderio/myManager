@@ -1,4 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useState, useCallback } from 'react';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 
 interface GalleryPickerProps {
   onSelect?: (uris: string[]) => void;
@@ -6,16 +9,51 @@ interface GalleryPickerProps {
   maxSelection?: number;
 }
 
-const screenWidth = Dimensions.get('window').width;
-const itemSize = (screenWidth - 6) / 3;
-
 export default function GalleryPicker({ onSelect, onClose, maxSelection = 10 }: GalleryPickerProps) {
-  const mockItems: string[] = [];
+  const [selectedUris, setSelectedUris] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDone = () => {
-    // TODO: return selected items
-    onSelect?.([]);
-  };
+  const pickImages = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Required',
+          'Please grant photo library access to select images.',
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: true,
+        selectionLimit: maxSelection,
+        quality: 0.85,
+        orderedSelection: true,
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        const uris = result.assets.map((asset) => asset.uri);
+        setSelectedUris(uris);
+      }
+    } catch (error) {
+      console.error('Failed to pick images:', error);
+      Alert.alert('Error', 'Failed to open the image picker. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [maxSelection]);
+
+  const handleRemove = useCallback((uri: string) => {
+    setSelectedUris((prev) => prev.filter((u) => u !== uri));
+  }, []);
+
+  const handleDone = useCallback(() => {
+    onSelect?.(selectedUris);
+  }, [selectedUris, onSelect]);
 
   return (
     <View style={styles.container}>
@@ -24,40 +62,68 @@ export default function GalleryPicker({ onSelect, onClose, maxSelection = 10 }: 
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Gallery</Text>
-        <TouchableOpacity onPress={handleDone}>
-          <Text style={styles.doneText}>Done</Text>
+        <TouchableOpacity onPress={handleDone} disabled={selectedUris.length === 0}>
+          <Text style={[styles.doneText, selectedUris.length === 0 && styles.doneTextDisabled]}>
+            Done{selectedUris.length > 0 ? ` (${selectedUris.length})` : ''}
+          </Text>
         </TouchableOpacity>
       </View>
 
       <Text style={styles.selectionInfo}>
-        Select up to {maxSelection} items
+        {selectedUris.length > 0
+          ? `${selectedUris.length} of ${maxSelection} selected`
+          : `Select up to ${maxSelection} items`}
       </Text>
 
-      {mockItems.length === 0 ? (
+      {selectedUris.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>No Photos</Text>
+          <Text style={styles.emptyTitle}>No Photos Selected</Text>
           <Text style={styles.emptyText}>
-            Grant photo library access to select images
+            Tap the button below to choose images from your library
           </Text>
-          <TouchableOpacity style={styles.permissionButton}>
-            <Text style={styles.permissionButtonText}>Grant Access</Text>
+          <TouchableOpacity
+            style={styles.permissionButton}
+            onPress={pickImages}
+            disabled={isLoading}
+          >
+            <Text style={styles.permissionButtonText}>
+              {isLoading ? 'Opening...' : 'Choose Photos'}
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <FlatList
-          data={mockItems}
-          renderItem={({ item: _item }) => (
-            <TouchableOpacity style={[styles.gridItem, { width: itemSize, height: itemSize }]}>
-              <View style={styles.placeholder} />
+        <View style={styles.selectedContainer}>
+          <View style={styles.grid}>
+            {selectedUris.map((uri) => (
+              <View key={uri} style={styles.gridItem}>
+                <Image source={{ uri }} style={styles.thumbnail} contentFit="cover" />
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => handleRemove(uri)}
+                >
+                  <Text style={styles.removeText}>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          {selectedUris.length < maxSelection && (
+            <TouchableOpacity
+              style={styles.addMoreButton}
+              onPress={pickImages}
+              disabled={isLoading}
+            >
+              <Text style={styles.addMoreText}>
+                {isLoading ? 'Opening...' : 'Add More Photos'}
+              </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(_, index) => String(index)}
-          numColumns={3}
-        />
+        </View>
       )}
     </View>
   );
 }
+
+const GRID_ITEM_SIZE = 110;
 
 const styles = StyleSheet.create({
   container: {
@@ -87,18 +153,63 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#7F77DD',
   },
+  doneTextDisabled: {
+    opacity: 0.4,
+  },
   selectionInfo: {
     fontSize: 13,
     color: '#999',
     textAlign: 'center',
     paddingVertical: 8,
   },
-  gridItem: {
-    margin: 1,
-  },
-  placeholder: {
+  selectedContainer: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingVertical: 8,
+  },
+  gridItem: {
+    width: GRID_ITEM_SIZE,
+    height: GRID_ITEM_SIZE,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  addMoreButton: {
+    alignSelf: 'center',
+    backgroundColor: '#7F77DD',
+    borderRadius: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    marginTop: 16,
+  },
+  addMoreText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   emptyState: {
     flex: 1,

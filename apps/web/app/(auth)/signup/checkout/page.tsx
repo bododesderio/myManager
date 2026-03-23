@@ -7,10 +7,23 @@ import { apiClient } from '@/lib/api/client';
 type PaymentMethod = 'mtn_momo' | 'airtel_money' | 'card' | 'google_pay';
 type PollingState = 'idle' | 'polling' | 'confirmed' | 'failed' | 'timeout';
 
-const UGX_RATE = 3_750; // placeholder conversion: 1 USD = 3,750 UGX
+const DEFAULT_UGX_RATE = 3_750;
 
-function formatUGX(usd: number) {
-  return new Intl.NumberFormat('en-UG').format(usd * UGX_RATE);
+async function fetchUGXRate(): Promise<number> {
+  try {
+    const res = await fetch('/api/v1/exchange-rates/UGX');
+    if (res.ok) {
+      const data = await res.json();
+      return data.rate ?? DEFAULT_UGX_RATE;
+    }
+  } catch {
+    // fallback to default
+  }
+  return DEFAULT_UGX_RATE;
+}
+
+function formatUGX(usd: number, rate: number) {
+  return new Intl.NumberFormat('en-UG').format(usd * rate);
 }
 
 function getNextRenewalDate(cycle: string): string {
@@ -47,11 +60,16 @@ function CheckoutContent() {
   const [cvv, setCvv] = useState('');
   const [pollingState, setPollingState] = useState<PollingState>('idle');
   const [error, setError] = useState('');
+  const [ugxRate, setUgxRate] = useState(DEFAULT_UGX_RATE);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nextRenewal = getNextRenewalDate(billingCycle);
   const cycleLabel = billingCycle === 'annual' ? 'Annual' : 'Monthly';
+
+  useEffect(() => {
+    fetchUGXRate().then(setUgxRate);
+  }, []);
 
   const cleanup = useCallback(() => {
     if (pollRef.current) {
@@ -299,7 +317,7 @@ function CheckoutContent() {
                 </div>
 
                 <p className="text-[12px] text-text font-medium">
-                  Amount: UGX {formatUGX(billingCycle === 'annual' ? planPrice * 12 : planPrice)}
+                  Amount: UGX {formatUGX(billingCycle === 'annual' ? planPrice * 12 : planPrice, ugxRate)}
                 </p>
 
                 <p className="text-[10px] text-text-muted">
@@ -339,7 +357,7 @@ function CheckoutContent() {
                 </div>
 
                 <p className="text-[12px] text-text font-medium">
-                  Amount: UGX {formatUGX(billingCycle === 'annual' ? planPrice * 12 : planPrice)}
+                  Amount: UGX {formatUGX(billingCycle === 'annual' ? planPrice * 12 : planPrice, ugxRate)}
                 </p>
 
                 <p className="text-[10px] text-text-muted">

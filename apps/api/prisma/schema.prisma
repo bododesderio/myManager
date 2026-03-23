@@ -1809,3 +1809,20 @@ model AuditLog {
   @@index([user_id, created_at])
   @@map("audit_logs")
 }
+
+// ═══════════════════════════════════════════════════════════
+// SYSTEM CONFIG
+// ═══════════════════════════════════════════════════════════
+
+model SystemConfig {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  value      String
+  category   String
+  is_secret  Boolean  @default(true)
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("system_configs")
+}

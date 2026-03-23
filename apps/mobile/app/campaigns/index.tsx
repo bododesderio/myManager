@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiClient } from '@/services/apiClient';
 
 interface Campaign {
   id: string;
@@ -11,9 +13,28 @@ interface Campaign {
   endDate: string;
 }
 
-const mockCampaigns: Campaign[] = [];
-
 export default function CampaignsScreen() {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCampaigns = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const data = await apiClient.get<{ campaigns: Campaign[] }>('/v1/campaigns');
+      setCampaigns(data.campaigns ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load campaigns');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, [fetchCampaigns]);
+
   const renderItem = ({ item }: { item: Campaign }) => (
     <TouchableOpacity
       style={styles.card}
@@ -43,7 +64,18 @@ export default function CampaignsScreen() {
         </TouchableOpacity>
       </View>
 
-      {mockCampaigns.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color="#7F77DD" />
+        </View>
+      ) : error ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchCampaigns}>
+            <Text style={styles.retryText}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : campaigns.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No Campaigns</Text>
           <Text style={styles.emptyText}>
@@ -55,7 +87,7 @@ export default function CampaignsScreen() {
         </View>
       ) : (
         <FlatList
-          data={mockCampaigns}
+          data={campaigns}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
@@ -166,6 +198,17 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#F44336',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    color: '#7F77DD',
     fontWeight: '600',
   },
 });

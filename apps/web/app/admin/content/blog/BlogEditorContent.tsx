@@ -5,6 +5,8 @@ import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { FileUpload } from '@/components/FileUpload';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 interface BlogForm {
   title: string;
@@ -187,44 +189,30 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Excerpt</label>
-                <textarea rows={2} value={form.excerpt} onChange={(e) => update('excerpt', e.target.value)} className={inputCls} placeholder="Short summary..." />
+                <RichTextEditor
+                  value={form.excerpt}
+                  onChange={(html) => update('excerpt', html)}
+                  placeholder="Short summary..."
+                  minHeight={80}
+                />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Cover Image URL</label>
-                <input type="url" value={form.cover_image} onChange={(e) => update('cover_image', e.target.value)} className={inputCls} placeholder="https://...image.png" />
-              </div>
+              <FileUpload
+                label="Cover Image"
+                value={form.cover_image}
+                onChange={(url) => update('cover_image', url)}
+                accept="image/*"
+              />
             </div>
           </div>
 
           <div className="rounded-brand border bg-white p-6 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Body (Markdown)</label>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setMdPreview(false)} className={`rounded px-2 py-1 text-xs font-medium ${!mdPreview ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-600'}`}>
-                  Write
-                </button>
-                <button type="button" onClick={() => setMdPreview(true)} className={`rounded px-2 py-1 text-xs font-medium ${mdPreview ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-600'}`}>
-                  Preview
-                </button>
-              </div>
-            </div>
-            {mdPreview ? (
-              <div
-                className="prose prose-sm max-w-none rounded-brand border bg-gray-50 p-4"
-                style={{ minHeight: 300 }}
-                dangerouslySetInnerHTML={{
-                  __html: form.body
-                    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-                    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/\n/g, '<br />'),
-                }}
-              />
-            ) : (
-              <textarea rows={16} value={form.body} onChange={(e) => update('body', e.target.value)} className={`${inputCls} font-mono text-xs`} placeholder="Write your post in Markdown..." />
-            )}
+            <label className="mb-2 block text-sm font-medium text-gray-700">Body</label>
+            <RichTextEditor
+              value={form.body}
+              onChange={(html) => update('body', html)}
+              placeholder="Write your blog post..."
+              minHeight={300}
+            />
           </div>
         </div>
 
@@ -278,10 +266,12 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 <label className="block text-sm font-medium text-gray-700">Meta Description</label>
                 <textarea rows={2} value={form.meta_desc} onChange={(e) => update('meta_desc', e.target.value)} className={inputCls} />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">OG Image URL</label>
-                <input type="url" value={form.og_image} onChange={(e) => update('og_image', e.target.value)} className={inputCls} placeholder="https://..." />
-              </div>
+              <FileUpload
+                label="OG Image"
+                value={form.og_image}
+                onChange={(url) => update('og_image', url)}
+                accept="image/*"
+              />
             </div>
           </div>
         </div>

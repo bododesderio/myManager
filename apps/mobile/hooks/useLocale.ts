@@ -1,17 +1,24 @@
 import { useState, useCallback } from 'react';
 import { getLocales } from 'expo-localization';
+import { storage, storageKeys } from '@/store/storage';
 
 export type SupportedLocale = 'en' | 'es' | 'fr' | 'de' | 'pt' | 'it' | 'ja' | 'ko' | 'zh' | 'ar';
 
-export function useLocale() {
+function getInitialLocale(): SupportedLocale {
+  const persisted = storage.getString(storageKeys.LOCALE);
+  if (persisted) {
+    return persisted as SupportedLocale;
+  }
   const deviceLocales = getLocales();
-  const deviceLanguage = (deviceLocales[0]?.languageCode || 'en') as SupportedLocale;
+  return (deviceLocales[0]?.languageCode || 'en') as SupportedLocale;
+}
 
-  const [locale, setLocale] = useState<SupportedLocale>(deviceLanguage);
+export function useLocale() {
+  const [locale, setLocale] = useState<SupportedLocale>(getInitialLocale);
 
   const changeLocale = useCallback((newLocale: SupportedLocale) => {
     setLocale(newLocale);
-    // TODO: persist locale preference and update i18n
+    storage.set(storageKeys.LOCALE, newLocale);
   }, []);
 
   const formatDate = useCallback(

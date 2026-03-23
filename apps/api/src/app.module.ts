@@ -44,6 +44,7 @@ import { TestimonialsModule } from './modules/testimonials/testimonials.module';
 import { ThemeModule } from './modules/theme/theme.module';
 import { PortalModule } from './modules/portal/portal.module';
 import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
+import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { PrismaModule } from './prisma.module';
 import { DlqModule } from './workers/dlq.module';
 import { HealthController } from './health.controller';
@@ -121,6 +122,7 @@ import { BrandController } from './brand.controller';
     ThemeModule,
     PortalModule,
     AdminDashboardModule,
+    SystemConfigModule,
     DlqModule,
   ],
   controllers: [HealthController, BrandController],
