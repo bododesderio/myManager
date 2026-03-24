@@ -42,7 +42,8 @@ async function getNavLinks(): Promise<{
       next: { revalidate: 300 },
     });
     if (!res.ok) return { footer_product: [], footer_company: [] };
-    const data = await res.json();
+    const json = await res.json();
+    const data = json?.data ?? json;
     return {
       footer_product: data.footer_product ?? [],
       footer_company: data.footer_company ?? [],
@@ -58,7 +59,8 @@ async function getBrand(): Promise<BrandConfig> {
       next: { revalidate: 300 },
     });
     if (!res.ok) return DEFAULT_BRAND;
-    return await res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch {
     return DEFAULT_BRAND;
   }
@@ -70,7 +72,8 @@ async function getFooterCms(): Promise<FooterCmsFields | null> {
       next: { revalidate: 300 },
     });
     if (!res.ok) return null;
-    const page = await res.json();
+    const json = await res.json();
+    const page = json?.data ?? json;
     const footerSection = page.sections?.find(
       (s: any) => s.section_key === 'footer',
     );

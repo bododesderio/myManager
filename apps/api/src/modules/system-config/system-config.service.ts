@@ -62,19 +62,33 @@ export class SystemConfigService {
 
   private encrypt(value: string): string {
     const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    const iv = crypto.randomBytes(12); // GCM uses 12-byte IV
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
     let encrypted = cipher.update(value, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    return `${iv.toString('hex')}:${encrypted}`;
+    const authTag = cipher.getAuthTag().toString('hex');
+    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
   }
 
-  private decrypt(encryptedValue: string): string {
+  private decrypt(encrypted: string): string {
     const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const [ivHex, encrypted] = encryptedValue.split(':');
+    const parts = encrypted.split(':');
+    // Support legacy CBC format (iv:ciphertext) by falling back
+    if (parts.length === 2) {
+      const [ivHex, cipherHex] = parts;
+      const iv = Buffer.from(ivHex, 'hex');
+      const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+      let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    }
+    // GCM format (iv:authTag:ciphertext)
+    const [ivHex, authTagHex, cipherHex] = parts;
     const iv = Buffer.from(ivHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    const authTag = Buffer.from(authTagHex, 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+    decipher.setAuthTag(authTag);
+    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
   }

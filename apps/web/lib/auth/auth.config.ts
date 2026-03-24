@@ -57,31 +57,33 @@ export const authConfig: NextAuthConfig = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
+          const loginBody: Record<string, string> = {
+            email: credentials.email as string,
+            password: credentials.password as string,
+          };
+          // Only include totp_code if it's a non-empty 6-digit string
+          const totp = credentials.totp_code as string | undefined;
+          if (totp && totp.length === 6) {
+            loginBody.totp_code = totp;
+          }
+
           const res = await fetch(`${API_URL}/api/v1/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-              totp_code: credentials.totp_code,
-            }),
+            body: JSON.stringify(loginBody),
           });
 
           if (!res.ok) {
-            const error = await res.json().catch(() => null);
-            throw new Error(error?.error?.code || 'AUTH_INVALID_CREDENTIALS');
+            // Return null for failed auth — NextAuth shows "CredentialsSignin"
+            return null;
           }
 
           const data = await res.json();
 
           // Handle 2FA requirement
           if (data.user?.requiresTwoFactor) {
-            if (!credentials.totp_code) {
-              throw new Error('AUTH_2FA_REQUIRED');
-            }
-            // Re-attempt login with 2FA code would need a separate endpoint
-            // For now, throw to indicate 2FA is needed
-            throw new Error('AUTH_2FA_REQUIRED');
+            // The login UI performs a preflight check and handles the 2FA prompt.
+            return null;
           }
 
           // Extract refresh token from set-cookie header
@@ -102,10 +104,7 @@ export const authConfig: NextAuthConfig = {
             refreshToken: refreshToken || '',
             remember: credentials.remember === 'true',
           };
-        } catch (error) {
-          if (error instanceof Error) {
-            throw error;
-          }
+        } catch {
           return null;
         }
       },

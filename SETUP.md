@@ -129,3 +129,23 @@ cd apps/api && npx prisma generate && cd ../..
 # Check turbo task graph
 pnpm turbo build --dry-run
 ```
+
+## Production Deployment
+
+```bash
+# 1. Build and start all services in detached mode
+docker compose up --build -d
+
+# 2. After first deploy, seed the database
+docker exec mymanager-api sh -c "npx ts-node prisma/seeds/index.ts"
+
+# 3. View logs
+docker compose logs -f
+```
+
+### Post-deploy checklist
+
+- Copy `.env.example` to `.env` and fill in all production values (database, Redis, JWT secrets, OAuth keys, payment keys, email/storage/AI credentials).
+- Manage runtime credentials (OAuth, payments, email, storage, AI, analytics) via the Super Admin panel at `/admin/settings/credentials`. Values are AES-256 encrypted in the database and override environment variables.
+- Ensure `ENCRYPTION_KEY` is a 64-character hex string and is **never** committed to version control.
+- Set `STORAGE_DRIVER=r2` and configure Cloudflare R2 credentials for production file uploads.

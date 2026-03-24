@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="40" viewBox="0 0 180 40">
+  <text x="0" y="30" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#7F77DD">my</tspan><tspan fill="#2D2B3D">Manager</tspan>
+  </text>
+</svg>

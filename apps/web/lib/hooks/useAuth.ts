@@ -6,17 +6,14 @@ import { apiClient } from '@/lib/api/client';
 
 export function useLogin() {
   return useMutation({
-    mutationFn: async (credentials: { email: string; password: string; totp_code?: string; remember?: boolean }) => {
+    mutationFn: async (credentials: { email: string; password: string; totp_code?: string }) => {
       const result = await signIn('credentials', {
-        email: credentials.email,
-        password: credentials.password,
-        totp_code: credentials.totp_code,
-        remember: credentials.remember ? 'true' : 'false',
+        ...credentials,
         redirect: false,
-      });
+      } as any) as { error?: string } | undefined;
 
-      if (result?.error) {
-        throw new Error(result.error);
+      if (!result || result.error) {
+        throw new Error(result?.error || 'Login failed');
       }
 
       return result;
@@ -26,7 +23,22 @@ export function useLogin() {
 
 export function useSignup() {
   return useMutation({
-    mutationFn: async (data: { email: string; password: string; name: string }) => {
+    mutationFn: async (data: {
+      accountType: 'individual' | 'company';
+      firstName: string;
+      lastName: string;
+      email: string;
+      password: string;
+      country?: string;
+      companyName?: string;
+      workspaceName?: string;
+      workspaceSlug?: string;
+      industry?: string;
+      teamSize?: string;
+      referralSource?: string;
+      planSlug?: string;
+      billingCycle?: 'monthly' | 'annual';
+    }) => {
       return apiClient.post('/auth/register', data);
     },
   });

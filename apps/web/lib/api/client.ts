@@ -2,6 +2,8 @@ import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axio
 import type { ApiError } from '@mymanager/types';
 
 let accessToken: string | null = null;
+let csrfToken: string | null = null;
+let csrfFetchPromise: Promise<string> | null = null;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
@@ -9,6 +11,36 @@ export function setAccessToken(token: string | null) {
 
 export function getAccessToken() {
   return accessToken;
+}
+
+/**
+ * Fetch a CSRF token from the server (double-submit cookie pattern).
+ * The server sets the `_csrf` cookie and returns the token in the body.
+ * We send it back as the `x-csrf-token` header on state-changing requests.
+ */
+async function fetchCsrfToken(): Promise<string> {
+  if (csrfToken) return csrfToken;
+
+  // Deduplicate concurrent requests for the CSRF token
+  if (csrfFetchPromise) return csrfFetchPromise;
+
+  csrfFetchPromise = axios
+    .get('/api/v1/auth/csrf-token', { withCredentials: true })
+    .then((res) => {
+      csrfToken = res.data?.csrfToken ?? null;
+      csrfFetchPromise = null;
+      return csrfToken!;
+    })
+    .catch((err) => {
+      csrfFetchPromise = null;
+      throw err;
+    });
+
+  return csrfFetchPromise;
+}
+
+export function clearCsrfToken() {
+  csrfToken = null;
 }
 
 const apiClient = axios.create({
@@ -19,11 +51,26 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor: attach bearer token
-apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+// Request interceptor: attach bearer token and CSRF token
+apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
+  // Attach CSRF token on state-changing requests
+  const method = (config.method ?? '').toUpperCase();
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    try {
+      const token = await fetchCsrfToken();
+      if (token) {
+        config.headers['x-csrf-token'] = token;
+      }
+    } catch {
+      // If we can't fetch a CSRF token, proceed without it.
+      // The server will reject if protection is required.
+    }
+  }
+
   return config;
 });
 
@@ -41,6 +88,25 @@ apiClient.interceptors.response.use(
   },
   async (error: any) => {
     const originalRequest = error.config;
+
+    // Handle 403 with CSRF message - refetch token and retry once
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.message?.includes('CSRF') &&
+      !originalRequest._csrfRetry
+    ) {
+      originalRequest._csrfRetry = true;
+      csrfToken = null;
+      try {
+        const token = await fetchCsrfToken();
+        if (token) {
+          originalRequest.headers['x-csrf-token'] = token;
+          return apiClient(originalRequest);
+        }
+      } catch {
+        // Fall through to normal error handling
+      }
+    }
 
     // Handle 401 - try refresh
     if (error.response?.status === 401 && !originalRequest._retry) {

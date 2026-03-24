@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { FileUpload } from '@/components/FileUpload';
 
 interface BrandResponse {
   id: string;
@@ -153,8 +154,15 @@ export function SeoContent() {
               <input id="seoKeywords" type="text" value={globalSeo.keywords} onChange={(e) => updateGlobal('keywords', e.target.value)} className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none" />
             </div>
             <div>
-              <label htmlFor="ogImage" className="block text-sm font-medium text-gray-700">OG Image URL</label>
-              <input id="ogImage" type="text" value={globalSeo.ogImage} onChange={(e) => updateGlobal('ogImage', e.target.value)} className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none" />
+              <label className="block text-sm font-medium text-gray-700">OG Image</label>
+              <FileUpload
+                value={globalSeo.ogImage}
+                onChange={(url) => updateGlobal('ogImage', url)}
+                accept="image/*"
+              />
+              {globalSeo.ogImage && (
+                <p className="mt-1 text-xs text-gray-500 truncate">{globalSeo.ogImage}</p>
+              )}
             </div>
             <div>
               <label htmlFor="canonicalUrl" className="block text-sm font-medium text-gray-700">Canonical URL</label>

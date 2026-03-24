@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   Req,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -47,14 +48,14 @@ export class SocialAccountsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get social account details' })
-  async getAccount(@Param('id') id: string) {
+  async getAccount(@Param('id', ParseUUIDPipe) id: string) {
     return this.socialAccountsService.getById(id);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update social account settings' })
   async updateAccount(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { metadata?: Record<string, unknown> },
   ) {
     return this.socialAccountsService.update(id, body);
@@ -62,19 +63,19 @@ export class SocialAccountsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Disconnect a social account' })
-  async disconnectAccount(@Param('id') id: string) {
+  async disconnectAccount(@Param('id', ParseUUIDPipe) id: string) {
     return this.socialAccountsService.disconnect(id);
   }
 
   @Post(':id/refresh-token')
   @ApiOperation({ summary: 'Manually refresh OAuth token for an account' })
-  async refreshToken(@Param('id') id: string) {
+  async refreshToken(@Param('id', ParseUUIDPipe) id: string) {
     return this.socialAccountsService.refreshToken(id);
   }
 
   @Get(':id/validate')
   @ApiOperation({ summary: 'Validate that the account token is still working' })
-  async validateAccount(@Param('id') id: string) {
+  async validateAccount(@Param('id', ParseUUIDPipe) id: string) {
     return this.socialAccountsService.validate(id);
   }
 

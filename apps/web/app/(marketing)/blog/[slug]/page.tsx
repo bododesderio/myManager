@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
+import DOMPurify from 'isomorphic-dompurify';
 
 const API_URL = process.env.API_URL || 'http://localhost:3001';
 
@@ -12,7 +13,8 @@ async function getBlogPost(slug: string) {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog/${slug}`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return null; }
 }
 
@@ -20,8 +22,9 @@ async function getRelatedPosts(category: string, excludeSlug: string) {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog?category=${encodeURIComponent(category)}&limit=3`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
-    const data = await res.json();
-    const posts = data.posts || data.data || data || [];
+    const json = await res.json();
+    const data = json?.data ?? json;
+    const posts = data.posts || data || [];
     return posts.filter((p: any) => p.slug !== excludeSlug);
   } catch { return []; }
 }
@@ -154,7 +157,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {post.body ? (
           <div
             className="prose mt-10 max-w-none"
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(post.body) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(renderMarkdown(post.body)) }}
           />
         ) : post.excerpt ? (
           <div className="mt-10">

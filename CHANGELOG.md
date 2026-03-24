@@ -1,6 +1,25 @@
 # Changelog
 
-## [Unreleased] - 2026-03-23
+## [Unreleased] - 2026-03-24
+
+### Added
+- Public platforms API endpoint (`GET /api/v1/platforms`) for dynamic platform data
+- `usePlatforms` React Query hook for frontend platform data fetching
+- OAuth callback page (`/connect/oauth`) for social account connection flow
+- WhatsApp Business, Webhooks, Services, and Branding credential sections in admin
+- RichTextEditor integration for bio descriptions, workspace/project descriptions, and lead notes
+
+### Changed
+- ComposeContent now fetches platform character limits dynamically from database instead of hardcoded values
+- BlogEditorContent categories fetched from API with fallback to defaults
+- SeoContent OG Image field now uses FileUpload component instead of URL text input
+- FAQ new item form upgraded from plain textarea to RichTextEditor
+- Theme settings error handling now shows toast notifications instead of silent failures
+- .gitignore expanded with `.env.production`, `.env.staging`, `*.pem`, `*.cert`, `*.crt`, `.npmrc` patterns
+- Admin credentials page expanded with WhatsApp, Webhooks, Services, and Branding sections
+
+### Fixed
+- Three TODO comments in theme settings replaced with actual toast error notifications
 
 ### Docker & Infrastructure
 - Enabled Next.js standalone output for Docker production builds

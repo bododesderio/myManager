@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
 
@@ -162,7 +163,7 @@ export function EmailTemplatesContent() {
           <p className="mb-2 text-sm text-gray-500">Subject: {editingTemplate.subject}</p>
           <div
             className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: editingTemplate.body ?? '' }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editingTemplate.body ?? '') }}
           />
         </div>
       </div>

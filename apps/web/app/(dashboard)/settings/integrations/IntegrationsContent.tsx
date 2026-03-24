@@ -48,9 +48,9 @@ export default function IntegrationsContent() {
       return;
     }
     const key: ApiKey = {
-      id: Math.random().toString(36).slice(2),
+      id: crypto.randomUUID(),
       name: newKeyName,
-      key: `mm_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`,
+      key: `mm_${crypto.randomUUID().replace(/-/g, '')}`,
       created_at: new Date().toISOString(),
     };
     setApiKeys((prev) => [...prev, key]);
@@ -75,7 +75,7 @@ export default function IntegrationsContent() {
       return;
     }
     const webhook: Webhook = {
-      id: Math.random().toString(36).slice(2),
+      id: crypto.randomUUID(),
       url: newWebhookUrl,
       events: newWebhookEvents,
       created_at: new Date().toISOString(),

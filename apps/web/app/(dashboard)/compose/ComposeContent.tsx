@@ -3,34 +3,11 @@
 import { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useSocialAccounts } from '@/lib/hooks/useSocialAccounts';
+import { usePlatforms } from '@/lib/hooks/usePlatforms';
 import { useCreatePost, usePublishPost } from '@/lib/hooks/usePosts';
 import { useUploadMedia } from '@/lib/hooks/useMedia';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
-
-/* ------------------------------------------------------------------ */
-/*  Platform character limits                                          */
-/* ------------------------------------------------------------------ */
-const PLATFORM_LIMITS: Record<string, number> = {
-  facebook: 63206,
-  instagram: 2200,
-  x: 280,
-  twitter: 280,
-  linkedin: 3000,
-  tiktok: 2200,
-  threads: 500,
-  pinterest: 500,
-  youtube: 5000,
-};
-
-function getActiveCharLimit(selectedPlatforms: string[]): number {
-  if (selectedPlatforms.length === 0) return 2200; // sensible default
-  return Math.min(
-    ...selectedPlatforms.map(
-      (p) => PLATFORM_LIMITS[p.toLowerCase()] ?? 2200,
-    ),
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Platform icon helper (simple coloured dot + label fallback)        */
@@ -76,9 +53,25 @@ export function ComposeContent() {
 
   /* --- Data hooks --- */
   const { data: accountsData, isLoading: accountsLoading } = useSocialAccounts();
+  const { data: platforms } = usePlatforms();
   const createPost = useCreatePost();
   const publishPost = usePublishPost();
   const uploadMedia = useUploadMedia();
+
+  /* --- Dynamic platform character limits --- */
+  const platformLimits: Record<string, number> = {};
+  if (platforms) {
+    for (const p of platforms) {
+      platformLimits[p.slug] = p.max_caption_chars;
+    }
+  }
+
+  function getActiveCharLimit(selectedPlatforms: string[]): number {
+    if (selectedPlatforms.length === 0) return 2200;
+    return Math.min(
+      ...selectedPlatforms.map((p) => platformLimits[p.toLowerCase()] ?? 2200),
+    );
+  }
 
   /* --- Local state --- */
   const [selectedAccountIds, setSelectedAccountIds] = useState<Set<string>>(new Set());

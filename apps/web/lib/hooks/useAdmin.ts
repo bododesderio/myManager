@@ -103,7 +103,22 @@ export function useAdminLeads() {
 export function useAdminQueue() {
   return useQuery({
     queryKey: adminKeys.queue(),
-    queryFn: () => apiClient.get('/admin/queue'),
+    queryFn: async () => {
+      const data = await apiClient.get('/admin/queue/stats');
+      const queuesObj = (data as any)?.queues ?? {};
+      const queues = Object.entries(queuesObj).map(([name, stats]: [string, any]) => ({
+        name,
+        waiting: stats?.waiting ?? 0,
+        active: stats?.active ?? 0,
+        completed: stats?.completed ?? 0,
+        failed: stats?.failed ?? 0,
+      }));
+
+      return {
+        queues,
+        activeJobs: [],
+      };
+    },
     refetchInterval: 10_000,
   });
 }
@@ -111,7 +126,21 @@ export function useAdminQueue() {
 export function useAdminHealth() {
   return useQuery({
     queryKey: adminKeys.health(),
-    queryFn: () => apiClient.get('/health'),
+    queryFn: async () => {
+      const data = await apiClient.get('/admin/api-health');
+      const checks = (data as any)?.checks ?? {};
+      return {
+        status: (data as any)?.status ?? 'unknown',
+        uptime: '--',
+        responseTime: '--',
+        services: Object.entries(checks).map(([name, value]: [string, any]) => ({
+          name,
+          status: value?.status ?? 'unknown',
+          latency: value?.latencyMs != null ? `${value.latencyMs}ms` : '--',
+          lastCheck: new Date().toLocaleTimeString(),
+        })),
+      };
+    },
     refetchInterval: 30_000,
   });
 }

@@ -13,6 +13,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { Request, Response } from 'express';
+import { randomBytes } from 'crypto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { Public } from '../../common/decorators/public.decorator';
@@ -31,6 +32,21 @@ import {
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get('csrf-token')
+  @Public()
+  @ApiOperation({ summary: 'Get a CSRF token (double-submit cookie pattern)' })
+  getCsrfToken(@Res({ passthrough: true }) res: Response) {
+    const token = randomBytes(32).toString('hex');
+    res.cookie('_csrf', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+    return { csrfToken: token };
+  }
 
   @Public()
   @Post('register')
@@ -96,7 +112,12 @@ export class AuthController {
     if (refreshToken) {
       await this.authService.revokeRefreshToken(refreshToken);
     }
-    res.clearCookie('refresh_token');
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/api/v1/auth',
+    });
     return { message: 'Logged out successfully' };
   }
 
@@ -108,6 +129,16 @@ export class AuthController {
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     await this.authService.sendPasswordResetEmail(body.email);
     return { message: 'If the email exists, a reset link has been sent' };
+  }
+
+  @Public()
+  @Post('resend-verification')
+  @Throttle({ long: { ttl: 900000, limit: 5 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification link' })
+  async resendVerification(@Body() body: ForgotPasswordDto) {
+    await this.authService.resendVerificationEmail(body.email);
+    return { message: 'If the email exists and is not yet verified, a verification link has been sent' };
   }
 
   @Public()
@@ -217,9 +248,9 @@ export class AuthController {
     res.cookie('refresh_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      path: '/',
+      sameSite: 'lax',
+      path: '/api/v1/auth',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
   }
 }

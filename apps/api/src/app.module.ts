@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guards/jwt.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { WorkspaceMemberGuard } from './common/guards/workspace-member.guard';
+import { CsrfGuard } from './common/guards/csrf.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
@@ -45,6 +46,7 @@ import { ThemeModule } from './modules/theme/theme.module';
 import { PortalModule } from './modules/portal/portal.module';
 import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
+import { PlatformsModule } from './modules/platforms/platforms.module';
 import { PrismaModule } from './prisma.module';
 import { DlqModule } from './workers/dlq.module';
 import { HealthController } from './health.controller';
@@ -123,12 +125,14 @@ import { BrandController } from './brand.controller';
     PortalModule,
     AdminDashboardModule,
     SystemConfigModule,
+    PlatformsModule,
     DlqModule,
   ],
   controllers: [HealthController, BrandController],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: CsrfGuard },
     { provide: APP_GUARD, useClass: WorkspaceMemberGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],

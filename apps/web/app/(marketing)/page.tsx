@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Route } from 'next';
 import type { Metadata } from 'next';
 import { PricingToggle } from '@/components/marketing/PricingToggle';
+import { PlatformIcon } from '@/components/icons/PlatformIcon';
 
 const API_URL = process.env.API_URL || 'http://localhost:3001';
 
@@ -9,7 +11,8 @@ async function getCmsPage(slug: string) {
   try {
     const res = await fetch(`${API_URL}/api/v1/cms/pages/${slug}`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return null; }
 }
 
@@ -17,7 +20,8 @@ async function getPlans() {
   try {
     const res = await fetch(`${API_URL}/api/v1/plans`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return []; }
 }
 
@@ -25,7 +29,8 @@ async function getPlatforms() {
   try {
     const res = await fetch(`${API_URL}/api/v1/platforms`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return []; }
 }
 
@@ -43,7 +48,7 @@ function safeParse(json: string | undefined, fallback: any[] = []) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getCmsPage('home');
+  const page = await getCmsPage('landing');
   const hero = getFields(page, 'hero');
   return {
     title: hero.meta_title || 'myManager — Social Media Management Platform',
@@ -67,7 +72,7 @@ const MOCK_PILLS = [
 
 export default async function LandingPage() {
   const [page, plans, platforms] = await Promise.all([
-    getCmsPage('home'),
+    getCmsPage('landing'),
     getPlans(),
     getPlatforms(),
   ]);
@@ -76,13 +81,13 @@ export default async function LandingPage() {
   const platformStrip = getFields(page, 'platform_strip');
   const features = getFields(page, 'features');
   const howItWorks = getFields(page, 'how_it_works');
-  const statsBand = getFields(page, 'stats_band');
-  const pricing = getFields(page, 'pricing');
+  const statsBand = getFields(page, 'stats');
+  const pricing = getFields(page, 'pricing_preview');
   const finalCta = getFields(page, 'final_cta');
 
-  const trustItems: { text: string }[] = safeParse(hero.trust_items_json);
-  const featureList: { title: string; description: string }[] = safeParse(features.features_json);
-  const steps: { title: string; description: string }[] = safeParse(howItWorks.steps_json);
+  const trustItems: { text: string }[] = safeParse(hero.trust_items);
+  const featureList: { icon: string; title: string; body: string }[] = safeParse(features.features_json);
+  const steps: { number: string; title: string; body: string }[] = safeParse(howItWorks.steps_json);
   const stats: { value: string; label: string }[] = safeParse(statsBand.stats_json);
 
   return (
@@ -92,10 +97,10 @@ export default async function LandingPage() {
         <div className="grid items-center gap-12 lg:grid-cols-[55%_45%]">
           {/* Left */}
           <div>
-            {hero.announcement_visible === 'true' && hero.announcement_text && (
+            {hero.announcement_badge_visible === 'true' && hero.announcement_badge_text && (
               <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary-light px-3 py-1 text-[11px] font-semibold text-primary-dark">
                 <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                {hero.announcement_text}
+                {hero.announcement_badge_text}
               </span>
             )}
             <h1 className="text-[42px] font-extrabold leading-tight lg:text-[46px]">
@@ -135,39 +140,16 @@ export default async function LandingPage() {
             )}
           </div>
 
-          {/* Right — Composer mockup */}
-          <div className="rounded-[16px] border border-border bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full" style={{ background: '#EF4444' }} />
-              <span className="h-2 w-2 rounded-full" style={{ background: '#F59E0B' }} />
-              <span className="h-2 w-2 rounded-full" style={{ background: '#22C55E' }} />
-              <span className="ml-2 text-[11px] font-medium text-text-muted">New post</span>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {MOCK_PILLS.map((p) => (
-                <span key={p.label} className="rounded-full px-3 py-1 text-[10px] font-bold text-white" style={{ background: p.bg }}>
-                  {p.label}
-                </span>
-              ))}
-            </div>
-            <div className="mt-4 rounded-input bg-bg-2 p-3 text-[12px] text-text-2">
-              {hero.composer_caption || 'Write your caption here... ✨'}
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {[MOCK_PILLS[0], MOCK_PILLS[1], MOCK_PILLS[2]].map((p) => (
-                <div key={p.label} className="overflow-hidden rounded-input border border-border">
-                  <div className="h-1.5" style={{ background: p.bg }} />
-                  <div className="space-y-1.5 p-2">
-                    <div className="h-2 w-full animate-pulse rounded bg-bg-2" />
-                    <div className="h-2 w-4/5 animate-pulse rounded bg-bg-2" />
-                    <div className="h-2 w-3/5 animate-pulse rounded bg-bg-2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button className="mt-4 w-full rounded-btn bg-primary py-2.5 text-[12px] font-bold text-white">
-              Schedule Post
-            </button>
+          {/* Right — Dashboard preview */}
+          <div className="rounded-[16px] border border-border bg-white p-2 shadow-lg overflow-hidden">
+            <Image
+              src="/images/hero-dashboard.svg"
+              alt="myManager Dashboard Preview"
+              width={800}
+              height={500}
+              className="w-full h-auto rounded-xl"
+              priority
+            />
           </div>
         </div>
       </section>
@@ -184,10 +166,7 @@ export default async function LandingPage() {
                 key={p.id || p.slug}
                 className="flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-[12px] font-medium text-text"
               >
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{ background: PLATFORM_COLORS[(p.slug || p.name || '').toLowerCase()] || 'var(--color-primary)' }}
-                />
+                <PlatformIcon platform={p.slug || p.name || ''} size={18} />
                 {p.name}
               </span>
             ))}
@@ -200,7 +179,7 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-5xl px-5">
           <div className="text-center">
             <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
-              {features.label || 'Features'}
+              {features.section_label || 'Features'}
             </p>
             <h2 className="mt-2 text-[28px] font-bold text-text">
               {features.headline || 'Everything you need to grow'}
@@ -221,7 +200,7 @@ export default async function LandingPage() {
                   </svg>
                 </div>
                 <h3 className="mt-3 text-[13px] font-bold text-text">{feat.title}</h3>
-                <p className="mt-1 text-[12px] text-text-2">{feat.description}</p>
+                <p className="mt-1 text-[12px] text-text-2">{feat.body}</p>
               </div>
             ))}
           </div>
@@ -232,7 +211,7 @@ export default async function LandingPage() {
       <section className="bg-bg-2 py-16">
         <div className="mx-auto max-w-5xl px-5 text-center">
           <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
-            {howItWorks.label || 'How it works'}
+            {howItWorks.section_label || 'How it works'}
           </p>
           <h2 className="mt-2 text-[28px] font-bold text-text">
             {howItWorks.headline || 'Get started in minutes'}
@@ -244,7 +223,7 @@ export default async function LandingPage() {
                   {i + 1}
                 </div>
                 <h3 className="mt-4 text-[14px] font-bold text-text">{step.title}</h3>
-                <p className="mt-1 text-[12px] text-text-2">{step.description}</p>
+                <p className="mt-1 text-[12px] text-text-2">{step.body}</p>
               </div>
             ))}
           </div>
@@ -267,7 +246,7 @@ export default async function LandingPage() {
       <section className="py-16">
         <div className="mx-auto max-w-5xl px-5 text-center">
           <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
-            {pricing.label || 'Pricing'}
+            {pricing.section_label || 'Pricing'}
           </p>
           <h2 className="mt-2 text-[28px] font-bold text-text">
             {pricing.headline || 'Simple, transparent pricing'}
@@ -278,8 +257,8 @@ export default async function LandingPage() {
           <div className="mt-8">
             <PricingToggle plans={plans} />
           </div>
-          {pricing.payment_note && (
-            <p className="mt-6 text-[11px] text-text-muted">{pricing.payment_note}</p>
+          {pricing.payment_methods_note && (
+            <p className="mt-6 text-[11px] text-text-muted">{pricing.payment_methods_note}</p>
           )}
         </div>
       </section>

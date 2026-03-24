@@ -7,7 +7,8 @@ async function getBrandConfig() {
   try {
     const res = await fetch(`${API_URL}/api/v1/cms/pages/brand`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return null; }
 }
 
@@ -15,7 +16,8 @@ async function getCmsPage(slug: string) {
   try {
     const res = await fetch(`${API_URL}/api/v1/cms/pages/${slug}`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return null; }
 }
 

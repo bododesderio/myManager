@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Route } from 'next';
 import { MobileNavMenu } from './MobileNavMenu';
 
@@ -23,7 +24,8 @@ async function getNavLinks(): Promise<NavLink[]> {
       next: { revalidate: 300 },
     });
     if (!res.ok) return [];
-    const data = await res.json();
+    const json = await res.json();
+    const data = json?.data ?? json;
     return data.main_nav ?? [];
   } catch {
     return [];
@@ -36,7 +38,8 @@ async function getBrand(): Promise<BrandConfig> {
       next: { revalidate: 300 },
     });
     if (!res.ok) return DEFAULT_BRAND;
-    return await res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch {
     return DEFAULT_BRAND;
   }
@@ -54,12 +57,8 @@ export async function MarketingNavbar() {
     >
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
         {/* Brand */}
-        <Link
-          href="/"
-          className="font-heading text-[15px] font-bold"
-          style={{ color: 'var(--color-primary-dark)' }}
-        >
-          {brand.app_name}
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/images/logo.svg" alt={brand.app_name} width={140} height={32} priority />
         </Link>
 
         {/* Center nav links — hidden on mobile */}

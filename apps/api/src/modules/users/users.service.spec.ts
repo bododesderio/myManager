@@ -12,8 +12,15 @@ describe('UsersService', () => {
       disableTwoFactor: jest.fn(),
     };
 
+    const configService = {
+      get: jest.fn().mockReturnValue('redis://localhost:6379'),
+    };
+
     return {
-      service: new UsersService(repository as unknown as ConstructorParameters<typeof UsersService>[0]),
+      service: new UsersService(
+        repository as unknown as ConstructorParameters<typeof UsersService>[0],
+        configService as unknown as ConstructorParameters<typeof UsersService>[1],
+      ),
       repository,
     };
   }

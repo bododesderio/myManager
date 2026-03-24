@@ -8,6 +8,9 @@ import {
   Req,
   Headers,
   UnauthorizedException,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -73,17 +76,19 @@ export class BillingController {
   @ApiOperation({ summary: 'Get billing history' })
   async getBillingHistory(
     @Req() req: Request,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.billingService.getBillingHistory(userId, page, limit);
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    return this.billingService.getBillingHistory(userId, safePage, safeLimit);
   }
 
   @Get('invoice/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get invoice details' })
-  async getInvoice(@Param('id') id: string) {
+  async getInvoice(@Param('id', ParseUUIDPipe) id: string) {
     return this.billingService.getInvoice(id);
   }
 
@@ -151,7 +156,7 @@ export class BillingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get MRR history over time (superadmin)' })
   async getMrrHistory(
-    @Query('months') months: number = 12,
+    @Query('months', new DefaultValuePipe(12), ParseIntPipe) months: number,
   ) {
     return this.billingService.getMrrHistory(months);
   }
@@ -169,9 +174,11 @@ export class BillingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get recent failed payments (superadmin)' })
   async getFailedPayments(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
-    return this.billingService.getFailedPayments(page, limit);
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    return this.billingService.getFailedPayments(safePage, safeLimit);
   }
 }

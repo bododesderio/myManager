@@ -4,13 +4,17 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useVerifyEmail } from '@/lib/hooks/useAuth';
+import { apiClient } from '@/lib/api/client';
+import { useToast } from '@/providers/ToastProvider';
 
 export function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const email = searchParams.get('email');
   const verifyEmail = useVerifyEmail();
+  const { addToast } = useToast();
   const [status, setStatus] = useState<'pending' | 'verifying' | 'success' | 'error'>('pending');
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
     if (token && status === 'pending') {
@@ -24,6 +28,23 @@ export function VerifyEmailContent() {
       );
     }
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleResend() {
+    if (!email) {
+      addToast({ type: 'error', message: 'No email address found. Please sign up again.' });
+      return;
+    }
+    setResending(true);
+    try {
+      await apiClient.post('/auth/resend-verification', { email });
+      addToast({ type: 'success', message: 'Verification email resent. Check your inbox.' });
+    } catch (err: any) {
+      const msg = err?.error?.message || err?.message || 'Failed to resend verification email.';
+      addToast({ type: 'error', message: msg });
+    } finally {
+      setResending(false);
+    }
+  }
 
   // Token present — auto-verify
   if (token) {
@@ -48,7 +69,8 @@ export function VerifyEmailContent() {
           <p className="mt-4 text-gray-600">Your email has been verified. You can now log in.</p>
           <Link
             href="/login"
-            className="mt-6 inline-block rounded-brand bg-brand-primary px-6 py-3 font-semibold text-white hover:bg-brand-primary-dark"
+            className="mt-6 inline-block rounded-btn px-6 py-3 text-[13px] font-bold"
+            style={{ backgroundColor: 'var(--color-primary, #7F77DD)', color: '#FFFFFF' }}
           >
             Log In
           </Link>
@@ -93,8 +115,12 @@ export function VerifyEmailContent() {
       </p>
       <p className="mt-6 text-sm text-gray-500">
         Did not receive the email? Check your spam folder or{' '}
-        <button className="font-medium text-brand-primary hover:underline">
-          resend the verification email
+        <button
+          onClick={handleResend}
+          disabled={resending}
+          className="font-medium text-brand-primary hover:underline disabled:opacity-50"
+        >
+          {resending ? 'Resending...' : 'resend the verification email'}
         </button>
         .
       </p>

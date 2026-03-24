@@ -52,4 +52,4 @@ EXPOSE 3001
 
 USER node
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/main.js"]
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node --import tsx dist/main.js"]

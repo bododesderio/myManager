@@ -207,11 +207,11 @@ export function FaqContent() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Answer</label>
-              <textarea
-                rows={3}
+              <RichTextEditor
                 value={newItem.answer}
-                onChange={(e) => setNewItem({ ...newItem, answer: e.target.value })}
-                className={inputCls}
+                onChange={(html) => setNewItem({ ...newItem, answer: html })}
+                placeholder="Write the answer..."
+                minHeight={120}
               />
             </div>
             <div>

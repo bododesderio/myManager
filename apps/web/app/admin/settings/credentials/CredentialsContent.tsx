@@ -98,6 +98,44 @@ const sections: CredentialSection[] = [
       { key: 'SENTRY_AUTH_TOKEN', label: 'Sentry AUTH_TOKEN', secret: true },
     ],
   },
+  {
+    id: 'whatsapp',
+    label: 'WhatsApp Business',
+    category: 'whatsapp',
+    fields: [
+      { key: 'WHATSAPP_SYSTEM_USER_TOKEN', label: 'System User Token', secret: true },
+      { key: 'WHATSAPP_PHONE_NUMBER_ID', label: 'Phone Number ID', secret: false },
+      { key: 'WHATSAPP_WABA_ID', label: 'Business Account ID', secret: false },
+    ],
+  },
+  {
+    id: 'webhooks',
+    label: 'Webhooks',
+    category: 'webhooks',
+    fields: [
+      { key: 'WEBHOOK_VERIFY_TOKEN', label: 'Webhook Verify Token', secret: true },
+    ],
+  },
+  {
+    id: 'services',
+    label: 'Services',
+    category: 'services',
+    fields: [
+      { key: 'LANGUAGETOOL_URL', label: 'LanguageTool URL', secret: false },
+      { key: 'OPEN_EXCHANGE_RATES_API_KEY', label: 'Exchange Rates API Key', secret: true },
+    ],
+  },
+  {
+    id: 'branding',
+    label: 'Branding & Email',
+    category: 'branding',
+    fields: [
+      { key: 'BRAND_NAME', label: 'Brand Name', secret: false },
+      { key: 'EMAIL_DOMAIN', label: 'Email Domain', secret: false },
+      { key: 'WEB_URL', label: 'Web App URL', secret: false },
+      { key: 'CORS_ORIGINS', label: 'CORS Origins', secret: false },
+    ],
+  },
 ];
 
 /* ------------------------------------------------------------------ */

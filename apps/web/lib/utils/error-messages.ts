@@ -2,6 +2,8 @@ import type { ApiError } from '@mymanager/types';
 
 const ERROR_MESSAGES: Record<string, string> = {
   AUTH_INVALID_CREDENTIALS: 'Invalid email or password.',
+  'Invalid email or password': 'Invalid email or password.',
+  'Invalid 2FA code': 'Invalid two-factor authentication code.',
   AUTH_EMAIL_NOT_VERIFIED: 'Please verify your email before logging in.',
   AUTH_TOKEN_EXPIRED: 'Your session has expired. Please log in again.',
   AUTH_TOKEN_INVALID: 'Invalid authentication token.',

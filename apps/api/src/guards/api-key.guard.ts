@@ -2,17 +2,38 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../prisma.service';
 import Redis from 'ioredis';
-
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
-export class ApiKeyGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) {}
+export class ApiKeyGuard implements CanActivate, OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(ApiKeyGuard.name);
+  private redis!: Redis;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  onModuleInit() {
+    this.redis = new Redis(
+      this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+    );
+    this.redis.on('error', (err) =>
+      this.logger.error('Redis connection error', err),
+    );
+  }
+
+  async onModuleDestroy() {
+    await this.redis?.quit();
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -26,9 +47,9 @@ export class ApiKeyGuard implements CanActivate {
     const prefix = rawKey.substring(0, 10);
 
     const rateLimitKey = `api_rate:${prefix}`;
-    const current = await redis.incr(rateLimitKey);
+    const current = await this.redis.incr(rateLimitKey);
     if (current === 1) {
-      await redis.expire(rateLimitKey, 3600);
+      await this.redis.expire(rateLimitKey, 3600);
     }
 
     const candidates = await this.prisma.apiKey.findMany({

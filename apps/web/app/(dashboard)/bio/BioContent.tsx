@@ -9,6 +9,7 @@ import {
   useUpdateBioPage,
 } from '@/lib/hooks/useBioPages';
 import { FileUpload } from '@/components/FileUpload';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
@@ -112,7 +113,7 @@ export function BioContent() {
     }
     setLinks((prev) => [
       ...prev,
-      { id: Math.random().toString(36).slice(2), label: newLinkLabel, url: newLinkUrl },
+      { id: crypto.randomUUID(), label: newLinkLabel, url: newLinkUrl },
     ]);
     setNewLinkLabel('');
     setNewLinkUrl('');
@@ -237,13 +238,11 @@ export function BioContent() {
                 <label htmlFor="bioDescription" className="block text-sm font-medium text-gray-700">
                   Description
                 </label>
-                <textarea
-                  id="bioDescription"
-                  rows={2}
+                <RichTextEditor
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(html) => setDescription(html)}
                   placeholder="Digital creator & marketer"
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  minHeight={80}
                 />
               </div>
               <FileUpload

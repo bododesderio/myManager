@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
 
@@ -35,7 +35,7 @@ export class AnalyticsController {
     @Query('workspaceId') workspaceId: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
-    @Query('limit') limit: number = 10,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('sortBy') sortBy: string = 'engagements',
   ) {
     return this.analyticsService.getTopPosts(workspaceId, startDate, endDate, limit, sortBy);

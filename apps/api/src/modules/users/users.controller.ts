@@ -9,6 +9,9 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -119,17 +122,19 @@ export class UsersController {
   @Get('admin/list')
   @ApiOperation({ summary: 'List all users (superadmin only)' })
   async listUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 50,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
     @Query('search') search?: string,
   ) {
-    return this.usersService.listUsers(page, limit, search);
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    return this.usersService.listUsers(safePage, safeLimit, search);
   }
 
   @SuperAdmin()
   @Get('admin/:id')
   @ApiOperation({ summary: 'Get user details (superadmin only)' })
-  async getUserById(@Param('id') id: string) {
+  async getUserById(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.getUserById(id);
   }
 
@@ -137,7 +142,7 @@ export class UsersController {
   @Put('admin/:id/role')
   @ApiOperation({ summary: 'Update user role (superadmin only)' })
   async updateUserRole(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: UpdateUserRoleDto,
   ) {
     return this.usersService.updateUserRole(id, body.is_superadmin);
@@ -147,7 +152,7 @@ export class UsersController {
   @Put('admin/:id/suspend')
   @ApiOperation({ summary: 'Suspend a user (superadmin only)' })
   async suspendUser(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: UpdateUserSuspensionDto,
   ) {
     return this.usersService.suspendUser(id, body.suspended);
@@ -156,7 +161,7 @@ export class UsersController {
   @SuperAdmin()
   @Put('admin/:id/2fa/disable')
   @ApiOperation({ summary: 'Disable 2FA for a user (superadmin only)' })
-  async disableUserTwoFactor(@Param('id') id: string) {
+  async disableUserTwoFactor(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.disableUserTwoFactor(id);
   }
 }

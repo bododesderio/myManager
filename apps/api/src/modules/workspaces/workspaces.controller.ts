@@ -9,6 +9,9 @@ import {
   Param,
   Query,
   Req,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -40,7 +43,7 @@ export class WorkspacesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get workspace details' })
-  async getWorkspace(@Param('id') id: string, @Req() req: Request) {
+  async getWorkspace(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
     return this.workspacesService.getById(id, userId);
   }
@@ -48,7 +51,7 @@ export class WorkspacesController {
   @Put(':id')
   @ApiOperation({ summary: 'Update workspace details' })
   async updateWorkspace(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() req: Request,
     @Body() body: { name?: string; slug?: string; avatarUrl?: string },
   ) {
@@ -58,7 +61,7 @@ export class WorkspacesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a workspace' })
-  async deleteWorkspace(@Param('id') id: string, @Req() req: Request) {
+  async deleteWorkspace(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
     return this.workspacesService.delete(id, userId);
   }
@@ -66,7 +69,7 @@ export class WorkspacesController {
   @Get(':id/members')
   @WorkspaceRoles('OWNER', 'ADMIN')
   @ApiOperation({ summary: 'List workspace members' })
-  async listMembers(@Param('id') id: string) {
+  async listMembers(@Param('id', ParseUUIDPipe) id: string) {
     return this.workspacesService.listMembers(id);
   }
 
@@ -74,7 +77,7 @@ export class WorkspacesController {
   @WorkspaceRoles('OWNER', 'ADMIN')
   @ApiOperation({ summary: 'Invite a member to workspace' })
   async inviteMember(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() req: Request,
     @Body() body: { email: string; role: string },
   ) {
@@ -86,7 +89,7 @@ export class WorkspacesController {
   @WorkspaceRoles('OWNER')
   @ApiOperation({ summary: 'Update member role' })
   async updateMemberRole(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Param('memberId') memberId: string,
     @Body() body: { role: string },
   ) {
@@ -97,7 +100,7 @@ export class WorkspacesController {
   @WorkspaceRoles('OWNER', 'ADMIN')
   @ApiOperation({ summary: 'Remove member from workspace' })
   async removeMember(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Param('memberId') memberId: string,
   ) {
     return this.workspacesService.removeMember(id, memberId);
@@ -105,14 +108,14 @@ export class WorkspacesController {
 
   @Get(':id/approval-config')
   @ApiOperation({ summary: 'Get workspace approval configuration' })
-  async getApprovalConfig(@Param('id') id: string) {
+  async getApprovalConfig(@Param('id', ParseUUIDPipe) id: string) {
     return this.workspacesService.getApprovalConfig(id);
   }
 
   @Put(':id/approval-config')
   @ApiOperation({ summary: 'Update workspace approval configuration' })
   async updateApprovalConfig(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { require_approval: boolean; auto_approve_admins: boolean; require_client_review: boolean },
   ) {
     return this.workspacesService.updateApprovalConfig(id, body);
@@ -120,7 +123,7 @@ export class WorkspacesController {
 
   @Get(':id/usage')
   @ApiOperation({ summary: 'Get workspace usage and quota limits' })
-  async getUsage(@Param('id') id: string, @Req() req: Request) {
+  async getUsage(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
     return this.workspacesService.getUsage(id, userId);
   }
@@ -129,8 +132,8 @@ export class WorkspacesController {
   @WorkspaceRoles('OWNER', 'ADMIN')
   @ApiOperation({ summary: 'Get team member activity for workspace' })
   async getTeamActivity(
-    @Param('id') id: string,
-    @Query('days') days: number = 30,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('days', new DefaultValuePipe(30), ParseIntPipe) days: number,
   ) {
     return this.workspacesService.getTeamActivity(id, days);
   }

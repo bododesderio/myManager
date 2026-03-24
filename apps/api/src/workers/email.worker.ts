@@ -54,7 +54,7 @@ export class EmailWorker {
         <div class="content">
           <p>Hi ${data.name},</p>
           <p>You requested a password reset. Click the button below to set a new password:</p>
-          <a href="${process.env.NEXTAUTH_URL}/reset-password?token=${data.resetToken}" class="button">Reset Password</a>
+          <a href="${data.resetUrl || `${process.env.NEXTAUTH_URL}/reset-password?token=${data.resetToken}`}" class="button">Reset Password</a>
           <p>This link expires in 1 hour. If you did not request this, ignore this email.</p>
         </div>
         <div class="footer"><p>You received this email because a password reset was requested for your account.</p></div>
@@ -75,7 +75,7 @@ export class EmailWorker {
         <div class="content">
           <p>Hi ${data.name},</p>
           <p>Please verify your email address by clicking the button below:</p>
-          <a href="${process.env.NEXTAUTH_URL}/verify-email?token=${data.verificationToken}" class="button">Verify Email</a>
+          <a href="${data.verifyUrl || `${process.env.NEXTAUTH_URL}/verify-email?token=${data.verificationToken}`}" class="button">Verify Email</a>
         </div>
       </body></html>`,
     };

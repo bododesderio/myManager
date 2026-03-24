@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AuditService } from './audit.service';
 
@@ -12,13 +12,13 @@ export class AuditController {
   @ApiOperation({ summary: 'List audit log entries' })
   async list(
     @Query('workspaceId') workspaceId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
     @Query('action') action?: string,
     @Query('userId') userId?: string,
     @Query('resourceType') resourceType?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 50,
   ) {
     return this.auditService.list(workspaceId, { action, userId, resourceType, startDate, endDate }, page, limit);
   }

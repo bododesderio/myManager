@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useWorkspace, useUpdateWorkspace } from '@/lib/hooks/useWorkspaces';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 export default function WorkspaceSettingsContent() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -77,13 +78,11 @@ export default function WorkspaceSettingsContent() {
             </div>
             <div>
               <label htmlFor="wsDesc" className="block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                id="wsDesc"
-                rows={3}
+              <RichTextEditor
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(html) => setDescription(html)}
                 placeholder="A brief description of your workspace"
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                minHeight={100}
               />
             </div>
           </div>

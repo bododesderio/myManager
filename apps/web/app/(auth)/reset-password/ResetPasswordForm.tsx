@@ -92,7 +92,8 @@ export function ResetPasswordForm() {
         <button
           type="submit"
           disabled={resetPassword.isPending}
-          className="w-full rounded-brand bg-brand-primary px-6 py-3 font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+          className="w-full rounded-btn py-3 text-[13px] font-bold transition disabled:opacity-50"
+          style={{ backgroundColor: 'var(--color-primary, #7F77DD)', color: '#FFFFFF' }}
         >
           {resetPassword.isPending ? 'Resetting...' : 'Reset Password'}
         </button>

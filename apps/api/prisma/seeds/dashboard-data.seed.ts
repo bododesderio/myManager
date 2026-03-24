@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PostStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -7,8 +7,8 @@ async function main() {
   const user = await prisma.user.findUnique({ where: { email: 'demo@mymanager.app' } });
   if (!user) throw new Error('Demo user not found — run demo.seed.ts first');
 
-  const workspace = await prisma.workspace.findUnique({ where: { slug: 'demo-workspace' } });
-  if (!workspace) throw new Error('Demo workspace not found — run demo.seed.ts first');
+  const workspace = await prisma.workspace.findFirst({ where: { owner_id: user.id } });
+  if (!workspace) throw new Error('Demo workspace not found — run main seed first');
 
   // ── Resolve platforms ────────────────────────────────────────
   const [fbPlatform, igPlatform, xPlatform, liPlatform] = await Promise.all([
@@ -122,7 +122,7 @@ async function main() {
         'Consistency beats perfection every time. The brands that show up daily on social media are the ones that build real trust. Start with 3 posts per week and scale from there. #SocialMediaMarketing #ContentStrategy',
       content_type: 'post',
       platforms: ['instagram', 'facebook'],
-      status: 'PUBLISHED',
+      status: PostStatus.PUBLISHED,
       published_at: daysAgo(2),
       scheduled_at: daysAgo(2),
       platform_options: {},
@@ -135,7 +135,7 @@ async function main() {
         'Your audience does not care about your product — they care about their problem. Flip the script: lead with the pain point, then position your offer as the solution. That is the secret to high-converting social copy.',
       content_type: 'post',
       platforms: ['linkedin'],
-      status: 'PUBLISHED',
+      status: PostStatus.PUBLISHED,
       published_at: daysAgo(4),
       scheduled_at: daysAgo(4),
       platform_options: {},
@@ -148,7 +148,7 @@ async function main() {
         'Short-form video is still king in 2026. Here are 5 hooks that stop the scroll: 1) Start with a bold claim 2) Ask a polarizing question 3) Use a pattern interrupt 4) Share a surprising stat 5) Tell a micro-story. Save this for later!',
       content_type: 'post',
       platforms: ['x', 'instagram'],
-      status: 'PUBLISHED',
+      status: PostStatus.PUBLISHED,
       published_at: daysAgo(6),
       scheduled_at: daysAgo(6),
       platform_options: {},
@@ -162,7 +162,7 @@ async function main() {
         'Behind every viral post is a strategy you did not see. Tomorrow we are breaking down the exact framework we use to plan a month of content in one afternoon. Stay tuned. #ContentPlanning #MarketingTips',
       content_type: 'post',
       platforms: ['facebook', 'instagram', 'linkedin'],
-      status: 'SCHEDULED',
+      status: PostStatus.SCHEDULED,
       scheduled_at: daysFromNow(1),
       platform_options: {},
     },
@@ -174,7 +174,7 @@ async function main() {
         'Engagement rate dropping? Here is what most brands overlook: your posting times matter less than your reply times. Respond within the first 30 minutes and watch your reach climb.',
       content_type: 'post',
       platforms: ['x', 'linkedin'],
-      status: 'SCHEDULED',
+      status: PostStatus.SCHEDULED,
       scheduled_at: daysFromNow(3),
       platform_options: {},
     },
@@ -186,7 +186,7 @@ async function main() {
         'We analyzed 10,000 Instagram Reels so you do not have to. The sweet spot? 15-30 seconds, native captions, and a hook in the first 1.5 seconds. Full breakdown in our new guide — link in bio.',
       content_type: 'post',
       platforms: ['instagram'],
-      status: 'SCHEDULED',
+      status: PostStatus.SCHEDULED,
       scheduled_at: daysFromNow(5),
       platform_options: {},
     },
@@ -199,7 +199,7 @@ async function main() {
         'Draft: Case study on how [Client Name] grew their LinkedIn following by 240% in 90 days using our content batching approach. Need to finalize metrics and add testimonial quote.',
       content_type: 'post',
       platforms: ['linkedin', 'facebook'],
-      status: 'DRAFT',
+      status: PostStatus.DRAFT,
       platform_options: {},
     },
     {
@@ -210,7 +210,7 @@ async function main() {
         'The algorithm does not hate you — it just rewards conversations over broadcasts. Here is how to turn every post into a two-way dialogue with your audience...',
       content_type: 'post',
       platforms: ['x', 'instagram', 'facebook'],
-      status: 'DRAFT',
+      status: PostStatus.DRAFT,
       platform_options: {},
     },
   ];

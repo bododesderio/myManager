@@ -40,7 +40,7 @@ const EMPTY_FORM: BlogForm = {
   og_image: '',
 };
 
-const CATEGORIES = ['General', 'Guides', 'Tips', 'Product', 'Engineering', 'Case Studies'];
+const FALLBACK_CATEGORIES = ['General', 'Guides', 'Tips', 'Product', 'Engineering', 'Case Studies'];
 
 function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -54,6 +54,25 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
   const [saving, setSaving] = useState(false);
   const [mdPreview, setMdPreview] = useState(false);
   const [autoSlug, setAutoSlug] = useState(!postId);
+  const [categories, setCategories] = useState<string[]>(FALLBACK_CATEGORIES);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/v1/admin/blog/categories');
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data) && data.length > 0) {
+          setCategories(data);
+        }
+      } catch {
+        // Keep fallback categories
+      }
+    }
+    void fetchCategories();
+    return () => { cancelled = true; };
+  }, []);
 
   const loadPost = useCallback(async () => {
     if (!postId) return;
@@ -241,7 +260,7 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Category</label>
                 <select value={form.category} onChange={(e) => update('category', e.target.value)} className={inputCls}>
-                  {CATEGORIES.map((category) => (
+                  {categories.map((category) => (
                     <option key={category} value={category}>
                       {category}
                     </option>

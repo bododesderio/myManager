@@ -7,6 +7,9 @@ import {
   Query,
   Req,
   Body,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -22,8 +25,8 @@ export class NotificationsController {
   @ApiOperation({ summary: 'List notifications for current user' })
   async list(
     @Req() req: Request,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
     @Query('unreadOnly') unreadOnly: boolean = false,
   ) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
@@ -39,7 +42,7 @@ export class NotificationsController {
 
   @Put(':id/read')
   @ApiOperation({ summary: 'Mark notification as read' })
-  async markRead(@Param('id') id: string) {
+  async markRead(@Param('id', ParseUUIDPipe) id: string) {
     return this.notificationsService.markAsRead(id);
   }
 
@@ -52,7 +55,7 @@ export class NotificationsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a notification' })
-  async deleteNotification(@Param('id') id: string) {
+  async deleteNotification(@Param('id', ParseUUIDPipe) id: string) {
     return this.notificationsService.delete(id);
   }
 

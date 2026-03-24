@@ -11,12 +11,24 @@ export interface AuthUser {
 
 interface LoginResponse {
   user: AuthUser;
-  token: string;
+  accessToken: string;
 }
 
 interface SignupResponse {
   user: AuthUser;
-  token: string;
+  accessToken: string;
+}
+
+function splitName(name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return { firstName: '', lastName: '' };
+  }
+
+  const parts = trimmed.split(/\s+/);
+  const firstName = parts[0] || '';
+  const lastName = parts.slice(1).join(' ') || 'User';
+  return { firstName, lastName };
 }
 
 export function useAuth() {
@@ -31,7 +43,7 @@ export function useAuth() {
           email,
           password,
         });
-        setAuth(data.user, data.token);
+        setAuth(data.user, data.accessToken);
       } catch (error) {
         setLoading(false);
         throw error;
@@ -54,12 +66,18 @@ export function useAuth() {
     async (name: string, email: string, password: string) => {
       setLoading(true);
       try {
+        const { firstName, lastName } = splitName(name);
         const data = await apiClient.post<SignupResponse>('/v1/auth/register', {
-          name,
+          accountType: 'individual',
+          firstName,
+          lastName,
           email,
           password,
+          country: 'Other',
+          planSlug: 'free',
+          billingCycle: 'monthly',
         });
-        setAuth(data.user, data.token);
+        setAuth(data.user, data.accessToken);
       } catch (error) {
         setLoading(false);
         throw error;

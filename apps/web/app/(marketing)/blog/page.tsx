@@ -7,7 +7,8 @@ async function getCmsPage(slug: string) {
   try {
     const res = await fetch(`${API_URL}/api/v1/cms/pages/${slug}`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return null; }
 }
 
@@ -15,8 +16,9 @@ async function getBlogPosts(params: string = 'page=1&limit=5') {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog?${params}`, { next: { revalidate: 300 } });
     if (!res.ok) return { posts: [], total: 0 };
-    const data = await res.json();
-    return { posts: data.posts || data.data || data || [], total: data.total || 0 };
+    const json = await res.json();
+    const data = json?.data ?? json;
+    return { posts: data.posts || data || [], total: data.total || 0 };
   } catch { return { posts: [], total: 0 }; }
 }
 
@@ -24,7 +26,8 @@ async function getCategories() {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog/categories`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
-    return res.json();
+    const json = await res.json();
+    return json?.data ?? json;
   } catch { return []; }
 }
 
@@ -32,8 +35,9 @@ async function getFeaturedPost() {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog?is_featured=true&limit=1`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
-    const data = await res.json();
-    const posts = data.posts || data.data || data || [];
+    const json = await res.json();
+    const data = json?.data ?? json;
+    const posts = data.posts || data || [];
     return posts[0] || null;
   } catch { return null; }
 }
@@ -42,8 +46,9 @@ async function getPopularPosts() {
   try {
     const res = await fetch(`${API_URL}/api/v1/blog?sort=views&limit=4`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
-    const data = await res.json();
-    return data.posts || data.data || data || [];
+    const json = await res.json();
+    const data = json?.data ?? json;
+    return data.posts || data || [];
   } catch { return []; }
 }
 

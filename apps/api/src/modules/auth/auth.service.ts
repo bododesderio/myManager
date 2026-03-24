@@ -1,5 +1,8 @@
 import {
   Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
   UnauthorizedException,
   ConflictException,
   BadRequestException,
@@ -9,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import Redis from 'ioredis';
 import { AuthRepository } from './auth.repository';
 
 interface AuthTokens {
@@ -17,16 +21,34 @@ interface AuthTokens {
   user: Record<string, any>;
 }
 
+/** TTL for the password-changed Redis key (24 hours). */
+const PWD_CHANGED_TTL = 86400;
+
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(AuthService.name);
   private readonly SALT_ROUNDS = 12;
   private readonly TOTP_WINDOW = 1;
+  private redis!: Redis;
 
   constructor(
     private readonly repository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  onModuleInit() {
+    this.redis = new Redis(
+      this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+    );
+    this.redis.on('error', (err) =>
+      this.logger.error('Redis connection error', err),
+    );
+  }
+
+  async onModuleDestroy() {
+    await this.redis?.quit();
+  }
 
   async register(data: {
     accountType: 'individual' | 'company';
@@ -86,7 +108,7 @@ export class AuthService {
       to: user.id,
       email: user.email,
       name: fullName,
-      verifyUrl: `${webUrl}/verify-email?token=${verifyToken}`,
+      verifyUrl: `${webUrl}/verify-email?token=${verifyToken}&email=${encodeURIComponent(user.email)}`,
     });
 
     const tokens = await this.generateTokens(user.id, user.email);
@@ -102,6 +124,10 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password_hash || '');
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (!user.email_verified) {
+      throw new UnauthorizedException('Please verify your email address before logging in');
     }
 
     // Check 2FA via preferences
@@ -175,6 +201,24 @@ export class AuthService {
     });
   }
 
+  async resendVerificationEmail(email: string): Promise<void> {
+    const user = await this.repository.findUserByEmail(email);
+    if (!user || user.email_verified) return;
+
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerifyToken = crypto.createHash('sha256').update(verifyToken).digest('hex');
+    const verifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await this.repository.storeEmailVerificationToken(user.id, hashedVerifyToken, verifyExpiresAt);
+
+    const webUrl = this.configService.get<string>('WEB_URL', 'http://localhost:3000');
+    await this.repository.enqueueEmail('verify-email', {
+      to: user.id,
+      email: user.email,
+      name: user.name,
+      verifyUrl: `${webUrl}/verify-email?token=${verifyToken}&email=${encodeURIComponent(user.email)}`,
+    });
+  }
+
   async resetPassword(token: string, newPassword: string): Promise<void> {
     if (!newPassword || newPassword.length < 8) {
       throw new BadRequestException('Password must be at least 8 characters');
@@ -191,6 +235,14 @@ export class AuthService {
     await this.repository.updateUserPassword(resetRecord.user_id, hashedPassword);
     await this.repository.markPasswordResetTokenUsed(resetRecord.id);
     await this.repository.deleteAllRefreshTokensForUser(resetRecord.user_id);
+
+    // Invalidate all existing JWTs by recording password change time
+    await this.redis.set(
+      `auth:pwd_changed:${resetRecord.user_id}`,
+      Date.now().toString(),
+      'EX',
+      PWD_CHANGED_TTL,
+    );
   }
 
   async verifyEmail(token: string): Promise<void> {
@@ -392,7 +444,7 @@ export class AuthService {
 
     const refreshToken = crypto.randomBytes(40).toString('hex');
     const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     await this.repository.storeRefreshToken(userId, hashedRefreshToken, expires);
 
     return { accessToken, refreshToken };
@@ -444,19 +496,33 @@ export class AuthService {
 
   private encryptTotpSecret(secret: string): string {
     const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    const iv = crypto.randomBytes(12); // GCM uses 12-byte IV
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
     let encrypted = cipher.update(secret, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    return `${iv.toString('hex')}:${encrypted}`;
+    const authTag = cipher.getAuthTag().toString('hex');
+    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
   }
 
   private decryptTotpSecret(encryptedSecret: string): string {
     const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const [ivHex, encrypted] = encryptedSecret.split(':');
+    const parts = encryptedSecret.split(':');
+    // Support legacy CBC format (iv:ciphertext) by falling back
+    if (parts.length === 2) {
+      const [ivHex, cipherHex] = parts;
+      const iv = Buffer.from(ivHex, 'hex');
+      const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+      let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    }
+    // GCM format (iv:authTag:ciphertext)
+    const [ivHex, authTagHex, cipherHex] = parts;
     const iv = Buffer.from(ivHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    const authTag = Buffer.from(authTagHex, 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+    decipher.setAuthTag(authTag);
+    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
   }

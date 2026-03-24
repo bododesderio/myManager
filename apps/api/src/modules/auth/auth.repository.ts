@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WorkspaceRole } from '@prisma/client';
+import { Resend } from 'resend';
 import { PrismaService } from '../../prisma.service';
 
 @Injectable()
@@ -218,8 +219,38 @@ export class AuthRepository {
   }
 
   async enqueueEmail(template: string, data: Record<string, any>) {
-    // This would typically add to a BullMQ queue
-    // For now, store in a pending_emails table or directly enqueue
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey && data.email) {
+      const resend = new Resend(resendApiKey);
+      const subjectMap: Record<string, string> = {
+        'verify-email': 'Verify your email address',
+        'password-reset': 'Reset your password',
+      };
+
+      const verifyUrl = data.verifyUrl as string | undefined;
+      const resetUrl = data.resetUrl as string | undefined;
+      const htmlMap: Record<string, string | undefined> = {
+        'verify-email': verifyUrl
+          ? `<p>Hi ${data.name || 'there'},</p><p>Please verify your email address by clicking the link below:</p><p><a href="${verifyUrl}">Verify Email</a></p>`
+          : undefined,
+        'password-reset': resetUrl
+          ? `<p>Hi ${data.name || 'there'},</p><p>You requested a password reset. Click the link below to choose a new password:</p><p><a href="${resetUrl}">Reset Password</a></p>`
+          : undefined,
+      };
+
+      const subject = subjectMap[template];
+      const html = htmlMap[template];
+
+      if (subject && html) {
+        await resend.emails.send({
+          from: `${process.env.BRAND_NAME || 'MyManager'} <noreply@${process.env.EMAIL_DOMAIN || 'mymanager.com'}>`,
+          to: data.email,
+          subject,
+          html,
+        });
+      }
+    }
+
     return this.prisma.notification.create({
       data: {
         user_id: data.to,

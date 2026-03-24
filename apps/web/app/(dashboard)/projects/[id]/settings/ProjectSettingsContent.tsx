@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useProject, useUpdateProject, useDeleteProject } from '@/lib/hooks/useProjects';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 export function ProjectSettingsContent({ id }: { id: string }) {
   const router = useRouter();
@@ -89,12 +90,10 @@ export function ProjectSettingsContent({ id }: { id: string }) {
                 <label htmlFor="projectDesc" className="block text-sm font-medium text-gray-700">
                   Description
                 </label>
-                <textarea
-                  id="projectDesc"
-                  rows={3}
+                <RichTextEditor
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  onChange={(html) => setDescription(html)}
+                  minHeight={100}
                 />
               </div>
               <div className="flex justify-end">

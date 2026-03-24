@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CLOSED_WON' | 'CLOSED_LOST';
 
@@ -187,19 +188,17 @@ export function LeadsContent() {
                           <div className="space-y-4">
                             <div>
                               <label className="text-xs font-semibold uppercase text-gray-400">Notes</label>
-                              <textarea
-                                rows={3}
+                              <RichTextEditor
                                 value={lead.notes ?? ''}
-                                onChange={(e) =>
+                                onChange={(html) =>
                                   setLeads((prev) =>
                                     prev.map((item) =>
-                                      item.id === lead.id ? { ...item, notes: e.target.value } : item,
+                                      item.id === lead.id ? { ...item, notes: html } : item,
                                     ),
                                   )
                                 }
-                                onBlur={(e) => void updateLead(lead.id, { notes: e.target.value })}
-                                className={inputCls}
                                 placeholder="Internal notes..."
+                                minHeight={80}
                               />
                             </div>
                             <div className="grid grid-cols-2 gap-4">

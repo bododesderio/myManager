@@ -1,16 +1,42 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
+  OnModuleDestroy,
+  OnModuleInit,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import Redis from 'ioredis';
 import { UsersRepository } from './users.repository';
 
-@Injectable()
-export class UsersService {
-  private readonly SALT_ROUNDS = 12;
+/** TTL for the password-changed Redis key (24 hours). */
+const PWD_CHANGED_TTL = 86400;
 
-  constructor(private readonly repository: UsersRepository) {}
+@Injectable()
+export class UsersService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(UsersService.name);
+  private readonly SALT_ROUNDS = 12;
+  private redis!: Redis;
+
+  constructor(
+    private readonly repository: UsersRepository,
+    private readonly configService: ConfigService,
+  ) {}
+
+  onModuleInit() {
+    this.redis = new Redis(
+      this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+    );
+    this.redis.on('error', (err) =>
+      this.logger.error('Redis connection error', err),
+    );
+  }
+
+  async onModuleDestroy() {
+    await this.redis?.quit();
+  }
 
   async getProfile(userId: string) {
     const user = await this.repository.findById(userId);
@@ -47,6 +73,15 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
     await this.repository.updateUser(userId, { password_hash: hashedPassword });
+
+    // Invalidate all existing JWTs by recording password change time
+    await this.redis.set(
+      `auth:pwd_changed:${userId}`,
+      Date.now().toString(),
+      'EX',
+      PWD_CHANGED_TTL,
+    );
+
     return { message: 'Password changed successfully' };
   }
 

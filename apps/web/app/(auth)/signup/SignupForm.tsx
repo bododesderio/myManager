@@ -36,6 +36,7 @@ export default function SignupForm() {
   // Step 3 fields
   const [selectedPlan, setSelectedPlan] = useState('free');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [resendingVerification, setResendingVerification] = useState(false);
 
   const totalSteps = accountType === 'company' ? 4 : 3;
 
@@ -82,6 +83,27 @@ export default function SignupForm() {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email) return;
+    setResendingVerification(true);
+    setError('');
+    try {
+      const res = await fetch('/api/v1/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to resend verification email');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend verification email');
+    } finally {
+      setResendingVerification(false);
+    }
+  };
+
   const nextStep = () => {
     if (step === 1 && accountType === 'individual') {
       // Individual skips step 2, goes to plan selection
@@ -98,40 +120,7 @@ export default function SignupForm() {
   const isStep1Valid = firstName && lastName && email && password.length >= 8 && country;
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-[420px] bg-gradient-to-b from-[#7F77DD] to-[#5B54A6] text-white p-8 flex-col justify-between">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">myManager</h2>
-          <p className="text-white/70 text-sm mb-8">Post once. Reach everywhere.</p>
-
-          {/* Step progress */}
-          <div className="space-y-4">
-            {Array.from({ length: totalSteps }, (_, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  i + 1 < step ? 'bg-green-400 text-white' :
-                  i + 1 === step ? 'bg-white text-[#7F77DD]' :
-                  'bg-white/20 text-white/60'
-                }`}>
-                  {i + 1 < step ? '\u2713' : i + 1}
-                </div>
-                <span className={`text-sm ${i + 1 <= step ? 'text-white' : 'text-white/60'}`}>
-                  {i === 0 ? 'Account details' :
-                   accountType === 'company' && i === 1 ? 'Workspace setup' :
-                   (accountType === 'company' ? i === 2 : i === 1) ? 'Choose plan' :
-                   'Verify email'}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <p className="text-xs text-white/40">&copy; {new Date().getFullYear()} MyManager Ltd</p>
-      </div>
-
-      {/* Right Panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-lg">
+    <div className="w-full max-w-md">
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">{error}</div>
           )}
@@ -347,14 +336,19 @@ export default function SignupForm() {
                   We&apos;ve sent a verification link to <strong>{email}</strong>
                 </p>
               </div>
-              <button className="text-sm text-[#7F77DD] hover:underline">Resend verification email</button>
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={resendingVerification}
+                className="text-sm text-[#7F77DD] hover:underline disabled:opacity-50"
+              >
+                {resendingVerification ? 'Resending verification email...' : 'Resend verification email'}
+              </button>
               <div className="bg-amber-50 text-amber-700 text-xs p-3 rounded-lg">
                 Tip: Open the verification link on the same device for a seamless experience.
               </div>
             </div>
           )}
-        </div>
-      </div>
     </div>
   );
 }

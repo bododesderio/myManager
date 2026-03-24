@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="800" height="500" rx="12" fill="#f5f4ef"/>
+  <!-- Sidebar -->
+  <rect width="180" height="500" rx="12" fill="#2D2B3D"/>
+  <rect x="180" width="12" height="500" fill="#2D2B3D"/>
+  <!-- Sidebar logo area -->
+  <circle cx="90" cy="40" r="16" fill="#7F77DD" opacity="0.9"/>
+  <rect x="70" y="34" width="40" height="4" rx="2" fill="#f5f4ef" opacity="0.9"/>
+  <rect x="78" y="42" width="24" height="3" rx="1.5" fill="#f5f4ef" opacity="0.5"/>
+  <!-- Sidebar nav items -->
+  <rect x="24" y="90" width="132" height="36" rx="8" fill="#7F77DD" opacity="0.15"/>
+  <rect x="40" y="102" width="16" height="12" rx="3" fill="#7F77DD"/>
+  <rect x="66" y="105" width="70" height="6" rx="3" fill="#7F77DD"/>
+  <rect x="40" y="148" width="16" height="12" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="66" y="151" width="60" height="6" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="40" y="184" width="16" height="12" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="66" y="187" width="50" height="6" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="40" y="220" width="16" height="12" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="66" y="223" width="65" height="6" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="40" y="256" width="16" height="12" rx="3" fill="#ffffff" opacity="0.25"/>
+  <rect x="66" y="259" width="45" height="6" rx="3" fill="#ffffff" opacity="0.25"/>
+  <!-- Main content area -->
+  <!-- Top bar -->
+  <rect x="210" y="20" width="560" height="44" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="230" y="36" width="120" height="12" rx="4" fill="#e0dfd8"/>
+  <circle cx="740" cy="42" r="14" fill="#7F77DD" opacity="0.15"/>
+  <circle cx="740" cy="42" r="10" fill="#7F77DD" opacity="0.3"/>
+  <!-- Stat cards row -->
+  <rect x="210" y="84" width="170" height="90" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="226" y="100" width="60" height="8" rx="4" fill="#c8c6be"/>
+  <rect x="226" y="118" width="90" height="16" rx="4" fill="#2D2B3D"/>
+  <rect x="226" y="146" width="50" height="6" rx="3" fill="#1D9E75"/>
+  <rect x="400" y="84" width="170" height="90" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="416" y="100" width="50" height="8" rx="4" fill="#c8c6be"/>
+  <rect x="416" y="118" width="80" height="16" rx="4" fill="#2D2B3D"/>
+  <rect x="416" y="146" width="60" height="6" rx="3" fill="#7F77DD"/>
+  <rect x="590" y="84" width="180" height="90" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="606" y="100" width="70" height="8" rx="4" fill="#c8c6be"/>
+  <rect x="606" y="118" width="100" height="16" rx="4" fill="#2D2B3D"/>
+  <rect x="606" y="146" width="40" height="6" rx="3" fill="#1D9E75"/>
+  <!-- Chart area -->
+  <rect x="210" y="194" width="370" height="200" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="230" y="212" width="80" height="10" rx="4" fill="#2D2B3D"/>
+  <rect x="230" y="228" width="50" height="6" rx="3" fill="#c8c6be"/>
+  <!-- Chart bars -->
+  <rect x="240" y="340" width="28" height="30" rx="4" fill="#7F77DD" opacity="0.3"/>
+  <rect x="278" y="310" width="28" height="60" rx="4" fill="#7F77DD" opacity="0.4"/>
+  <rect x="316" y="290" width="28" height="80" rx="4" fill="#7F77DD" opacity="0.5"/>
+  <rect x="354" y="270" width="28" height="100" rx="4" fill="#7F77DD" opacity="0.7"/>
+  <rect x="392" y="250" width="28" height="120" rx="4" fill="#7F77DD"/>
+  <rect x="430" y="280" width="28" height="90" rx="4" fill="#7F77DD" opacity="0.6"/>
+  <rect x="468" y="300" width="28" height="70" rx="4" fill="#1D9E75" opacity="0.7"/>
+  <rect x="506" y="260" width="28" height="110" rx="4" fill="#1D9E75"/>
+  <rect x="230" y="376" width="330" height="1" fill="#e0dfd8"/>
+  <!-- Right panel - recent posts -->
+  <rect x="600" y="194" width="170" height="200" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="616" y="212" width="70" height="10" rx="4" fill="#2D2B3D"/>
+  <rect x="616" y="236" width="138" height="40" rx="6" fill="#f5f4ef"/>
+  <circle cx="632" cy="256" r="10" fill="#7F77DD" opacity="0.2"/>
+  <rect x="650" y="250" width="80" height="6" rx="3" fill="#c8c6be"/>
+  <rect x="650" y="260" width="50" height="4" rx="2" fill="#e0dfd8"/>
+  <rect x="616" y="286" width="138" height="40" rx="6" fill="#f5f4ef"/>
+  <circle cx="632" cy="306" r="10" fill="#1D9E75" opacity="0.2"/>
+  <rect x="650" y="300" width="70" height="6" rx="3" fill="#c8c6be"/>
+  <rect x="650" y="310" width="60" height="4" rx="2" fill="#e0dfd8"/>
+  <rect x="616" y="336" width="138" height="40" rx="6" fill="#f5f4ef"/>
+  <circle cx="632" cy="356" r="10" fill="#7F77DD" opacity="0.2"/>
+  <rect x="650" y="350" width="90" height="6" rx="3" fill="#c8c6be"/>
+  <rect x="650" y="360" width="45" height="4" rx="2" fill="#e0dfd8"/>
+  <!-- Bottom cards -->
+  <rect x="210" y="414" width="265" height="66" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="230" y="430" width="90" height="8" rx="4" fill="#2D2B3D"/>
+  <rect x="230" y="448" width="200" height="6" rx="3" fill="#c8c6be"/>
+  <rect x="230" y="460" width="140" height="6" rx="3" fill="#e0dfd8"/>
+  <rect x="495" y="414" width="275" height="66" rx="10" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="515" y="430" width="80" height="8" rx="4" fill="#2D2B3D"/>
+  <rect x="515" y="448" width="180" height="6" rx="3" fill="#c8c6be"/>
+  <rect x="515" y="460" width="120" height="6" rx="3" fill="#e0dfd8"/>
+</svg>

@@ -8,6 +8,9 @@ import {
   Param,
   Query,
   Req,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -23,10 +26,12 @@ export class ProjectsController {
   @ApiOperation({ summary: 'List projects in workspace' })
   async listProjects(
     @Query('workspaceId') workspaceId: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
-    return this.projectsService.listByWorkspace(workspaceId, page, limit);
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    return this.projectsService.listByWorkspace(workspaceId, safePage, safeLimit);
   }
 
   @Post()
@@ -47,14 +52,14 @@ export class ProjectsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get project details' })
-  async getProject(@Param('id') id: string) {
+  async getProject(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.getById(id);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update project details' })
   async updateProject(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { name?: string; clientName?: string; clientEmail?: string; description?: string; status?: string },
   ) {
     return this.projectsService.update(id, body);
@@ -62,20 +67,20 @@ export class ProjectsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a project' })
-  async deleteProject(@Param('id') id: string) {
+  async deleteProject(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.delete(id);
   }
 
   @Get(':id/members')
   @ApiOperation({ summary: 'List project members' })
-  async listMembers(@Param('id') id: string) {
+  async listMembers(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.listMembers(id);
   }
 
   @Post(':id/members')
   @ApiOperation({ summary: 'Add member to project' })
   async addMember(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { userId: string; role: string },
   ) {
     return this.projectsService.addMember(id, body.userId, body.role);
@@ -83,20 +88,20 @@ export class ProjectsController {
 
   @Delete(':id/members/:userId')
   @ApiOperation({ summary: 'Remove member from project' })
-  async removeMember(@Param('id') id: string, @Param('userId') userId: string) {
+  async removeMember(@Param('id', ParseUUIDPipe) id: string, @Param('userId') userId: string) {
     return this.projectsService.removeMember(id, userId);
   }
 
   @Post(':id/portal-token')
   @ApiOperation({ summary: 'Generate client portal access token' })
-  async generatePortalToken(@Param('id') id: string) {
+  async generatePortalToken(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.generatePortalToken(id);
   }
 
   @Get(':id/analytics')
   @ApiOperation({ summary: 'Get project-level analytics' })
   async getAnalytics(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {

@@ -5,6 +5,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
+    "types": ["node", "react", "react-dom"],
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./*"]

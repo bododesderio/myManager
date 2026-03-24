@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useToast } from '@/providers/ToastProvider';
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -220,6 +221,7 @@ function PillToggle<T extends string>({
 /* -------------------------------------------------------------------------- */
 
 export default function AdminThemeSettingsPage() {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabKey>('presets');
   const [activePresetId, setActivePresetId] = useState<string>('indigo-default');
 
@@ -259,7 +261,7 @@ export default function AdminThemeSettingsPage() {
       const preset = PRESETS.find((p) => p.id === id);
       if (preset) setColors({ ...preset.colors });
     } catch {
-      // TODO: surface error via toast
+      toast({ title: 'Failed to apply preset', variant: 'error' });
     }
   }
 
@@ -272,7 +274,7 @@ export default function AdminThemeSettingsPage() {
         body: JSON.stringify({ colors, darkColors, typography, radius, density }),
       });
     } catch {
-      // TODO: surface error via toast
+      toast({ title: 'Failed to save theme', variant: 'error' });
     } finally {
       setSaving(false);
     }
@@ -296,7 +298,7 @@ export default function AdminThemeSettingsPage() {
         body: JSON.stringify({ name, colors, darkColors, typography, radius, density }),
       });
     } catch {
-      // TODO: surface error via toast
+      toast({ title: 'Failed to save preset', variant: 'error' });
     }
   }
 

@@ -4,49 +4,99 @@ import Link from 'next/link';
 import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { useLogin } from '@/lib/hooks/useAuth';
+import { signIn } from 'next-auth/react';
 import { getErrorMessage } from '@/lib/utils/error-messages';
+
+function getSafeRedirectUrl(url: string | null): string {
+  const defaultUrl = '/home';
+  if (!url) return defaultUrl;
+  try {
+    const parsed = new URL(url, 'http://localhost');
+    // Reject if origin is different (means it's an absolute URL to an external site)
+    if (parsed.origin !== 'http://localhost') return defaultUrl;
+    // Reject auth routes to prevent redirect loops
+    if (parsed.pathname.startsWith('/login') || parsed.pathname.startsWith('/signup')) return defaultUrl;
+    return parsed.pathname + parsed.search;
+  } catch {
+    return defaultUrl;
+  }
+}
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('next') || searchParams.get('callbackUrl') || '/home';
-  const login = useLogin();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
-  const [remember, setRemember] = useState(false);
   const [needs2FA, setNeeds2FA] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    login.mutate(
-      { email, password, totp_code: needs2FA ? totpCode : undefined, remember },
-      {
-        onSuccess: () => {
-          router.push(callbackUrl as Route);
-          router.refresh();
-        },
-        onError: (err) => {
-          const msg = err instanceof Error ? err.message : '';
-          if (msg === 'AUTH_2FA_REQUIRED') {
-            setNeeds2FA(true);
-            return;
-          }
-          setError(getErrorMessage(err));
-        },
-      },
-    );
+    try {
+      const loginRes = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          totp_code: needs2FA ? totpCode : '',
+        }),
+      });
+      const loginBody = await loginRes.json();
+
+      if (!loginRes.ok) {
+        setError(getErrorMessage(loginBody));
+        setLoading(false);
+        return;
+      }
+
+      if (loginBody?.user?.requiresTwoFactor) {
+        setNeeds2FA(true);
+        setError('Enter your 6-digit two-factor code to continue.');
+        setLoading(false);
+        return;
+      }
+
+      const result = await signIn('credentials', {
+        email,
+        password,
+        totp_code: needs2FA ? totpCode : '',
+        remember: 'false',
+        redirect: false,
+      });
+
+      if (!result || result.error) {
+        setError('Unable to create a session. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const sessionRes = await fetch('/api/auth/session');
+      const session = await sessionRes.json();
+
+      if (session?.user?.is_superadmin) {
+        router.push('/admin/dashboard' as Route);
+      } else {
+        const callbackUrl = getSafeRedirectUrl(searchParams.get('next') || searchParams.get('callbackUrl'));
+        router.push(callbackUrl as Route);
+      }
+      router.refresh();
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="flex-1 flex items-center justify-center px-6">
-      <div className="w-full max-w-[320px]">
+      <div className="w-full max-w-[340px]">
         {/* Header */}
         <p className="text-[10px] font-bold uppercase tracking-wider text-primary">
           Welcome back
@@ -92,20 +142,15 @@ export function LoginForm() {
 
           {/* Password */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label htmlFor="password" className="text-[11px] font-medium text-text-2">
-                Password
-              </label>
-              <Link href="/forgot-password" className="text-primary text-[11px]">
-                Forgot?
-              </Link>
-            </div>
+            <label htmlFor="password" className="text-[11px] font-medium text-text-2 mb-1 block">
+              Password
+            </label>
             <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                required
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-border rounded-input px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none pr-10"
@@ -130,6 +175,11 @@ export function LoginForm() {
                 )}
               </button>
             </div>
+            <div className="mt-1.5 text-right">
+              <Link href="/forgot-password" className="text-[11px] font-medium" style={{ color: 'var(--color-primary, #7F77DD)' }}>
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           {/* 2FA */}
@@ -150,16 +200,20 @@ export function LoginForm() {
                 placeholder="Enter 6-digit code"
                 className="w-full border border-border rounded-input px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
               />
+              <p className="mt-1 text-[11px] text-text-muted">
+                Use the code from your authenticator app.
+              </p>
             </div>
           )}
 
           {/* Sign in button */}
           <button
             type="submit"
-            disabled={login.isPending}
-            className="w-full bg-primary hover:bg-primary-dark text-white rounded-btn py-2.5 text-[11px] font-bold transition disabled:opacity-50"
+            disabled={loading}
+            className="w-full rounded-btn py-3 text-[13px] font-bold transition disabled:opacity-50"
+            style={{ backgroundColor: 'var(--color-primary, #7F77DD)', color: '#FFFFFF' }}
           >
-            {login.isPending ? 'Signing in...' : 'Sign in'}
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
