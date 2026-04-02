@@ -103,13 +103,9 @@ export class TokenRefreshWorker {
   private decryptToken(encrypted: string): string {
     const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
     const parts = encrypted.split(':');
-    // Support legacy CBC format (iv:ciphertext) by falling back
-    if (parts.length === 2) {
-      const [ivHex, cipherHex] = parts;
-      const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(ivHex, 'hex'));
-      return decipher.update(cipherHex, 'hex', 'utf8') + decipher.final('utf8');
+    if (parts.length !== 3) {
+      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
     }
-    // GCM format (iv:authTag:ciphertext)
     const [ivHex, authTagHex, cipherHex] = parts;
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');

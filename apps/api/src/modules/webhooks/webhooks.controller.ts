@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@ne
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { WebhooksService } from './webhooks.service';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('Webhooks')
 @ApiBearerAuth()
@@ -47,4 +48,14 @@ export class WebhooksController {
   @Post('deliveries/:deliveryId/retry')
   @ApiOperation({ summary: 'Retry a failed webhook delivery' })
   async retryDelivery(@Param('deliveryId') deliveryId: string) { return this.webhooksService.retryDelivery(deliveryId); }
+
+  @Public()
+  @Post('social/:platform')
+  @ApiOperation({ summary: 'Receive inbound social platform webhooks' })
+  async receiveSocialWebhook(
+    @Param('platform') platform: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.webhooksService.handleIncomingSocialWebhook(platform, body);
+  }
 }

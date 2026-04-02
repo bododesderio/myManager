@@ -47,6 +47,7 @@ import { PortalModule } from './modules/portal/portal.module';
 import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { PlatformsModule } from './modules/platforms/platforms.module';
+import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
 import { PrismaModule } from './prisma.module';
 import { DlqModule } from './workers/dlq.module';
 import { HealthController } from './health.controller';
@@ -126,6 +127,7 @@ import { BrandController } from './brand.controller';
     AdminDashboardModule,
     SystemConfigModule,
     PlatformsModule,
+    ExchangeRatesModule,
     DlqModule,
   ],
   controllers: [HealthController, BrandController],

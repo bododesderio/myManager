@@ -279,16 +279,9 @@ export class SocialAccountsService {
   private decryptToken(encryptedToken: string): string {
     const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
     const parts = encryptedToken.split(':');
-    // Support legacy CBC format (iv:ciphertext) by falling back
-    if (parts.length === 2) {
-      const [ivHex, cipherHex] = parts;
-      const iv = Buffer.from(ivHex, 'hex');
-      const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-      let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      return decrypted;
+    if (parts.length !== 3) {
+      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
     }
-    // GCM format (iv:authTag:ciphertext)
     const [ivHex, authTagHex, cipherHex] = parts;
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');

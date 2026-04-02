@@ -145,6 +145,7 @@ model User {
   portal_tokens_created    PortalAccessToken[]     @relation("PortalTokenCreator")
   post_comments            PostComment[]
   approval_events          ApprovalEvent[]
+  comment_replies          SocialComment[]          @relation("CommentReplies")
 
   @@index([email])
   @@map("users")
@@ -1494,9 +1495,13 @@ model SocialComment {
   text                String
   sentiment           String?
   is_reply            Boolean   @default(false)
+  is_hidden           Boolean   @default(false)
   replied_at          DateTime?
+  reply_text          String?
+  reply_user_id       String?
   fetched_at          DateTime  @default(now())
 
+  reply_user  User?              @relation("CommentReplies", fields: [reply_user_id], references: [id])
   assignments CommentAssignment[]
 
   @@unique([platform, platform_comment_id])

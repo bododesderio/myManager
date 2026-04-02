@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma.service';
 export class CommentsRepository {
   constructor(private readonly prisma: PrismaService) {}
   async findByWorkspace(workspaceId: string, filters: { platform?: string; sentiment?: string }, offset: number, limit: number): Promise<[unknown[], number]> {
-    const where: Record<string, unknown> = { workspace_id: workspaceId };
+    const where: Record<string, unknown> = { workspace_id: workspaceId, is_hidden: false };
     if (filters.platform) where.platform = filters.platform;
     if (filters.sentiment) where.sentiment = filters.sentiment;
     const [comments, total] = await Promise.all([
@@ -19,8 +19,18 @@ export class CommentsRepository {
     return this.prisma.socialComment.findUnique({ where: { id }, include: { assignments: true } });
   }
 
-  async createReply(commentId: string, _userId: string, _text: string) {
-    return this.prisma.socialComment.update({ where: { id: commentId }, data: { replied_at: new Date() } });
+  async createReply(commentId: string, userId: string, text: string) {
+    return this.prisma.socialComment.update({
+      where: { id: commentId },
+      data: { replied_at: new Date(), reply_text: text, reply_user_id: userId },
+    });
+  }
+
+  async hide(commentId: string) {
+    return this.prisma.socialComment.update({
+      where: { id: commentId },
+      data: { is_hidden: true },
+    });
   }
 
   async assign(commentId: string, assigneeId: string, assignerId: string) {

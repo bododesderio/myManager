@@ -32,7 +32,10 @@ export class CommentsService {
     return this.repository.updateAssignmentStatus(assignmentId, status);
   }
 
-  async hide(_commentId: string) {
+  async hide(commentId: string) {
+    const comment = await this.repository.findById(commentId);
+    if (!comment) throw new NotFoundException('Comment not found');
+    await this.repository.hide(commentId);
     return { message: 'Comment hidden' };
   }
 

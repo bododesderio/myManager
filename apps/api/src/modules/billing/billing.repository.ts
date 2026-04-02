@@ -43,6 +43,23 @@ export class BillingRepository {
     });
   }
 
+  async findPrimaryWorkspaceForUser(userId: string) {
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: { user_id: userId },
+      orderBy: { joined_at: 'asc' },
+      select: { workspace_id: true },
+    });
+
+    return membership?.workspace_id ?? null;
+  }
+
+  async findBillingRecordByFlutterwaveRef(flutterwaveRef: string) {
+    return this.prisma.billingHistory.findFirst({
+      where: { flutterwave_ref: flutterwaveRef },
+      orderBy: { created_at: 'desc' },
+    });
+  }
+
   async createSubscription(data: {
     user_id: string;
     workspace_id: string;

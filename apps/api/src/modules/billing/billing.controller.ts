@@ -55,6 +55,22 @@ export class BillingController {
     return this.billingService.changePlan(userId, body.planId);
   }
 
+  @Post('verify-payment')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Verify a completed Flutterwave checkout and activate subscription' })
+  async verifyPayment(
+    @Req() req: Request,
+    @Body() body: {
+      transaction_id: number;
+      tx_ref?: string;
+      plan?: string;
+      billing_cycle?: 'monthly' | 'annual';
+    },
+  ) {
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.billingService.verifyPayment(userId, body);
+  }
+
   @Post('cancel')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel subscription (effective at period end)' })

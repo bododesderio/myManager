@@ -39,6 +39,9 @@ const nextConfig: NextConfig = {
       fallback: [],
     };
   },
+  experimental: {
+    serverSourceMaps: true,
+  },
 };
 
 export default nextConfig;

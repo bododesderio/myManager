@@ -150,6 +150,83 @@ export class BillingService {
     return invoice;
   }
 
+  async verifyPayment(userId: string, data: {
+    transaction_id: number;
+    tx_ref?: string;
+    plan?: string;
+    billing_cycle?: 'monthly' | 'annual';
+  }) {
+    this.ensureBillingConfigured();
+
+    const response = await axios.get(
+      `${this.baseUrl}/transactions/${data.transaction_id}/verify`,
+      {
+        headers: { Authorization: `Bearer ${this.flutterwaveSecret}` },
+      },
+    );
+
+    const verified = response.data?.data;
+    if (!verified || verified.status !== 'successful') {
+      throw new BadRequestException('Payment has not been completed successfully');
+    }
+
+    const existing = verified.flw_ref
+      ? await this.repository.findBillingRecordByFlutterwaveRef(verified.flw_ref)
+      : null;
+    if (existing) {
+      return { message: 'Payment already verified', billingRecordId: existing.id };
+    }
+
+    const planSlug = data.plan || verified.meta?.plan;
+    const plan = planSlug
+      ? await this.repository.findPlanBySlug(planSlug)
+      : null;
+    if (!plan) {
+      throw new NotFoundException('Plan not found for verified payment');
+    }
+
+    const workspaceId =
+      verified.meta?.workspaceId ||
+      await this.repository.findPrimaryWorkspaceForUser(userId);
+    if (!workspaceId) {
+      throw new NotFoundException('Workspace not found for payment verification');
+    }
+
+    await this.repository.createSubscription({
+      user_id: userId,
+      workspace_id: workspaceId,
+      plan_id: plan.id,
+      status: 'ACTIVE',
+      flutterwave_subscription_id: String(verified.id ?? data.transaction_id),
+      billing_cycle:
+        (data.billing_cycle || verified.meta?.billing_cycle) === 'annual'
+          ? 'ANNUAL'
+          : 'MONTHLY',
+      locked_limits: plan.limits as Record<string, any>,
+      locked_features: plan.features as Record<string, any>,
+      current_period_start: new Date(),
+      current_period_end: this.calculatePeriodEnd(
+        data.billing_cycle || verified.meta?.billing_cycle || 'monthly',
+      ),
+    });
+
+    const billingRecord = await this.repository.createBillingRecord({
+      workspace_id: workspaceId,
+      user_id: userId,
+      plan_name: plan.name,
+      amount: Number(verified.amount ?? 0),
+      currency: String(verified.currency ?? 'USD'),
+      status: 'PAID',
+      flutterwave_ref: String(verified.flw_ref ?? data.tx_ref ?? ''),
+    });
+
+    return {
+      message: 'Payment verified successfully',
+      billingRecordId: billingRecord.id,
+      plan: { id: plan.id, slug: plan.slug, name: plan.name },
+    };
+  }
+
   async handleWebhook(body: Record<string, any>) {
     this.ensureBillingConfigured();
 

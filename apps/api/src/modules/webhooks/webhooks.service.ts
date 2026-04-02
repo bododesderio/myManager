@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { WebhooksRepository } from './webhooks.repository';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class WebhooksService {
-  constructor(private readonly repository: WebhooksRepository) {}
+  constructor(
+    private readonly repository: WebhooksRepository,
+    private readonly auditService: AuditService,
+  ) {}
 
   async list(workspaceId: string) { return this.repository.findByWorkspace(workspaceId); }
 
@@ -54,6 +58,18 @@ export class WebhooksService {
       const signature = this.signPayload(JSON.stringify(payload), endpoint.secret);
       await this.repository.createDelivery({ endpointId: endpoint.id, event, payload, signature, status: 'pending' });
     }
+  }
+
+  async handleIncomingSocialWebhook(platform: string, payload: Record<string, unknown>) {
+    await this.auditService.log(`social_webhook_received:${platform}`, {
+      resourceType: 'social_webhook',
+      metadata: {
+        platform,
+        payload,
+      },
+    });
+
+    return { status: 'accepted', platform };
   }
 
   private signPayload(payload: string, secret: string): string {

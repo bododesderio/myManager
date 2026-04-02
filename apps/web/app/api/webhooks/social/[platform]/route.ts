@@ -45,13 +45,16 @@ export async function POST(request: NextRequest, { params }: SocialWebhookRouteP
       return NextResponse.json({ error: `Unsupported platform: ${platform}` }, { status: 400 });
     }
 
-    // Process webhook based on platform
-    console.log(`Received ${platform} webhook:`, JSON.stringify(payload).slice(0, 200));
+    const apiUrl = process.env.API_URL || 'http://localhost:3001';
+    const upstream = await fetch(`${apiUrl}/api/v1/webhooks/social/${platform}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+    });
 
-    // In production: validate signature, enqueue processing job
-    // await queueWebhookProcessing(platform, payload);
-
-    return NextResponse.json({ status: 'received', platform });
+    const data = await upstream.json().catch(() => ({ status: 'accepted', platform }));
+    return NextResponse.json(data, { status: upstream.status });
   } catch (error) {
     console.error(`Social webhook processing failed for platform:`, error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });

@@ -17,6 +17,8 @@ COPY packages/utils/package.json ./packages/utils/
 COPY packages/validators/package.json ./packages/validators/
 
 # Install all deps (cached unless manifests change)
+# Skip Puppeteer browser download — only needed in worker container
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN pnpm install --frozen-lockfile
 
 # Now copy all source code

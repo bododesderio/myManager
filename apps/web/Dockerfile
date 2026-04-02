@@ -26,6 +26,7 @@ COPY packages/ ./packages/
 COPY apps/web/ ./apps/web/
 
 # Build-time env vars (non-secret — just enough for Next.js to compile)
+ENV API_URL=http://api:3001
 ENV NEXTAUTH_URL=http://localhost:3000
 ENV NEXTAUTH_SECRET=build-time-placeholder-secret-32chars-min
 ENV NEXT_PUBLIC_API_URL=http://localhost:3001

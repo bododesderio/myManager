@@ -34,26 +34,19 @@ export async function POST(request: NextRequest) {
     }
 
     const event = (await request.json()) as FlutterwaveEvent;
+    const apiUrl = process.env.API_URL || 'http://localhost:3001';
+    const upstream = await fetch(`${apiUrl}/api/v1/billing/webhook/flutterwave`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'verif-hash': signature,
+      },
+      body: JSON.stringify(event),
+      cache: 'no-store',
+    });
 
-    switch (event.event) {
-      case 'charge.completed':
-        if (event.data.status === 'successful') {
-          // Process successful payment
-          // Update subscription status in database
-          console.log(`Payment successful: ${event.data.tx_ref} - ${event.data.amount} ${event.data.currency}`);
-        }
-        break;
-
-      case 'subscription.cancelled':
-        // Handle subscription cancellation
-        console.log(`Subscription cancelled: ${event.data.tx_ref}`);
-        break;
-
-      default:
-        console.log(`Unhandled Flutterwave event: ${event.event}`);
-    }
-
-    return NextResponse.json({ status: 'received' });
+    const data = await upstream.json().catch(() => ({ status: 'received' }));
+    return NextResponse.json(data, { status: upstream.status });
   } catch (error) {
     console.error('Flutterwave webhook processing failed:', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
