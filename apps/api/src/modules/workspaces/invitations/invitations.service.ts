@@ -70,7 +70,10 @@ export class InvitationsService {
 
     // Generate HMAC token
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-    const secret = this.configService.get<string>('JWT_SECRET', 'dev-secret');
+    const secret = this.configService.get<string>('JWT_SECRET');
+    if (!secret) {
+      throw new Error('JWT_SECRET is not configured');
+    }
     const tokenData = `${workspaceId}:${email}:${role}:${expiresAt.toISOString()}`;
     const token = crypto.createHmac('sha256', secret).update(tokenData).digest('hex');
 

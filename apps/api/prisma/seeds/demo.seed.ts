@@ -4,7 +4,14 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  const password = await bcrypt.hash('demo1234', 12);
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('demo.seed.ts must not run in production');
+  }
+  const rawPassword = process.env.DEMO_USER_PASSWORD;
+  if (!rawPassword) {
+    throw new Error('DEMO_USER_PASSWORD env var is required to run demo.seed.ts');
+  }
+  const password = await bcrypt.hash(rawPassword, 12);
 
   const proPlan = await prisma.plan.findFirst({ where: { slug: 'pro' } });
   if (!proPlan) throw new Error('Pro plan not found — run plans.seed.ts first');
