@@ -60,31 +60,47 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {/* Toast display */}
       {toasts.length > 0 && (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-          {toasts.map((toast) => (
-            <div
-              key={toast.id}
-              className={`rounded-lg px-4 py-3 text-sm font-medium text-white shadow-lg transition-all ${
-                toast.type === 'success'
-                  ? 'bg-green-600'
-                  : toast.type === 'error'
-                    ? 'bg-red-600'
-                    : toast.type === 'warning'
-                      ? 'bg-yellow-600'
-                      : 'bg-blue-600'
-              }`}
-            >
+        <div
+          role="region"
+          aria-label="Notifications"
+          className="fixed bottom-4 right-4 z-50 flex flex-col gap-2"
+        >
+          {toasts.map((toast) => {
+            const className = `rounded-lg px-4 py-3 text-sm font-medium text-white shadow-lg transition-all ${
+              toast.type === 'success'
+                ? 'bg-green-600'
+                : toast.type === 'error'
+                  ? 'bg-red-600'
+                  : toast.type === 'warning'
+                    ? 'bg-yellow-600'
+                    : 'bg-blue-600'
+            }`;
+            const inner = (
               <div className="flex items-center gap-2">
                 <span>{toast.message}</span>
                 <button
+                  type="button"
+                  aria-label="Dismiss notification"
                   onClick={() => removeToast(toast.id)}
                   className="ml-2 opacity-70 hover:opacity-100"
                 >
                   &times;
                 </button>
               </div>
-            </div>
-          ))}
+            );
+            if (toast.type === 'error') {
+              return (
+                <div key={toast.id} role="alert" aria-live="assertive" aria-atomic="true" className={className}>
+                  {inner}
+                </div>
+              );
+            }
+            return (
+              <div key={toast.id} role="status" aria-live="polite" aria-atomic="true" className={className}>
+                {inner}
+              </div>
+            );
+          })}
         </div>
       )}
     </ToastContext.Provider>
