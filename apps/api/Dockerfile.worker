@@ -1,8 +1,41 @@
-FROM node:20-alpine AS base
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# ── Stage 1: Build ──────────────────────────────────────────────────
+FROM node:20-alpine AS builder
+RUN apk add --no-cache python3 make g++ \
+    chromium nss freetype harfbuzz ca-certificates ttf-freefont
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 WORKDIR /app
 
-# Install Chromium for Puppeteer (PDF report generation)
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Copy package manifests first for better layer caching
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/config/package.json ./packages/config/
+COPY packages/constants/package.json ./packages/constants/
+COPY packages/emails/package.json ./packages/emails/
+COPY packages/seo/package.json ./packages/seo/
+COPY packages/translations/package.json ./packages/translations/
+COPY packages/types/package.json ./packages/types/
+COPY packages/utils/package.json ./packages/utils/
+COPY packages/validators/package.json ./packages/validators/
+
+# Install all deps (same as main API to get @nestjs/cli in root node_modules)
+RUN pnpm install --frozen-lockfile
+
+# Copy all source code
+COPY packages/ ./packages/
+COPY apps/api/ ./apps/api/
+
+# Build workspace packages first (constants must be JS for runtime require)
+RUN cd packages/constants && npx --yes tsc -p tsconfig.build.json
+
+# Generate prisma client & build
+RUN cd apps/api && npx --yes prisma@6.19.2 generate
+RUN pnpm --filter @mymanager/api run build
+
+# ── Stage 2: Production runtime ──────────────────────────────────────
+FROM node:20-alpine AS runner
 RUN apk add --no-cache \
     chromium \
     nss \
@@ -12,37 +45,24 @@ RUN apk add --no-cache \
     ttf-freefont \
     dumb-init
 
+ENV NODE_ENV=production
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-FROM base AS deps
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY apps/api/package.json apps/api/
-COPY packages/types/package.json packages/types/
-COPY packages/utils/package.json packages/utils/
-COPY packages/constants/package.json packages/constants/
-COPY packages/validators/package.json packages/validators/
-COPY packages/config/package.json packages/config/
-RUN pnpm install --frozen-lockfile --filter @mymanager/api...
-
-FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY . .
-RUN pnpm --filter @mymanager/api run build
-
-FROM base AS runner
-ENV NODE_ENV=production
 WORKDIR /app
 
-COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/node_modules ./node_modules
-COPY --from=builder /app/apps/api/package.json ./
-COPY --from=builder /app/apps/api/prisma ./prisma
-COPY --from=builder /app/node_modules/.pnpm ./node_modules/.pnpm
+# Copy built API and node_modules (pnpm symlink structure)
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-RUN npx prisma generate
+WORKDIR /app/apps/api
+RUN mkdir -p ./uploads && chown node:node ./uploads
 
 USER node
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/workers/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/worker-main.js"]

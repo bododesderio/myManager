@@ -1,5 +1,6 @@
 # ── Stage 1: Build ──────────────────────────────────────────────────
 FROM node:20-alpine AS builder
+RUN apk add --no-cache python3 make g++
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 WORKDIR /app
 
@@ -12,7 +13,6 @@ COPY packages/emails/package.json ./packages/emails/
 COPY packages/seo/package.json ./packages/seo/
 COPY packages/translations/package.json ./packages/translations/
 COPY packages/types/package.json ./packages/types/
-COPY packages/ui/package.json ./packages/ui/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/validators/package.json ./packages/validators/
 
@@ -24,6 +24,9 @@ RUN pnpm install --frozen-lockfile
 # Now copy all source code
 COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
+
+# Build workspace packages first (constants must be JS for runtime require)
+RUN cd packages/constants && npx --yes tsc -p tsconfig.build.json
 
 # Generate prisma client & build API
 RUN cd apps/api && npx --yes prisma@6.19.2 generate
