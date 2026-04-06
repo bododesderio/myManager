@@ -101,6 +101,8 @@ export function CalendarContent() {
       <div className="rounded-brand border bg-white shadow-sm">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <button
+            type="button"
+            aria-label="Previous month"
             onClick={goPrev}
             className="text-sm font-medium text-gray-600 hover:text-brand-primary"
           >
@@ -108,6 +110,8 @@ export function CalendarContent() {
           </button>
           <h2 className="font-heading text-lg font-semibold">{formatMonth(year, month)}</h2>
           <button
+            type="button"
+            aria-label="Next month"
             onClick={goNext}
             className="text-sm font-medium text-gray-600 hover:text-brand-primary"
           >
@@ -115,11 +119,11 @@ export function CalendarContent() {
           </button>
         </div>
 
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-1 sm:grid-cols-7">
           {DAYS.map((day) => (
             <div
               key={day}
-              className="border-b border-r px-3 py-2 text-center text-xs font-semibold text-gray-500"
+              className="hidden border-b border-r px-3 py-2 text-center text-xs font-semibold text-gray-500 sm:block"
             >
               {day}
             </div>
@@ -143,29 +147,32 @@ export function CalendarContent() {
                 const dayPosts = isValid ? postsByDate[dateStr] || [] : [];
                 const isToday = dateStr === todayStr;
 
+                if (!isValid) {
+                  // Hide leading/trailing blanks on mobile (single-column layout)
+                  return <div key={i} className="hidden border-b border-r bg-gray-50/50 sm:block" />;
+                }
                 return (
                   <Link
                     key={i}
-                    href={isValid ? `/compose?date=${dateStr}` : '#'}
-                    className={`min-h-[100px] border-b border-r p-2 text-xs transition hover:bg-gray-50 ${
+                    href={`/compose?date=${dateStr}`}
+                    className={`min-h-[60px] border-b border-r p-2 text-xs transition hover:bg-gray-50 sm:min-h-[100px] ${
                       isToday ? 'bg-brand-primary/5' : ''
-                    } ${!isValid ? 'cursor-default bg-gray-50/50' : ''}`}
-                    onClick={(e) => {
-                      if (!isValid) e.preventDefault();
-                    }}
+                    }`}
                   >
-                    {isValid && (
-                      <>
-                        <span
-                          className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                            isToday
-                              ? 'bg-brand-primary text-white'
-                              : 'text-gray-700'
-                          }`}
-                        >
-                          {dayNum}
-                        </span>
-                        <div className="mt-1 space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
+                          isToday ? 'bg-brand-primary text-white' : 'text-gray-700'
+                        }`}
+                      >
+                        {dayNum}
+                      </span>
+                      <span className="text-xs text-gray-500 sm:hidden">
+                        {DAYS[(startDayOfWeek + dayNum - 1) % 7]}
+                      </span>
+                    </div>
+                    <>
+                      <div className="mt-1 space-y-0.5">
                           {dayPosts.slice(0, 3).map((post: any) => {
                             const platforms = post.platforms || [];
                             const platform = platforms[0] || 'default';
@@ -187,14 +194,13 @@ export function CalendarContent() {
                               </div>
                             );
                           })}
-                          {dayPosts.length > 3 && (
-                            <span className="text-[10px] text-gray-400">
-                              +{dayPosts.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      </>
-                    )}
+                        {dayPosts.length > 3 && (
+                          <span className="text-[10px] text-gray-400">
+                            +{dayPosts.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </>
                   </Link>
                 );
               })}

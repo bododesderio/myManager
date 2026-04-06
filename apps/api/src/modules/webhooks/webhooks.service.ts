@@ -1,5 +1,7 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import * as crypto from 'crypto';
+import { InjectQueue } from '@nestjs/bull';
+import type { Queue } from 'bullmq';
 import { WebhooksRepository } from './webhooks.repository';
 import { AuditService } from '../audit/audit.service';
 
@@ -20,6 +22,7 @@ export class WebhooksService {
   constructor(
     private readonly repository: WebhooksRepository,
     private readonly auditService: AuditService,
+    @Optional() @InjectQueue('webhook-delivery') private readonly deliveryQueue?: Queue,
   ) {}
 
   async list(workspaceId: string) {
@@ -123,7 +126,7 @@ export class WebhooksService {
       max_attempts: 6,
     });
 
-    await this.deliverWebhook(endpoint, delivery.id, payload);
+    await this.enqueueOrDeliver(endpoint, delivery.id, payload);
 
     return { message: 'Test webhook delivered', deliveryId: delivery.id };
   }
@@ -137,7 +140,7 @@ export class WebhooksService {
       delivered_at: null,
     });
 
-    await this.deliverWebhook(
+    await this.enqueueOrDeliver(
       delivery.endpoint,
       delivery.id,
       delivery.payload as Record<string, unknown>,
@@ -146,6 +149,30 @@ export class WebhooksService {
     );
 
     return { message: 'Delivery retry completed', deliveryId: delivery.id };
+  }
+
+  private async enqueueOrDeliver(
+    endpoint: { id: string; url: string; secret: string },
+    deliveryId: string,
+    payload: Record<string, unknown>,
+    previousAttempts: number = 0,
+    maxAttempts: number = 6,
+  ) {
+    if (this.deliveryQueue) {
+      await this.deliveryQueue.add(
+        'deliver',
+        { deliveryId },
+        {
+          attempts: maxAttempts - previousAttempts,
+          backoff: { type: 'exponential', delay: 60_000 },
+          removeOnComplete: true,
+        },
+      );
+      return;
+    }
+    // Fallback when running inside the API process without a queue (e.g. tests):
+    // perform a single inline delivery so the test endpoint still works.
+    await this.deliverWebhook(endpoint, deliveryId, payload, previousAttempts, maxAttempts);
   }
 
   async dispatchEvent(workspaceId: string, event: string, data: Record<string, unknown>) {
@@ -159,7 +186,7 @@ export class WebhooksService {
         attempts: 0,
         max_attempts: 6,
       });
-      await this.deliverWebhook(endpoint, delivery.id, payload);
+      await this.enqueueOrDeliver(endpoint, delivery.id, payload);
     }
   }
 

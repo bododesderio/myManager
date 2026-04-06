@@ -34,7 +34,7 @@ function formatRelativeDate(dateStr: string) {
 }
 
 export function ApprovalsContent() {
-  const { data, isLoading } = usePendingApprovals();
+  const { data, isLoading, isError, error, refetch } = usePendingApprovals();
   const approvePost = useApprovePost();
   const rejectPost = useRejectPost();
   const requestRevision = useRequestRevision();
@@ -94,6 +94,13 @@ export function ApprovalsContent() {
 
       {isLoading ? (
         <TableSkeleton rows={4} cols={3} />
+      ) : isError ? (
+        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Failed to load pending approvals. {(error as Error)?.message ?? ''}{' '}
+          <button type="button" onClick={() => refetch()} className="ml-1 underline">
+            Retry
+          </button>
+        </div>
       ) : approvals.length === 0 ? (
         <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">

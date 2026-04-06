@@ -155,8 +155,29 @@ export function HomeContent() {
   const stepsCompleted = [hasAccount, hasConnected, hasFirstPost].filter(Boolean).length;
   const allStepsDone = stepsCompleted === 3;
 
+  const queryError =
+    analytics.error || feed.error || scheduled.error || pendingApprovals.error || subscription.error;
+
   return (
     <div className="space-y-5">
+      {queryError && (
+        <div className="rounded-brand border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          Some dashboard data failed to load: {(queryError as Error)?.message ?? 'unknown error'}.
+          <button
+            type="button"
+            onClick={() => {
+              analytics.refetch();
+              feed.refetch();
+              scheduled.refetch();
+              pendingApprovals.refetch();
+              subscription.refetch();
+            }}
+            className="ml-2 underline"
+          >
+            Retry
+          </button>
+        </div>
+      )}
       {/* ── ONBOARDING STRIP ──────────────── */}
       {!onboardingDismissed && !allStepsDone && (
         <div

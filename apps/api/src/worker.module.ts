@@ -25,6 +25,7 @@ import { ExchangeRatesCron } from './crons/exchange-rates.cron';
 import { MonthlyReportsCron } from './crons/monthly-reports.cron';
 import { ScheduledPostsCron } from './crons/scheduled-posts.cron';
 import { TokenRefreshCron } from './crons/token-refresh.cron';
+import { ListeningSyncCron } from './crons/listening-sync.cron';
 import {
   FacebookProcessor,
   InstagramProcessor,
@@ -41,6 +42,7 @@ import {
   ReportGenerationProcessor,
   EmailDeliveryProcessor,
   PushNotificationProcessor,
+  WebhookDeliveryProcessor,
 } from './workers/publishing.processors';
 
 @Module({
@@ -78,6 +80,7 @@ import {
       { name: 'token-refresh' },
       { name: 'email-delivery' },
       { name: 'push-notifications' },
+      { name: 'webhook-delivery' },
       { name: 'publishing-facebook' },
       { name: 'publishing-instagram' },
       { name: 'publishing-x' },
@@ -114,6 +117,7 @@ import {
     MonthlyReportsCron,
     ScheduledPostsCron,
     TokenRefreshCron,
+    ListeningSyncCron,
     FacebookProcessor,
     InstagramProcessor,
     XProcessor,
@@ -129,6 +133,7 @@ import {
     ReportGenerationProcessor,
     EmailDeliveryProcessor,
     PushNotificationProcessor,
+    WebhookDeliveryProcessor,
   ],
 })
 export class WorkerModule {}

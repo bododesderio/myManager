@@ -117,7 +117,14 @@ export default function SignupForm() {
 
   const prevStep = () => setStep((step - 1) as Step);
 
-  const isStep1Valid = firstName && lastName && email && password.length >= 8 && country;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isStep1Valid =
+    firstName.trim().length >= 2 &&
+    lastName.trim().length >= 2 &&
+    emailValid &&
+    password.length >= 8 &&
+    country &&
+    (accountType === 'individual' || (companyName.trim().length >= 2 && teamSize));
 
   return (
     <div className="w-full max-w-md">
@@ -156,6 +163,9 @@ export default function SignupForm() {
               {accountType === 'company' && (
                 <input
                   type="text"
+                  required
+                  minLength={2}
+                  aria-label="Company name"
                   placeholder="Company / Agency name"
                   value={companyName}
                   onChange={(e) => {
@@ -168,17 +178,22 @@ export default function SignupForm() {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <input type="text" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
+                <input type="text" required minLength={2} aria-label="First name" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
                   className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
-                <input type="text" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
+                <input type="text" required minLength={2} aria-label="Last name" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
                   className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
               </div>
 
-              <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+              <div>
+                <input type="email" required aria-label="Email address" autoComplete="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+                {email && !emailValid && (
+                  <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
+                )}
+              </div>
 
               <div>
-                <input type="password" placeholder="Password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
+                <input type="password" required minLength={8} aria-label="Password" autoComplete="new-password" placeholder="Password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
                 {password && (
                   <div className="flex gap-1 mt-2">

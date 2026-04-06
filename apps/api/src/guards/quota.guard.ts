@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../prisma.service';
@@ -11,6 +12,8 @@ type QuotaType = 'posts' | 'accounts' | 'seats' | 'storage' | 'aiCredits' | 'sch
 
 @Injectable()
 export class QuotaGuard implements CanActivate {
+  private readonly logger = new Logger(QuotaGuard.name);
+
   constructor(private readonly reflector: Reflector, private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -37,7 +40,19 @@ export class QuotaGuard implements CanActivate {
     const currentCount = await this.getCurrentCount(quotaType, user.id, workspaceId);
     const limit = this.getLimit(quotaType, plan.limits);
 
-    if (limit !== null && currentCount >= limit) {
+    // Treat null/undefined limit as misconfiguration: log + allow (do not fail-open silently).
+    if (limit === null) {
+      this.logger.warn(
+        `Quota '${quotaType}' has no limit defined on plan '${plan.slug ?? plan.id ?? 'unknown'}'; allowing request`,
+      );
+      return true;
+    }
+
+    // -1 conventionally means "unlimited"
+    if (limit < 0) return true;
+
+    // Check before creation: if user already has `limit`, the next creation would exceed it.
+    if (currentCount >= limit) {
       throw new ForbiddenException(
         `You have reached your ${quotaType} limit (${currentCount}/${limit}). Please upgrade your plan.`,
       );
@@ -101,6 +116,8 @@ export class QuotaGuard implements CanActivate {
     };
 
     const value = limits[mapping[type]];
-    return value !== undefined ? (value as number) : null;
+    if (value === undefined || value === null) return null;
+    const n = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(n) ? n : null;
   }
 }

@@ -93,6 +93,13 @@ export function AnalyticsContent() {
       {/* Stat cards */}
       {overview.isLoading ? (
         <StatCardSkeletonGrid count={4} />
+      ) : overview.isError ? (
+        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Failed to load analytics overview. {(overview.error as Error)?.message ?? ''}{' '}
+          <button type="button" onClick={() => overview.refetch()} className="ml-1 underline">
+            Retry
+          </button>
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[

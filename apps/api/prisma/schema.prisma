@@ -328,9 +328,9 @@ model Subscription {
   created_at                  DateTime     @default(now())
   updated_at                  DateTime     @updatedAt
 
-  user               User               @relation(fields: [user_id], references: [id])
-  workspace          Workspace          @relation(fields: [workspace_id], references: [id])
-  plan               Plan               @relation(fields: [plan_id], references: [id])
+  user               User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workspace          Workspace          @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  plan               Plan               @relation(fields: [plan_id], references: [id], onDelete: Restrict)
   subscription_items SubscriptionItem[]
 
   @@map("subscriptions")
@@ -362,7 +362,7 @@ model BillingHistory {
   billing_period  String?
   created_at      DateTime @default(now())
 
-  workspace Workspace @relation(fields: [workspace_id], references: [id])
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
 
   @@index([workspace_id, created_at])
   @@index([user_id, created_at])
@@ -379,9 +379,9 @@ model PlanOverride {
   override_until DateTime?
   created_at     DateTime  @default(now())
 
-  user  User @relation("OverrideUser", fields: [user_id], references: [id])
-  admin User @relation("OverrideAdmin", fields: [admin_id], references: [id])
-  plan  Plan @relation(fields: [plan_id], references: [id])
+  user  User @relation("OverrideUser", fields: [user_id], references: [id], onDelete: Cascade)
+  admin User @relation("OverrideAdmin", fields: [admin_id], references: [id], onDelete: Cascade)
+  plan  Plan @relation(fields: [plan_id], references: [id], onDelete: Restrict)
 
   @@map("plan_overrides")
 }
@@ -482,7 +482,7 @@ model WorkspaceInvitation {
   created_at    DateTime      @default(now())
 
   workspace  Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
-  invited_by User      @relation(fields: [invited_by_id], references: [id])
+  invited_by User      @relation(fields: [invited_by_id], references: [id], onDelete: Cascade)
 
   @@index([workspace_id, email])
   @@index([token])
@@ -790,6 +790,8 @@ model Post {
   @@index([workspace_id, scheduled_at])
   @@index([workspace_id, published_at])
   @@index([project_id, status])
+  @@index([workspace_id, status, scheduled_at])
+  @@index([user_id, created_at])
   @@map("posts")
 }
 
@@ -986,10 +988,11 @@ model MediaAsset {
   tags             String[]
   created_at       DateTime @default(now())
 
-  workspace Workspace   @relation(fields: [workspace_id], references: [id])
+  workspace Workspace   @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
   posts     PostMedia[]
 
   @@index([workspace_id])
+  @@index([user_id, created_at])
   @@map("media_assets")
 }
 
@@ -1085,9 +1088,10 @@ model Notification {
   created_at   DateTime  @default(now())
 
   user      User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  workspace Workspace? @relation(fields: [workspace_id], references: [id])
+  workspace Workspace? @relation(fields: [workspace_id], references: [id], onDelete: SetNull)
 
   @@index([user_id, read])
+  @@index([user_id, read, created_at])
   @@map("notifications")
 }
 
@@ -1255,7 +1259,7 @@ model BlogPost {
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
 
-  author User @relation(fields: [author_id], references: [id])
+  author User @relation(fields: [author_id], references: [id], onDelete: Cascade)
 
   @@index([slug])
   @@index([category, is_published])
@@ -1772,7 +1776,7 @@ model DataExportRequest {
   completed_at DateTime?
   created_at   DateTime  @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("data_export_requests")
 }
@@ -1786,7 +1790,7 @@ model DeletionRequest {
   completed_at DateTime?
   created_at   DateTime  @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("deletion_requests")
 }
@@ -1834,10 +1838,11 @@ model AuditLog {
   user_agent   String?
   created_at   DateTime @default(now())
 
-  user User? @relation(fields: [user_id], references: [id])
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
 
   @@index([workspace_id, created_at])
   @@index([user_id, created_at])
+  @@index([workspace_id, action, created_at])
   @@map("audit_logs")
 }
 

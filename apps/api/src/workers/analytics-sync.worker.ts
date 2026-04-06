@@ -58,6 +58,11 @@ export class AnalyticsSyncWorker {
       x: () => this.fetchXMetrics(postId, token),
       linkedin: () => this.fetchLinkedInMetrics(postId, token),
       tiktok: () => this.fetchTikTokMetrics(postId, token),
+      youtube: () => this.fetchYouTubeMetrics(postId, token),
+      pinterest: () => this.fetchPinterestMetrics(postId, token),
+      threads: () => this.fetchThreadsMetrics(postId, token),
+      'google-business': () => this.fetchGoogleBusinessMetrics(postId, token),
+      whatsapp: () => this.fetchWhatsAppMetrics(postId, token),
     };
     return (fetchers[platform] || (() => Promise.resolve({})))();
   }
@@ -107,6 +112,111 @@ export class AnalyticsSyncWorker {
     const resp = await axios.post('https://open.tiktokapis.com/v2/video/query/', { filters: { video_ids: [postId] } }, { headers: { Authorization: `Bearer ${token}` } });
     const video = resp.data.data?.videos?.[0] || {};
     return { likes: video.like_count || 0, comments: video.comment_count || 0, shares: video.share_count || 0, impressions: video.view_count || 0, reach: 0, clicks: 0, engagements: (video.like_count || 0) + (video.comment_count || 0) + (video.share_count || 0) };
+  }
+
+  private async fetchYouTubeMetrics(videoId: string, token: string) {
+    try {
+      const resp = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { part: 'statistics', id: videoId },
+      });
+      const s = resp.data.items?.[0]?.statistics || {};
+      const likes = parseInt(s.likeCount ?? '0', 10);
+      const comments = parseInt(s.commentCount ?? '0', 10);
+      return {
+        impressions: parseInt(s.viewCount ?? '0', 10),
+        likes,
+        comments,
+        shares: 0,
+        reach: 0,
+        clicks: 0,
+        engagements: likes + comments,
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  private async fetchPinterestMetrics(pinId: string, token: string) {
+    try {
+      const resp = await axios.get(`https://api.pinterest.com/v5/pins/${pinId}/analytics`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { metric_types: 'IMPRESSION,SAVE,PIN_CLICK' },
+      });
+      const all = resp.data?.all || {};
+      return {
+        impressions: all.IMPRESSION ?? 0,
+        engagements: (all.SAVE ?? 0) + (all.PIN_CLICK ?? 0),
+        clicks: all.PIN_CLICK ?? 0,
+        likes: 0,
+        comments: 0,
+        shares: all.SAVE ?? 0,
+        reach: 0,
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  private async fetchThreadsMetrics(mediaId: string, token: string) {
+    try {
+      const resp = await axios.get(`https://graph.threads.net/v1.0/${mediaId}/insights`, {
+        params: { metric: 'views,likes,replies,reposts,quotes', access_token: token },
+      });
+      const data = resp.data.data || [];
+      const get = (n: string) =>
+        data.find((d: { name: string; values?: { value: number }[] }) => d.name === n)?.values?.[0]?.value || 0;
+      const likes = get('likes');
+      const comments = get('replies');
+      const shares = get('reposts') + get('quotes');
+      return {
+        impressions: get('views'),
+        likes,
+        comments,
+        shares,
+        reach: 0,
+        clicks: 0,
+        engagements: likes + comments + shares,
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  private async fetchGoogleBusinessMetrics(postId: string, token: string) {
+    // GBP local-post insights API: requires location resource. postId is expected to be the
+    // full localPosts/{id} resource path; if not, skip cleanly.
+    try {
+      const resp = await axios.post(
+        `https://businessprofileperformance.googleapis.com/v1/${postId}:fetchMultiDailyMetricsTimeSeries`,
+        { dailyMetrics: ['CALL_CLICKS', 'WEBSITE_CLICKS', 'BUSINESS_IMPRESSIONS_DESKTOP_MAPS'] },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const series = resp.data.multiDailyMetricTimeSeries?.[0]?.dailyMetricTimeSeries ?? [];
+      const sum = (name: string) =>
+        series
+          .find((s: any) => s.dailyMetric === name)
+          ?.timeSeries?.datedValues?.reduce((a: number, b: any) => a + (b.value ?? 0), 0) ?? 0;
+      return {
+        impressions: sum('BUSINESS_IMPRESSIONS_DESKTOP_MAPS'),
+        clicks: sum('WEBSITE_CLICKS') + sum('CALL_CLICKS'),
+        engagements: sum('WEBSITE_CLICKS') + sum('CALL_CLICKS'),
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        reach: 0,
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  private async fetchWhatsAppMetrics(messageId: string, token: string) {
+    // WhatsApp Cloud API does not expose per-message analytics; use message_status webhooks instead.
+    // We return zero metrics so the row is created but is not misleading.
+    void messageId;
+    void token;
+    return { impressions: 0, likes: 0, comments: 0, shares: 0, reach: 0, clicks: 0, engagements: 0 };
   }
 
   private decryptToken(encrypted: string): string {

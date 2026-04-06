@@ -45,7 +45,7 @@ export function MediaContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const perPage = 24;
-  const { data, isLoading } = useMedia({
+  const { data, isLoading, isError, error, refetch } = useMedia({
     type: typeFilter || undefined,
     page,
     per_page: perPage,
@@ -161,6 +161,13 @@ export function MediaContent() {
               className="aspect-square animate-pulse rounded-brand border bg-gray-100"
             />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Failed to load media library. {(error as Error)?.message ?? ''}{' '}
+          <button type="button" onClick={() => refetch()} className="ml-1 underline">
+            Retry
+          </button>
         </div>
       ) : !Array.isArray(mediaItems) || mediaItems.length === 0 ? (
         <div className="rounded-brand border bg-white py-16 text-center shadow-sm">

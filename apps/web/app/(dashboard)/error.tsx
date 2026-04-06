@@ -22,14 +22,26 @@ export default function DashboardError({
       </div>
       <h2 className="text-xl font-semibold text-gray-900">Something went wrong</h2>
       <p className="max-w-md text-sm text-gray-500">
-        An error occurred while loading this page. Please try again.
+        {error.message || 'An error occurred while loading this page. Please try again.'}
       </p>
-      <button
-        onClick={reset}
-        className="rounded-lg bg-[var(--brand-primary)] px-6 py-2.5 text-sm font-medium text-white hover:opacity-90"
-      >
-        Try again
-      </button>
+      {error.digest && (
+        <p className="text-xs text-gray-400">Error ID: {error.digest}</p>
+      )}
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={reset}
+          className="rounded-lg bg-[var(--brand-primary)] px-6 py-2.5 text-sm font-medium text-white hover:opacity-90"
+        >
+          Try again
+        </button>
+        <a
+          href="/home"
+          className="rounded-lg border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Back to dashboard
+        </a>
+      </div>
     </div>
   );
 }

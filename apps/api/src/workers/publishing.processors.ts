@@ -17,6 +17,7 @@ import { TokenRefreshWorker } from './token-refresh.worker';
 import { ReportGeneratorWorker } from './report-generator.worker';
 import { EmailWorker } from './email.worker';
 import { NotificationWorker } from './notification.worker';
+import { WebhookDeliveryWorker } from './webhook-delivery.worker';
 import type { PublishJobData } from './platforms/base.worker';
 
 @Processor('publishing-facebook')
@@ -196,6 +197,19 @@ export class PushNotificationProcessor {
     this.worker = new NotificationWorker(prisma);
   }
   @Process('send')
+  handle(job: Job<any>) {
+    return this.worker.process(job);
+  }
+}
+
+@Processor('webhook-delivery')
+@Injectable()
+export class WebhookDeliveryProcessor {
+  private readonly worker: WebhookDeliveryWorker;
+  constructor(prisma: PrismaService) {
+    this.worker = new WebhookDeliveryWorker(prisma);
+  }
+  @Process('deliver')
   handle(job: Job<any>) {
     return this.worker.process(job);
   }

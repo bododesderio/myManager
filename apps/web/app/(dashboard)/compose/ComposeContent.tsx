@@ -148,6 +148,13 @@ export function ComposeContent() {
       addToast({ type: 'error', message: 'Add some content or media before posting.' });
       return;
     }
+    if (caption.length > charLimit) {
+      addToast({
+        type: 'error',
+        message: `Caption is ${caption.length - charLimit} characters over the limit for the selected platforms.`,
+      });
+      return;
+    }
     if (mode === 'schedule' && !scheduledAt) {
       addToast({ type: 'error', message: 'Pick a date and time for scheduling.' });
       return;
@@ -367,10 +374,16 @@ export function ComposeContent() {
         <div className="rounded-brand border bg-white p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-gray-700">Schedule</h2>
 
+          {caption.length > charLimit && (
+            <p className="mt-2 text-sm font-medium text-red-600">
+              Caption is {(caption.length - charLimit).toLocaleString()} characters over the limit. Trim it before publishing.
+            </p>
+          )}
+
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <button
               type="button"
-              disabled={isSubmitting}
+              disabled={isSubmitting || caption.length > charLimit}
               onClick={() => {
                 setSubmitMode('publish');
                 handleSubmit('publish');
@@ -382,7 +395,7 @@ export function ComposeContent() {
 
             <button
               type="button"
-              disabled={isSubmitting}
+              disabled={isSubmitting || caption.length > charLimit}
               onClick={() => {
                 if (submitMode !== 'schedule') {
                   setSubmitMode('schedule');

@@ -22,37 +22,56 @@ export class BestTimesCron {
           include: { analytics: true },
         });
 
-        const platformHourMap: Record<string, Record<number, { total: number; count: number }>> = {};
+        // Bucket by platform → day_of_week (0-6) → hour (0-23)
+        const buckets: Record<string, Record<number, Record<number, { total: number; count: number }>>> = {};
 
         for (const post of posts) {
           if (!post.published_at) continue;
           const hour = post.published_at.getUTCHours();
-          const _dayOfWeek = post.published_at.getUTCDay();
+          const dayOfWeek = post.published_at.getUTCDay();
 
           for (const platform of post.platforms) {
-            const key = `${platform}`;
-            if (!platformHourMap[key]) platformHourMap[key] = {};
-            if (!platformHourMap[key][hour]) platformHourMap[key][hour] = { total: 0, count: 0 };
+            buckets[platform] ??= {};
+            buckets[platform][dayOfWeek] ??= {};
+            buckets[platform][dayOfWeek][hour] ??= { total: 0, count: 0 };
 
             const analytics = post.analytics.find((a) => a.platform === platform);
             if (analytics) {
-              const engagement = (analytics.likes + analytics.comments + analytics.shares + analytics.saves) / Math.max(analytics.impressions || 1, 1);
-              platformHourMap[key][hour].total += engagement;
-              platformHourMap[key][hour].count += 1;
+              const engagement =
+                (analytics.likes + analytics.comments + analytics.shares + analytics.saves) /
+                Math.max(analytics.impressions || 1, 1);
+              buckets[platform][dayOfWeek][hour].total += engagement;
+              buckets[platform][dayOfWeek][hour].count += 1;
             }
           }
         }
 
-        for (const [platform, hours] of Object.entries(platformHourMap)) {
-          for (const [hourStr, data] of Object.entries(hours)) {
-            const hour = parseInt(hourStr);
-            const avgRate = data.count > 0 ? data.total / data.count : 0;
-
-            await this.prisma.bestTime.upsert({
-              where: { workspace_id_platform_day_of_week_hour: { workspace_id: workspace.id, platform, day_of_week: 0, hour } },
-              update: { score: avgRate, sample_size: data.count },
-              create: { workspace_id: workspace.id, platform, hour, day_of_week: 0, score: avgRate, sample_size: data.count },
-            });
+        for (const [platform, byDay] of Object.entries(buckets)) {
+          for (const [dayStr, byHour] of Object.entries(byDay)) {
+            const day_of_week = parseInt(dayStr);
+            for (const [hourStr, data] of Object.entries(byHour)) {
+              const hour = parseInt(hourStr);
+              const avgRate = data.count > 0 ? data.total / data.count : 0;
+              await this.prisma.bestTime.upsert({
+                where: {
+                  workspace_id_platform_day_of_week_hour: {
+                    workspace_id: workspace.id,
+                    platform,
+                    day_of_week,
+                    hour,
+                  },
+                },
+                update: { score: avgRate, sample_size: data.count },
+                create: {
+                  workspace_id: workspace.id,
+                  platform,
+                  hour,
+                  day_of_week,
+                  score: avgRate,
+                  sample_size: data.count,
+                },
+              });
+            }
           }
         }
       }

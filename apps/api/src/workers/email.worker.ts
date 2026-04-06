@@ -29,11 +29,23 @@ export class EmailWorker {
     const { template, data } = job.data;
     const subject = TEMPLATE_SUBJECTS[template] || 'Notification';
 
+    // The "to" field comes from data.to or data.email; data.to may itself be a userId
+    // (legacy callers). Resolve to a real email address.
+    const candidate = (data.email ?? data.to) as string | string[] | undefined;
+    if (!candidate) {
+      throw new Error(`email worker: missing recipient for template ${template}`);
+    }
+    const recipients = Array.isArray(candidate) ? candidate : [candidate];
+    const valid = recipients.filter((r) => typeof r === 'string' && /.+@.+\..+/.test(r));
+    if (valid.length === 0) {
+      throw new Error(`email worker: no valid email addresses in recipient list for template ${template}`);
+    }
+
     const html = this.renderTemplate(template, data);
 
     await resend.emails.send({
       from: `${process.env.BRAND_NAME || 'MyManager'} <noreply@${process.env.EMAIL_DOMAIN || 'mymanager.com'}>`,
-      to: (data.to || data.email) as string | string[],
+      to: valid,
       subject,
       html,
     });
@@ -76,6 +88,85 @@ export class EmailWorker {
           <p>Hi ${data.name},</p>
           <p>Please verify your email address by clicking the button below:</p>
           <a href="${data.verifyUrl || `${process.env.NEXTAUTH_URL}/verify-email?token=${data.verificationToken}`}" class="button">Verify Email</a>
+        </div>
+      </body></html>`,
+
+      'team-invite': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>You're invited</h1></div>
+        <div class="content">
+          <p>${data.inviterName ?? 'Someone'} invited you to join the workspace <strong>${data.workspaceName ?? ''}</strong> as a ${data.role ?? 'member'}.</p>
+          <a href="${data.inviteUrl}" class="button">Accept Invitation</a>
+          <p>This invitation expires in 7 days.</p>
+        </div>
+      </body></html>`,
+
+      'invoice': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Invoice ${data.invoiceNumber ?? ''}</h1></div>
+        <div class="content">
+          <p>Hi ${data.name},</p>
+          <p>Your invoice for <strong>${data.amount} ${data.currency ?? 'USD'}</strong> is ready.</p>
+          <a href="${data.invoiceUrl}" class="button">View Invoice</a>
+        </div>
+      </body></html>`,
+
+      'payment-failed': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Payment failed</h1></div>
+        <div class="content">
+          <p>Hi ${data.name},</p>
+          <p>We were unable to process your payment of <strong>${data.amount} ${data.currency ?? 'USD'}</strong>. Please update your payment method to avoid service interruption.</p>
+          <a href="${process.env.NEXTAUTH_URL}/settings/billing" class="button">Update Payment Method</a>
+        </div>
+      </body></html>`,
+
+      'post-failed': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Post failed to publish</h1></div>
+        <div class="content">
+          <p>Your post on <strong>${data.platform}</strong> failed to publish.</p>
+          <p>Reason: ${data.errorMessage ?? 'Unknown error'}</p>
+          <a href="${process.env.NEXTAUTH_URL}/posts/${data.postId}" class="button">View Post</a>
+        </div>
+      </body></html>`,
+
+      'report-ready': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Your report is ready</h1></div>
+        <div class="content">
+          <p>Hi ${data.name},</p>
+          <p>The <strong>${data.reportName ?? 'report'}</strong> you requested is ready for download.</p>
+          <a href="${data.downloadUrl}" class="button">Download Report</a>
+        </div>
+      </body></html>`,
+
+      'approval-needed': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Approval needed</h1></div>
+        <div class="content">
+          <p>${data.requesterName ?? 'A team member'} submitted a post that needs your approval.</p>
+          <a href="${process.env.NEXTAUTH_URL}/approvals" class="button">Review Post</a>
+        </div>
+      </body></html>`,
+
+      'revision-requested': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Revision requested</h1></div>
+        <div class="content">
+          <p>${data.reviewerName ?? 'A reviewer'} requested changes to your post.</p>
+          ${data.feedback ? `<blockquote style="border-left:3px solid #7F77DD;padding-left:12px;color:#555;">${data.feedback}</blockquote>` : ''}
+          <a href="${process.env.NEXTAUTH_URL}/posts/${data.postId}" class="button">Open Post</a>
+        </div>
+      </body></html>`,
+
+      'plan-renewing': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Your subscription renews soon</h1></div>
+        <div class="content">
+          <p>Hi ${data.name},</p>
+          <p>Your <strong>${data.planName}</strong> subscription will renew on <strong>${data.renewalDate}</strong> for <strong>${data.amount} ${data.currency ?? 'USD'}</strong>.</p>
+          <a href="${process.env.NEXTAUTH_URL}/settings/billing" class="button">Manage Subscription</a>
+        </div>
+      </body></html>`,
+
+      'social-token-expired': `<html><head><style>${baseStyle}</style></head><body>
+        <div class="header"><h1>Reconnect ${data.platform}</h1></div>
+        <div class="content">
+          <p>Your <strong>${data.platform}</strong> connection has expired. Reconnect to keep publishing without interruption.</p>
+          <a href="${process.env.NEXTAUTH_URL}/settings/accounts" class="button">Reconnect Account</a>
         </div>
       </body></html>`,
     };
