@@ -1,4 +1,5 @@
 import { Job } from 'bullmq';
+import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import puppeteer from 'puppeteer';
@@ -8,6 +9,7 @@ interface ReportGenerateJobData {
 }
 
 export class ReportGeneratorWorker {
+  private readonly logger = new Logger(ReportGeneratorWorker.name);
   private readonly s3Client: S3Client;
   private readonly bucket: string;
 
@@ -43,9 +45,19 @@ export class ReportGeneratorWorker {
         data: { status: 'COMPLETED', generated_at: new Date() },
       });
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      const stack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Report ${reportId} generation failed: ${message}`, stack);
       await this.prisma.report.update({
         where: { id: reportId },
-        data: { status: 'FAILED', metadata: { error: error instanceof Error ? error.message : String(error) } },
+        data: {
+          status: 'FAILED',
+          metadata: {
+            error: message,
+            failedAt: new Date().toISOString(),
+            phase: report.file_format,
+          },
+        },
       });
       throw error;
     }
@@ -58,15 +70,21 @@ export class ReportGeneratorWorker {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     });
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1200, height: 800 });
-    await page.goto(renderUrl, { waitUntil: 'networkidle0', timeout: 60000 });
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '20mm', right: '15mm', bottom: '20mm', left: '15mm' },
-    });
-    await browser.close();
+    let pdfBuffer: Buffer;
+    try {
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1200, height: 800 });
+      await page.goto(renderUrl, { waitUntil: 'networkidle0', timeout: 60000 });
+      pdfBuffer = Buffer.from(
+        await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: { top: '20mm', right: '15mm', bottom: '20mm', left: '15mm' },
+        }),
+      );
+    } finally {
+      await browser.close().catch(() => undefined);
+    }
 
     const r2Key = `reports/${report.workspace_id}/${report.id}.pdf`;
     await this.s3Client.send(new PutObjectCommand({

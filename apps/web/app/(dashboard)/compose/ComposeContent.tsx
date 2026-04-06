@@ -242,7 +242,7 @@ export function ComposeContent() {
                   {account.avatar_url ? (
                     <Image
                       src={account.avatar_url}
-                      alt=""
+                      alt={`${account.display_name || account.platform_username} avatar`}
                       width={20}
                       height={20}
                       className="h-5 w-5 rounded-full object-cover"
@@ -289,7 +289,9 @@ export function ComposeContent() {
         <div className="rounded-brand border bg-white p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-gray-700">Media</h2>
 
-          <div
+          <button
+            type="button"
+            aria-label="Upload media files"
             onDragOver={(e) => {
               e.preventDefault();
               setIsDragging(true);
@@ -297,7 +299,7 @@ export function ComposeContent() {
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`mt-3 flex cursor-pointer flex-col items-center justify-center rounded-brand border-2 border-dashed px-6 py-8 transition ${
+            className={`mt-3 flex w-full cursor-pointer flex-col items-center justify-center rounded-brand border-2 border-dashed px-6 py-8 transition ${
               isDragging
                 ? 'border-brand-primary bg-brand-primary/5'
                 : 'border-gray-300 hover:border-brand-primary'
@@ -309,6 +311,7 @@ export function ComposeContent() {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={1.5}
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -320,21 +323,24 @@ export function ComposeContent() {
               Drag &amp; drop files here, or{' '}
               <span className="font-medium text-brand-primary">browse</span>
             </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*,video/*"
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files) handleFileUpload(e.target.files);
-                e.target.value = '';
-              }}
-            />
-          </div>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,video/*"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) handleFileUpload(e.target.files);
+              e.target.value = '';
+            }}
+          />
 
           {uploadMedia.isPending && (
-            <p className="mt-2 text-xs text-gray-400">Uploading...</p>
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-500" role="status" aria-live="polite">
+              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
+              Uploading {uploadedMedia.length > 0 ? `(${uploadedMedia.length} done)` : ''}…
+            </div>
           )}
 
           {uploadedMedia.length > 0 && (
@@ -457,7 +463,7 @@ export function ComposeContent() {
       </div>
 
       {/* ==================== RIGHT: Preview ==================== */}
-      <div className="space-y-4">
+      <div className="hidden space-y-4 lg:block">
         <div className="rounded-brand border bg-white p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-gray-700">Preview</h2>
 

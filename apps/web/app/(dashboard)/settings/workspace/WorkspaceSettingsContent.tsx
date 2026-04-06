@@ -27,10 +27,23 @@ export default function WorkspaceSettingsContent() {
     }
   }, [ws]);
 
+  const errors = {
+    name: name.trim().length < 2 ? 'Workspace name must be at least 2 characters.' : '',
+    slug:
+      !/^[a-z0-9-]{2,}$/.test(slug)
+        ? 'Slug must be lowercase letters, numbers, and dashes (min 2 chars).'
+        : '',
+  };
+  const isValid = !errors.name && !errors.slug;
+
   const handleSave = () => {
     if (!activeWorkspaceId) return;
+    if (!isValid) {
+      addToast({ type: 'error', message: 'Please fix the highlighted fields.' });
+      return;
+    }
     updateWorkspace.mutate(
-      { id: activeWorkspaceId, name, slug },
+      { id: activeWorkspaceId, name: name.trim(), slug: slug.trim(), description },
       {
         onSuccess: () => addToast({ type: 'success', message: 'Workspace updated successfully.' }),
         onError: () => addToast({ type: 'error', message: 'Failed to update workspace.' }),
@@ -54,27 +67,41 @@ export default function WorkspaceSettingsContent() {
           <h2 className="font-heading text-lg font-semibold">General</h2>
           <div className="mt-4 space-y-4">
             <div>
-              <label htmlFor="wsName" className="block text-sm font-medium text-gray-700">Workspace Name</label>
+              <label htmlFor="wsName" className="block text-sm font-medium text-gray-700">
+                Workspace Name <span className="text-red-500">*</span>
+              </label>
               <input
                 id="wsName"
                 type="text"
+                required
+                minLength={2}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className={`mt-1 block w-full rounded-brand border px-4 py-2 focus:outline-none ${
+                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                }`}
               />
+              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
             </div>
             <div>
-              <label htmlFor="wsSlug" className="block text-sm font-medium text-gray-700">Workspace URL</label>
+              <label htmlFor="wsSlug" className="block text-sm font-medium text-gray-700">
+                Workspace URL <span className="text-red-500">*</span>
+              </label>
               <div className="mt-1 flex items-center">
                 <span className="text-sm text-gray-500">mymanager.app/</span>
                 <input
                   id="wsSlug"
                   type="text"
+                  required
+                  pattern="[a-z0-9\-]+"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="block flex-1 rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className={`block flex-1 rounded-brand border px-4 py-2 focus:outline-none ${
+                    errors.slug ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                  }`}
                 />
               </div>
+              {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
             </div>
             <div>
               <label htmlFor="wsDesc" className="block text-sm font-medium text-gray-700">Description</label>
@@ -87,8 +114,9 @@ export default function WorkspaceSettingsContent() {
             </div>
           </div>
           <button
+            type="button"
             onClick={handleSave}
-            disabled={updateWorkspace.isPending}
+            disabled={updateWorkspace.isPending || !isValid}
             className="mt-6 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
           >
             {updateWorkspace.isPending ? 'Saving...' : 'Save Changes'}

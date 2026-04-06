@@ -167,9 +167,17 @@ export function AnalyticsContent() {
           <div className="mt-4">
             <TableSkeleton rows={5} cols={4} />
           </div>
+        ) : topPosts.isError ? (
+          <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            Failed to load top posts. {(topPosts.error as Error)?.message ?? ''}{' '}
+            <button type="button" onClick={() => topPosts.refetch()} className="ml-1 underline">
+              Retry
+            </button>
+          </div>
         ) : topPostsData.length > 0 ? (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <p className="mb-2 text-xs text-gray-400 sm:hidden">← Scroll to see all columns →</p>
+            <table className="w-full min-w-[480px] text-left text-sm">
               <thead>
                 <tr className="border-b text-gray-500">
                   <th className="pb-2 pr-4 font-medium">Post</th>

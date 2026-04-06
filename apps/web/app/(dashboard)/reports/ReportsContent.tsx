@@ -45,9 +45,21 @@ export function ReportsContent() {
     }));
   }
 
+  const formErrors = {
+    name: !formData.name.trim() ? 'Report name is required.' : '',
+    dateFrom: !formData.dateFrom ? 'Start date is required.' : '',
+    dateTo:
+      !formData.dateTo
+        ? 'End date is required.'
+        : formData.dateFrom && formData.dateTo < formData.dateFrom
+          ? 'End date must be after start date.'
+          : '',
+  };
+  const isFormValid = !formErrors.name && !formErrors.dateFrom && !formErrors.dateTo;
+
   function handleGenerate() {
-    if (!formData.name.trim() || !formData.dateFrom || !formData.dateTo) {
-      addToast({ type: 'warning', message: 'Please fill in all required fields.' });
+    if (!isFormValid) {
+      addToast({ type: 'warning', message: 'Please fix the highlighted fields.' });
       return;
     }
     generateReport.mutate(
@@ -223,11 +235,16 @@ export function ReportsContent() {
                 <input
                   id="reportName"
                   type="text"
+                  required
+                  minLength={2}
                   value={formData.name}
                   onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Monthly Overview"
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                  className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
+                    formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                  }`}
                 />
+                {formErrors.name && <p className="mt-1 text-xs text-red-600">{formErrors.name}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -237,10 +254,14 @@ export function ReportsContent() {
                   <input
                     id="dateFrom"
                     type="date"
+                    required
                     value={formData.dateFrom}
                     onChange={(e) => setFormData((f) => ({ ...f, dateFrom: e.target.value }))}
-                    className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                      className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
+                      formErrors.dateFrom ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                    }`}
                   />
+                  {formErrors.dateFrom && <p className="mt-1 text-xs text-red-600">{formErrors.dateFrom}</p>}
                 </div>
                 <div>
                   <label htmlFor="dateTo" className="block text-sm font-medium text-gray-700">
@@ -249,10 +270,15 @@ export function ReportsContent() {
                   <input
                     id="dateTo"
                     type="date"
+                    required
+                    min={formData.dateFrom || undefined}
                     value={formData.dateTo}
                     onChange={(e) => setFormData((f) => ({ ...f, dateTo: e.target.value }))}
-                    className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                      className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
+                      formErrors.dateTo ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                    }`}
                   />
+                  {formErrors.dateTo && <p className="mt-1 text-xs text-red-600">{formErrors.dateTo}</p>}
                 </div>
               </div>
               <div>

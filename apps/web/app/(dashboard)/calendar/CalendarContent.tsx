@@ -83,6 +83,9 @@ export function CalendarContent() {
 
   const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
+  const [openDate, setOpenDate] = useState<string | null>(null);
+  const openDayPosts = openDate ? postsByDate[openDate] || [] : [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -148,14 +151,19 @@ export function CalendarContent() {
                 const isToday = dateStr === todayStr;
 
                 if (!isValid) {
-                  // Hide leading/trailing blanks on mobile (single-column layout)
                   return <div key={i} className="hidden border-b border-r bg-gray-50/50 sm:block" />;
                 }
+                const hasPosts = dayPosts.length > 0;
                 return (
-                  <Link
+                  <button
+                    type="button"
                     key={i}
-                    href={`/compose?date=${dateStr}`}
-                    className={`min-h-[60px] border-b border-r p-2 text-xs transition hover:bg-gray-50 sm:min-h-[100px] ${
+                    onClick={() => {
+                      if (hasPosts) setOpenDate(dateStr);
+                      else window.location.href = `/compose?date=${dateStr}`;
+                    }}
+                    aria-label={`${dayNum}: ${dayPosts.length} posts`}
+                    className={`min-h-[60px] border-b border-r p-2 text-left text-xs transition hover:bg-gray-50 sm:min-h-[100px] ${
                       isToday ? 'bg-brand-primary/5' : ''
                     }`}
                   >
@@ -201,11 +209,74 @@ export function CalendarContent() {
                         )}
                       </div>
                     </>
-                  </Link>
+                  </button>
                 );
               })}
         </div>
       </div>
+
+      {openDate && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="day-posts-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setOpenDate(null)}
+        >
+          <div
+            className="w-full max-w-lg rounded-brand bg-white p-6 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between">
+              <h3 id="day-posts-title" className="font-heading text-lg font-semibold">
+                Posts on {openDate}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setOpenDate(null)}
+                aria-label="Close"
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <ul className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
+              {openDayPosts.map((post: any) => (
+                <li key={post.id} className="rounded-brand border p-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    {(post.platforms ?? []).map((p: string) => (
+                      <span
+                        key={p}
+                        className={`inline-block h-2 w-2 rounded-full ${PLATFORM_COLORS[p] ?? 'bg-gray-400'}`}
+                      />
+                    ))}
+                    <span className="text-xs text-gray-500">
+                      {post.scheduled_at
+                        ? new Date(post.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : ''}
+                    </span>
+                  </div>
+                  <p className="mt-2 line-clamp-3 text-gray-800">{post.caption || post.title || 'Untitled post'}</p>
+                  <Link
+                    href={`/posts/${post.id}`}
+                    className="mt-2 inline-block text-xs text-brand-primary hover:underline"
+                  >
+                    Open post →
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 flex justify-end">
+              <Link
+                href={`/compose?date=${openDate}`}
+                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-dark"
+              >
+                + New post on this day
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

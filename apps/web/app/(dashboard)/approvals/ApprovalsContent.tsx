@@ -149,6 +149,8 @@ export function ApprovalsContent() {
                   </div>
                   <div className="flex flex-shrink-0 gap-2">
                     <button
+                      type="button"
+                      aria-label={`Approve post by ${author}`}
                       onClick={() => handleApprove(postId)}
                       disabled={approvePost.isPending}
                       className="rounded-brand bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
@@ -156,12 +158,16 @@ export function ApprovalsContent() {
                       Approve
                     </button>
                     <button
+                      type="button"
+                      aria-label={`Request revision on post by ${author}`}
                       onClick={() => openCommentModal(postId, 'revision')}
                       className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
                     >
                       Request Revision
                     </button>
                     <button
+                      type="button"
+                      aria-label={`Reject post by ${author}`}
                       onClick={() => openCommentModal(postId, 'reject')}
                       className="rounded-brand border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                     >
@@ -177,9 +183,29 @@ export function ApprovalsContent() {
 
       {/* Comment modal for rejection / revision */}
       {commentPostId && commentAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-brand bg-white p-6 shadow-lg">
-            <h3 className="font-heading text-lg font-semibold">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="approval-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => {
+            setCommentPostId(null);
+            setCommentAction(null);
+            setComment('');
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setCommentPostId(null);
+              setCommentAction(null);
+              setComment('');
+            }
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-brand bg-white p-6 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="approval-modal-title" className="font-heading text-lg font-semibold">
               {commentAction === 'reject' ? 'Reject Post' : 'Request Revision'}
             </h3>
             <p className="mt-2 text-sm text-gray-500">
