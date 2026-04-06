@@ -2,15 +2,38 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useProjects, useDeleteProject } from '@/lib/hooks/useProjects';
+import { useProjects, useDeleteProject, useCreateProject } from '@/lib/hooks/useProjects';
 import { useToast } from '@/providers/ToastProvider';
 import { CardGridSkeleton } from '@/components/skeletons/CardSkeleton';
 
 export function ProjectsContent() {
   const { data, isLoading } = useProjects();
   const deleteProject = useDeleteProject();
+  const createProject = useCreateProject();
   const { addToast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+
+  function handleCreate() {
+    if (!newName.trim()) {
+      addToast({ type: 'error', message: 'Project name is required.' });
+      return;
+    }
+    createProject.mutate(
+      { name: newName.trim(), description: newDescription.trim() || undefined },
+      {
+        onSuccess: () => {
+          addToast({ type: 'success', message: 'Project created.' });
+          setCreating(false);
+          setNewName('');
+          setNewDescription('');
+        },
+        onError: () => addToast({ type: 'error', message: 'Failed to create project.' }),
+      },
+    );
+  }
 
   const projects: any[] = (data as any)?.projects || (data as any) || [];
 
@@ -39,7 +62,10 @@ export function ProjectsContent() {
           <h1 className="font-heading text-2xl font-bold">Projects</h1>
           <p className="mt-1 text-sm text-gray-500">Manage client projects and workspaces.</p>
         </div>
-        <button className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark">
+        <button
+          onClick={() => setCreating(true)}
+          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+        >
           New Project
         </button>
       </div>
@@ -81,6 +107,51 @@ export function ProjectsContent() {
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Create modal */}
+      {creating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setCreating(false)}>
+          <div className="w-full max-w-md rounded-brand bg-white p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-heading text-lg font-semibold">New Project</h3>
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Name *</label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="mt-1 w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                  placeholder="Acme Q2 Campaign"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="mt-1 w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                  rows={3}
+                  placeholder="What is this project about?"
+                  aria-label="Project description"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={() => setCreating(false)} className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary">
+                Cancel
+              </button>
+              <button
+                onClick={handleCreate}
+                disabled={createProject.isPending}
+                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+              >
+                {createProject.isPending ? 'Creating...' : 'Create'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

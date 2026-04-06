@@ -94,9 +94,10 @@ export class WhatsAppWorker extends BasePublishingWorker {
   }
 
   private async getRecipientList(listId: string): Promise<{ phone: string }[]> {
-    const list = await this.prisma.whatsAppContactList.findUnique({ where: { id: listId } });
-    if (!list) return [];
-    // TODO: WhatsAppContactList only stores contact_count; individual contacts need a separate model or external source.
-    return [];
+    const contacts = await this.prisma.whatsAppContact.findMany({
+      where: { list_id: listId, opted_in: true },
+      select: { phone: true },
+    });
+    return contacts;
   }
 }

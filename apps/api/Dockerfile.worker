@@ -1,7 +1,7 @@
 # ── Stage 1: Build ──────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 RUN apk add --no-cache python3 make g++ \
-    chromium nss freetype harfbuzz ca-certificates ttf-freefont
+    chromium nss freetype harfbuzz ca-certificates ttf-freefont ffmpeg
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 WORKDIR /app
 
@@ -43,6 +43,7 @@ RUN apk add --no-cache \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
+    ffmpeg \
     dumb-init
 
 ENV NODE_ENV=production

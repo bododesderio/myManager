@@ -25,6 +25,23 @@ import { ExchangeRatesCron } from './crons/exchange-rates.cron';
 import { MonthlyReportsCron } from './crons/monthly-reports.cron';
 import { ScheduledPostsCron } from './crons/scheduled-posts.cron';
 import { TokenRefreshCron } from './crons/token-refresh.cron';
+import {
+  FacebookProcessor,
+  InstagramProcessor,
+  XProcessor,
+  LinkedInProcessor,
+  TikTokProcessor,
+  GoogleBusinessProcessor,
+  PinterestProcessor,
+  YouTubeProcessor,
+  WhatsAppProcessor,
+  ThreadsProcessor,
+  AnalyticsSyncProcessor,
+  TokenRefreshProcessor,
+  ReportGenerationProcessor,
+  EmailDeliveryProcessor,
+  PushNotificationProcessor,
+} from './workers/publishing.processors';
 
 @Module({
   imports: [
@@ -59,6 +76,8 @@ import { TokenRefreshCron } from './crons/token-refresh.cron';
       { name: 'analytics-sync' },
       { name: 'report-generation' },
       { name: 'token-refresh' },
+      { name: 'email-delivery' },
+      { name: 'push-notifications' },
       { name: 'publishing-facebook' },
       { name: 'publishing-instagram' },
       { name: 'publishing-x' },
@@ -95,6 +114,21 @@ import { TokenRefreshCron } from './crons/token-refresh.cron';
     MonthlyReportsCron,
     ScheduledPostsCron,
     TokenRefreshCron,
+    FacebookProcessor,
+    InstagramProcessor,
+    XProcessor,
+    LinkedInProcessor,
+    TikTokProcessor,
+    GoogleBusinessProcessor,
+    PinterestProcessor,
+    YouTubeProcessor,
+    WhatsAppProcessor,
+    ThreadsProcessor,
+    AnalyticsSyncProcessor,
+    TokenRefreshProcessor,
+    ReportGenerationProcessor,
+    EmailDeliveryProcessor,
+    PushNotificationProcessor,
   ],
 })
 export class WorkerModule {}

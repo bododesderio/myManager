@@ -726,9 +726,25 @@ model WhatsAppContactList {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
-  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  workspace Workspace            @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  contacts  WhatsAppContact[]
 
   @@map("whatsapp_contact_lists")
+}
+
+model WhatsAppContact {
+  id         String   @id @default(uuid())
+  list_id    String
+  phone      String
+  name       String?
+  opted_in   Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  list WhatsAppContactList @relation(fields: [list_id], references: [id], onDelete: Cascade)
+
+  @@unique([list_id, phone])
+  @@index([list_id])
+  @@map("whatsapp_contacts")
 }
 
 // ═══════════════════════════════════════════════════════════

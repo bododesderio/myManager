@@ -42,7 +42,7 @@ export function useUnreadNotificationCount() {
 export function useMarkNotificationRead() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => apiClient.post(`/notifications/${id}/read`),
+    mutationFn: (id: string) => apiClient.put(`/notifications/${id}/read`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all });
     },
@@ -52,7 +52,7 @@ export function useMarkNotificationRead() {
 export function useMarkAllNotificationsRead() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => apiClient.post('/notifications/read-all'),
+    mutationFn: () => apiClient.put('/notifications/read-all'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all });
     },
