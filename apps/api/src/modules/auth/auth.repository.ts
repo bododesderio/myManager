@@ -97,6 +97,24 @@ export class AuthRepository {
     });
   }
 
+  /**
+   * Atomically delete a refresh token if it exists and is unexpired.
+   * Returns the deleted row, or null if nothing was deleted (race or invalid).
+   */
+  async deleteRefreshTokenIfValid(token: string) {
+    // Atomic: deleteMany returns count; only one concurrent caller sees count===1.
+    return this.prisma.$transaction(async (tx) => {
+      const existing = await tx.session.findFirst({
+        where: { session_token: token, expires: { gt: new Date() } },
+      });
+      if (!existing) return null;
+      const result = await tx.session.deleteMany({
+        where: { session_token: token },
+      });
+      return result.count === 1 ? existing : null;
+    });
+  }
+
   async deleteAllRefreshTokensForUser(userId: string) {
     return this.prisma.session.deleteMany({
       where: { user_id: userId },

@@ -12,8 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import Redis from 'ioredis';
 import { AuthRepository } from './auth.repository';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
 interface AuthTokens {
   accessToken: string;
@@ -29,7 +29,6 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(AuthService.name);
   private readonly SALT_ROUNDS = 12;
   private readonly TOTP_WINDOW = 1;
-  private redis!: Redis;
 
   constructor(
     private readonly repository: AuthRepository,
@@ -38,17 +37,13 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    this.redis = new Redis(
+    getSharedRedis(
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-    );
-    this.redis.on('error', (err) =>
-      this.logger.error('Redis connection error', err),
+      this.logger,
     );
   }
 
-  async onModuleDestroy() {
-    await this.redis?.quit();
-  }
+  async onModuleDestroy() {}
 
   async register(data: {
     accountType: 'individual' | 'company';
@@ -162,14 +157,13 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
   async refreshTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    const storedToken = await this.repository.findRefreshToken(hashedToken);
-    if (!storedToken || storedToken.expires < new Date()) {
+    // Atomic rotation: only one concurrent refresh wins; the other sees 0 rows deleted.
+    const deleted = await this.repository.deleteRefreshTokenIfValid(hashedToken);
+    if (!deleted) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    await this.repository.deleteRefreshToken(hashedToken);
-
-    const user = await this.repository.findUserById(storedToken.user_id);
+    const user = await this.repository.findUserById(deleted.user_id);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -237,7 +231,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     await this.repository.deleteAllRefreshTokensForUser(resetRecord.user_id);
 
     // Invalidate all existing JWTs by recording password change time
-    await this.redis.set(
+    await getSharedRedis().set(
       `auth:pwd_changed:${resetRecord.user_id}`,
       Date.now().toString(),
       'EX',
@@ -320,6 +314,13 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   async handleGoogleAuth(code: string, redirectUri: string): Promise<AuthTokens> {
+    const allowed = (this.configService.get<string>('OAUTH_REDIRECT_WHITELIST') ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (!allowed.includes(redirectUri)) {
+      throw new BadRequestException('redirect_uri not allowed');
+    }
     const googleTokenUrl = 'https://oauth2.googleapis.com/token';
     const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
     const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
@@ -429,7 +430,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     }
 
     // Generate a suggestion
-    const suffix = Math.floor(Math.random() * 9000 + 1000);
+    const suffix = crypto.randomInt(1000, 10000);
     return {
       available: false,
       slug: normalized,
