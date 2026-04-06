@@ -62,8 +62,7 @@ export function ForgotPasswordForm() {
         <button
           type="submit"
           disabled={forgotPassword.isPending}
-          className="w-full rounded-btn py-3 text-[13px] font-bold transition disabled:opacity-50"
-          style={{ backgroundColor: 'var(--color-primary, #7F77DD)', color: '#FFFFFF' }}
+          className="w-full rounded-btn bg-primary py-3 text-[13px] font-bold text-white transition disabled:opacity-50"
         >
           {forgotPassword.isPending ? 'Sending...' : 'Send Reset Link'}
         </button>

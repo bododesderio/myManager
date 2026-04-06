@@ -30,6 +30,16 @@ export class PublishingRepository {
     });
   }
 
+  async findActiveSocialAccounts(workspaceId: string, platforms: string[]) {
+    return this.prisma.socialAccount.findMany({
+      where: {
+        workspace_id: workspaceId,
+        platform_id: { in: platforms },
+        is_active: true,
+      },
+    });
+  }
+
   async updatePlatformResult(
     postId: string,
     platform: string,

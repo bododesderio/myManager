@@ -1,11 +1,10 @@
-import NextAuth from 'next-auth';
+import NextAuth, { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth.config';
 
-const nextAuth = NextAuth({
-  ...authConfig,
-  trustHost: true,
-});
+const handler = NextAuth(authConfig);
 
-export const auth: typeof nextAuth.auth = nextAuth.auth;
-export const handlers = nextAuth.handlers;
-export const { GET, POST } = handlers;
+export function auth() {
+  return getServerSession(authConfig);
+}
+
+export { handler as GET, handler as POST };

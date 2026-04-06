@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { PostsService } from './posts.service';
 import {
   CreatePostDto,
@@ -51,8 +52,10 @@ export class PostsController {
     @Req() req: Request,
     @Body() body: CreatePostDto,
   ) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.postsService.create(userId, body);
+    return this.postsService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get('calendar')
@@ -138,8 +141,11 @@ export class PostsController {
     @Req() req: Request,
     @Body() body: BulkScheduleDto,
   ) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.postsService.bulkSchedule(userId, body.workspaceId, body.posts);
+    return this.postsService.bulkSchedule(
+      getRequestUserId(req),
+      getRequestWorkspaceId(req),
+      body.posts,
+    );
   }
 
   @Post('bulk/delete')

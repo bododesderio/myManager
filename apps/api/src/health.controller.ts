@@ -12,4 +12,10 @@ export class HealthController {
       version: '0.1.0',
     };
   }
+
+  @Public()
+  @Get('api/v1/health')
+  healthVersioned() {
+    return this.health();
+  }
 }

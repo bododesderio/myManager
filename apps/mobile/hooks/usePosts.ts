@@ -54,6 +54,28 @@ export function useCreatePost() {
   });
 }
 
+export function useSchedulePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: {
+      content: string;
+      platforms: string[];
+      scheduledAt: string;
+      mediaUrls: string[];
+    }) => {
+      return apiClient.post<Post>('/posts', {
+        ...data,
+        status: 'scheduled',
+        scheduled_at: data.scheduledAt,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+}
+
 export function useDeletePost() {
   const queryClient = useQueryClient();
 

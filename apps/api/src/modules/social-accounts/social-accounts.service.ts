@@ -120,6 +120,12 @@ export class SocialAccountsService {
   async handleOAuthCallback(platform: string, code: string, state: string, workspaceId: string) {
     const storedState = await this.repository.getOAuthState(state);
     if (!storedState) throw new BadRequestException('Invalid or expired OAuth state');
+    if (storedState.platform !== platform) {
+      throw new BadRequestException('OAuth state does not match requested platform');
+    }
+    if (workspaceId && storedState.workspaceId && workspaceId !== storedState.workspaceId) {
+      throw new BadRequestException('Workspace mismatch for OAuth callback');
+    }
 
     const config = this.platformConfigs[platform];
     const tokenResponse = await fetch(config.tokenUrl, {
@@ -141,7 +147,7 @@ export class SocialAccountsService {
     const profile = await this.fetchPlatformProfile(platform, tokens.access_token);
 
     const account = await this.repository.upsert({
-      workspace_id: workspaceId,
+      workspace_id: storedState.workspaceId,
       platform_id: platform,
       platform_user_id: profile.id,
       platform_username: profile.username,

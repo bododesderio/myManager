@@ -32,6 +32,7 @@ export function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,19 +40,26 @@ export function LoginForm() {
     setLoading(true);
 
     try {
+      const loginBody_req: Record<string, string> = { email, password };
+      if (needs2FA && totpCode) loginBody_req.totp_code = totpCode;
+
       const loginRes = await fetch('/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          totp_code: needs2FA ? totpCode : '',
-        }),
+        body: JSON.stringify(loginBody_req),
       });
       const loginBody = await loginRes.json();
 
       if (!loginRes.ok) {
-        setError(getErrorMessage(loginBody));
+        const body = loginBody;
+        // Handle validation errors array from NestJS
+        if (body?.errors?.length) {
+          setError(body.errors.join('. '));
+        } else if (body?.message) {
+          setError(body.message);
+        } else {
+          setError(getErrorMessage(body));
+        }
         setLoading(false);
         return;
       }
@@ -66,8 +74,8 @@ export function LoginForm() {
       const result = await signIn('credentials', {
         email,
         password,
-        totp_code: needs2FA ? totpCode : '',
-        remember: 'false',
+        ...(needs2FA && totpCode ? { totp_code: totpCode } : {}),
+        remember: remember ? 'true' : 'false',
         redirect: false,
       });
 
@@ -176,10 +184,24 @@ export function LoginForm() {
               </button>
             </div>
             <div className="mt-1.5 text-right">
-              <Link href="/forgot-password" className="text-[11px] font-medium" style={{ color: 'var(--color-primary, #7F77DD)' }}>
+              <Link href="/forgot-password" className="text-[11px] font-medium text-primary">
                 Forgot password?
               </Link>
             </div>
+          </div>
+
+          {/* Remember me */}
+          <div className="flex items-center gap-2">
+            <input
+              id="remember"
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary"
+            />
+            <label htmlFor="remember" className="text-[12px] text-text-2 select-none cursor-pointer">
+              Remember me for 30 days
+            </label>
           </div>
 
           {/* 2FA */}
@@ -210,8 +232,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-btn py-3 text-[13px] font-bold transition disabled:opacity-50"
-            style={{ backgroundColor: 'var(--color-primary, #7F77DD)', color: '#FFFFFF' }}
+            className="w-full rounded-btn bg-primary py-3 text-[13px] font-bold text-white transition disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>

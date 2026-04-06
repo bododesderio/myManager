@@ -52,6 +52,7 @@ import { PrismaModule } from './prisma.module';
 import { DlqModule } from './workers/dlq.module';
 import { HealthController } from './health.controller';
 import { BrandController } from './brand.controller';
+import { MetricsController } from './metrics.controller';
 
 @Module({
   imports: [
@@ -130,7 +131,7 @@ import { BrandController } from './brand.controller';
     ExchangeRatesModule,
     DlqModule,
   ],
-  controllers: [HealthController, BrandController],
+  controllers: [HealthController, BrandController, MetricsController],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },

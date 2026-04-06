@@ -11,7 +11,7 @@ export default function VerifyEmailPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left Panel */}
-      <div className="hidden lg:flex w-[420px] shrink-0 min-h-screen p-10 flex-col justify-between" style={{ backgroundColor: 'var(--color-primary, #7F77DD)' }}>
+      <div className="hidden lg:flex w-[420px] shrink-0 min-h-screen p-10 flex-col justify-between bg-primary">
         <div>
           <span className="text-white font-bold text-[14px]">myManager</span>
         </div>

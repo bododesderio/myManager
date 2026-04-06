@@ -8,8 +8,8 @@ import {
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import Redis from 'ioredis';
 import { AuthRepository } from '../auth.repository';
+import { getSharedRedis } from '../../../common/redis/shared-redis';
 
 interface JwtPayload {
   sub: string;
@@ -24,7 +24,6 @@ export class JwtStrategy
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(JwtStrategy.name);
-  private redis!: Redis;
 
   constructor(
     private readonly configService: ConfigService,
@@ -38,21 +37,17 @@ export class JwtStrategy
   }
 
   onModuleInit() {
-    this.redis = new Redis(
+    getSharedRedis(
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-    );
-    this.redis.on('error', (err) =>
-      this.logger.error('Redis connection error', err),
+      this.logger,
     );
   }
 
-  async onModuleDestroy() {
-    await this.redis?.quit();
-  }
+  async onModuleDestroy() {}
 
   async validate(payload: JwtPayload) {
     // Check if the user's password was changed after this token was issued
-    const pwdChangedAt = await this.redis.get(
+    const pwdChangedAt = await getSharedRedis().get(
       `auth:pwd_changed:${payload.sub}`,
     );
     if (pwdChangedAt && payload.iat * 1000 < parseInt(pwdChangedAt, 10)) {

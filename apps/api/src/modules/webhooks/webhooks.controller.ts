@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req, Headers, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { createHmac, timingSafeEqual } from 'crypto';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { WebhooksService } from './webhooks.service';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -19,8 +21,10 @@ export class WebhooksController {
   async create(@Req() req: Request, @Body() body: {
     workspaceId: string; url: string; events: string[]; secret?: string;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.webhooksService.create(userId, body);
+    return this.webhooksService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')
@@ -55,7 +59,35 @@ export class WebhooksController {
   async receiveSocialWebhook(
     @Param('platform') platform: string,
     @Body() body: Record<string, unknown>,
+    @Headers('x-mymanager-webhook-timestamp') timestamp: string,
+    @Headers('x-mymanager-webhook-signature') signature: string,
   ) {
+    this.verifyForwardedWebhook(body, timestamp, signature);
     return this.webhooksService.handleIncomingSocialWebhook(platform, body);
+  }
+
+  private verifyForwardedWebhook(body: Record<string, unknown>, timestamp?: string, signature?: string) {
+    const secret = process.env.WEBHOOK_FORWARD_SECRET;
+    if (!secret) {
+      throw new UnauthorizedException('Webhook forward secret not configured');
+    }
+    if (!timestamp || !signature) {
+      throw new UnauthorizedException('Missing internal webhook signature');
+    }
+
+    const issuedAt = Number(timestamp);
+    if (!Number.isFinite(issuedAt) || Math.abs(Date.now() - issuedAt) > 5 * 60 * 1000) {
+      throw new UnauthorizedException('Expired webhook signature');
+    }
+
+    const expected = createHmac('sha256', secret)
+      .update(`${timestamp}.${JSON.stringify(body)}`)
+      .digest('hex');
+
+    const signatureBuf = Buffer.from(signature, 'utf8');
+    const expectedBuf = Buffer.from(expected, 'utf8');
+    if (signatureBuf.length !== expectedBuf.length || !timingSafeEqual(signatureBuf, expectedBuf)) {
+      throw new UnauthorizedException('Invalid internal webhook signature');
+    }
   }
 }

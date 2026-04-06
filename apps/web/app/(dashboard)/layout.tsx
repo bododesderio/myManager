@@ -1,8 +1,22 @@
 import type { ReactNode } from 'react';
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { Topbar } from '@/components/layout/Topbar';
 import { auth } from '@/auth';
+
+const Sidebar = dynamic(
+  () => import('@/components/layout/Sidebar').then((m) => ({ default: m.Sidebar })),
+  {
+    loading: () => <div className="w-16 shrink-0 border-r border-border bg-bg" />,
+  },
+);
+
+const Topbar = dynamic(
+  () => import('@/components/layout/Topbar').then((m) => ({ default: m.Topbar })),
+  {
+    loading: () => <div className="h-14 border-b border-border bg-bg" />,
+  },
+);
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await auth();
@@ -13,10 +27,18 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
+      <Suspense fallback={<div className="w-16 shrink-0 border-r border-border bg-bg" />}>
+        <Sidebar />
+      </Suspense>
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar />
-        <main className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: 'var(--color-bg-2)' }}>{children}</main>
+        <Suspense fallback={<div className="h-14 border-b border-border bg-bg" />}>
+          <Topbar />
+        </Suspense>
+        <main className="flex-1 overflow-y-auto bg-bg-2 p-6">
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

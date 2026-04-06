@@ -114,24 +114,21 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`flex flex-col border-r transition-all`}
-      style={{
-        width: sidebarCollapsed ? 64 : 216,
-        backgroundColor: 'var(--color-bg)',
-        borderColor: 'var(--color-border)',
-      }}
+      className={`flex flex-col border-r border-border bg-bg transition-all duration-300 ease-in-out ${
+        sidebarCollapsed ? 'w-16' : 'w-[216px]'
+      }`}
     >
       {/* Collapse toggle */}
       <div className="flex items-center justify-between px-3 py-3">
         {!sidebarCollapsed && (
-          <Link href="/home" className="font-heading text-lg font-extrabold px-1" style={{ color: 'var(--color-primary)' }}>
+          <Link href="/home" className="font-heading text-lg font-extrabold px-1 text-primary">
             myManager
           </Link>
         )}
         <button
+          type="button"
           onClick={toggleSidebar}
-          className="rounded-btn p-1.5 hover:opacity-80"
-          style={{ color: 'var(--color-text-muted)' }}
+          className="rounded-btn p-1.5 text-text-muted transition-colors hover:bg-bg-card hover:text-primary"
         >
           {sidebarCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
         </button>
@@ -139,16 +136,13 @@ export function Sidebar() {
 
       {/* Workspace header */}
       {!sidebarCollapsed && (
-        <div className="mx-3 mb-3 rounded-card p-3" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+        <div className="mx-3 mb-3 rounded-card bg-bg-card p-3">
           <WorkspaceSwitcher />
           <div className="mt-2 flex items-center gap-2 px-2">
-            <span
-              className="rounded-badge px-1.5 py-0.5 text-[10px] font-bold uppercase"
-              style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-            >
+            <span className="rounded-badge bg-primary-light px-1.5 py-0.5 text-[10px] font-bold uppercase text-primary">
               {planLabel}
             </span>
-            <span className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+            <span className="text-[11px] text-text-muted">
               {seatUsed}/{seatLimit} seats
             </span>
           </div>
@@ -165,28 +159,22 @@ export function Sidebar() {
               key={item.href}
               href={item.href as Route}
               title={sidebarCollapsed ? item.label : undefined}
-              className="flex items-center gap-2.5 rounded-btn px-2.5 py-2 text-[13px] transition"
-              style={{
-                fontWeight: isActive ? 600 : 500,
-                color: isActive ? 'var(--color-primary)' : 'var(--color-text-2)',
-                backgroundColor: isActive ? 'var(--color-primary-light)' : 'transparent',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-bg-card)';
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-              }}
+              className={`group flex items-center gap-2.5 rounded-btn px-2.5 py-2 text-[13px] transition-all duration-200 ${
+                isActive
+                  ? 'bg-gradient-to-r from-primary/15 to-primary/5 font-semibold text-primary'
+                  : 'font-medium text-text-2 hover:bg-bg-card hover:text-text'
+              }`}
             >
-              <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+              <Icon
+                className={`h-[18px] w-[18px] flex-shrink-0 transition-colors duration-200 ${
+                  isActive ? 'text-primary' : 'text-text-muted group-hover:text-primary'
+                }`}
+              />
               {!sidebarCollapsed && (
                 <>
                   <span className="flex-1 truncate">{item.label}</span>
                   {item.badge != null && item.badge > 0 && (
-                    <span
-                      className="flex h-5 min-w-[20px] items-center justify-center rounded-badge px-1 text-[10px] font-bold"
-                      style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
-                    >
+                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-badge bg-primary px-1 text-[10px] font-bold text-white">
                       {item.badge > 99 ? '99+' : item.badge}
                     </span>
                   )}
@@ -198,31 +186,25 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t px-2 py-3" style={{ borderColor: 'var(--color-border)' }}>
+      <div className="border-t border-border px-2 py-3">
         <Link
           href="/settings"
-          className="flex items-center gap-2.5 rounded-btn px-2.5 py-2 text-[13px] transition"
-          style={{ color: 'var(--color-text-2)', fontWeight: 500 }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-card)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+          className="group flex items-center gap-2.5 rounded-btn px-2.5 py-2 text-[13px] font-medium text-text-2 transition-all duration-200 hover:bg-bg-card hover:text-text"
         >
-          <Settings className="h-[18px] w-[18px] flex-shrink-0" />
+          <Settings className="h-[18px] w-[18px] flex-shrink-0 text-text-muted transition-colors duration-200 group-hover:text-primary" />
           {!sidebarCollapsed && 'Settings'}
         </Link>
 
         {!sidebarCollapsed && (
           <div className="mt-2 flex items-center gap-2.5 px-2.5 py-1.5">
-            <div
-              className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-              style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
-            >
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-dark text-xs font-bold text-white">
               {userInitial}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[12px] font-semibold" style={{ color: 'var(--color-text)' }}>
+              <p className="truncate text-[12px] font-semibold text-text">
                 {session?.user?.name || 'User'}
               </p>
-              <p className="truncate text-[11px] capitalize" style={{ color: 'var(--color-text-muted)' }}>
+              <p className="truncate text-[11px] capitalize text-text-muted">
                 {role}
               </p>
             </div>

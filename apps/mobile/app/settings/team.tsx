@@ -12,6 +12,10 @@ interface TeamMember {
   role: 'owner' | 'admin' | 'editor' | 'viewer';
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function TeamSettingsScreen() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,8 +34,8 @@ export default function TeamSettingsScreen() {
         `/v1/workspaces/${currentWorkspace.id}/members`
       );
       setMembers(data.members ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load team members');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load team members'));
     } finally {
       setLoading(false);
     }

@@ -13,7 +13,6 @@ COPY packages/emails/package.json ./packages/emails/
 COPY packages/seo/package.json ./packages/seo/
 COPY packages/translations/package.json ./packages/translations/
 COPY packages/types/package.json ./packages/types/
-COPY packages/ui/package.json ./packages/ui/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/validators/package.json ./packages/validators/
 

@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { ReportsService } from './reports.service';
 
 @ApiTags('Reports')
@@ -21,8 +22,10 @@ export class ReportsController {
     workspaceId: string; projectId?: string; type: string; fileFormat: string;
     dateRange: { start: string; end: string }; platforms?: string[];
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.reportsService.generate(userId, body);
+    return this.reportsService.generate(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')
@@ -41,10 +44,15 @@ export class ReportsController {
 
   @Post('configs')
   @ApiOperation({ summary: 'Save a report configuration with optional schedule' })
-  async saveConfig(@Body() body: {
+  async saveConfig(@Req() req: Request, @Body() body: {
     workspaceId: string; name: string; type: string; format: string;
     platforms: string[]; schedule?: { frequency: string; dayOfMonth?: number };
-  }) { return this.reportsService.saveConfig(body); }
+  }) {
+    return this.reportsService.saveConfig({
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
+  }
 
   @Put('configs/:id')
   @ApiOperation({ summary: 'Update a report configuration' })

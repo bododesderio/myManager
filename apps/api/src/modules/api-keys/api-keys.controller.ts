@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { ApiKeysService } from './api-keys.service';
 
 @ApiTags('API Keys')
@@ -16,8 +17,10 @@ export class ApiKeysController {
   @Post()
   @ApiOperation({ summary: 'Create a new API key' })
   async create(@Req() req: Request, @Body() body: { workspaceId: string; name: string; scopes: string[] }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.apiKeysService.create(userId, body);
+    return this.apiKeysService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')

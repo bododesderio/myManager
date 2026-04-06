@@ -8,9 +8,17 @@ export class CommentsRepository {
     const where: Record<string, unknown> = { workspace_id: workspaceId, is_hidden: false };
     if (filters.platform) where.platform = filters.platform;
     if (filters.sentiment) where.sentiment = filters.sentiment;
+    // Some local environments have stale Prisma client types until `prisma generate` can run.
+    const queryArgs = {
+      where,
+      skip: offset,
+      take: limit,
+      orderBy: { fetched_at: 'desc' },
+      include: { assignments: { include: { assigned_to: { select: { id: true, name: true, avatar_url: true } } } } },
+    } as any;
     const [comments, total] = await Promise.all([
-      this.prisma.socialComment.findMany({ where, skip: offset, take: limit, orderBy: { fetched_at: 'desc' }, include: { assignments: { include: { assigned_to: { select: { id: true, name: true, avatar_url: true } } } } } }),
-      this.prisma.socialComment.count({ where }),
+      this.prisma.socialComment.findMany(queryArgs),
+      this.prisma.socialComment.count({ where } as any),
     ]);
     return [comments, total];
   }
@@ -23,14 +31,14 @@ export class CommentsRepository {
     return this.prisma.socialComment.update({
       where: { id: commentId },
       data: { replied_at: new Date(), reply_text: text, reply_user_id: userId },
-    });
+    } as any);
   }
 
   async hide(commentId: string) {
     return this.prisma.socialComment.update({
       where: { id: commentId },
       data: { is_hidden: true },
-    });
+    } as any);
   }
 
   async assign(commentId: string, assigneeId: string, assignerId: string) {

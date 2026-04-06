@@ -34,6 +34,8 @@ export class WorkspaceRoleGuard implements CanActivate {
     if (user.is_superadmin) return true;
 
     const workspaceId =
+      request.workspaceMember?.workspace_id ??
+      request.workspaceId ??
       request.params?.workspaceId ??
       request.query?.workspaceId ??
       request.body?.workspaceId;
@@ -60,6 +62,7 @@ export class WorkspaceRoleGuard implements CanActivate {
       );
     }
 
+    request.workspaceId = workspaceId;
     request.workspaceMember = member;
     return true;
   }

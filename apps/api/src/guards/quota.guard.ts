@@ -27,7 +27,11 @@ export class QuotaGuard implements CanActivate {
 
     if (!plan || !plan.limits) return true;
 
-    const workspaceId = request.body?.workspaceId || request.query?.workspaceId;
+    const workspaceId =
+      request.workspaceMember?.workspace_id ||
+      request.workspaceId ||
+      request.body?.workspaceId ||
+      request.query?.workspaceId;
     if (!workspaceId) return true;
 
     const currentCount = await this.getCurrentCount(quotaType, user.id, workspaceId);

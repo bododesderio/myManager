@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Request } from 'express';
+import { getRequestWorkspaceId } from '../../common/http/request-context';
 import { ListeningService } from './listening.service';
 
 @ApiTags('Listening')
@@ -14,8 +16,11 @@ export class ListeningController {
 
   @Post('terms')
   @ApiOperation({ summary: 'Add a monitoring term' })
-  async addTerm(@Body() body: { workspaceId: string; term: string; platforms: string[] }) {
-    return this.listeningService.addTerm(body);
+  async addTerm(@Req() req: Request, @Body() body: { workspaceId: string; term: string; platforms: string[] }) {
+    return this.listeningService.addTerm({
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Delete('terms/:id')

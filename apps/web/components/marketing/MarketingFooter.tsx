@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import type { Route } from 'next';
 import { NewsletterForm } from './NewsletterForm';
-
-const API_URL = process.env.API_URL || 'http://localhost:3001';
+import { fetchServerApi } from '@/lib/api/server';
 
 interface NavLink {
   label: string;
@@ -15,7 +14,6 @@ interface BrandConfig {
   tagline: string;
   footer_made_in?: string;
   footer_copyright?: string;
-  supported_languages?: string[];
 }
 
 interface FooterCmsFields {
@@ -31,61 +29,36 @@ const DEFAULT_BRAND: BrandConfig = {
   tagline: '',
 };
 
-const DEFAULT_LANGUAGES = ['EN', 'FR', 'SW', 'AR', 'ES'];
-
 async function getNavLinks(): Promise<{
   footer_product: NavLink[];
   footer_company: NavLink[];
 }> {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/nav`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return { footer_product: [], footer_company: [] };
-    const json = await res.json();
-    const data = json?.data ?? json;
-    return {
-      footer_product: data.footer_product ?? [],
-      footer_company: data.footer_company ?? [],
-    };
-  } catch {
-    return { footer_product: [], footer_company: [] };
-  }
+  const data = await fetchServerApi<{ footer_product?: NavLink[]; footer_company?: NavLink[] }>(
+    '/api/v1/cms/nav',
+    {},
+    { label: 'marketing footer nav links' },
+  );
+  return {
+    footer_product: data.footer_product ?? [],
+    footer_company: data.footer_company ?? [],
+  };
 }
 
 async function getBrand(): Promise<BrandConfig> {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/brand`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return DEFAULT_BRAND;
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch {
-    return DEFAULT_BRAND;
-  }
+  return fetchServerApi('/api/v1/cms/brand', DEFAULT_BRAND, { label: 'marketing footer brand config' });
 }
 
 async function getFooterCms(): Promise<FooterCmsFields | null> {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/pages/landing`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const page = json?.data ?? json;
-    const footerSection = page.sections?.find(
-      (s: any) => s.section_key === 'footer',
-    );
-    if (!footerSection) return null;
-    const fields: Record<string, string> = {};
-    for (const f of footerSection.fields || []) {
-      fields[f.field_key] = f.value;
-    }
-    return fields;
-  } catch {
-    return null;
+  const page = await fetchServerApi<any>('/api/v1/cms/pages/landing', null, { label: 'marketing footer cms page' });
+  const footerSection = page?.sections?.find(
+    (s: any) => s.section_key === 'footer',
+  );
+  if (!footerSection) return null;
+  const fields: Record<string, string> = {};
+  for (const f of footerSection.fields || []) {
+    fields[f.field_key] = f.value;
   }
+  return fields;
 }
 
 export async function MarketingFooter() {
@@ -95,51 +68,31 @@ export async function MarketingFooter() {
     getFooterCms(),
   ]);
 
-  const languages = brand.supported_languages ?? DEFAULT_LANGUAGES;
-
   return (
-    <footer
-      className="border-t pb-8 pt-12"
-      style={{
-        borderColor: 'var(--color-border)',
-        backgroundColor: 'var(--color-bg-2)',
-      }}
-    >
+    <footer className="border-t border-border bg-[var(--color-bg-2)] pb-8 pt-12">
       <div className="mx-auto max-w-[1200px] px-6">
         {/* 4-column grid */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Col 1 — Brand tagline + Made in */}
           <div>
-            <p
-              className="font-heading text-[15px] font-bold"
-              style={{ color: 'var(--color-primary-dark)' }}
-            >
+            <p className="font-heading text-[15px] font-bold text-[var(--color-primary-dark)]">
               {brand.app_name}
             </p>
             {footerCms?.tagline && (
-              <p
-                className="mt-2 whitespace-pre-line text-[12px]"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
+              <p className="mt-2 whitespace-pre-line text-[12px] text-text-muted">
                 {footerCms.tagline}
               </p>
             )}
             {brand.footer_made_in && (
-              <p
-                className="mt-4 text-[11px]"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
+              <p className="mt-4 text-[11px] text-text-muted">
                 {brand.footer_made_in}
               </p>
             )}
           </div>
 
-          {/* Col 2 — Product links (footer_product placement) */}
+          {/* Col 2 — Product links */}
           <div>
-            <h4
-              className="mb-3 text-[11px] font-bold uppercase"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
+            <h4 className="mb-3 text-[11px] font-bold uppercase text-text-muted">
               Product
             </h4>
             <ul className="space-y-2">
@@ -147,8 +100,7 @@ export async function MarketingFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href as Route}
-                    className="text-[13px] transition-colors hover:opacity-80"
-                    style={{ color: 'var(--color-text-2)' }}
+                    className="text-[13px] text-text-2 transition-colors hover:text-primary"
                   >
                     {link.label}
                   </Link>
@@ -157,12 +109,9 @@ export async function MarketingFooter() {
             </ul>
           </div>
 
-          {/* Col 3 — Company links (footer_company placement) */}
+          {/* Col 3 — Company links */}
           <div>
-            <h4
-              className="mb-3 text-[11px] font-bold uppercase"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
+            <h4 className="mb-3 text-[11px] font-bold uppercase text-text-muted">
               Company
             </h4>
             <ul className="space-y-2">
@@ -170,8 +119,7 @@ export async function MarketingFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href as Route}
-                    className="text-[13px] transition-colors hover:opacity-80"
-                    style={{ color: 'var(--color-text-2)' }}
+                    className="text-[13px] text-text-2 transition-colors hover:text-primary"
                   >
                     {link.label}
                   </Link>
@@ -180,7 +128,7 @@ export async function MarketingFooter() {
             </ul>
           </div>
 
-          {/* Col 4 — Newsletter (client island) */}
+          {/* Col 4 — Newsletter */}
           <div>
             <NewsletterForm
               title={footerCms?.newsletter_title}
@@ -190,38 +138,12 @@ export async function MarketingFooter() {
           </div>
         </div>
 
-        {/* Bottom row: Language pills + Copyright */}
-        <div
-          className="mt-8 border-t pt-6"
-          style={{ borderColor: 'var(--color-border)' }}
-        >
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            {/* Language pills */}
-            <div className="flex flex-wrap gap-2">
-              {languages.map((lang: string) => (
-                <span
-                  key={lang}
-                  className="inline-block rounded-full px-3 py-1 text-[10px] font-semibold uppercase"
-                  style={{
-                    backgroundColor: 'var(--color-bg)',
-                    color: 'var(--color-text-muted)',
-                    border: '1px solid var(--color-border)',
-                  }}
-                >
-                  {lang}
-                </span>
-              ))}
-            </div>
-
-            {/* Copyright */}
-            {brand.footer_copyright && (
-              <p
-                className="text-[11px]"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
-                {brand.footer_copyright}
-              </p>
-            )}
+        {/* Bottom row: Copyright only */}
+        <div className="mt-8 border-t border-border pt-6">
+          <div className="flex items-center justify-center sm:justify-between">
+            <p className="text-[11px] text-text-muted">
+              {brand.footer_copyright || `© ${new Date().getFullYear()} ${brand.app_name}. All rights reserved.`}
+            </p>
           </div>
         </div>
       </div>

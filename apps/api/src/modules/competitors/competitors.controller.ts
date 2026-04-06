@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Request } from 'express';
+import { getRequestWorkspaceId } from '../../common/http/request-context';
 import { CompetitorsService } from './competitors.service';
 
 @ApiTags('Competitors')
@@ -14,8 +16,11 @@ export class CompetitorsController {
 
   @Post()
   @ApiOperation({ summary: 'Add a competitor profile to track' })
-  async add(@Body() body: { workspaceId: string; platform: string; platformUsername: string; displayName: string }) {
-    return this.competitorsService.add(body);
+  async add(@Req() req: Request, @Body() body: { workspaceId: string; platform: string; platformUsername: string; displayName: string }) {
+    return this.competitorsService.add({
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')

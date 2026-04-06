@@ -23,9 +23,9 @@ export class WebhookDeliveryWorker {
       const response = await axios.post(delivery.endpoint.url, delivery.payload, {
         headers: {
           'Content-Type': 'application/json',
-          'X-Webhook-Signature': signature,
-          'X-Webhook-Id': delivery.id,
-          'X-Webhook-Event': delivery.event,
+          'x-mymanager-signature': signature,
+          'x-mymanager-delivery-id': delivery.id,
+          'x-mymanager-event': delivery.event,
         },
         timeout: 30000,
       });

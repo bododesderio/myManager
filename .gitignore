@@ -80,3 +80,13 @@ apps/api/prisma/migrations/**/migration_lock.toml
 
 # Vercel
 .vercel/
+
+# Trunk linter
+.trunk/
+
+# NPM packed files
+*.tgz
+
+# Additional environment files
+.env.development
+.env.test

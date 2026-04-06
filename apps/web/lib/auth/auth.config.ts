@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 const API_URL = process.env.API_URL || 'http://localhost:3001';
@@ -43,7 +43,7 @@ async function refreshAccessToken(token: any) {
   }
 }
 
-export const authConfig: NextAuthConfig = {
+export const authConfig: NextAuthOptions = {
   providers: [
     Credentials({
       name: 'credentials',
@@ -61,9 +61,9 @@ export const authConfig: NextAuthConfig = {
             email: credentials.email as string,
             password: credentials.password as string,
           };
-          // Only include totp_code if it's a non-empty 6-digit string
-          const totp = credentials.totp_code as string | undefined;
-          if (totp && totp.length === 6) {
+          // Only include totp_code if it's a non-empty string (at least 6 digits)
+          const totp = (credentials.totp_code as string | undefined)?.trim();
+          if (totp && totp.length >= 6) {
             loginBody.totp_code = totp;
           }
 
@@ -97,7 +97,7 @@ export const authConfig: NextAuthConfig = {
             id: data.user.id,
             email: data.user.email,
             name: data.user.name,
-            emailVerified: data.user.email_verified ? new Date(data.user.email_verified) : null,
+            emailVerified: data.user.email_verified ? new Date() : null,
             avatar_url: data.user.avatar_url || null,
             is_superadmin: data.user.is_superadmin || false,
             accessToken: data.accessToken,

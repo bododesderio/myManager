@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { SubStatus, BillingCycle } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import Redis from 'ioredis';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getSharedRedis();
 
 @Injectable()
 export class BillingRepository {
@@ -39,6 +39,13 @@ export class BillingRepository {
   async findUserById(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
+      select: { id: true, email: true, name: true, email_verified: true, status: true },
+    });
+  }
+
+  async findUserByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
       select: { id: true, email: true, name: true },
     });
   }
@@ -73,7 +80,10 @@ export class BillingRepository {
     current_period_end: Date;
   }) {
     await this.prisma.subscription.updateMany({
-      where: { user_id: data.user_id, status: 'ACTIVE' },
+      where: {
+        workspace_id: data.workspace_id,
+        status: { in: ['ACTIVE', 'CANCELLING', 'PAST_DUE', 'GRACE_PERIOD'] },
+      },
       data: { status: 'SUPERSEDED' as SubStatus },
     });
 
@@ -100,6 +110,17 @@ export class BillingRepository {
     flutterwave_ref: string;
   }) {
     return this.prisma.billingHistory.create({ data });
+  }
+
+  async updateBillingRecord(id: string, data: Record<string, any>) {
+    return this.prisma.billingHistory.update({ where: { id }, data });
+  }
+
+  async updateUserStatus(id: string, status: 'ACTIVE' | 'PENDING_VERIFICATION') {
+    return this.prisma.user.update({
+      where: { id },
+      data: { status },
+    });
   }
 
   async findBillingHistory(userId: string, offset: number, limit: number): Promise<[unknown[], number]> {

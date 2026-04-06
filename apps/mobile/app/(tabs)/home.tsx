@@ -28,6 +28,10 @@ interface DashboardData {
   };
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 const quickActions: QuickAction[] = [
   { label: 'New Post', icon: '+', route: '/compose/new' },
   { label: 'Approvals', icon: '!', route: '/approvals' },
@@ -49,7 +53,7 @@ export default function HomeScreen() {
         params: { status: 'published', limit: '5' },
       });
       setRecentPosts(data.posts ?? []);
-    } catch (err: any) {
+    } catch {
       // Try dashboard endpoint as fallback
       try {
         const dashboard = await apiClient.get<DashboardData>('/v1/dashboard');
@@ -57,8 +61,8 @@ export default function HomeScreen() {
         if (dashboard.metrics) {
           setMetrics(dashboard.metrics);
         }
-      } catch (fallbackErr: any) {
-        setError(fallbackErr.message || 'Failed to load dashboard');
+      } catch (error: unknown) {
+        setError(getErrorMessage(error, 'Failed to load dashboard'));
       }
     } finally {
       setLoading(false);

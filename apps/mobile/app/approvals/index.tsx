@@ -12,6 +12,10 @@ interface ApprovalItem {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function ApprovalsScreen() {
   const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,8 +29,8 @@ export default function ApprovalsScreen() {
         params: { status: 'pending' },
       });
       setApprovals(data.approvals ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load approvals');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load approvals'));
     } finally {
       setLoading(false);
     }

@@ -5,8 +5,8 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
 import { PrismaService } from '../../prisma.service';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
 const CACHE_TTL_1H = 3600; // 1 hour in seconds
 const CACHE_TTL_5M = 300; // 5 minutes in seconds
@@ -19,18 +19,17 @@ const CACHE_KEY_PAGE_PREFIX = 'cms:page:';
 @Injectable()
 export class CmsService implements OnModuleDestroy {
   private readonly logger = new Logger(CmsService.name);
-  private readonly redis: Redis;
+  private readonly redis = getSharedRedis(
+    this.config.get<string>('REDIS_URL') || 'redis://localhost:6379',
+    this.logger,
+  );
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-  ) {
-    this.redis = new Redis(this.config.get<string>('REDIS_URL') || 'redis://localhost:6379');
-  }
+  ) {}
 
-  async onModuleDestroy() {
-    await this.redis.quit();
-  }
+  async onModuleDestroy() {}
 
   // ───────────────────────────────────────────────
   // Cache helpers

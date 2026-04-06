@@ -1,6 +1,7 @@
 import { Controller, Post, Body, Req, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { AiService } from './ai.service';
 
 @ApiTags('AI')
@@ -15,8 +16,10 @@ export class AiController {
     workspaceId: string; platform: string; topic: string; tone?: string;
     keywords?: string[]; maxLength?: number; language?: string;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.generateCaption(userId, body);
+    return this.aiService.generateCaption(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Post('caption/rewrite')
@@ -24,8 +27,10 @@ export class AiController {
   async rewriteCaption(@Req() req: Request, @Body() body: {
     workspaceId: string; caption: string; targetTone: string; platform: string;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.rewriteCaption(userId, body);
+    return this.aiService.rewriteCaption(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Post('caption/translate')
@@ -33,8 +38,10 @@ export class AiController {
   async translateCaption(@Req() req: Request, @Body() body: {
     workspaceId: string; caption: string; targetLanguage: string;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.translateCaption(userId, body);
+    return this.aiService.translateCaption(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Post('hashtags/suggest')
@@ -42,8 +49,10 @@ export class AiController {
   async suggestHashtags(@Req() req: Request, @Body() body: {
     workspaceId: string; caption: string; platform: string; count?: number;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.suggestHashtags(userId, body);
+    return this.aiService.suggestHashtags(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Post('image/analyze')
@@ -51,8 +60,10 @@ export class AiController {
   async analyzeImage(@Req() req: Request, @Body() body: {
     workspaceId: string; imageUrl: string; platform: string;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.analyzeImage(userId, body);
+    return this.aiService.analyzeImage(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Post('image/generate')
@@ -60,14 +71,15 @@ export class AiController {
   async generateImage(@Req() req: Request, @Body() body: {
     workspaceId: string; prompt: string; style?: string; aspectRatio?: string;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.generateImage(userId, body);
+    return this.aiService.generateImage(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get('credits')
   @ApiOperation({ summary: 'Get remaining AI credits' })
   async getCredits(@Req() req: Request, @Query('workspaceId') workspaceId: string) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.aiService.getCredits(userId, workspaceId);
+    return this.aiService.getCredits(getRequestUserId(req), workspaceId);
   }
 }

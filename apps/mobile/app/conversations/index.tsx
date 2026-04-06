@@ -13,6 +13,10 @@ interface Conversation {
   unread: boolean;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function ConversationsScreen() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +28,8 @@ export default function ConversationsScreen() {
       setLoading(true);
       const data = await apiClient.get<{ comments: Conversation[] }>('/v1/comments');
       setConversations(data.comments ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load conversations');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load conversations'));
     } finally {
       setLoading(false);
     }

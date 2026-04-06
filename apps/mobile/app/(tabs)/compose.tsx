@@ -11,6 +11,10 @@ interface Draft {
   updatedAt: string;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function ComposeTabScreen() {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +28,8 @@ export default function ComposeTabScreen() {
         params: { status: 'draft' },
       });
       setDrafts(data.posts ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load drafts');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load drafts'));
     } finally {
       setLoading(false);
     }

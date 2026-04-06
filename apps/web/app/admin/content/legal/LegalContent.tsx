@@ -194,17 +194,15 @@ export function LegalContent() {
                   <button
                     onClick={() => void handleToggleStatus(doc)}
                     disabled={toggling === doc.id}
-                    className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50"
-                    style={{
-                      backgroundColor: doc.status === 'published' ? '#16a34a' : '#d1d5db',
-                    }}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50 ${
+                      doc.status === 'published' ? 'bg-green-600' : 'bg-gray-300'
+                    }`}
                     title={doc.status === 'published' ? 'Click to unpublish' : 'Click to publish'}
                   >
                     <span
-                      className="inline-block h-4 w-4 rounded-full bg-white shadow transition-transform"
-                      style={{
-                        transform: doc.status === 'published' ? 'translateX(22px)' : 'translateX(4px)',
-                      }}
+                      className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                        doc.status === 'published' ? 'translate-x-[22px]' : 'translate-x-1'
+                      }`}
                     />
                   </button>
                   <span

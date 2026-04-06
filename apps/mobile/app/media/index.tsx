@@ -13,6 +13,10 @@ interface MediaItem {
   createdAt: string;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 const screenWidth = Dimensions.get('window').width;
 const itemSize = (screenWidth - 48 - 8) / 3;
 
@@ -28,8 +32,8 @@ export default function MediaScreen() {
       setLoading(true);
       const data = await apiClient.get<{ media: MediaItem[] }>('/v1/media');
       setMedia(data.media ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load media');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load media'));
     } finally {
       setLoading(false);
     }

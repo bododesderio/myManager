@@ -1,23 +1,12 @@
 import type { Metadata } from 'next';
-
-const API_URL = process.env.API_URL || 'http://localhost:3001';
+import { fetchServerApi } from '@/lib/api/server';
 
 async function getCmsPage(slug: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/pages/${slug}`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch { return null; }
+  return fetchServerApi(`/api/v1/cms/pages/${slug}`, null, { label: `cms page:${slug}` });
 }
 
 async function getPlatforms() {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/platforms`, { next: { revalidate: 300 } });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch { return []; }
+  return fetchServerApi('/api/v1/platforms', [], { label: 'features page platforms' });
 }
 
 function getFields(page: any, sectionKey: string): Record<string, string> {
@@ -65,12 +54,19 @@ const FALLBACK_GROUPS: FeatureGroup[] = [
   },
 ];
 
-const PLATFORM_COLORS: Record<string, string> = {
-  facebook: '#1877F2', instagram: '#E4405F', tiktok: '#010101',
-  linkedin: '#0A66C2', x: '#000000', twitter: '#000000',
-  pinterest: '#E60023', youtube: '#FF0000', whatsapp: '#25D366',
-  threads: '#000000', gbp: '#4285F4',
-};
+const GROUP_THEMES = [
+  { icon: 'text-primary', iconBg: 'bg-[var(--color-primary-light)]', accent: 'hover:border-primary' },
+  { icon: 'text-[var(--color-secondary)]', iconBg: 'bg-[var(--color-secondary-light)]', accent: 'hover:border-[var(--color-secondary)]' },
+  { icon: 'text-[var(--color-tertiary)]', iconBg: 'bg-[var(--color-tertiary-light)]', accent: 'hover:border-[var(--color-tertiary)]' },
+  { icon: 'text-[var(--color-accent)]', iconBg: 'bg-[var(--color-accent-light)]', accent: 'hover:border-[var(--color-accent)]' },
+];
+
+const GROUP_ICONS = [
+  'M13 10V3L4 14h7v7l9-11h-7z',
+  'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+  'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
+  'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064',
+];
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getCmsPage('features');
@@ -89,59 +85,65 @@ export default async function FeaturesPage() {
 
   const hero = getFields(page, 'feat_hero');
   const groupsSection = getFields(page, 'feat_groups');
-
   const groups: FeatureGroup[] = safeParse(groupsSection.groups_json, FALLBACK_GROUPS);
 
   return (
     <main className="min-h-screen bg-bg font-body text-text">
       {/* ── HERO ── */}
-      <section className="mx-auto max-w-6xl px-5 pt-16 pb-12 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
-          {hero.label || 'Features'}
-        </p>
-        <h1 className="mt-2 text-[42px] font-extrabold leading-tight lg:text-[46px]">
-          {hero.headline || 'Everything You Need to Manage Social Media'}
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-[15px] text-text-2">
-          {hero.subtext || 'Powerful tools for publishing, analytics, collaboration, and engagement.'}
-        </p>
+      <section className="relative overflow-hidden bg-mesh">
+        <div className="pattern-dots absolute inset-0 opacity-20" />
+        <div className="relative mx-auto max-w-6xl px-5 pt-16 pb-12 text-center">
+          <p className="animate-fade-in-up text-[11px] font-bold uppercase tracking-wide text-primary">
+            {hero.label || 'Features'}
+          </p>
+          <h1 className="animate-fade-in-up delay-100 mt-2 text-[42px] font-extrabold leading-tight lg:text-[46px]">
+            {hero.headline || 'Everything You Need to Manage Social Media'}
+          </h1>
+          <p className="animate-fade-in-up delay-200 mx-auto mt-4 max-w-xl text-[15px] text-text-2">
+            {hero.subtext || 'Powerful tools for publishing, analytics, collaboration, and engagement.'}
+          </p>
+        </div>
       </section>
 
       {/* ── FEATURE GROUPS ── */}
-      {groups.map((group, gi) => (
-        <section key={group.title} className={gi % 2 === 0 ? 'bg-white py-16' : 'bg-bg-2 py-16'}>
-          <div className="mx-auto max-w-5xl px-5">
-            <h2 className="text-[11px] font-bold uppercase tracking-wide text-primary">
-              {group.title}
-            </h2>
-            {group.description && (
-              <p className="mt-2 text-[15px] text-text-2">{group.description}</p>
-            )}
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
-              {group.features.map((feature) => (
-                <div
-                  key={feature.title}
-                  className="rounded-card border border-border bg-white p-6 transition hover:border-primary hover:shadow-sm"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-icon bg-primary-light">
-                    <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+      {groups.map((group, gi) => {
+        const theme = GROUP_THEMES[gi % GROUP_THEMES.length];
+        const isAlt = gi % 2 !== 0;
+        return (
+          <section key={group.title} className={isAlt ? 'bg-[var(--color-bg-2)] py-16' : 'bg-white py-16'}>
+            <div className="mx-auto max-w-5xl px-5">
+              <h2 className="animate-fade-in-up text-[11px] font-bold uppercase tracking-wide text-primary">
+                {group.title}
+              </h2>
+              {group.description && (
+                <p className="animate-fade-in-up delay-100 mt-2 text-[15px] text-text-2">{group.description}</p>
+              )}
+              <div className="mt-8 grid gap-6 md:grid-cols-3">
+                {group.features.map((feature, fi) => (
+                  <div
+                    key={feature.title}
+                    className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-6 ${theme.accent} ${['', 'delay-100', 'delay-200'][fi] || ''}`}
+                  >
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-icon ${theme.iconBg}`}>
+                      <svg className={`h-5 w-5 ${theme.icon}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={GROUP_ICONS[gi % GROUP_ICONS.length]} />
+                      </svg>
+                    </div>
+                    <h3 className="mt-3 text-[14px] font-bold text-text">{feature.title}</h3>
+                    <p className="mt-1 text-[13px] text-text-2">{feature.description}</p>
                   </div>
-                  <h3 className="mt-3 text-[14px] font-bold text-text">{feature.title}</h3>
-                  <p className="mt-1 text-[13px] text-text-2">{feature.description}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      ))}
+          </section>
+        );
+      })}
 
       {/* ── PLATFORM TABLE ── */}
       {platforms.length > 0 && (
         <section className="bg-white py-16">
           <div className="mx-auto max-w-5xl px-5">
-            <div className="text-center">
+            <div className="animate-fade-in-up text-center">
               <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
                 Supported Platforms
               </p>
@@ -149,9 +151,9 @@ export default async function FeaturesPage() {
                 {hero.platforms_headline || 'Works with all major platforms'}
               </h2>
             </div>
-            <div className="mt-10 overflow-x-auto rounded-card border border-border">
+            <div className="animate-fade-in-up delay-200 mt-10 overflow-x-auto rounded-card border border-border shadow-[var(--shadow-card)]">
               <table className="w-full text-left text-[13px]">
-                <thead className="border-b border-border bg-bg-2">
+                <thead className="border-b border-border bg-[var(--color-bg-2)]">
                   <tr>
                     <th className="px-5 py-3 font-semibold text-text">Platform</th>
                     <th className="px-5 py-3 font-semibold text-text">Scheduling</th>
@@ -161,17 +163,14 @@ export default async function FeaturesPage() {
                 </thead>
                 <tbody>
                   {platforms.map((p: any) => (
-                    <tr key={p.id || p.slug} className="border-b border-border last:border-0">
+                    <tr key={p.id || p.slug} className="border-b border-border transition-colors last:border-0 hover:bg-[var(--color-bg-2)]">
                       <td className="flex items-center gap-2 px-5 py-3 font-medium text-text">
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: PLATFORM_COLORS[(p.slug || p.name || '').toLowerCase()] || 'var(--color-primary)' }}
-                        />
+                        <span className="h-2 w-2 rounded-full bg-primary" />
                         {p.name}
                       </td>
-                      <td className="px-5 py-3 text-text-2">{p.supports_scheduling !== false ? 'Yes' : '—'}</td>
-                      <td className="px-5 py-3 text-text-2">{p.supports_analytics !== false ? 'Yes' : '—'}</td>
-                      <td className="px-5 py-3 text-text-2">{p.supports_inbox ? 'Yes' : '—'}</td>
+                      <td className="px-5 py-3 text-text-2">{p.supports_scheduling !== false ? '✓' : '—'}</td>
+                      <td className="px-5 py-3 text-text-2">{p.supports_analytics !== false ? '✓' : '—'}</td>
+                      <td className="px-5 py-3 text-text-2">{p.supports_inbox ? '✓' : '—'}</td>
                     </tr>
                   ))}
                 </tbody>

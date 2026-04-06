@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { SocialAccountsService } from './social-accounts.service';
 
 @ApiTags('Social Accounts')
@@ -33,8 +34,12 @@ export class SocialAccountsController {
     @Req() req: Request,
     @Body() body: { workspaceId: string; redirectUri: string },
   ) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.socialAccountsService.initiateOAuth(platform, userId, body.workspaceId, body.redirectUri);
+    return this.socialAccountsService.initiateOAuth(
+      platform,
+      getRequestUserId(req),
+      getRequestWorkspaceId(req),
+      body.redirectUri,
+    );
   }
 
   @Post('callback/:platform')

@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { ProjectsService } from './projects.service';
 
 @ApiTags('Projects')
@@ -46,8 +47,10 @@ export class ProjectsController {
       description?: string;
     },
   ) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.projectsService.create(userId, body);
+    return this.projectsService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')

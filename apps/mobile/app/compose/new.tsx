@@ -1,11 +1,30 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useCreatePost, useSchedulePost } from '@/hooks/usePosts';
+import { useWorkspaceStore } from '@/store/workspaceStore';
 
 export default function NewComposeScreen() {
   const [content, setContent] = useState('');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [scheduledAt, setScheduledAt] = useState<string | null>(null);
+  const [showScheduleInput, setShowScheduleInput] = useState(false);
+
+  const currentWorkspace = useWorkspaceStore((s) => s.currentWorkspace);
+  const createPost = useCreatePost();
+  const schedulePost = useSchedulePost();
+
+  const isMutating = createPost.isPending || schedulePost.isPending;
 
   const platforms = ['Facebook', 'Instagram', 'Twitter', 'LinkedIn', 'TikTok'];
 
@@ -15,19 +34,131 @@ export default function NewComposeScreen() {
     );
   };
 
+  const validate = (): boolean => {
+    if (!content.trim()) {
+      Alert.alert('Validation Error', 'Please enter some content for your post.');
+      return false;
+    }
+    if (selectedPlatforms.length === 0) {
+      Alert.alert('Validation Error', 'Please select at least one platform.');
+      return false;
+    }
+    if (!currentWorkspace) {
+      Alert.alert('Error', 'No workspace selected. Please select a workspace first.');
+      return false;
+    }
+    return true;
+  };
+
+  const handlePublishNow = () => {
+    if (!validate()) return;
+
+    createPost.mutate(
+      {
+        content: content.trim(),
+        platforms: selectedPlatforms,
+        status: 'draft',
+        mediaUrls: [],
+      },
+      {
+        onSuccess: () => {
+          Alert.alert('Success', 'Your post has been published.', [
+            { text: 'OK', onPress: () => router.back() },
+          ]);
+        },
+        onError: (error) => {
+          Alert.alert('Error', error.message || 'Failed to publish the post. Please try again.');
+        },
+      }
+    );
+  };
+
+  const handleSchedule = () => {
+    if (!validate()) return;
+
+    if (!scheduledAt) {
+      Alert.alert('Validation Error', 'Please set a date and time for scheduling.');
+      return;
+    }
+
+    const parsed = new Date(scheduledAt);
+    if (isNaN(parsed.getTime())) {
+      Alert.alert('Validation Error', 'Invalid date format. Please use ISO format (e.g. 2026-04-10T14:00:00Z).');
+      return;
+    }
+
+    if (parsed.getTime() <= Date.now()) {
+      Alert.alert('Validation Error', 'Scheduled date must be in the future.');
+      return;
+    }
+
+    schedulePost.mutate(
+      {
+        content: content.trim(),
+        platforms: selectedPlatforms,
+        scheduledAt,
+        mediaUrls: [],
+      },
+      {
+        onSuccess: () => {
+          Alert.alert('Scheduled', 'Your post has been scheduled.', [
+            { text: 'OK', onPress: () => router.back() },
+          ]);
+        },
+        onError: (error) => {
+          Alert.alert('Error', error.message || 'Failed to schedule the post. Please try again.');
+        },
+      }
+    );
+  };
+
+  const handleSaveDraft = () => {
+    if (!content.trim()) {
+      Alert.alert('Validation Error', 'Please enter some content to save as a draft.');
+      return;
+    }
+    if (!currentWorkspace) {
+      Alert.alert('Error', 'No workspace selected. Please select a workspace first.');
+      return;
+    }
+
+    createPost.mutate(
+      {
+        content: content.trim(),
+        platforms: selectedPlatforms,
+        status: 'draft',
+        mediaUrls: [],
+      },
+      {
+        onSuccess: () => {
+          Alert.alert('Draft Saved', 'Your draft has been saved.', [
+            { text: 'OK', onPress: () => router.back() },
+          ]);
+        },
+        onError: (error) => {
+          Alert.alert('Error', error.message || 'Failed to save draft. Please try again.');
+        },
+      }
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.cancelText}>Cancel</Text>
+        <TouchableOpacity onPress={() => router.back()} disabled={isMutating}>
+          <Text style={[styles.cancelText, isMutating && styles.disabledText]}>Cancel</Text>
         </TouchableOpacity>
         <Text style={styles.title}>New Post</Text>
-        <TouchableOpacity onPress={() => router.push('/compose/preview')}>
-          <Text style={styles.nextText}>Preview</Text>
+        <TouchableOpacity onPress={handleSaveDraft} disabled={isMutating}>
+          {createPost.isPending ? (
+            <ActivityIndicator size="small" color="#7F77DD" />
+          ) : (
+            <Text style={[styles.nextText, isMutating && styles.disabledText]}>Save Draft</Text>
+          )}
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.scrollContent}>
         <Text style={styles.sectionLabel}>Platforms</Text>
         <View style={styles.platformRow}>
           {platforms.map((platform) => (
@@ -38,6 +169,7 @@ export default function NewComposeScreen() {
                 selectedPlatforms.includes(platform) && styles.platformChipActive,
               ]}
               onPress={() => togglePlatform(platform)}
+              disabled={isMutating}
             >
               <Text
                 style={[
@@ -60,6 +192,7 @@ export default function NewComposeScreen() {
           onChangeText={setContent}
           multiline
           textAlignVertical="top"
+          editable={!isMutating}
         />
 
         <Text style={styles.charCount}>{content.length} characters</Text>
@@ -67,27 +200,75 @@ export default function NewComposeScreen() {
         <View style={styles.mediaSection}>
           <Text style={styles.sectionLabel}>Media</Text>
           <View style={styles.mediaButtons}>
-            <TouchableOpacity style={styles.mediaButton}>
+            <TouchableOpacity style={styles.mediaButton} disabled={isMutating}>
               <Text style={styles.mediaButtonIcon}>📷</Text>
               <Text style={styles.mediaButtonText}>Camera</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton}>
+            <TouchableOpacity style={styles.mediaButton} disabled={isMutating}>
               <Text style={styles.mediaButtonIcon}>🖼️</Text>
               <Text style={styles.mediaButtonText}>Gallery</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton}>
+            <TouchableOpacity style={styles.mediaButton} disabled={isMutating}>
               <Text style={styles.mediaButtonIcon}>📁</Text>
               <Text style={styles.mediaButtonText}>Files</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.scheduleButton}>
-            <Text style={styles.scheduleButtonText}>Schedule</Text>
+        <View style={styles.scheduleSection}>
+          <TouchableOpacity
+            style={styles.scheduleToggle}
+            onPress={() => setShowScheduleInput((prev) => !prev)}
+            disabled={isMutating}
+          >
+            <Text style={styles.scheduleToggleText}>
+              {showScheduleInput ? 'Hide schedule options' : 'Set schedule date/time'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.publishButton}>
-            <Text style={styles.publishButtonText}>Publish Now</Text>
+
+          {showScheduleInput && (
+            <View style={styles.scheduleInputContainer}>
+              <Text style={styles.scheduleHint}>
+                Enter ISO date (e.g. 2026-04-10T14:00:00Z)
+              </Text>
+              <TextInput
+                style={styles.scheduleInput}
+                placeholder="2026-04-10T14:00:00Z"
+                placeholderTextColor="#bbb"
+                value={scheduledAt || ''}
+                onChangeText={(text) => setScheduledAt(text || null)}
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isMutating}
+              />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={[styles.scheduleButton, isMutating && styles.disabledButton]}
+            onPress={handleSchedule}
+            disabled={isMutating}
+          >
+            {schedulePost.isPending ? (
+              <ActivityIndicator size="small" color="#7F77DD" />
+            ) : (
+              <Text style={[styles.scheduleButtonText, isMutating && styles.disabledText]}>
+                Schedule
+              </Text>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.publishButton, isMutating && styles.disabledPublishButton]}
+            onPress={handlePublishNow}
+            disabled={isMutating}
+          >
+            {createPost.isPending ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.publishButtonText}>Publish Now</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -123,7 +304,7 @@ const styles = StyleSheet.create({
     color: '#7F77DD',
     fontWeight: '600',
   },
-  content: {
+  scrollContent: {
     flex: 1,
     padding: 20,
   },
@@ -195,6 +376,34 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
+  scheduleSection: {
+    marginTop: 20,
+  },
+  scheduleToggle: {
+    paddingVertical: 10,
+  },
+  scheduleToggleText: {
+    fontSize: 14,
+    color: '#7F77DD',
+    fontWeight: '500',
+  },
+  scheduleInputContainer: {
+    marginTop: 8,
+  },
+  scheduleHint: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 6,
+  },
+  scheduleInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 15,
+    backgroundColor: '#f9f9f9',
+    color: '#1a1a1a',
+  },
   actions: {
     flexDirection: 'row',
     gap: 12,
@@ -208,6 +417,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   scheduleButtonText: {
     color: '#7F77DD',
@@ -220,10 +430,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   publishButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  disabledButton: {
+    borderColor: '#ccc',
+  },
+  disabledPublishButton: {
+    backgroundColor: '#b8b3e8',
+  },
+  disabledText: {
+    color: '#ccc',
   },
 });

@@ -9,13 +9,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import Redis from 'ioredis';
 import { PrismaService } from '../prisma.service';
+import { getSharedRedis } from '../common/redis/shared-redis';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate, OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ApiKeyGuard.name);
-  private redis!: Redis;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -23,17 +22,13 @@ export class ApiKeyGuard implements CanActivate, OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    this.redis = new Redis(
+    getSharedRedis(
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-    );
-    this.redis.on('error', (err) =>
-      this.logger.error('Redis connection error', err),
+      this.logger,
     );
   }
 
-  async onModuleDestroy() {
-    await this.redis?.quit();
-  }
+  async onModuleDestroy() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -47,9 +42,10 @@ export class ApiKeyGuard implements CanActivate, OnModuleInit, OnModuleDestroy {
     const prefix = rawKey.substring(0, 10);
 
     const rateLimitKey = `api_rate:${prefix}`;
-    const current = await this.redis.incr(rateLimitKey);
+    const redis = getSharedRedis();
+    const current = await redis.incr(rateLimitKey);
     if (current === 1) {
-      await this.redis.expire(rateLimitKey, 3600);
+      await redis.expire(rateLimitKey, 3600);
     }
 
     const candidates = await this.prisma.apiKey.findMany({

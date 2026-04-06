@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { TemplatesService } from './templates.service';
 
 @ApiTags('Templates')
@@ -21,8 +22,10 @@ export class TemplatesController {
     workspaceId: string; name: string; caption: string; platforms: string[];
     contentType: string; hashtagIds?: string[]; platformOptions?: Record<string, unknown>;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.templatesService.create(userId, body);
+    return this.templatesService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')
@@ -42,7 +45,6 @@ export class TemplatesController {
   @Post(':id/create-post')
   @ApiOperation({ summary: 'Create a post from a template' })
   async createFromTemplate(@Param('id') id: string, @Req() req: Request, @Body() body: { scheduledAt?: string }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.templatesService.createPostFromTemplate(id, userId, body.scheduledAt);
+    return this.templatesService.createPostFromTemplate(id, getRequestUserId(req), body.scheduledAt);
   }
 }

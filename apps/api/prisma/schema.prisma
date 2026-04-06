@@ -364,6 +364,9 @@ model BillingHistory {
 
   workspace Workspace @relation(fields: [workspace_id], references: [id])
 
+  @@index([workspace_id, created_at])
+  @@index([user_id, created_at])
+  @@index([flutterwave_ref])
   @@map("billing_history")
 }
 
@@ -537,6 +540,8 @@ model Project {
   posts          Post[]
 
   @@unique([workspace_id, slug])
+  @@index([workspace_id, created_at])
+  @@index([workspace_id, status])
   @@map("projects")
 }
 
@@ -927,6 +932,7 @@ model Campaign {
   posts          Post[]
   campaign_posts CampaignPost[]
 
+  @@index([workspace_id, created_at])
   @@map("campaigns")
 }
 
@@ -1122,6 +1128,8 @@ model ReportConfig {
 
   workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
 
+  @@index([workspace_id, created_at])
+  @@index([workspace_id, is_active])
   @@map("report_configs")
 }
 
@@ -1714,6 +1722,8 @@ model WebhookDelivery {
 
   endpoint WebhookEndpoint @relation(fields: [webhook_endpoint_id], references: [id], onDelete: Cascade)
 
+  @@index([webhook_endpoint_id, created_at])
+  @@index([next_retry_at])
   @@map("webhook_deliveries")
 }
 

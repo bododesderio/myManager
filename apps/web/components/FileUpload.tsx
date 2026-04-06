@@ -89,6 +89,8 @@ export function FileUpload({
       >
         {value && isImage && (
           <div className="mb-3 flex items-center gap-3">
+            {/* Upload previews can be temporary or third-party URLs that are not suitable for next/image optimization. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={value} alt="Preview" className="h-16 w-16 rounded border object-cover" />
             <span className="truncate text-xs text-gray-500">{value}</span>
           </div>

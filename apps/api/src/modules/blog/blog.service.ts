@@ -6,13 +6,13 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
 import { PrismaService } from '../../prisma.service';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
 @Injectable()
 export class BlogService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(BlogService.name);
-  private redis!: Redis;
+  private redis = getSharedRedis();
 
   private readonly CACHE_TTL = 300; // 5 minutes
 
@@ -22,15 +22,13 @@ export class BlogService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    this.redis = new Redis(this.config.get<string>('REDIS_URL') || 'redis://localhost:6379');
-    this.redis.on('error', (err) =>
-      this.logger.error('Redis connection error', err),
+    this.redis = getSharedRedis(
+      this.config.get<string>('REDIS_URL') || 'redis://localhost:6379',
+      this.logger,
     );
   }
 
-  async onModuleDestroy() {
-    await this.redis?.quit();
-  }
+  async onModuleDestroy() {}
 
   // ─── Public ────────────────────────────────────────────────────────
 

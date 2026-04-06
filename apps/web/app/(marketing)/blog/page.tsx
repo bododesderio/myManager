@@ -1,55 +1,29 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-
-const API_URL = process.env.API_URL || 'http://localhost:3001';
+import { fetchServerApi } from '@/lib/api/server';
 
 async function getCmsPage(slug: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/pages/${slug}`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch { return null; }
+  return fetchServerApi(`/api/v1/cms/pages/${slug}`, null, { label: `cms page:${slug}` });
 }
 
 async function getBlogPosts(params: string = 'page=1&limit=5') {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/blog?${params}`, { next: { revalidate: 300 } });
-    if (!res.ok) return { posts: [], total: 0 };
-    const json = await res.json();
-    const data = json?.data ?? json;
-    return { posts: data.posts || data || [], total: data.total || 0 };
-  } catch { return { posts: [], total: 0 }; }
+  const data = await fetchServerApi<any>(`/api/v1/blog?${params}`, null, { label: `blog posts:${params}` });
+  return { posts: data?.posts || data || [], total: data?.total || 0 };
 }
 
 async function getCategories() {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/blog/categories`, { next: { revalidate: 300 } });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch { return []; }
+  return fetchServerApi('/api/v1/blog/categories', [], { label: 'blog categories' });
 }
 
 async function getFeaturedPost() {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/blog?is_featured=true&limit=1`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const data = json?.data ?? json;
-    const posts = data.posts || data || [];
-    return posts[0] || null;
-  } catch { return null; }
+  const data = await fetchServerApi<any>('/api/v1/blog?is_featured=true&limit=1', null, { label: 'featured blog post' });
+  const posts = data?.posts || data || [];
+  return posts[0] || null;
 }
 
 async function getPopularPosts() {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/blog?sort=views&limit=4`, { next: { revalidate: 300 } });
-    if (!res.ok) return [];
-    const json = await res.json();
-    const data = json?.data ?? json;
-    return data.posts || data || [];
-  } catch { return []; }
+  const data = await fetchServerApi<any>('/api/v1/blog?sort=views&limit=4', null, { label: 'popular blog posts' });
+  return data?.posts || data || [];
 }
 
 function getFields(page: any, sectionKey: string): Record<string, string> {
@@ -76,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogPage() {
-  const [page, { posts }, categories, featuredPost, popularPosts] = await Promise.all([
+  const [page, blogData, rawCategories, featuredPost, rawPopularPosts] = await Promise.all([
     getCmsPage('blog'),
     getBlogPosts('page=1&limit=5'),
     getCategories(),
@@ -84,31 +58,37 @@ export default async function BlogPage() {
     getPopularPosts(),
   ]);
 
+  const posts = blogData?.posts ?? [];
+  const categories = Array.isArray(rawCategories) ? rawCategories : [];
+  const popularPosts = Array.isArray(rawPopularPosts) ? rawPopularPosts : [];
   const hero = getFields(page, 'blog_hero');
 
   return (
     <main className="min-h-screen bg-bg font-body text-text">
       {/* ── HERO ── */}
-      <section className="mx-auto max-w-6xl px-5 pt-16 pb-12 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
-          {hero.label || 'Blog'}
-        </p>
-        <h1 className="mt-2 text-[42px] font-extrabold leading-tight lg:text-[46px]">
-          {hero.headline || 'Blog'}
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-[15px] text-text-2">
-          {hero.subtext || 'Tips, guides, and insights on social media management.'}
-        </p>
+      <section className="relative overflow-hidden bg-mesh">
+        <div className="pattern-dots absolute inset-0 opacity-20" />
+        <div className="relative mx-auto max-w-6xl px-5 pt-16 pb-12 text-center">
+          <p className="animate-fade-in-up text-[11px] font-bold uppercase tracking-wide text-primary">
+            {hero.label || 'Blog'}
+          </p>
+          <h1 className="animate-fade-in-up delay-100 mt-2 text-[42px] font-extrabold leading-tight lg:text-[46px]">
+            {hero.headline || 'Blog'}
+          </h1>
+          <p className="animate-fade-in-up delay-200 mx-auto mt-4 max-w-xl text-[15px] text-text-2">
+            {hero.subtext || 'Tips, guides, and insights on social media management.'}
+          </p>
+        </div>
       </section>
 
       {/* ── CATEGORIES ── */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-6xl px-5 pb-8">
+        <section className="mx-auto max-w-6xl px-5 pb-8 pt-6">
           <div className="flex flex-wrap gap-2">
             {categories.map((cat: any) => (
               <span
                 key={cat.id || cat.slug || cat.name}
-                className="rounded-full border border-border bg-white px-4 py-1.5 text-[12px] font-medium text-text-2 transition hover:border-primary hover:text-primary"
+                className="card-hover cursor-pointer rounded-full border border-border bg-white px-4 py-1.5 text-[12px] font-medium text-text-2 hover:border-primary hover:text-primary"
               >
                 {cat.name || cat}
               </span>
@@ -123,12 +103,12 @@ export default async function BlogPage() {
           <div>
             {/* Featured Post */}
             {featuredPost && (
-              <article className="mb-10 rounded-card border border-primary bg-primary-light p-6">
-                <span className="inline-block rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase text-white">
+              <article className="animate-fade-in-up mb-10 overflow-hidden rounded-card border border-primary bg-gradient-to-br from-[var(--color-primary-light)] to-white p-6 shadow-[var(--shadow-card)]">
+                <span className="inline-block rounded-full bg-gradient-to-r from-primary to-[var(--color-primary-dark)] px-3 py-0.5 text-[10px] font-bold uppercase text-white">
                   Featured
                 </span>
                 <h2 className="mt-3 text-[22px] font-bold text-text">
-                  <Link href={`/blog/${featuredPost.slug}`} className="hover:text-primary">
+                  <Link href={`/blog/${featuredPost.slug}`} className="transition-colors hover:text-primary">
                     {featuredPost.title}
                   </Link>
                 </h2>
@@ -149,14 +129,14 @@ export default async function BlogPage() {
 
             {/* Post List */}
             <div className="space-y-6">
-              {posts.map((post: any) => (
+              {posts.map((post: any, i: number) => (
                 <article
                   key={post.slug || post.id}
-                  className="rounded-card border border-border bg-white p-6 transition hover:border-primary"
+                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-6 ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400'][i] || ''}`}
                 >
                   <div className="flex items-center gap-3 text-[12px] text-text-muted">
                     {post.category && (
-                      <span className="rounded-full bg-primary-light px-2 py-0.5 text-[11px] font-medium text-primary">
+                      <span className="rounded-full bg-[var(--color-primary-light)] px-2 py-0.5 text-[11px] font-medium text-primary">
                         {post.category}
                       </span>
                     )}
@@ -167,7 +147,7 @@ export default async function BlogPage() {
                     )}
                   </div>
                   <h2 className="mt-3 text-[18px] font-bold text-text">
-                    <Link href={`/blog/${post.slug}`} className="hover:text-primary">
+                    <Link href={`/blog/${post.slug}`} className="transition-colors hover:text-primary">
                       {post.title}
                     </Link>
                   </h2>
@@ -190,17 +170,16 @@ export default async function BlogPage() {
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside className="space-y-8">
-            {/* Popular Posts */}
+          <aside className="animate-fade-in-up delay-300 space-y-8">
             {popularPosts.length > 0 && (
-              <div className="rounded-card border border-border bg-white p-5">
+              <div className="rounded-card border border-border bg-white p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Popular Posts</h3>
                 <div className="mt-4 space-y-4">
                   {popularPosts.map((post: any) => (
                     <div key={post.slug || post.id}>
                       <Link
                         href={`/blog/${post.slug}`}
-                        className="text-[14px] font-semibold text-text hover:text-primary"
+                        className="text-[14px] font-semibold text-text transition-colors hover:text-primary"
                       >
                         {post.title}
                       </Link>
@@ -215,9 +194,8 @@ export default async function BlogPage() {
               </div>
             )}
 
-            {/* Categories Sidebar */}
             {categories.length > 0 && (
-              <div className="rounded-card border border-border bg-white p-5">
+              <div className="rounded-card border border-border bg-white p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Categories</h3>
                 <div className="mt-4 space-y-2">
                   {categories.map((cat: any) => (
@@ -227,7 +205,7 @@ export default async function BlogPage() {
                     >
                       <span className="text-text-2">{cat.name || cat}</span>
                       {cat.count != null && (
-                        <span className="text-[11px] text-text-muted">{cat.count}</span>
+                        <span className="rounded-full bg-[var(--color-primary-light)] px-2 py-0.5 text-[10px] font-medium text-primary">{cat.count}</span>
                       )}
                     </div>
                   ))}

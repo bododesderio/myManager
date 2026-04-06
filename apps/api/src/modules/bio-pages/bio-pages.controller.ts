@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { BioPagesService } from './bio-pages.service';
 
 @ApiTags('Bio Pages')
@@ -22,8 +23,10 @@ export class BioPagesController {
     workspaceId: string; projectId?: string; slug: string; title: string;
     description?: string; theme?: Record<string, unknown>; links: Array<Record<string, unknown>>;
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.bioPagesService.create(userId, body);
+    return this.bioPagesService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get('public/:slug')

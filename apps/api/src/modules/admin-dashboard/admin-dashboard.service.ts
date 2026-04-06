@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
 import { PrismaService } from '../../prisma.service';
 import { PLATFORM_QUEUES } from '@mymanager/constants';
+import { getRedisConnectionOptions, getSharedRedis } from '../../common/redis/shared-redis';
 
 const PUBLISHING_QUEUE_NAMES = Object.values(PLATFORM_QUEUES);
 
@@ -30,12 +31,12 @@ export class AdminDashboardService {
     // Redis check
     const redisStart = Date.now();
     try {
-      const Redis = (await import('ioredis')).default;
-      const redisUrl = this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
-      const redis = new Redis(redisUrl);
+      const redis = getSharedRedis(
+        this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+        this.logger,
+      );
       await redis.ping();
       checks.redis = { status: 'healthy', latencyMs: Date.now() - redisStart };
-      await redis.quit();
     } catch (error: unknown) {
       checks.redis = { status: 'unhealthy', latencyMs: Date.now() - redisStart, error: error instanceof Error ? error.message : String(error) };
     }
@@ -162,16 +163,8 @@ export class AdminDashboardService {
   }
 
   private getRedisOpts(): { host: string; port: number; password?: string } {
-    const redisUrl = this.configService.get('REDIS_URL', 'redis://localhost:6379');
-    try {
-      const url = new URL(redisUrl);
-      return {
-        host: url.hostname,
-        port: parseInt(url.port) || 6379,
-        password: url.password || undefined,
-      };
-    } catch {
-      return { host: 'localhost', port: 6379 };
-    }
+    return getRedisConnectionOptions(
+      this.configService.get('REDIS_URL', 'redis://localhost:6379'),
+    );
   }
 }

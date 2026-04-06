@@ -1,14 +1,14 @@
 import Image from 'next/image';
 import { TestimonialCarousel } from './TestimonialCarousel';
+import { fetchServerApi } from '@/lib/api/server';
 
-const API_URL = process.env.API_URL || 'http://localhost:3001';
+interface BrandConfig {
+  app_name?: string;
+  app_tagline?: string;
+}
 
 async function getBrandConfig() {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/brand`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    return res.json();
-  } catch { return null; }
+  return fetchServerApi<BrandConfig | null>('/api/v1/brand', null, { label: 'auth brand config' });
 }
 
 interface AuthBrandPanelProps {
@@ -28,8 +28,7 @@ export async function AuthBrandPanel({ headline, subtext }: AuthBrandPanelProps)
 
   return (
     <div
-      className="hidden lg:flex w-[480px] shrink-0 min-h-screen flex-col justify-center items-center px-10 relative overflow-hidden"
-      style={{ backgroundColor: '#7F77DD' }}
+      className="hidden lg:flex w-[480px] shrink-0 min-h-screen flex-col justify-center items-center px-10 relative overflow-hidden bg-primary"
     >
       {/* Top logo */}
       <div className="absolute top-8 left-8">

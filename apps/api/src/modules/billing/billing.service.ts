@@ -4,9 +4,11 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { UserStatus } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { BillingRepository } from './billing.repository';
+import { WebhooksService } from '../webhooks/webhooks.service';
 
 @Injectable()
 export class BillingService {
@@ -19,6 +21,7 @@ export class BillingService {
   constructor(
     private readonly repository: BillingRepository,
     private readonly configService: ConfigService,
+    private readonly webhooksService: WebhooksService,
   ) {
     this.flutterwaveSecret = this.configService.get('FLUTTERWAVE_SECRET_KEY', '');
     this.flutterwaveWebhookSecret = this.configService.get('FLUTTERWAVE_WEBHOOK_SECRET', '');
@@ -120,6 +123,13 @@ export class BillingService {
       status: 'CANCELLING',
     });
 
+    await this.dispatchBillingEvent(subscription.workspace_id, 'billing.subscription_cancellation_scheduled', {
+      subscriptionId: subscription.id,
+      userId: subscription.user_id,
+      planId: subscription.plan_id,
+      currentPeriodEnd: subscription.current_period_end.toISOString(),
+    });
+
     return { message: 'Subscription will be cancelled at the end of the billing period' };
   }
 
@@ -130,6 +140,12 @@ export class BillingService {
     await this.repository.updateSubscription(subscription.id, {
       cancel_at_period_end: false,
       status: 'ACTIVE',
+    });
+
+    await this.dispatchBillingEvent(subscription.workspace_id, 'billing.subscription_reactivated', {
+      subscriptionId: subscription.id,
+      userId: subscription.user_id,
+      planId: subscription.plan_id,
     });
 
     return { message: 'Subscription reactivated' };
@@ -192,22 +208,12 @@ export class BillingService {
       throw new NotFoundException('Workspace not found for payment verification');
     }
 
-    await this.repository.createSubscription({
-      user_id: userId,
-      workspace_id: workspaceId,
-      plan_id: plan.id,
-      status: 'ACTIVE',
-      flutterwave_subscription_id: String(verified.id ?? data.transaction_id),
-      billing_cycle:
-        (data.billing_cycle || verified.meta?.billing_cycle) === 'annual'
-          ? 'ANNUAL'
-          : 'MONTHLY',
-      locked_limits: plan.limits as Record<string, any>,
-      locked_features: plan.features as Record<string, any>,
-      current_period_start: new Date(),
-      current_period_end: this.calculatePeriodEnd(
-        data.billing_cycle || verified.meta?.billing_cycle || 'monthly',
-      ),
+    await this.activateSubscription({
+      userId,
+      workspaceId,
+      planId: plan.id,
+      flutterwaveId: String(verified.id ?? data.transaction_id),
+      billingCycle: data.billing_cycle || verified.meta?.billing_cycle || 'monthly',
     });
 
     const billingRecord = await this.repository.createBillingRecord({
@@ -218,6 +224,19 @@ export class BillingService {
       currency: String(verified.currency ?? 'USD'),
       status: 'PAID',
       flutterwave_ref: String(verified.flw_ref ?? data.tx_ref ?? ''),
+    });
+
+    await this.syncUserStatusAfterPayment(userId);
+    await this.dispatchBillingEvent(workspaceId, 'billing.payment_succeeded', {
+      billingRecordId: billingRecord.id,
+      transactionId: String(verified.id ?? data.transaction_id),
+      flutterwaveRef: String(verified.flw_ref ?? data.tx_ref ?? ''),
+      userId,
+      planId: plan.id,
+      planSlug: plan.slug,
+      amount: Number(verified.amount ?? 0),
+      currency: String(verified.currency ?? 'USD'),
+      billingCycle: data.billing_cycle || verified.meta?.billing_cycle || 'monthly',
     });
 
     return {
@@ -232,6 +251,11 @@ export class BillingService {
 
     const event = body.event;
     const data = body.data;
+
+    if (!event || !data) {
+      this.logger.warn('Received malformed Flutterwave webhook payload');
+      return { status: 'ignored' };
+    }
 
     switch (event) {
       case 'charge.completed':
@@ -331,33 +355,81 @@ export class BillingService {
   }
 
   private async handleChargeCompleted(data: Record<string, any>) {
-    const meta = data.meta;
-    if (!meta?.userId || !meta?.planId) return;
+    if (data.status !== 'successful') {
+      this.logger.warn(`Ignoring Flutterwave charge.completed event with status ${String(data.status)}`);
+      return;
+    }
 
-    const plan = await this.repository.findPlanById(meta.planId);
-    if (!plan) return;
+    const flutterwaveRef = String(data.flw_ref ?? '');
+    const existingBillingRecord = flutterwaveRef
+      ? await this.repository.findBillingRecordByFlutterwaveRef(flutterwaveRef)
+      : null;
 
-    await this.repository.createSubscription({
-      user_id: meta.userId,
-      workspace_id: meta.workspaceId,
-      plan_id: meta.planId,
-      status: 'ACTIVE',
-      flutterwave_subscription_id: data.id?.toString() ?? '',
-      billing_cycle: meta.interval === 'yearly' ? 'ANNUAL' : 'MONTHLY',
-      locked_limits: plan.limits as Record<string, any>,
-      locked_features: plan.features as Record<string, any>,
-      current_period_start: new Date(),
-      current_period_end: this.calculatePeriodEnd(meta.interval),
+    if (existingBillingRecord?.status === 'PAID') {
+      return;
+    }
+
+    const meta = (data.meta ?? {}) as Record<string, any>;
+    const billingCycle = meta.billing_cycle || meta.interval || 'monthly';
+    const plan = await this.resolvePlan(meta);
+    if (!plan) {
+      this.logger.warn('Unable to resolve plan for Flutterwave charge.completed webhook');
+      return;
+    }
+
+    const userId = await this.resolveUserId(data, meta);
+    if (!userId) {
+      this.logger.warn('Unable to resolve user for Flutterwave charge.completed webhook');
+      return;
+    }
+
+    const workspaceId = meta.workspaceId || await this.repository.findPrimaryWorkspaceForUser(userId);
+    if (!workspaceId) {
+      this.logger.warn(`Unable to resolve workspace for Flutterwave charge.completed webhook user ${userId}`);
+      return;
+    }
+
+    await this.activateSubscription({
+      userId,
+      workspaceId,
+      planId: plan.id,
+      flutterwaveId: String(data.id ?? ''),
+      billingCycle,
     });
 
-    await this.repository.createBillingRecord({
-      workspace_id: meta.workspaceId,
-      user_id: meta.userId,
-      plan_name: plan.name,
-      amount: data.amount,
-      currency: data.currency,
-      status: 'PAID',
-      flutterwave_ref: data.flw_ref,
+    let billingRecordId: string;
+    if (existingBillingRecord) {
+      await this.repository.updateBillingRecord(existingBillingRecord.id, {
+        plan_name: plan.name,
+        amount: Number(data.amount ?? existingBillingRecord.amount),
+        currency: String(data.currency ?? existingBillingRecord.currency),
+        status: 'PAID',
+      });
+      billingRecordId = existingBillingRecord.id;
+    } else {
+      const billingRecord = await this.repository.createBillingRecord({
+        workspace_id: workspaceId,
+        user_id: userId,
+        plan_name: plan.name,
+        amount: Number(data.amount ?? 0),
+        currency: String(data.currency ?? 'USD'),
+        status: 'PAID',
+        flutterwave_ref: flutterwaveRef,
+      });
+      billingRecordId = billingRecord.id;
+    }
+
+    await this.syncUserStatusAfterPayment(userId);
+    await this.dispatchBillingEvent(workspaceId, 'billing.payment_succeeded', {
+      billingRecordId,
+      transactionId: String(data.id ?? ''),
+      flutterwaveRef,
+      userId,
+      planId: plan.id,
+      planSlug: plan.slug,
+      amount: Number(data.amount ?? 0),
+      currency: String(data.currency ?? 'USD'),
+      billingCycle,
     });
   }
 
@@ -365,22 +437,77 @@ export class BillingService {
     const subscription = await this.repository.findByFlutterwaveId(data.id?.toString());
     if (subscription) {
       await this.repository.updateSubscription(subscription.id, { status: 'CANCELLED' });
+      await this.dispatchBillingEvent(subscription.workspace_id, 'billing.subscription_cancelled', {
+        subscriptionId: subscription.id,
+        userId: subscription.user_id,
+        planId: subscription.plan_id,
+        flutterwaveSubscriptionId: subscription.flutterwave_subscription_id,
+      });
     }
   }
 
   private async handlePaymentFailed(data: Record<string, any>) {
-    const meta = data.meta;
-    if (meta?.userId && meta?.workspaceId) {
-      await this.repository.createBillingRecord({
-        workspace_id: meta.workspaceId,
-        user_id: meta.userId,
-        plan_name: 'Unknown',
-        amount: data.amount,
-        currency: data.currency,
-        status: 'FAILED',
-        flutterwave_ref: data.flw_ref,
-      });
+    const meta = (data.meta ?? {}) as Record<string, any>;
+    const flutterwaveRef = String(data.flw_ref ?? '');
+    const existing = flutterwaveRef
+      ? await this.repository.findBillingRecordByFlutterwaveRef(flutterwaveRef)
+      : null;
+
+    if (existing?.status === 'PAID' || existing?.status === 'FAILED') {
+      return;
     }
+
+    const userId = await this.resolveUserId(data, meta);
+    if (!userId) {
+      this.logger.warn('Unable to resolve user for Flutterwave charge.failed webhook');
+      return;
+    }
+
+    const workspaceId = meta.workspaceId || await this.repository.findPrimaryWorkspaceForUser(userId);
+    if (!workspaceId) {
+      this.logger.warn(`Unable to resolve workspace for Flutterwave charge.failed webhook user ${userId}`);
+      return;
+    }
+
+    const plan = await this.resolvePlan(meta);
+    const planName = plan?.name ?? String(meta.plan ?? 'Unknown');
+
+    if (existing) {
+      await this.repository.updateBillingRecord(existing.id, {
+        plan_name: planName,
+        amount: Number(data.amount ?? existing.amount),
+        currency: String(data.currency ?? existing.currency),
+        status: 'FAILED',
+      });
+      await this.dispatchBillingEvent(workspaceId, 'billing.payment_failed', {
+        billingRecordId: existing.id,
+        flutterwaveRef,
+        userId,
+        amount: Number(data.amount ?? existing.amount),
+        currency: String(data.currency ?? existing.currency),
+        planName,
+      });
+      return;
+    }
+
+    const billingRecord = await this.repository.createBillingRecord({
+      workspace_id: workspaceId,
+      user_id: userId,
+      plan_name: planName,
+      amount: Number(data.amount ?? 0),
+      currency: String(data.currency ?? 'USD'),
+      status: 'FAILED',
+      flutterwave_ref: flutterwaveRef,
+    });
+
+    await this.dispatchBillingEvent(workspaceId, 'billing.payment_failed', {
+      billingRecordId: billingRecord.id,
+      flutterwaveRef,
+      userId,
+      amount: Number(data.amount ?? 0),
+      currency: String(data.currency ?? 'USD'),
+      planName,
+    });
   }
 
   private calculatePeriodEnd(interval: string): Date {
@@ -389,5 +516,88 @@ export class BillingService {
       return new Date(now.setFullYear(now.getFullYear() + 1));
     }
     return new Date(now.setMonth(now.getMonth() + 1));
+  }
+
+  private async activateSubscription(data: {
+    userId: string;
+    workspaceId: string;
+    planId: string;
+    flutterwaveId: string;
+    billingCycle: string;
+  }) {
+    if (data.flutterwaveId) {
+      const existingSubscription = await this.repository.findByFlutterwaveId(data.flutterwaveId);
+      if (existingSubscription) {
+        return existingSubscription;
+      }
+    }
+
+    const plan = await this.repository.findPlanById(data.planId);
+    if (!plan) {
+      throw new NotFoundException('Plan not found');
+    }
+
+    return this.repository.createSubscription({
+      user_id: data.userId,
+      workspace_id: data.workspaceId,
+      plan_id: data.planId,
+      status: 'ACTIVE',
+      flutterwave_subscription_id: data.flutterwaveId,
+      billing_cycle: data.billingCycle === 'annual' || data.billingCycle === 'ANNUAL' ? 'ANNUAL' : 'MONTHLY',
+      locked_limits: plan.limits as Record<string, any>,
+      locked_features: plan.features as Record<string, any>,
+      current_period_start: new Date(),
+      current_period_end: this.calculatePeriodEnd(data.billingCycle),
+    });
+  }
+
+  private async syncUserStatusAfterPayment(userId: string) {
+    const user = await this.repository.findUserById(userId);
+    if (!user) {
+      return;
+    }
+
+    const currentStatus = user.status as UserStatus;
+    if (currentStatus === 'SUSPENDED' || currentStatus === 'DEACTIVATED') {
+      return;
+    }
+
+    const nextStatus: UserStatus = user.email_verified ? 'ACTIVE' : 'PENDING_VERIFICATION';
+    if (currentStatus !== nextStatus) {
+      await this.repository.updateUserStatus(userId, nextStatus);
+    }
+  }
+
+  private async dispatchBillingEvent(workspaceId: string, event: string, data: Record<string, unknown>) {
+    try {
+      await this.webhooksService.dispatchEvent(workspaceId, event, data);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown billing webhook dispatch error';
+      this.logger.warn(`Billing webhook dispatch failed for ${event}: ${message}`);
+    }
+  }
+
+  private async resolvePlan(meta: Record<string, any>) {
+    if (meta.planId) {
+      return this.repository.findPlanById(String(meta.planId));
+    }
+    if (meta.plan) {
+      return this.repository.findPlanBySlug(String(meta.plan).toLowerCase());
+    }
+    return null;
+  }
+
+  private async resolveUserId(data: Record<string, any>, meta: Record<string, any>) {
+    if (meta.userId) {
+      return String(meta.userId);
+    }
+
+    const email = data.customer?.email;
+    if (!email) {
+      return null;
+    }
+
+    const user = await this.repository.findUserByEmail(String(email));
+    return user?.id ?? null;
   }
 }

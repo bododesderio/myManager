@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import Redis from 'ioredis';
 import { UsersRepository } from './users.repository';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
 /** TTL for the password-changed Redis key (24 hours). */
 const PWD_CHANGED_TTL = 86400;
@@ -18,7 +18,6 @@ const PWD_CHANGED_TTL = 86400;
 export class UsersService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(UsersService.name);
   private readonly SALT_ROUNDS = 12;
-  private redis!: Redis;
 
   constructor(
     private readonly repository: UsersRepository,
@@ -26,17 +25,13 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    this.redis = new Redis(
+    getSharedRedis(
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-    );
-    this.redis.on('error', (err) =>
-      this.logger.error('Redis connection error', err),
+      this.logger,
     );
   }
 
-  async onModuleDestroy() {
-    await this.redis?.quit();
-  }
+  async onModuleDestroy() {}
 
   async getProfile(userId: string) {
     const user = await this.repository.findById(userId);
@@ -75,7 +70,7 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
     await this.repository.updateUser(userId, { password_hash: hashedPassword });
 
     // Invalidate all existing JWTs by recording password change time
-    await this.redis.set(
+    await getSharedRedis().set(
       `auth:pwd_changed:${userId}`,
       Date.now().toString(),
       'EX',

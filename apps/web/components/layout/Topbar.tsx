@@ -56,28 +56,25 @@ export function Topbar() {
   }, []);
 
   return (
-    <header
-      className="flex h-14 items-center justify-between border-b px-6"
-      style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
-    >
+    <header className="relative flex h-14 items-center justify-between border-b border-border bg-bg px-6">
+      {/* Subtle accent gradient line at top */}
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary via-accent to-primary opacity-60" />
+
       {/* LEFT: Greeting + context */}
       <div className="flex items-center gap-3">
         <div>
-          <h1 className="text-[15px] font-bold leading-tight" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-[15px] font-bold leading-tight text-text">
             {getGreeting()}{firstName ? `, ${firstName}` : ''}
           </h1>
-          <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+          <div className="flex items-center gap-2 text-[11px] text-text-muted">
             <span>{todayStr}</span>
             {activeWorkspace && (
               <>
-                <span style={{ color: 'var(--color-border)' }}>|</span>
+                <span className="text-border">|</span>
                 <span>{activeWorkspace.name}</span>
               </>
             )}
-            <span
-              className="rounded-badge px-1.5 py-0.5 text-[10px] font-bold uppercase"
-              style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-            >
+            <span className="rounded-badge bg-primary-light px-1.5 py-0.5 text-[10px] font-bold uppercase text-primary">
               {planLabel}
             </span>
           </div>
@@ -90,8 +87,7 @@ export function Topbar() {
         {approvalCount > 0 && (
           <Link
             href={"/approvals" as Route}
-            className="flex items-center gap-1.5 rounded-btn px-2.5 py-1.5 text-[12px] font-medium transition-opacity hover:opacity-80"
-            style={{ backgroundColor: 'var(--color-warning-light)', color: 'var(--color-warning)' }}
+            className="flex items-center gap-1.5 rounded-btn bg-warning-light px-2.5 py-1.5 text-[12px] font-medium text-warning transition-opacity hover:opacity-80"
           >
             <AlertCircle className="h-3.5 w-3.5" />
             {approvalCount} pending
@@ -101,8 +97,7 @@ export function Topbar() {
         {/* New post button */}
         <Link
           href={"/compose" as Route}
-          className="flex items-center gap-1.5 rounded-btn px-3 py-1.5 text-[13px] font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+          className="flex items-center gap-1.5 rounded-btn bg-primary px-3 py-1.5 text-[13px] font-semibold text-white transition-all hover:opacity-90 hover:shadow-md"
         >
           <Plus className="h-4 w-4" />
           New post
@@ -113,56 +108,55 @@ export function Topbar() {
 
         {/* Bell */}
         <button
-          className="relative rounded-btn p-2 transition-colors hover:opacity-80"
-          style={{ color: 'var(--color-text-2)' }}
+          type="button"
+          className="relative rounded-btn p-2 text-text-2 transition-colors hover:bg-bg-card hover:text-primary"
         >
           <Bell className="h-5 w-5" />
+          {/* Animated notification dot — shown when there are pending approvals */}
+          {approvalCount > 0 && (
+            <span className="absolute right-1.5 top-1.5 flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-error" />
+            </span>
+          )}
         </button>
 
         {/* User dropdown */}
         <div className="relative" ref={menuRef}>
           <button
+            type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-2 rounded-btn px-2 py-1 transition-colors"
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-card)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            className="flex items-center gap-2 rounded-btn px-2 py-1 transition-colors hover:bg-bg-card"
           >
-            <div
-              className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold"
-              style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
-            >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
               {userInitial}
             </div>
-            <ChevronDown className="hidden md:block h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+            <ChevronDown className="hidden h-4 w-4 text-text-muted md:block" />
           </button>
 
           {menuOpen && (
-            <div
-              className="absolute right-0 z-50 mt-2 w-52 rounded-card border py-1 shadow-lg"
-              style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
-            >
+            <div className="absolute right-0 z-50 mt-2 w-52 rounded-card border border-border bg-bg py-1 shadow-lg">
               <div className="px-4 py-2.5">
-                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                <p className="text-sm font-medium text-text">
                   {session?.user?.name || 'User'}
                 </p>
-                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                <p className="text-xs text-text-muted">
                   {session?.user?.email || ''}
                 </p>
               </div>
-              <hr style={{ borderColor: 'var(--color-border-light)' }} />
+              <hr className="border-border-light" />
               <a
                 href="/settings"
-                className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:opacity-80"
-                style={{ color: 'var(--color-text-2)' }}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-2 transition-colors hover:bg-bg-card"
               >
-                <Settings className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                <Settings className="h-4 w-4 text-text-muted" />
                 Settings
               </a>
-              <hr style={{ borderColor: 'var(--color-border-light)' }} />
+              <hr className="border-border-light" />
               <button
+                type="button"
                 onClick={() => logout.mutate()}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:opacity-80"
-                style={{ color: 'var(--color-error)' }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-error transition-colors hover:bg-error-light"
               >
                 <LogOut className="h-4 w-4" />
                 Log Out

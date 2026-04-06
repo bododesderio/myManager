@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { timingSafeEqual } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 function safeCompare(a: string, b: string): boolean {
   const aBuf = Buffer.from(a, 'utf8');
@@ -11,6 +11,30 @@ function safeCompare(a: string, b: string): boolean {
 
 interface SocialWebhookRouteProps {
   params: Promise<{ platform: string }>;
+}
+
+const META_WEBHOOK_PLATFORMS = new Set(['facebook', 'instagram', 'threads', 'whatsapp']);
+const KNOWN_PLATFORMS = new Set([
+  'facebook', 'instagram', 'threads', 'whatsapp',
+  'x', 'linkedin', 'tiktok', 'pinterest', 'youtube', 'google-business',
+]);
+
+function getForwardSecret(): string | null {
+  return process.env.WEBHOOK_FORWARD_SECRET ?? null;
+}
+
+function verifyMetaSignature(platform: string, payload: string, signature: string | null): boolean {
+  if (!META_WEBHOOK_PLATFORMS.has(platform)) {
+    return false;
+  }
+
+  const appSecret = process.env.FACEBOOK_APP_SECRET;
+  if (!appSecret || !signature) {
+    return false;
+  }
+
+  const expected = `sha256=${createHmac('sha256', appSecret).update(payload).digest('hex')}`;
+  return safeCompare(signature, expected);
 }
 
 export async function GET(request: NextRequest, { params }: SocialWebhookRouteProps) {
@@ -34,22 +58,45 @@ export async function GET(request: NextRequest, { params }: SocialWebhookRoutePr
 export async function POST(request: NextRequest, { params }: SocialWebhookRouteProps) {
   try {
     const { platform } = await params;
-    const payload = await request.json();
+    const rawBody = await request.text();
 
-    const supportedPlatforms = [
-      'facebook', 'instagram', 'x', 'linkedin', 'tiktok',
-      'pinterest', 'youtube', 'whatsapp', 'threads', 'gbp',
-    ];
-
-    if (!supportedPlatforms.includes(platform)) {
-      return NextResponse.json({ error: `Unsupported platform: ${platform}` }, { status: 400 });
+    if (!KNOWN_PLATFORMS.has(platform)) {
+      return NextResponse.json(
+        { error: `Unknown platform: ${platform}` },
+        { status: 400 },
+      );
     }
+
+    // For Meta platforms, verify the provider signature
+    let signatureVerified = false;
+    if (META_WEBHOOK_PLATFORMS.has(platform)) {
+      const providerSignature = request.headers.get('x-hub-signature-256');
+      if (!verifyMetaSignature(platform, rawBody, providerSignature)) {
+        return NextResponse.json({ error: 'Invalid provider signature' }, { status: 401 });
+      }
+      signatureVerified = true;
+    }
+
+    const forwardSecret = getForwardSecret();
+    if (!forwardSecret) {
+      return NextResponse.json({ error: 'Webhook forward secret is not configured' }, { status: 500 });
+    }
+
+    const timestamp = Date.now().toString();
+    const forwardSignature = createHmac('sha256', forwardSecret)
+      .update(`${timestamp}.${rawBody}`)
+      .digest('hex');
 
     const apiUrl = process.env.API_URL || 'http://localhost:3001';
     const upstream = await fetch(`${apiUrl}/api/v1/webhooks/social/${platform}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-mymanager-webhook-timestamp': timestamp,
+        'x-mymanager-webhook-signature': forwardSignature,
+        'x-mymanager-webhook-verified': signatureVerified ? 'true' : 'false',
+      },
+      body: rawBody,
       cache: 'no-store',
     });
 

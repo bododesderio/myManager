@@ -1,12 +1,11 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
 import { PrismaService } from '../../prisma.service';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
 @Injectable()
 export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SocialAccountsRepository.name);
-  private redis!: Redis;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -14,17 +13,13 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    this.redis = new Redis(
+    getSharedRedis(
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-    );
-    this.redis.on('error', (err) =>
-      this.logger.error('Redis connection error', err),
+      this.logger,
     );
   }
 
-  async onModuleDestroy() {
-    await this.redis?.quit();
-  }
+  async onModuleDestroy() {}
   async findByWorkspace(workspaceId: string) {
     return this.prisma.socialAccount.findMany({
       where: { workspace_id: workspaceId, is_active: true },
@@ -86,16 +81,16 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
   }
 
   async storeOAuthState(state: string, data: Record<string, unknown>) {
-    await this.redis.setex(`oauth:state:${state}`, 600, JSON.stringify(data));
+    await getSharedRedis().setex(`oauth:state:${state}`, 600, JSON.stringify(data));
   }
 
   async getOAuthState(state: string) {
-    const data = await this.redis.get(`oauth:state:${state}`);
+    const data = await getSharedRedis().get(`oauth:state:${state}`);
     return data ? JSON.parse(data) : null;
   }
 
   async deleteOAuthState(state: string) {
-    await this.redis.del(`oauth:state:${state}`);
+    await getSharedRedis().del(`oauth:state:${state}`);
   }
 
   async findAllPlatforms() {

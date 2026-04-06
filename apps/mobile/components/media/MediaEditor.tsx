@@ -43,7 +43,7 @@ export default function MediaEditor({ uri, type, onSave, onCancel }: MediaEditor
       await FileSystem.copyAsync({ from: uri, to: editedUri });
 
       onSave?.(editedUri);
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to save the edited image. Please try again.');
     } finally {
       setIsSaving(false);

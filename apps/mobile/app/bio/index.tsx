@@ -11,7 +11,7 @@ interface BioLink {
 }
 
 export default function BioScreen() {
-  const [links, _setLinks] = useState<BioLink[]>([]);
+  const [links] = useState<BioLink[]>([]);
   const [bioTitle, setBioTitle] = useState('');
   const [bioDescription, setBioDescription] = useState('');
 

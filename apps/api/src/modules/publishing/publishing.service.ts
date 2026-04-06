@@ -44,11 +44,14 @@ export class PublishingService {
 
     await this.repository.updatePostStatus(postId, 'queued');
 
+    const accounts = await this.repository.findActiveSocialAccounts(post.workspace_id, post.platforms);
+    const accountMap = new Map(accounts.map((account) => [account.platform_id, account]));
+
     const dispatched: string[] = [];
     const errors: { platform: string; error: string }[] = [];
 
     for (const platform of post.platforms) {
-      const account = await this.repository.findActiveSocialAccount(post.workspace_id, platform);
+      const account = accountMap.get(platform);
       if (!account) {
         errors.push({ platform, error: `No connected ${platform} account` });
         await this.repository.updatePlatformResult(postId, platform, 'failed', null, `No connected ${platform} account`);

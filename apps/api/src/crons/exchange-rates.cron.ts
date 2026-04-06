@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma.service';
-import Redis from 'ioredis';
 import axios from 'axios';
 import { withDistributedLock } from '../common/utils/distributed-lock';
+import { getSharedRedis } from '../common/redis/shared-redis';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getSharedRedis();
 
 const SUPPORTED_CURRENCIES = ['UGX', 'KES', 'TZS', 'NGN', 'GHS', 'ZAR', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'AED', 'SAR', 'EGP', 'MAD'];
 

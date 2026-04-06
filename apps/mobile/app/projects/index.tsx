@@ -12,6 +12,10 @@ interface Project {
   membersCount: number;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function ProjectsScreen() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +27,8 @@ export default function ProjectsScreen() {
       setLoading(true);
       const data = await apiClient.get<{ projects: Project[] }>('/v1/projects');
       setProjects(data.projects ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load projects');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load projects'));
     } finally {
       setLoading(false);
     }

@@ -69,8 +69,7 @@ export function VerifyEmailContent() {
           <p className="mt-4 text-gray-600">Your email has been verified. You can now log in.</p>
           <Link
             href="/login"
-            className="mt-6 inline-block rounded-btn px-6 py-3 text-[13px] font-bold"
-            style={{ backgroundColor: 'var(--color-primary, #7F77DD)', color: '#FFFFFF' }}
+            className="mt-6 inline-block rounded-btn bg-primary px-6 py-3 text-[13px] font-bold text-white"
           >
             Log In
           </Link>

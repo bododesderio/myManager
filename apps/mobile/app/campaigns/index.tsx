@@ -13,6 +13,10 @@ interface Campaign {
   endDate: string;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function CampaignsScreen() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +28,8 @@ export default function CampaignsScreen() {
       setLoading(true);
       const data = await apiClient.get<{ campaigns: Campaign[] }>('/v1/campaigns');
       setCampaigns(data.campaigns ?? []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load campaigns');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to load campaigns'));
     } finally {
       setLoading(false);
     }

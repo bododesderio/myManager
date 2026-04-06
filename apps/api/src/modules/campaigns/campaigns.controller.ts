@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { CampaignsService } from './campaigns.service';
 
 @ApiTags('Campaigns')
@@ -21,8 +22,10 @@ export class CampaignsController {
     workspaceId: string; name: string; description?: string; startDate: string; endDate: string;
     color?: string; hashtags?: string[];
   }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.campaignsService.create(userId, body);
+    return this.campaignsService.create(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')

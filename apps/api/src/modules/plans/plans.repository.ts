@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import Redis from 'ioredis';
+import { getSharedRedis } from '../../common/redis/shared-redis';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = getSharedRedis();
 
 @Injectable()
 export class PlansRepository {

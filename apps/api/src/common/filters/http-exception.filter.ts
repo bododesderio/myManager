@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import * as Sentry from '@sentry/node';
 import { Request, Response } from 'express';
 
 @Catch()
@@ -15,7 +16,11 @@ export class GlobalHttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const request = ctx.getRequest<Request & {
+      requestId?: string;
+      workspaceId?: string;
+      user?: { id?: string; email?: string };
+    }>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
@@ -57,9 +62,22 @@ export class GlobalHttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
+      requestId: request.requestId,
     };
 
     if (status >= 500) {
+      Sentry.captureException(exception, {
+        tags: {
+          method: request.method,
+          path: request.url,
+          workspaceId: request.workspaceId ?? 'unknown',
+        },
+        user: request.user?.id ? { id: request.user.id, email: request.user.email } : undefined,
+        extra: {
+          requestId: request.requestId,
+          errors,
+        },
+      });
       this.logger.error(
         `${request.method} ${request.url} ${status}`,
         JSON.stringify(errorResponse),

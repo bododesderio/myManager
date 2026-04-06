@@ -1,24 +1,13 @@
 import type { Metadata } from 'next';
 import { ContactForm } from '@/components/marketing/ContactForm';
-
-const API_URL = process.env.API_URL || 'http://localhost:3001';
+import { fetchServerApi } from '@/lib/api/server';
 
 async function getBrandConfig() {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/pages/brand`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch { return null; }
+  return fetchServerApi('/api/v1/cms/pages/brand', null, { label: 'contact brand page' });
 }
 
 async function getCmsPage(slug: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/cms/pages/${slug}`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json?.data ?? json;
-  } catch { return null; }
+  return fetchServerApi(`/api/v1/cms/pages/${slug}`, null, { label: `cms page:${slug}` });
 }
 
 function getFields(page: any, sectionKey: string): Record<string, string> {
@@ -50,7 +39,6 @@ export default async function ContactPage() {
   const supportEmail = brand.support_email || 'support@mymanager.com';
   const salesEmail = brand.sales_email || 'sales@mymanager.com';
 
-  // Collect social links from brand config
   const socialLinks: { label: string; url: string }[] = [];
   if (brand.twitter_url) socialLinks.push({ label: 'Twitter / X', url: brand.twitter_url });
   if (brand.linkedin_url) socialLinks.push({ label: 'LinkedIn', url: brand.linkedin_url });
@@ -61,29 +49,32 @@ export default async function ContactPage() {
   return (
     <main className="min-h-screen bg-bg font-body text-text">
       {/* ── HERO ── */}
-      <section className="mx-auto max-w-4xl px-5 pt-16 pb-4 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
-          {hero.label || 'Contact'}
-        </p>
-        <h1 className="mt-2 text-[42px] font-extrabold leading-tight lg:text-[46px]">
-          {hero.headline || 'Contact Us'}
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-[15px] text-text-2">
-          {hero.subtext || 'Have a question or need help? Fill out the form below and we will get back to you within 24 hours.'}
-        </p>
+      <section className="relative overflow-hidden bg-mesh">
+        <div className="pattern-dots absolute inset-0 opacity-20" />
+        <div className="relative mx-auto max-w-4xl px-5 pt-16 pb-4 text-center">
+          <p className="animate-fade-in-up text-[11px] font-bold uppercase tracking-wide text-primary">
+            {hero.label || 'Contact'}
+          </p>
+          <h1 className="animate-fade-in-up delay-100 mt-2 text-[42px] font-extrabold leading-tight lg:text-[46px]">
+            {hero.headline || 'Contact Us'}
+          </h1>
+          <p className="animate-fade-in-up delay-200 mx-auto mt-4 max-w-xl text-[15px] text-text-2">
+            {hero.subtext || 'Have a question or need help? Fill out the form below and we will get back to you within 24 hours.'}
+          </p>
+        </div>
       </section>
 
       <div className="mx-auto max-w-4xl px-5 pb-20">
         <div className="grid gap-12 lg:grid-cols-[1fr_300px]">
           {/* ── FORM ── */}
-          <div>
+          <div className="animate-fade-in-up delay-100">
             <ContactForm supportEmail={supportEmail} salesEmail={salesEmail} />
           </div>
 
           {/* ── SIDEBAR INFO ── */}
-          <aside className="space-y-8 pt-10 lg:pt-0">
+          <aside className="animate-fade-in-up delay-300 space-y-6 pt-10 lg:pt-0">
             {/* Email contacts */}
-            <div className="rounded-card border border-border bg-white p-5">
+            <div className="card-hover rounded-card border border-border bg-white p-5 shadow-[var(--shadow-card)]">
               <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Email Us</h3>
               <div className="mt-4 space-y-3 text-[13px]">
                 <div>
@@ -103,7 +94,7 @@ export default async function ContactPage() {
 
             {/* Social Links */}
             {socialLinks.length > 0 && (
-              <div className="rounded-card border border-border bg-white p-5">
+              <div className="card-hover rounded-card border border-border bg-white p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Follow Us</h3>
                 <div className="mt-4 space-y-2">
                   {socialLinks.map((link) => (
@@ -121,9 +112,9 @@ export default async function ContactPage() {
               </div>
             )}
 
-            {/* Office / Extra info */}
+            {/* Office */}
             {brand.address && (
-              <div className="rounded-card border border-border bg-white p-5">
+              <div className="card-hover rounded-card border border-border bg-white p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Office</h3>
                 <p className="mt-3 text-[13px] text-text-2 whitespace-pre-line">{brand.address}</p>
               </div>

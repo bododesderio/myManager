@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
 import { RssService } from './rss.service';
 
 @ApiTags('RSS')
@@ -16,8 +17,10 @@ export class RssController {
   @Post()
   @ApiOperation({ summary: 'Add an RSS feed' })
   async add(@Req() req: Request, @Body() body: { workspaceId: string; url: string; name?: string; autoPost: boolean; platforms?: string[] }) {
-    const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.rssService.add(userId, body);
+    return this.rssService.add(getRequestUserId(req), {
+      ...body,
+      workspaceId: getRequestWorkspaceId(req),
+    });
   }
 
   @Get(':id')
