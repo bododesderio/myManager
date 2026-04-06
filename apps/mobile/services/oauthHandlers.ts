@@ -12,24 +12,28 @@ interface OAuthResult {
 
 const REDIRECT_URI = Linking.createURL('oauth/callback');
 
-export async function initiateOAuth(provider: OAuthProvider): Promise<string> {
-  const response = await apiClient.get<{ authUrl: string }>(`/oauth/${provider}/authorize`, {
-    params: { redirectUri: REDIRECT_URI },
+export async function initiateOAuth(provider: OAuthProvider, workspaceId: string): Promise<string> {
+  const response = await apiClient.post<{ authUrl: string }>(`/social-accounts/connect/${provider}`, {
+    workspaceId,
+    redirectUri: REDIRECT_URI,
   });
   return response.authUrl;
 }
 
 export async function handleOAuthCallback(
   provider: OAuthProvider,
-  code: string
+  code: string,
+  state: string,
+  workspaceId: string,
 ): Promise<OAuthResult> {
   try {
     const response = await apiClient.post<{
       accountId: string;
       accountName: string;
-    }>(`/oauth/${provider}/callback`, {
+    }>(`/social-accounts/callback/${provider}`, {
       code,
-      redirectUri: REDIRECT_URI,
+      state,
+      workspaceId,
     });
 
     return {
@@ -45,10 +49,14 @@ export async function handleOAuthCallback(
   }
 }
 
-export async function disconnectAccount(provider: OAuthProvider, accountId: string): Promise<void> {
-  await apiClient.delete(`/oauth/${provider}/accounts/${accountId}`);
+export async function disconnectAccount(accountId: string): Promise<void> {
+  await apiClient.delete(`/social-accounts/${accountId}`);
 }
 
-export async function refreshAccountToken(provider: OAuthProvider, accountId: string): Promise<void> {
-  await apiClient.post(`/oauth/${provider}/accounts/${accountId}/refresh`);
+export async function refreshAccountToken(accountId: string): Promise<void> {
+  await apiClient.post(`/social-accounts/${accountId}/refresh-token`);
+}
+
+export async function listSocialAccounts<T = unknown>(workspaceId: string): Promise<T> {
+  return apiClient.get<T>('/social-accounts', { params: { workspaceId } });
 }

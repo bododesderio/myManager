@@ -24,7 +24,7 @@ export default function ComposeTabScreen() {
     try {
       setError(null);
       setLoading(true);
-      const data = await apiClient.get<{ posts: Draft[] }>('/v1/posts', {
+      const data = await apiClient.get<{ posts: Draft[] }>('/posts', {
         params: { status: 'draft' },
       });
       setDrafts(data.posts ?? []);

@@ -30,7 +30,7 @@ export default function MediaScreen() {
     try {
       setError(null);
       setLoading(true);
-      const data = await apiClient.get<{ media: MediaItem[] }>('/v1/media');
+      const data = await apiClient.get<{ media: MediaItem[] }>('/media');
       setMedia(data.media ?? []);
     } catch (error: unknown) {
       setError(getErrorMessage(error, 'Failed to load media'));

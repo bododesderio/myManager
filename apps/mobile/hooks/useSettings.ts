@@ -33,7 +33,7 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: async (data: ProfileUpdate) => {
       const response = await apiClient.put<{ user: { id: string; email: string; name: string; avatarUrl?: string } }>(
-        '/v1/users/profile',
+        '/users/profile',
         data
       );
       return response;
@@ -52,7 +52,7 @@ export function useUpdateNotificationPrefs() {
 
   return useMutation({
     mutationFn: async (prefs: NotificationPrefs) => {
-      const response = await apiClient.put('/v1/users/preferences', {
+      const response = await apiClient.put('/users/preferences', {
         notifications: prefs,
       });
       return response;
@@ -66,7 +66,7 @@ export function useUpdateNotificationPrefs() {
 export function useChangePassword() {
   return useMutation({
     mutationFn: async (data: ChangePasswordPayload) => {
-      const response = await apiClient.post('/v1/auth/change-password', data);
+      const response = await apiClient.post('/auth/change-password', data);
       return response;
     },
   });

@@ -72,7 +72,7 @@ export function usePlan() {
     async function fetchSubscription() {
       try {
         const data = await apiClient.get<SubscriptionResponse>(
-          '/v1/users/me/subscription'
+          '/users/me/subscription'
         );
         if (!cancelled && data.tier && PLANS[data.tier]) {
           setCurrentTier(data.tier);

@@ -49,14 +49,14 @@ export default function HomeScreen() {
   const fetchDashboard = useCallback(async () => {
     try {
       setError(null);
-      const data = await apiClient.get<{ posts: Post[] }>('/v1/posts', {
+      const data = await apiClient.get<{ posts: Post[] }>('/posts', {
         params: { status: 'published', limit: '5' },
       });
       setRecentPosts(data.posts ?? []);
     } catch {
       // Try dashboard endpoint as fallback
       try {
-        const dashboard = await apiClient.get<DashboardData>('/v1/dashboard');
+        const dashboard = await apiClient.get<DashboardData>('/dashboard');
         setRecentPosts(dashboard.recentPosts ?? []);
         if (dashboard.metrics) {
           setMetrics(dashboard.metrics);

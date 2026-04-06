@@ -39,7 +39,7 @@ export function useAuth() {
     async (email: string, password: string) => {
       setLoading(true);
       try {
-        const data = await apiClient.post<LoginResponse>('/v1/auth/login', {
+        const data = await apiClient.post<LoginResponse>('/auth/login', {
           email,
           password,
         });
@@ -54,7 +54,7 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     try {
-      await apiClient.post('/v1/auth/logout');
+      await apiClient.post('/auth/logout');
     } catch {
       // Proceed with local logout even if server call fails
     } finally {
@@ -67,7 +67,7 @@ export function useAuth() {
       setLoading(true);
       try {
         const { firstName, lastName } = splitName(name);
-        const data = await apiClient.post<SignupResponse>('/v1/auth/register', {
+        const data = await apiClient.post<SignupResponse>('/auth/register', {
           accountType: 'individual',
           firstName,
           lastName,
@@ -87,7 +87,7 @@ export function useAuth() {
   );
 
   const forgotPassword = useCallback(async (email: string) => {
-    await apiClient.post('/v1/auth/forgot-password', { email });
+    await apiClient.post('/auth/forgot-password', { email });
   }, []);
 
   return {

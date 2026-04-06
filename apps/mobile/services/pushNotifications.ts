@@ -42,10 +42,11 @@ export async function registerForPushNotifications(): Promise<string | null> {
   const tokenData = await Notifications.getExpoPushTokenAsync();
   const token = tokenData.data;
 
-  // Register token with backend
-  await apiClient.post('/notifications/register', {
+  // Register token with backend (matches PUT /api/v1/users/push-tokens)
+  await apiClient.put('/users/push-tokens', {
     token,
     platform: Platform.OS,
+    deviceName: Platform.OS === 'ios' ? 'iOS device' : 'Android device',
   });
 
   return token;

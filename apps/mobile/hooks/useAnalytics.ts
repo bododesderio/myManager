@@ -1,57 +1,71 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/services/apiClient';
 
-export interface AnalyticsMetrics {
-  totalReach: number;
-  reachChange: number;
-  engagement: number;
-  engagementChange: number;
-  followers: number;
-  followersChange: number;
-  posts: number;
-  postsChange: number;
-  topPosts: Array<{
+export interface AnalyticsOverview {
+  reach?: number;
+  impressions?: number;
+  engagements?: number;
+  engagementRate?: number;
+  followers?: number;
+  posts?: number;
+  topPosts?: Array<{
     id: string;
-    content: string;
+    caption?: string;
     platform: string;
-    reach: number;
-    engagement: number;
+    impressions?: number;
+    engagements?: number;
   }>;
-  platformBreakdown: Array<{
+  platformBreakdown?: Array<{
     platform: string;
-    reach: number;
-    engagement: number;
-    followers: number;
-  }>;
-  bestTimes: Array<{
-    day: string;
-    hour: number;
-    score: number;
+    reach?: number;
+    impressions?: number;
+    engagements?: number;
   }>;
 }
 
-export function useAnalytics(workspaceId: string, period: string = '30d') {
-  return useQuery<AnalyticsMetrics>({
-    queryKey: ['analytics', workspaceId, period],
+function periodToDates(period: '7d' | '30d' | '90d') {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const end = new Date();
+  const start = new Date(end);
+  start.setDate(start.getDate() - days);
+  return {
+    startDate: start.toISOString().slice(0, 10),
+    endDate: end.toISOString().slice(0, 10),
+  };
+}
+
+export function useAnalytics(workspaceId: string | null | undefined, period: '7d' | '30d' | '90d' = '30d') {
+  const { startDate, endDate } = periodToDates(period);
+  return useQuery<AnalyticsOverview>({
+    queryKey: ['analytics', 'overview', workspaceId, period],
     queryFn: async () => {
-      const response = await apiClient.get<AnalyticsMetrics>(
-        `/v1/analytics?workspace_id=${workspaceId}&period=${period}`
-      );
-      return response;
+      return apiClient.get<AnalyticsOverview>('/analytics/overview', {
+        params: { workspaceId: workspaceId!, startDate, endDate },
+      });
     },
     enabled: !!workspaceId,
   });
 }
 
-export function useAnalyticsByPlatform(workspaceId: string, platform: string) {
+export function useTopPosts(workspaceId: string | null | undefined, period: '7d' | '30d' | '90d' = '30d') {
+  const { startDate, endDate } = periodToDates(period);
   return useQuery({
-    queryKey: ['analytics', workspaceId, platform],
+    queryKey: ['analytics', 'top-posts', workspaceId, period],
     queryFn: async () => {
-      const response = await apiClient.get(
-        `/v1/analytics/${platform}?workspace_id=${workspaceId}`
-      );
-      return response;
+      return apiClient.get('/analytics/posts/top', {
+        params: { workspaceId: workspaceId!, startDate, endDate },
+      });
     },
-    enabled: !!workspaceId && !!platform,
+    enabled: !!workspaceId,
+  });
+}
+
+export function useBestTimes(workspaceId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['analytics', 'best-times', workspaceId],
+    queryFn: async () => {
+      return apiClient.get('/analytics/best-times', { params: { workspaceId: workspaceId! } });
+    },
+    enabled: !!workspaceId,
   });
 }

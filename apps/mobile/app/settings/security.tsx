@@ -1,11 +1,43 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useChangePassword } from '@/hooks/useSettings';
 
 export default function SecuritySettingsScreen() {
   const [twoFactor, setTwoFactor] = useState(false);
   const [biometric, setBiometric] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const changePassword = useChangePassword();
+
+  function handleUpdatePassword() {
+    if (!currentPassword || !newPassword) {
+      Alert.alert('Required', 'All password fields are required.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      Alert.alert('Too short', 'Password must be at least 8 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Mismatch', 'Passwords do not match.');
+      return;
+    }
+    changePassword.mutate(
+      { currentPassword, newPassword } as any,
+      {
+        onSuccess: () => {
+          Alert.alert('Updated', 'Password changed successfully.');
+          setCurrentPassword('');
+          setNewPassword('');
+          setConfirmPassword('');
+        },
+        onError: (e: any) => Alert.alert('Failed', e?.message ?? 'Could not change password'),
+      },
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -25,21 +57,36 @@ export default function SecuritySettingsScreen() {
             placeholder="Current Password"
             placeholderTextColor="#999"
             secureTextEntry
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            autoComplete="current-password"
           />
           <TextInput
             style={styles.input}
-            placeholder="New Password"
+            placeholder="New Password (min 8 characters)"
             placeholderTextColor="#999"
             secureTextEntry
+            value={newPassword}
+            onChangeText={setNewPassword}
+            autoComplete="new-password"
           />
           <TextInput
             style={styles.input}
             placeholder="Confirm New Password"
             placeholderTextColor="#999"
             secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            autoComplete="new-password"
           />
-          <TouchableOpacity style={styles.updateButton}>
-            <Text style={styles.updateButtonText}>Update Password</Text>
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={handleUpdatePassword}
+            disabled={changePassword.isPending}
+          >
+            <Text style={styles.updateButtonText}>
+              {changePassword.isPending ? 'Updating…' : 'Update Password'}
+            </Text>
           </TouchableOpacity>
         </View>
 

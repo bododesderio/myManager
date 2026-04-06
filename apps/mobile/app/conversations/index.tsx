@@ -3,6 +3,19 @@ import { router } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '@/services/apiClient';
+import { useWorkspaceStore } from '@/store/workspaceStore';
+
+interface RawComment {
+  id: string;
+  author_name?: string;
+  authorName?: string;
+  platform: string;
+  text?: string;
+  body?: string;
+  created_at?: string;
+  createdAt?: string;
+  status?: string;
+}
 
 interface Conversation {
   id: string;
@@ -17,23 +30,54 @@ function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
+function relTime(iso?: string) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'now';
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d`;
+  return d.toLocaleDateString();
+}
+
 export default function ConversationsScreen() {
+  const workspaceId = useWorkspaceStore((s) => s.currentWorkspace?.id ?? null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchConversations = useCallback(async () => {
+    if (!workspaceId) {
+      setLoading(false);
+      return;
+    }
     try {
       setError(null);
       setLoading(true);
-      const data = await apiClient.get<{ comments: Conversation[] }>('/v1/comments');
-      setConversations(data.comments ?? []);
+      const data = await apiClient.get<{ data?: RawComment[]; comments?: RawComment[] }>(
+        '/comments',
+        { params: { workspaceId } },
+      );
+      const raw: RawComment[] = data.data ?? data.comments ?? (data as any) ?? [];
+      const mapped: Conversation[] = raw.map((c) => ({
+        id: c.id,
+        contact: c.authorName ?? c.author_name ?? 'Unknown',
+        platform: c.platform,
+        lastMessage: c.text ?? c.body ?? '',
+        timestamp: relTime(c.createdAt ?? c.created_at),
+        unread: c.status === 'unread' || c.status === 'new',
+      }));
+      setConversations(mapped);
     } catch (error: unknown) {
       setError(getErrorMessage(error, 'Failed to load conversations'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [workspaceId]);
 
   useEffect(() => {
     fetchConversations();

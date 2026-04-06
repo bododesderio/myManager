@@ -16,7 +16,7 @@ export function useMedia(workspaceId: string) {
     queryKey: ['media', workspaceId],
     queryFn: async () => {
       const response = await apiClient.get<{ media: MediaItem[] }>(
-        `/v1/media`,
+        `/media`,
         { params: workspaceId ? { workspace_id: workspaceId } : undefined }
       );
       return response.media ?? [];
@@ -52,7 +52,7 @@ export function useUploadMedia() {
       } as unknown as Blob);
       formData.append('workspace_id', workspaceId);
 
-      const response = await fetch(`${BASE_URL}/v1/media/upload`, {
+      const response = await fetch(`${BASE_URL}/media/upload`, {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -78,7 +78,7 @@ export function useDeleteMedia() {
 
   return useMutation({
     mutationFn: async (mediaId: string) => {
-      await apiClient.delete(`/v1/media/${mediaId}`);
+      await apiClient.delete(`/media/${mediaId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });

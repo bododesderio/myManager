@@ -88,3 +88,15 @@ export function useDeletePost() {
     },
   });
 }
+
+export function useDuplicatePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.post<Post>(`/posts/${id}/duplicate`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+}

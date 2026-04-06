@@ -1,19 +1,86 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiClient } from '@/services/apiClient';
+import { useWorkspaceStore } from '@/store/workspaceStore';
 
 interface BioLink {
-  id: string;
+  id?: string;
   title: string;
   url: string;
-  active: boolean;
+  active?: boolean;
+}
+
+interface BioPage {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string;
+  links: BioLink[];
 }
 
 export default function BioScreen() {
-  const [links] = useState<BioLink[]>([]);
+  const workspaceId = useWorkspaceStore((s) => s.currentWorkspace?.id ?? null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['bio-pages', workspaceId],
+    queryFn: () =>
+      apiClient.get<BioPage[] | { pages?: BioPage[] }>('/bio-pages', {
+        params: { workspaceId: workspaceId! },
+      }),
+    enabled: !!workspaceId,
+  });
+
+  const pages: BioPage[] = (data as any)?.pages ?? (data as any) ?? [];
+  const existing = pages[0];
+
   const [bioTitle, setBioTitle] = useState('');
   const [bioDescription, setBioDescription] = useState('');
+  const [links, setLinks] = useState<BioLink[]>([]);
+
+  useEffect(() => {
+    if (existing) {
+      setBioTitle(existing.title ?? '');
+      setBioDescription(existing.description ?? '');
+      setLinks(existing.links ?? []);
+    }
+  }, [existing]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!workspaceId) throw new Error('No workspace selected');
+      if (existing) {
+        return apiClient.put(`/bio-pages/${existing.id}`, {
+          title: bioTitle,
+          description: bioDescription,
+          links,
+        });
+      }
+      return apiClient.post('/bio-pages', {
+        workspaceId,
+        slug: bioTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) || 'my-bio',
+        title: bioTitle,
+        description: bioDescription,
+        links,
+      });
+    },
+    onSuccess: () => Alert.alert('Saved', 'Bio page saved.'),
+    onError: (e: any) => Alert.alert('Failed', e?.message ?? 'Could not save'),
+  });
+
+  function addLink() {
+    setLinks((prev) => [...prev, { title: '', url: '', active: true }]);
+  }
+
+  function updateLink(index: number, patch: Partial<BioLink>) {
+    setLinks((prev) => prev.map((l, i) => (i === index ? { ...l, ...patch } : l)));
+  }
+
+  function removeLink(index: number) {
+    setLinks((prev) => prev.filter((_, i) => i !== index));
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,199 +89,126 @@ export default function BioScreen() {
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Bio Link</Text>
-        <TouchableOpacity>
-          <Text style={styles.saveText}>Save</Text>
+        <TouchableOpacity onPress={() => save.mutate()} disabled={save.isPending || !bioTitle.trim()}>
+          <Text style={[styles.saveText, (!bioTitle.trim() || save.isPending) && { opacity: 0.5 }]}>
+            {save.isPending ? '…' : 'Save'}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profile</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Page Title"
-            placeholderTextColor="#999"
-            value={bioTitle}
-            onChangeText={setBioTitle}
-          />
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Bio Description"
-            placeholderTextColor="#999"
-            value={bioDescription}
-            onChangeText={setBioDescription}
-            multiline
-          />
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator color="#7F77DD" />
         </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Links</Text>
-            <TouchableOpacity style={styles.addLinkButton}>
-              <Text style={styles.addLinkText}>+ Add Link</Text>
-            </TouchableOpacity>
+      ) : (
+        <ScrollView style={styles.content}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Profile</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Page Title"
+              placeholderTextColor="#999"
+              value={bioTitle}
+              onChangeText={setBioTitle}
+            />
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Bio Description"
+              placeholderTextColor="#999"
+              value={bioDescription}
+              onChangeText={setBioDescription}
+              multiline
+            />
           </View>
 
-          {links.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>
-                Add links to create your bio page
-              </Text>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Links</Text>
+              <TouchableOpacity onPress={addLink}>
+                <Text style={styles.addLinkText}>+ Add Link</Text>
+              </TouchableOpacity>
             </View>
-          ) : (
-            links.map((link) => (
-              <View key={link.id} style={styles.linkCard}>
-                <Text style={styles.linkTitle}>{link.title}</Text>
-                <Text style={styles.linkUrl}>{link.url}</Text>
+
+            {links.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>Add links to create your bio page</Text>
               </View>
-            ))
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preview</Text>
-          <View style={styles.previewContainer}>
-            <View style={styles.previewAvatar}>
-              <Text style={styles.previewAvatarText}>U</Text>
-            </View>
-            <Text style={styles.previewTitle}>
-              {bioTitle || 'Your Page Title'}
-            </Text>
-            <Text style={styles.previewDescription}>
-              {bioDescription || 'Your bio description'}
-            </Text>
+            ) : (
+              links.map((link, i) => (
+                <View key={i} style={styles.linkCard}>
+                  <TextInput
+                    style={styles.linkInput}
+                    placeholder="Title"
+                    value={link.title}
+                    onChangeText={(t) => updateLink(i, { title: t })}
+                  />
+                  <TextInput
+                    style={styles.linkInput}
+                    placeholder="https://…"
+                    value={link.url}
+                    onChangeText={(t) => updateLink(i, { url: t })}
+                    autoCapitalize="none"
+                    keyboardType="url"
+                  />
+                  <TouchableOpacity onPress={() => removeLink(i)}>
+                    <Text style={styles.removeLinkText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            )}
           </View>
-        </View>
-      </ScrollView>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preview</Text>
+            <View style={styles.previewContainer}>
+              <View style={styles.previewAvatar}>
+                <Text style={styles.previewAvatarText}>
+                  {bioTitle ? bioTitle[0].toUpperCase() : 'U'}
+                </Text>
+              </View>
+              <Text style={styles.previewTitle}>{bioTitle || 'Your Page Title'}</Text>
+              <Text style={styles.previewDescription}>{bioDescription || 'Your bio description'}</Text>
+              {links.filter((l) => l.url).map((l, i) => (
+                <View key={i} style={styles.previewLinkPill}>
+                  <Text style={styles.previewLinkText}>{l.title || l.url}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff',
+    borderBottomWidth: 1, borderBottomColor: '#eee',
   },
-  backText: {
-    fontSize: 16,
-    color: '#7F77DD',
-    fontWeight: '600',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
-  saveText: {
-    fontSize: 16,
-    color: '#7F77DD',
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  section: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-    marginBottom: 12,
-  },
-  textArea: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  addLinkButton: {
-    marginBottom: 12,
-  },
-  addLinkText: {
-    color: '#7F77DD',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  linkCard: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-  },
-  linkTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
-  linkUrl: {
-    fontSize: 13,
-    color: '#999',
-    marginTop: 2,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#999',
-  },
-  previewContainer: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-  },
-  previewAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#7F77DD',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  previewAvatarText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  previewTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  previewDescription: {
-    fontSize: 14,
-    color: '#666',
-  },
+  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
+  saveText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  content: { flex: 1, padding: 16 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  section: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#f9f9f9', marginBottom: 12 },
+  textArea: { minHeight: 80, textAlignVertical: 'top' },
+  addLinkText: { color: '#7F77DD', fontSize: 14, fontWeight: '600' },
+  linkCard: { backgroundColor: '#f9f9f9', borderRadius: 8, padding: 12, marginBottom: 8 },
+  linkInput: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#eee', borderRadius: 6, padding: 8, marginBottom: 6, fontSize: 14 },
+  removeLinkText: { color: '#F44336', fontSize: 13, fontWeight: '600', alignSelf: 'flex-end' },
+  emptyState: { alignItems: 'center', paddingVertical: 20 },
+  emptyText: { fontSize: 14, color: '#999' },
+  previewContainer: { alignItems: 'center', paddingVertical: 24, backgroundColor: '#f9f9f9', borderRadius: 12 },
+  previewAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#7F77DD', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  previewAvatarText: { color: '#fff', fontSize: 24, fontWeight: '700' },
+  previewTitle: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginBottom: 4 },
+  previewDescription: { fontSize: 14, color: '#666', marginBottom: 12 },
+  previewLinkPill: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginTop: 6, borderWidth: 1, borderColor: '#eee' },
+  previewLinkText: { color: '#1a1a1a', fontSize: 14, fontWeight: '500' },
 });

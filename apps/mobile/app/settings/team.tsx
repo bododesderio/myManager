@@ -1,4 +1,14 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  TextInput,
+  Alert,
+} from 'react-native';
 import { router } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +32,35 @@ export default function TeamSettingsScreen() {
   const [error, setError] = useState<string | null>(null);
   const currentWorkspace = useWorkspaceStore((s) => s.currentWorkspace);
 
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'admin' | 'editor' | 'viewer'>('editor');
+  const [inviting, setInviting] = useState(false);
+
+  async function sendInvite() {
+    if (!currentWorkspace?.id) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail)) {
+      Alert.alert('Invalid email', 'Enter a valid email address.');
+      return;
+    }
+    try {
+      setInviting(true);
+      await apiClient.post(`/workspaces/${currentWorkspace.id}/members/invite`, {
+        email: inviteEmail.trim().toLowerCase(),
+        role: inviteRole,
+      });
+      Alert.alert('Invitation sent', `Invited ${inviteEmail}.`);
+      setShowInvite(false);
+      setInviteEmail('');
+      setInviteRole('editor');
+      fetchMembers();
+    } catch (err: any) {
+      Alert.alert('Failed', err?.message ?? 'Could not send invitation');
+    } finally {
+      setInviting(false);
+    }
+  }
+
   const fetchMembers = useCallback(async () => {
     if (!currentWorkspace?.id) {
       setLoading(false);
@@ -31,7 +70,7 @@ export default function TeamSettingsScreen() {
       setError(null);
       setLoading(true);
       const data = await apiClient.get<{ members: TeamMember[] }>(
-        `/v1/workspaces/${currentWorkspace.id}/members`
+        `/workspaces/${currentWorkspace.id}/members`
       );
       setMembers(data.members ?? []);
     } catch (error: unknown) {
@@ -67,7 +106,7 @@ export default function TeamSettingsScreen() {
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Team Members</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowInvite(true)}>
           <Text style={styles.inviteText}>Invite</Text>
         </TouchableOpacity>
       </View>
@@ -94,13 +133,53 @@ export default function TeamSettingsScreen() {
             </View>
           }
           ListFooterComponent={
-            <TouchableOpacity style={styles.inviteButton}>
+            <TouchableOpacity style={styles.inviteButton} onPress={() => setShowInvite(true)}>
               <Text style={styles.inviteButtonText}>+ Invite Team Member</Text>
             </TouchableOpacity>
           }
           contentContainerStyle={styles.list}
         />
       )}
+
+      <Modal visible={showInvite} transparent animationType="slide" onRequestClose={() => setShowInvite(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Invite Team Member</Text>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={inviteEmail}
+              onChangeText={setInviteEmail}
+              placeholder="colleague@company.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoFocus
+            />
+            <Text style={styles.label}>Role</Text>
+            <View style={styles.roleRow}>
+              {(['admin', 'editor', 'viewer'] as const).map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[styles.rolePill, inviteRole === r && styles.rolePillActive]}
+                  onPress={() => setInviteRole(r)}
+                >
+                  <Text style={[styles.rolePillText, inviteRole === r && styles.rolePillTextActive]}>
+                    {r}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowInvite(false)}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveBtn} onPress={sendInvite} disabled={inviting}>
+                <Text style={styles.saveText}>{inviting ? 'Sending…' : 'Send Invite'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -220,4 +299,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
   },
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalCard: { backgroundColor: '#fff', padding: 20, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: '#1a1a1a', marginBottom: 16 },
+  label: { fontSize: 13, fontWeight: '500', color: '#444', marginBottom: 4, marginTop: 12 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
+  roleRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  rolePill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#ddd' },
+  rolePillActive: { backgroundColor: '#7F77DD', borderColor: '#7F77DD' },
+  rolePillText: { fontSize: 13, color: '#666', textTransform: 'capitalize' },
+  rolePillTextActive: { color: '#fff', fontWeight: '600' },
+  modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 20 },
+  cancelBtn: { paddingHorizontal: 16, paddingVertical: 10 },
+  cancelText: { color: '#666', fontSize: 14, fontWeight: '600' },
+  saveBtn: { backgroundColor: '#7F77DD', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
+  saveText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });
