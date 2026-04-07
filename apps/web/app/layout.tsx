@@ -32,7 +32,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
         {/* Server-rendered brand colors override globals.css defaults at request time */}
-        {/* @ts-expect-error Async server component */}
         <BrandStyleInjector />
       </head>
       <body className="font-body antialiased text-text bg-bg">

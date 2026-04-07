@@ -43,7 +43,7 @@ export default function WorkspaceSettingsContent() {
       return;
     }
     updateWorkspace.mutate(
-      { id: activeWorkspaceId, name: name.trim(), slug: slug.trim(), description },
+      { id: activeWorkspaceId, name: name.trim(), slug: slug.trim(), description } as any,
       {
         onSuccess: () => addToast({ type: 'success', message: 'Workspace updated successfully.' }),
         onError: () => addToast({ type: 'error', message: 'Failed to update workspace.' }),
