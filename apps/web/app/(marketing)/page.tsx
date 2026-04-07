@@ -143,19 +143,20 @@ export default async function LandingPage() {
       </section>
 
       {/* ── PLATFORM STRIP ── */}
-      <section className="bg-[var(--color-bg-2)] py-8">
+      <section className="bg-[var(--color-bg-2)] py-10">
         <div className="mx-auto max-w-5xl px-5 text-center">
           <p className="text-[12px] font-medium uppercase tracking-wide text-text-muted">
             {platformStrip.label || 'Works with your favourite platforms'}
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {/* Symmetric 5-column grid: 2 rows of 5 on desktop, gracefully collapses on smaller screens */}
+          <div className="mt-6 grid grid-cols-2 justify-items-center gap-3 sm:grid-cols-3 md:grid-cols-5">
             {(platforms.length ? platforms : []).map((p: any, i: number) => (
               <span
                 key={p.id || p.slug}
-                className={`animate-fade-in-up card-hover flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-[12px] font-medium text-text ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-600', 'delay-700'][i] || 'delay-700'}`}
+                className={`animate-fade-in-up card-hover flex w-full items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-[12px] font-medium text-text ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-600', 'delay-700'][i] || 'delay-700'}`}
               >
                 <PlatformIcon platform={p.slug || p.name || ''} size={18} />
-                {p.name}
+                <span className="truncate">{p.name}</span>
               </span>
             ))}
           </div>
