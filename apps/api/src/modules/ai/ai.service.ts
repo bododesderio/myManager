@@ -28,6 +28,39 @@ export class AiService {
     }
   }
 
+  /**
+   * Capabilities probe used by the frontend to decide whether to render AI
+   * features at all. Returns plain JSON; never throws. Cache-friendly.
+   */
+  getCapabilities() {
+    return {
+      anthropic: {
+        configured: !!this.anthropic,
+        models: this.anthropic ? ['claude-sonnet-4-20250514'] : [],
+      },
+      replicate: {
+        configured: !!this.configService.get('REPLICATE_API_KEY'),
+      },
+      openai: {
+        configured: !!this.configService.get('OPENAI_API_KEY'),
+      },
+      languagetool: {
+        configured: !!this.configService.get('LANGUAGETOOL_URL'),
+      },
+      // High-level feature flags the UI can read directly
+      features: {
+        captionGeneration: !!this.anthropic,
+        captionRewrite: !!this.anthropic,
+        captionTranslate: !!this.anthropic,
+        hashtagSuggest: !!this.anthropic,
+        imageAnalyze: !!this.anthropic,
+        imageGenerate: !!this.configService.get('REPLICATE_API_KEY'),
+        grammarCheck: !!this.configService.get('LANGUAGETOOL_URL'),
+        videoCaptions: !!this.configService.get('OPENAI_API_KEY'),
+      },
+    };
+  }
+
   async generateCaption(userId: string, data: {
     workspaceId: string; platform: string; topic: string; tone?: string;
     keywords?: string[]; maxLength?: number; language?: string;

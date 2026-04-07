@@ -4,8 +4,28 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useSubscription, usePlans, useBillingHistory, useChangePlan, useCancelSubscription } from '@/lib/hooks/useBilling';
 import { useToast } from '@/providers/ToastProvider';
+import { useCapabilities } from '@/providers/CapabilitiesProvider';
+import { ServiceUnavailable } from '@/components/status/ServiceUnavailable';
 
 export default function BillingContent() {
+  const caps = useCapabilities();
+  if (!caps.payments.configured) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-heading text-2xl font-bold">Billing</h1>
+        <ServiceUnavailable
+          title="Billing temporarily unavailable"
+          message="The payment provider isn't configured yet. A superadmin needs to add Flutterwave credentials before billing can be enabled."
+          actionHref="/superadmin/settings/credentials"
+          actionLabel="Configure credentials"
+        />
+      </div>
+    );
+  }
+  return <BillingContentInner />;
+}
+
+function BillingContentInner() {
   const { data: subscription, isLoading: loadingSub } = useSubscription();
   const { data: plans, isLoading: loadingPlans } = usePlans();
   const { data: history, isLoading: loadingHistory } = useBillingHistory();

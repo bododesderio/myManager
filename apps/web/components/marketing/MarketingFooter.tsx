@@ -14,6 +14,8 @@ interface BrandConfig {
   tagline: string;
   footer_made_in?: string;
   footer_copyright?: string;
+  footer_attribution_text?: string;
+  footer_attribution_url?: string;
 }
 
 interface FooterCmsFields {
@@ -24,7 +26,7 @@ interface FooterCmsFields {
 }
 
 const DEFAULT_BRAND: BrandConfig = {
-  app_name: 'MyManager',
+  app_name: 'myManager',
   logo_url: null,
   tagline: '',
 };
@@ -138,12 +140,29 @@ export async function MarketingFooter() {
           </div>
         </div>
 
-        {/* Bottom row: Copyright only */}
+        {/* Bottom row: copyright + attribution */}
         <div className="mt-8 border-t border-border pt-6">
-          <div className="flex items-center justify-center sm:justify-between">
+          <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
             <p className="text-[11px] text-text-muted">
-              {brand.footer_copyright || `© ${new Date().getFullYear()} ${brand.app_name}. All rights reserved.`}
+              {brand.footer_copyright ||
+                `© ${new Date().getFullYear()} ${brand.app_name}. All rights reserved.`}
             </p>
+            {brand.footer_attribution_text && (
+              <p className="text-[11px] text-text-muted">
+                {brand.footer_attribution_url ? (
+                  <a
+                    href={brand.footer_attribution_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline-offset-2 hover:text-primary hover:underline"
+                  >
+                    {brand.footer_attribution_text}
+                  </a>
+                ) : (
+                  brand.footer_attribution_text
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>

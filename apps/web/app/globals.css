@@ -152,6 +152,52 @@
   --shadow-glow:          0 0 20px rgba(167,139,250,0.4);
 }
 
+/* ──────────────────────────────────────────────────
+   OS-level dark mode auto-detection
+   Applies the dark palette automatically when the user's
+   OS is in dark mode AND no explicit theme override has
+   been set. The data-theme attribute (set by the inline
+   anti-FOUC script + ThemeToggle) takes precedence.
+   ────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-primary:        #A78BFA;
+    --color-primary-dark:   #7C3AED;
+    --color-primary-light:  #2D1B69;
+    --color-primary-border: #4C1D95;
+    --color-secondary:      #FB7185;
+    --color-secondary-dark: #E11D48;
+    --color-secondary-light:#500724;
+    --color-accent:         #34D399;
+    --color-accent-light:   #064E3B;
+    --color-accent-border:  #059669;
+    --color-tertiary:       #38BDF8;
+    --color-tertiary-dark:  #0284C7;
+    --color-tertiary-light: #0C4A6E;
+    --color-text:           #F1F5F9;
+    --color-text-2:         #CBD5E1;
+    --color-text-muted:     #64748B;
+    --color-bg:             #0F172A;
+    --color-bg-2:           #1E293B;
+    --color-bg-card:        #1E293B;
+    --color-border:         #334155;
+    --color-border-light:   #1E293B;
+    --color-error:          #F87171;
+    --color-error-light:    #450A0A;
+    --color-warning:        #FBBF24;
+    --color-warning-light:  #451A03;
+    --color-stats-bg:       #4C1D95;
+    --color-stats-text:     #ffffff;
+    --gradient-hero:        linear-gradient(135deg, #1E1B4B 0%, #500724 50%, #0C4A6E 100%);
+    --gradient-card:        linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    --gradient-cta:         linear-gradient(135deg, #7C3AED 0%, #4C1D95 50%, #E11D48 100%);
+    --gradient-stats:       linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #0284C7 100%);
+    --shadow-card:          0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(167,139,250,0.10);
+    --shadow-card-hover:    0 4px 16px rgba(167,139,250,0.20), 0 8px 32px rgba(167,139,250,0.12);
+    --shadow-float:         0 8px 30px rgba(167,139,250,0.30);
+  }
+}
+
 /* ── Body defaults ──────────────────────────────── */
 body {
   color: var(--color-text);

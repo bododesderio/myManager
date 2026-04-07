@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Anti-FOUC: set data-theme before first paint */}
+        {/* Anti-FOUC: honour stored override, otherwise let OS preference flow through @media in globals.css */}
         <script
           dangerouslySetInnerHTML={{
             __html: `

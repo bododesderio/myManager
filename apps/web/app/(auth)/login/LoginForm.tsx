@@ -104,8 +104,8 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center px-6">
-      <div className="w-full max-w-[340px]">
+    <div className="w-full">
+      <div className="w-full">
         {/* Header */}
         <p className="text-[10px] font-bold uppercase tracking-wider text-primary">
           Welcome back

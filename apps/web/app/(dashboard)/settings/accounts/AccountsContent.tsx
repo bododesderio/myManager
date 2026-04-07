@@ -4,6 +4,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { useSocialAccounts, useDisconnectSocialAccount } from '@/lib/hooks/useSocialAccounts';
 import { useToast } from '@/providers/ToastProvider';
+import { ServiceUnavailableInline } from '@/components/status/ServiceUnavailable';
 
 export default function AccountsContent() {
   const { data: accounts, isLoading } = useSocialAccounts();
@@ -78,6 +79,15 @@ export default function AccountsContent() {
                   >
                     {account.status}
                   </span>
+                )}
+                {account.status && account.status !== 'active' && (
+                  <div className="mt-2">
+                    <ServiceUnavailableInline
+                      message={`${account.platform} token ${account.status}. Posts to this account are paused until you reconnect.`}
+                      actionHref={`/connect/oauth?platform=${encodeURIComponent(account.platform)}`}
+                      actionLabel="Reconnect"
+                    />
+                  </div>
                 )}
               </div>
               <button

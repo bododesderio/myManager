@@ -1,19 +1,20 @@
 import type { Metadata } from 'next';
-import { AuthBrandPanel } from '@/components/auth/AuthBrandPanel';
+import { AuthShell } from '@/components/auth/AuthShell';
 import SignupForm from './SignupForm';
 
 export const metadata: Metadata = {
-  title: 'Sign Up',
+  title: 'Create account',
   description: 'Create your myManager account.',
 };
 
 export default function SignupPage() {
   return (
-    <div className="flex min-h-screen">
-      <AuthBrandPanel headline="Start managing social media smarter" subtext="Join thousands of creators and agencies across Africa." />
-      <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
-        <SignupForm />
-      </div>
-    </div>
+    <AuthShell
+      eyebrow="Get started"
+      headline="Start managing social media smarter"
+      subtext="Free forever for solo creators. Pay with mobile money when you're ready to scale."
+    >
+      <SignupForm />
+    </AuthShell>
   );
 }

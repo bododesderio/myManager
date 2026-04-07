@@ -67,36 +67,29 @@ async function seedStockImages() {
 
 // ─── Brand Config ─────────────────────────────────────────
 async function seedBrand() {
+  const data = {
+    app_name: 'myManager',
+    app_tagline: 'Post once. Reach everywhere.',
+    support_email: 'support@mymanager.app',
+    sales_email: 'sales@mymanager.app',
+    footer_made_in: 'Developed from Uganda',
+    footer_copyright: `© 2025–${new Date().getFullYear()} myManager. All rights reserved.`,
+    footer_attribution_text: 'Developed by Rooibok Technologies Limited',
+    footer_attribution_url: 'https://rooibok.net',
+    meta_title_suffix: '— myManager',
+    maintenance_mode: false,
+  };
   const existing = await prisma.brandConfig.findFirst();
   if (existing) {
-    await prisma.brandConfig.update({
-      where: { id: existing.id },
-      data: {
-        app_name: 'myManager',
-        app_tagline: 'Post once. Reach everywhere.',
-        support_email: 'support@mymanager.app',
-        sales_email: 'sales@mymanager.app',
-        footer_made_in: 'Made with care in Kampala, Uganda',
-        footer_copyright: '© 2025–2026 MyManager Ltd. All rights reserved.',
-        meta_title_suffix: '— myManager',
-        maintenance_mode: false,
-      },
-    });
+    await prisma.brandConfig.update({ where: { id: existing.id }, data });
   } else {
     await prisma.brandConfig.create({
       data: {
-        app_name: 'myManager',
-        app_tagline: 'Post once. Reach everywhere.',
-        support_email: 'support@mymanager.app',
-        sales_email: 'sales@mymanager.app',
-        footer_made_in: 'Made with care in Kampala, Uganda',
-        footer_copyright: '© 2025–2026 MyManager Ltd. All rights reserved.',
-        meta_title_suffix: '— myManager',
-        maintenance_mode: false,
+        ...data,
         config: {
-          primary_color: '#7F77DD',
-          secondary_color: '#534AB7',
-          accent_color: '#1D9E75',
+          primary_color: '#6D5AE8',
+          secondary_color: '#FF5C7A',
+          accent_color: '#10B981',
         },
       },
     });

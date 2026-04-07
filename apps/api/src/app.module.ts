@@ -46,6 +46,7 @@ import { ThemeModule } from './modules/theme/theme.module';
 import { PortalModule } from './modules/portal/portal.module';
 import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
+import { SystemStatusModule } from './modules/system-status/system-status.module';
 import { PlatformsModule } from './modules/platforms/platforms.module';
 import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
 import { PrismaModule } from './prisma.module';
@@ -127,6 +128,7 @@ import { MetricsController } from './metrics.controller';
     PortalModule,
     AdminDashboardModule,
     SystemConfigModule,
+    SystemStatusModule,
     PlatformsModule,
     ExchangeRatesModule,
     DlqModule,

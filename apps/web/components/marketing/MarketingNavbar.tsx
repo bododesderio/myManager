@@ -15,7 +15,7 @@ interface BrandConfig {
   tagline: string;
 }
 
-const DEFAULT_BRAND: BrandConfig = { app_name: 'MyManager', logo_url: null, tagline: '' };
+const DEFAULT_BRAND: BrandConfig = { app_name: 'myManager', logo_url: null, tagline: '' };
 
 async function getNavLinks(): Promise<NavLink[]> {
   const data = await fetchServerApi<{ main_nav?: NavLink[] }>(

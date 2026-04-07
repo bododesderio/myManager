@@ -1165,8 +1165,10 @@ model BrandConfig {
   favicon_url          String?
   support_email        String   @default("support@mymanager.app")
   sales_email          String   @default("sales@mymanager.app")
-  footer_made_in       String   @default("Made with care in Kampala, Uganda")
-  footer_copyright     String   @default("© 2025–2026 MyManager Ltd. All rights reserved.")
+  footer_made_in       String   @default("Developed from Uganda")
+  footer_copyright     String   @default("© 2025–2026 myManager. All rights reserved.")
+  footer_attribution_text String @default("Developed by Rooibok Technologies Limited")
+  footer_attribution_url  String @default("https://rooibok.net")
   meta_title_suffix    String   @default("— myManager")
   google_analytics_id  String?
   maintenance_mode     Boolean  @default(false)

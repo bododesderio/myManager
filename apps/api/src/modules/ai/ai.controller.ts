@@ -88,4 +88,10 @@ export class AiController {
   async getCredits(@Req() req: Request, @Query('workspaceId') workspaceId: string) {
     return this.aiService.getCredits(getRequestUserId(req), workspaceId);
   }
+
+  @Get('capabilities')
+  @ApiOperation({ summary: 'Probe which AI features are available (never throws)' })
+  getCapabilities() {
+    return this.aiService.getCapabilities();
+  }
 }
