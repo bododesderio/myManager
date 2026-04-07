@@ -22,8 +22,7 @@ import {
   Check,
   ChevronRight,
 } from 'lucide-react';
-
-// ─── Helpers ──────────────────────────────────────────────
+import styles from './DashboardContent.module.css';
 
 function getDateRange(days: number) {
   const end = new Date();
@@ -101,8 +100,6 @@ function useCurrentPlan(): string {
   return (sub.data as any)?.plan?.slug ?? (sub.data as any)?.plan_name ?? 'free';
 }
 
-// ─── Main Component ───────────────────────────────────────
-
 export default function DashboardContent() {
   const { data: session } = useSession();
   const { startDate, endDate } = useMemo(() => getDateRange(30), []);
@@ -151,31 +148,23 @@ export default function DashboardContent() {
 
   return (
     <div className="space-y-5">
-      {/* ONBOARDING STRIP */}
       {!onboardingDismissed && !allStepsDone && (
-        <div
-          className="relative rounded-card p-4"
-          style={{
-            backgroundColor: 'var(--color-primary-light)',
-            border: '1px solid var(--color-primary-border)',
-          }}
-        >
+        <div className={`relative rounded-card p-4 ${styles.onboardingStrip}`}>
           <button
             onClick={() => setOnboardingDismissed(true)}
-            className="absolute right-3 top-3 rounded-btn p-1 transition-opacity hover:opacity-70"
-            style={{ color: 'var(--color-text-muted)' }}
+            className={`absolute right-3 top-3 rounded-btn p-1 transition-opacity hover:opacity-70 ${styles.iconBtnMuted}`}
           >
             <X className="h-4 w-4" />
           </button>
           <div className="flex items-center justify-between mb-2 pr-6">
-            <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text)' }}>
+            <span className={`text-[13px] font-semibold ${styles.textBase}`}>
               Complete your setup &mdash; {stepsCompleted} of 3 steps done
             </span>
           </div>
-          <div className="h-1 w-full rounded-full mb-3" style={{ backgroundColor: 'var(--color-border)' }}>
+          <div className={`h-1 w-full rounded-full mb-3 ${styles.progressTrack}`}>
             <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${(stepsCompleted / 3) * 100}%`, backgroundColor: 'var(--color-primary)' }}
+              className={`h-full rounded-full transition-all ${styles.progressFill}`}
+              style={{ ['--progress' as string]: `${(stepsCompleted / 3) * 100}%` } as React.CSSProperties}
             />
           </div>
           <div className="flex gap-6 text-[13px]">
@@ -186,7 +175,6 @@ export default function DashboardContent() {
         </div>
       )}
 
-      {/* KPI METRICS ROW */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard label="Total reach" value={formatNumber(overview?.total_reach ?? 0)} change={overview?.reach_change} icon={<Eye className="h-4 w-4" />} />
         <KPICard label="Posts published" value={String(overview?.posts_published ?? recentPosts.length ?? 0)} change={overview?.posts_change} icon={<FileText className="h-4 w-4" />} />
@@ -194,27 +182,26 @@ export default function DashboardContent() {
         <KPICard label="Posts in queue" value={String(scheduledPosts.length ?? 0)} change={null} icon={<Clock className="h-4 w-4" />} highlighted />
       </div>
 
-      {/* PENDING APPROVALS */}
       {isOwnerOrAdmin && approvalCount > 0 && (
         <Card>
           <CardHeader title="Pending approvals" badge={approvalCount} badgeColor="var(--color-warning)" action={{ label: 'View all', href: '/approvals' }} />
-          <div className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+          <div className={`divide-y ${styles.divider}`}>
             {approvalItems.map((item: any) => (
               <div key={item.id} className="flex items-center gap-3 px-5 py-3">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${styles.avatarPrimary}`}>
                   {(item.user?.name ?? item.author_name ?? 'U')[0]?.toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-medium" style={{ color: 'var(--color-text)' }}>{item.user?.name ?? item.author_name ?? 'Team member'}</p>
-                  <p className="truncate text-[12px]" style={{ color: 'var(--color-text-muted)' }}>{item.caption ?? item.post?.caption ?? 'No caption'}</p>
+                  <p className={`truncate text-[13px] font-medium ${styles.textBase}`}>{item.user?.name ?? item.author_name ?? 'Team member'}</p>
+                  <p className={`truncate text-[12px] ${styles.textMuted}`}>{item.caption ?? item.post?.caption ?? 'No caption'}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {(item.platforms ?? item.post?.platforms ?? []).slice(0, 3).map((p: string) => (<PlatformDot key={p} platform={p} />))}
                 </div>
-                <span className="text-[11px] flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>{item.created_at ? timeAgo(item.created_at) : ''}</span>
+                <span className={`text-[11px] flex-shrink-0 ${styles.textMuted}`}>{item.created_at ? timeAgo(item.created_at) : ''}</span>
                 <div className="flex gap-1.5 flex-shrink-0">
-                  <button onClick={() => approvePost.mutate({ postId: item.id ?? item.post_id })} className="rounded-btn px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80" style={{ backgroundColor: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>Approve</button>
-                  <button onClick={() => requestRevision.mutate({ postId: item.id ?? item.post_id, comment: 'Please revise' })} className="rounded-btn px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80" style={{ border: '1px solid var(--color-error)', color: 'var(--color-error)', backgroundColor: 'transparent' }}>Revise</button>
+                  <button onClick={() => approvePost.mutate({ postId: item.id ?? item.post_id })} className={`rounded-btn px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80 ${styles.approveBtn}`}>Approve</button>
+                  <button onClick={() => requestRevision.mutate({ postId: item.id ?? item.post_id, comment: 'Please revise' })} className={`rounded-btn px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80 ${styles.reviseBtn}`}>Revise</button>
                 </div>
               </div>
             ))}
@@ -222,22 +209,21 @@ export default function DashboardContent() {
         </Card>
       )}
 
-      {/* RECENT POSTS */}
       <Card>
         <CardHeader title="Recent posts" action={{ label: 'View all', href: '/drafts' }} />
         {recentPosts.length > 0 ? (
-          <div className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+          <div className={`divide-y ${styles.divider}`}>
             {recentPosts.map((post: any) => (
               <Link key={post.id} href={`/posts/${post.id}` as Route} className="flex items-center gap-3 px-5 py-3 transition-colors" onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-card)'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
                 {post.thumbnail_url ? (
                   <Image src={post.thumbnail_url} alt="" width={40} height={40} className="h-10 w-10 flex-shrink-0 rounded-icon object-cover" unoptimized />
                 ) : (
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-icon" style={{ backgroundColor: 'var(--color-bg-card)' }}><FileText className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} /></div>
+                  <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-icon ${styles.thumbBg}`}><FileText className={`h-4 w-4 ${styles.textMuted}`} /></div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-medium" style={{ color: 'var(--color-text)' }}>{post.caption || 'Untitled post'}</p>
+                  <p className={`truncate text-[13px] font-medium ${styles.textBase}`}>{post.caption || 'Untitled post'}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    {post.project?.name && (<span className="text-[11px]" style={{ color: 'var(--color-primary)' }}>{post.project.name}</span>)}
+                    {post.project?.name && (<span className={`text-[11px] ${styles.textPrimary}`}>{post.project.name}</span>)}
                     <div className="flex gap-1">{(post.platforms ?? []).slice(0, 4).map((p: string) => (<PlatformDot key={p} platform={p} />))}</div>
                   </div>
                 </div>
@@ -250,7 +236,6 @@ export default function DashboardContent() {
         )}
       </Card>
 
-      {/* WEEKLY SCHEDULE + UPCOMING */}
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader title="Weekly schedule" action={{ label: 'Open calendar', href: '/calendar' }} />
@@ -261,11 +246,11 @@ export default function DashboardContent() {
         <Card>
           <CardHeader title="Upcoming" action={{ label: 'View all', href: '/calendar' }} />
           {scheduledPosts.length > 0 ? (
-            <div className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+            <div className={`divide-y ${styles.divider}`}>
               {scheduledPosts.map((post: any) => (
                 <Link key={post.id} href={`/posts/${post.id}` as Route} className="flex items-center gap-3 px-5 py-2.5 transition-colors" onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-card)'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                  <span className="w-12 flex-shrink-0 text-[12px] font-medium" style={{ color: 'var(--color-text-2)' }}>{post.scheduled_at ? new Date(post.scheduled_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '--:--'}</span>
-                  <div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium" style={{ color: 'var(--color-text)' }}>{post.caption || 'Untitled'}</p></div>
+                  <span className={`w-12 flex-shrink-0 text-[12px] font-medium ${styles.textSec}`}>{post.scheduled_at ? new Date(post.scheduled_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '--:--'}</span>
+                  <div className="min-w-0 flex-1"><p className={`truncate text-[13px] font-medium ${styles.textBase}`}>{post.caption || 'Untitled'}</p></div>
                   <div className="flex gap-1">{(post.platforms ?? []).slice(0, 3).map((p: string) => (<PlatformDot key={p} platform={p} />))}</div>
                   <StatusBadge status={post.status} />
                 </Link>
@@ -277,22 +262,21 @@ export default function DashboardContent() {
         </Card>
       </div>
 
-      {/* CLIENT PROJECTS (Enterprise) */}
       {isEnterprise && projectsArr.length > 0 && (
         <Card>
           <CardHeader title="Client projects" action={{ label: 'View all', href: '/projects' }} />
-          <div className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+          <div className={`divide-y ${styles.divider}`}>
             {projectsArr.map((proj: any) => {
               const target = proj.monthly_target ?? proj.target ?? 20;
               const current = proj.posts_this_month ?? proj.post_count ?? 0;
               const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
               return (
                 <div key={proj.id} className="flex items-center gap-4 px-5 py-3">
-                  <div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium" style={{ color: 'var(--color-text)' }}>{proj.name}</p></div>
-                  <span className="text-[11px] flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>{current}/{target}</span>
+                  <div className="min-w-0 flex-1"><p className={`truncate text-[13px] font-medium ${styles.textBase}`}>{proj.name}</p></div>
+                  <span className={`text-[11px] flex-shrink-0 ${styles.textMuted}`}>{current}/{target}</span>
                   <div className="w-28 flex-shrink-0">
-                    <div className="h-[5px] w-full rounded-full" style={{ backgroundColor: 'var(--color-border)' }}>
-                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: 'var(--color-primary)' }} />
+                    <div className={`h-[5px] w-full rounded-full ${styles.progressTrack}`}>
+                      <div className={`h-full rounded-full transition-all ${styles.progressFill}`} style={{ ['--progress' as string]: `${pct}%` } as React.CSSProperties} />
                     </div>
                   </div>
                 </div>
@@ -302,25 +286,24 @@ export default function DashboardContent() {
         </Card>
       )}
 
-      {/* TEAM ACTIVITY (Owner/Admin) */}
       {isOwnerOrAdmin && (
         <Card>
           <CardHeader title="Team activity" />
           {membersArr.length > 0 ? (
             <>
-              <div className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+              <div className={`divide-y ${styles.divider}`}>
                 {membersArr.map((m: any) => (
                   <div key={m.id ?? m.user_id} className="flex items-center gap-3 px-5 py-3">
-                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>{(m.name ?? m.user?.name ?? 'U')[0]?.toUpperCase()}</div>
+                    <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${styles.avatarPrimary}`}>{(m.name ?? m.user?.name ?? 'U')[0]?.toUpperCase()}</div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-medium" style={{ color: 'var(--color-text)' }}>{m.name ?? m.user?.name ?? 'Team member'}</p>
-                      <p className="text-[11px] capitalize" style={{ color: 'var(--color-text-muted)' }}>{m.role ?? 'member'}</p>
+                      <p className={`truncate text-[13px] font-medium ${styles.textBase}`}>{m.name ?? m.user?.name ?? 'Team member'}</p>
+                      <p className={`text-[11px] capitalize ${styles.textMuted}`}>{m.role ?? 'member'}</p>
                     </div>
-                    <span className="text-[12px]" style={{ color: 'var(--color-text-2)' }}>{m.posts_this_week ?? 0} posts submitted</span>
+                    <span className={`text-[12px] ${styles.textSec}`}>{m.posts_this_week ?? 0} posts submitted</span>
                   </div>
                 ))}
               </div>
-              <div className="px-5 py-3 text-[12px]" style={{ color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border-light)' }}>
+              <div className={`px-5 py-3 text-[12px] ${styles.teamFooter}`}>
                 Seats used: {seatUsed}/{seatLimit} &middot; +$15 to add more
               </div>
             </>
@@ -330,7 +313,6 @@ export default function DashboardContent() {
         </Card>
       )}
 
-      {/* PLAN QUOTA BARS */}
       <Card>
         <CardHeader title="Usage" action={{ label: 'Upgrade', href: '/settings/billing' }} />
         <div className="space-y-4 px-5 pb-5">
@@ -344,27 +326,26 @@ export default function DashboardContent() {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────
-
 function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-card overflow-hidden" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
-      {children}
-    </div>
-  );
+  return <div className={`rounded-card overflow-hidden ${styles.card}`}>{children}</div>;
 }
 
 function CardHeader({ title, badge, badgeColor, action }: { title: string; badge?: number; badgeColor?: string; action?: { label: string; href: string } }) {
   return (
-    <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid var(--color-border-light)' }}>
+    <div className={`flex items-center justify-between px-5 py-3.5 ${styles.cardHeader}`}>
       <div className="flex items-center gap-2">
-        <h2 className="text-[14px] font-semibold" style={{ color: 'var(--color-text)' }}>{title}</h2>
+        <h2 className={`text-[14px] font-semibold ${styles.textBase}`}>{title}</h2>
         {badge != null && badge > 0 && (
-          <span className="flex h-5 min-w-[20px] items-center justify-center rounded-badge px-1.5 text-[10px] font-bold text-white" style={{ backgroundColor: badgeColor ?? 'var(--color-primary)' }}>{badge}</span>
+          <span
+            className={`flex h-5 min-w-[20px] items-center justify-center rounded-badge px-1.5 text-[10px] font-bold text-white ${styles.badge}`}
+            style={badgeColor ? ({ ['--badge-color' as string]: badgeColor } as React.CSSProperties) : undefined}
+          >
+            {badge}
+          </span>
         )}
       </div>
       {action && (
-        <Link href={action.href as Route} className="flex items-center gap-0.5 text-[12px] font-medium transition-opacity hover:opacity-80" style={{ color: 'var(--color-primary)' }}>
+        <Link href={action.href as Route} className={`flex items-center gap-0.5 text-[12px] font-medium transition-opacity hover:opacity-80 ${styles.linkPrimary}`}>
           {action.label}<ChevronRight className="h-3.5 w-3.5" />
         </Link>
       )}
@@ -376,16 +357,16 @@ function KPICard({ label, value, change, icon, highlighted }: { label: string; v
   const hasChange = change != null && change !== 0;
   const isPositive = (change ?? 0) >= 0;
   return (
-    <div className="rounded-card p-4" style={{ backgroundColor: highlighted ? 'var(--color-stats-bg)' : 'var(--color-bg)', border: highlighted ? 'none' : '1px solid var(--color-border)', color: highlighted ? 'var(--color-stats-text)' : undefined }}>
+    <div className={`rounded-card p-4 ${highlighted ? styles.kpiCardHighlighted : styles.kpiCard}`}>
       <div className="flex items-center justify-between">
-        <p className="text-[12px] font-medium uppercase tracking-wide" style={{ color: highlighted ? 'rgba(255,255,255,0.7)' : 'var(--color-text-muted)' }}>{label}</p>
-        <div className="rounded-icon p-1.5" style={{ backgroundColor: highlighted ? 'rgba(255,255,255,0.15)' : 'var(--color-primary-light)', color: highlighted ? '#fff' : 'var(--color-primary)' }}>{icon}</div>
+        <p className={`text-[12px] font-medium uppercase tracking-wide ${styles.kpiLabel}`}>{label}</p>
+        <div className={`rounded-icon p-1.5 ${styles.kpiIcon}`}>{icon}</div>
       </div>
       <p className="mt-2 text-2xl font-bold">{value}</p>
       {hasChange ? (
-        <p className="mt-1 text-[12px] font-medium" style={{ color: highlighted ? 'rgba(255,255,255,0.8)' : isPositive ? 'var(--color-accent)' : 'var(--color-error)' }}>{isPositive ? '+' : ''}{change}% vs last month</p>
+        <p className={`mt-1 text-[12px] font-medium ${isPositive ? styles.kpiChangePos : styles.kpiChangeNeg}`}>{isPositive ? '+' : ''}{change}% vs last month</p>
       ) : (
-        <p className="mt-1 text-[12px]" style={{ color: highlighted ? 'rgba(255,255,255,0.5)' : 'var(--color-text-muted)' }}>--</p>
+        <p className={`mt-1 text-[12px] ${styles.kpiChangeNone}`}>--</p>
       )}
     </div>
   );
@@ -394,8 +375,8 @@ function KPICard({ label, value, change, icon, highlighted }: { label: string; v
 function OnboardingStep({ done, label, href }: { done: boolean; label: string; href?: string }) {
   const inner = (
     <span className="flex items-center gap-1.5">
-      {done ? (<Check className="h-3.5 w-3.5" style={{ color: 'var(--color-accent)' }} />) : (<span className="inline-block h-3.5 w-3.5 rounded-full border-2" style={{ borderColor: 'var(--color-border)' }} />)}
-      <span style={{ color: done ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>{label}</span>
+      {done ? (<Check className={`h-3.5 w-3.5 ${styles.textAccent}`} />) : (<span className={`inline-block h-3.5 w-3.5 rounded-full border-2 ${styles.borderMuted}`} />)}
+      <span className={done ? styles.doneText : styles.notDoneText}>{label}</span>
     </span>
   );
   if (!done && href) return <Link href={href as Route} className="hover:opacity-80 transition-opacity">{inner}</Link>;
@@ -403,19 +384,32 @@ function OnboardingStep({ done, label, href }: { done: boolean; label: string; h
 }
 
 function PlatformDot({ platform }: { platform: string }) {
-  return <span title={platform} className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: PLATFORM_COLORS[platform] ?? 'var(--color-text-muted)' }} />;
+  return (
+    <span
+      title={platform}
+      className={`inline-block h-2.5 w-2.5 rounded-full ${styles.platformDot}`}
+      style={{ ['--platform-color' as string]: PLATFORM_COLORS[platform] ?? 'var(--color-text-muted)' } as React.CSSProperties}
+    />
+  );
 }
 
 function StatusBadge({ status }: { status: string }) {
   const style = STATUS_STYLES[status] ?? STATUS_STYLES.draft;
-  return <span className="flex-shrink-0 rounded-badge px-2 py-0.5 text-[11px] font-medium capitalize" style={{ backgroundColor: style.bg, color: style.color }}>{status?.replace('_', ' ') ?? 'draft'}</span>;
+  return (
+    <span
+      className={`flex-shrink-0 rounded-badge px-2 py-0.5 text-[11px] font-medium capitalize ${styles.statusBadge}`}
+      style={{ ['--badge-bg' as string]: style.bg, ['--badge-fg' as string]: style.color } as React.CSSProperties}
+    >
+      {status?.replace('_', ' ') ?? 'draft'}
+    </span>
+  );
 }
 
 function EmptyState({ message, action }: { message: string; action?: { label: string; href: string } }) {
   return (
     <div className="flex flex-col items-center py-8 text-center px-5">
-      <p className="text-[13px] font-medium" style={{ color: 'var(--color-text-2)' }}>{message}</p>
-      {action && (<Link href={action.href as Route} className="mt-3 rounded-btn px-4 py-1.5 text-[13px] font-medium transition-opacity hover:opacity-90" style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>{action.label}</Link>)}
+      <p className={`text-[13px] font-medium ${styles.emptyText}`}>{message}</p>
+      {action && (<Link href={action.href as Route} className={`mt-3 rounded-btn px-4 py-1.5 text-[13px] font-medium transition-opacity hover:opacity-90 ${styles.primaryBtn}`}>{action.label}</Link>)}
     </div>
   );
 }
@@ -439,9 +433,17 @@ function WeekCalendar({ monday, posts }: { monday: Date; posts: any[] }) {
     <div className="grid grid-cols-7 gap-2">
       {dayData.map((d) => (
         <div key={d.label} className="flex flex-col items-center gap-1">
-          <span className="text-[11px] font-medium" style={{ color: 'var(--color-text-muted)' }}>{d.label}</span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-semibold" style={{ backgroundColor: d.isToday ? 'var(--color-primary)' : 'transparent', color: d.isToday ? '#fff' : 'var(--color-text)' }}>{d.date}</div>
-          <div className="flex gap-0.5 h-2.5">{d.platforms.map((p) => (<span key={p} className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: PLATFORM_COLORS[p] ?? 'var(--color-text-muted)' }} />))}</div>
+          <span className={`text-[11px] font-medium ${styles.textMuted}`}>{d.label}</span>
+          <div className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-semibold ${d.isToday ? styles.weekDayCircleToday : styles.weekDayCircle}`}>{d.date}</div>
+          <div className="flex gap-0.5 h-2.5">
+            {d.platforms.map((p) => (
+              <span
+                key={p}
+                className={`inline-block h-2 w-2 rounded-full ${styles.platformDot}`}
+                style={{ ['--platform-color' as string]: PLATFORM_COLORS[p] ?? 'var(--color-text-muted)' } as React.CSSProperties}
+              />
+            ))}
+          </div>
         </div>
       ))}
     </div>
@@ -457,11 +459,14 @@ function QuotaBar({ label, used, limit, unit, warnAt90 }: { label: string; used:
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[13px]" style={{ color: 'var(--color-text-2)' }}>{label}</span>
-        <span className="text-[12px] font-medium" style={{ color: isRed ? 'var(--color-error)' : 'var(--color-text-muted)' }}>{used} / {limit}{unit ? ` ${unit}` : ''}</span>
+        <span className={`text-[13px] ${styles.textSec}`}>{label}</span>
+        <span className={`text-[12px] font-medium ${isRed ? styles.textError : styles.textMuted}`}>{used} / {limit}{unit ? ` ${unit}` : ''}</span>
       </div>
-      <div className="h-[5px] w-full rounded-full" style={{ backgroundColor: 'var(--color-border)' }}>
-        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: barColor }} />
+      <div className={`h-[5px] w-full rounded-full ${styles.progressTrack}`}>
+        <div
+          className={`h-full rounded-full transition-all ${styles.progressFill}`}
+          style={{ ['--progress' as string]: `${Math.min(pct, 100)}%`, ['--color-primary' as string]: barColor } as React.CSSProperties}
+        />
       </div>
     </div>
   );

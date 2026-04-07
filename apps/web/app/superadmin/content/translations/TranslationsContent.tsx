@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import styles from './TranslationsContent.module.css';
 
 interface TranslationKey {
   id: string;
@@ -278,8 +279,8 @@ export function TranslationsContent() {
               </div>
               <div className="mt-1 h-2 rounded-full bg-gray-200">
                 <div
-                  className="h-2 rounded-full bg-brand-primary"
-                  style={{ width: `${lang.progress}%` }}
+                  className={`h-2 rounded-full bg-brand-primary ${styles.progressFill}`}
+                  style={{ ['--progress' as string]: `${lang.progress}%` } as React.CSSProperties}
                 />
               </div>
             </div>

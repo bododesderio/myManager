@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { styles } from './analytics.styles';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAnalytics, useTopPosts } from '@/hooks/useAnalytics';
@@ -133,43 +134,3 @@ export default function AnalyticsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  title: { fontSize: 24, fontWeight: '700', color: '#1a1a1a' },
-  periodSelector: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  periodButton: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#f0f0f0' },
-  periodButtonActive: { backgroundColor: '#7F77DD' },
-  periodText: { fontSize: 13, fontWeight: '500', color: '#666' },
-  periodTextActive: { color: '#fff' },
-  content: { flex: 1, padding: 16 },
-  metricsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 16 },
-  metricCard: { width: '48%', backgroundColor: '#fff', borderRadius: 12, padding: 16, flexGrow: 1 },
-  metricLabel: { fontSize: 12, color: '#999', marginBottom: 4 },
-  metricValue: { fontSize: 24, fontWeight: '700', color: '#1a1a1a', marginBottom: 4 },
-  section: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },
-  emptyState: { alignItems: 'center', paddingVertical: 24 },
-  emptyText: { fontSize: 14, color: '#999', textAlign: 'center' },
-  center: { alignItems: 'center', paddingVertical: 32 },
-  errorSection: { backgroundColor: '#FEE2E2' },
-  errorText: { color: '#991B1B', marginBottom: 8 },
-  retryBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#fff', borderRadius: 6 },
-  retryText: { color: '#7F77DD', fontWeight: '600' },
-  postRow: { paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#eee' },
-  postCaption: { fontSize: 14, color: '#1a1a1a', fontWeight: '500' },
-  postMeta: { fontSize: 12, color: '#777', marginTop: 2 },
-});

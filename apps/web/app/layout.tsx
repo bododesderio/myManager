@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import '@/app/globals.css';
 import { Providers } from '@/providers/Providers';
+import { BrandStyleInjector } from '@/providers/BrandProvider';
 
 export const metadata: Metadata = {
   title: {
@@ -30,6 +31,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             `,
           }}
         />
+        {/* Server-rendered brand colors override globals.css defaults at request time */}
+        {/* @ts-expect-error Async server component */}
+        <BrandStyleInjector />
       </head>
       <body className="font-body antialiased text-text bg-bg">
         <Providers>{children}</Providers>

@@ -1,0 +1,3 @@
+.progressFill {
+  width: var(--progress, 0%);
+}

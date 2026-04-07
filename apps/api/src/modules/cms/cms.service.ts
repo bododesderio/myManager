@@ -120,6 +120,27 @@ export class CmsService implements OnModuleDestroy {
   }
 
   // ───────────────────────────────────────────────
+  // Public: Stock images (SystemConfig under category="stock_images")
+  // ───────────────────────────────────────────────
+
+  async getStockImages(): Promise<Record<string, string>> {
+    const cacheKey = 'cms:stock-images';
+    const cached = await this.getFromCache(cacheKey);
+    if (cached) return cached as Record<string, string>;
+
+    const rows = await this.prisma.systemConfig.findMany({
+      where: { category: 'stock_images', is_secret: false },
+      select: { key: true, value: true },
+    });
+    const map: Record<string, string> = {};
+    for (const row of rows) {
+      map[row.key] = row.value;
+    }
+    await this.setCache(cacheKey, map, 300);
+    return map;
+  }
+
+  // ───────────────────────────────────────────────
   // Public: CMS Page (visible sections only)
   // ───────────────────────────────────────────────
 

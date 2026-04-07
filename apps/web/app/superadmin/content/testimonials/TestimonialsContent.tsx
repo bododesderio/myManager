@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import styles from './TestimonialsContent.module.css';
 
 interface Testimonial {
   id: string;
@@ -157,8 +158,8 @@ export function TestimonialsContent() {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-                  style={{ backgroundColor: item.author_avatar_color }}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${styles.avatar}`}
+                  style={{ ['--avatar-color' as string]: item.author_avatar_color } as React.CSSProperties}
                 >
                   {item.author_initials}
                 </div>

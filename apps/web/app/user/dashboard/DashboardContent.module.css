@@ -1,0 +1,112 @@
+.onboardingStrip {
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border);
+}
+
+.iconBtnMuted { color: var(--color-text-muted); }
+.textBase { color: var(--color-text); }
+.textSec { color: var(--color-text-2); }
+.textMuted { color: var(--color-text-muted); }
+.textPrimary { color: var(--color-primary); }
+.textAccent { color: var(--color-accent); }
+.textError { color: var(--color-error); }
+
+.progressTrack { background-color: var(--color-border); }
+.progressFill {
+  width: var(--progress, 0%);
+  background-color: var(--color-primary);
+}
+
+.divider { border-color: var(--color-border-light); }
+
+.avatarPrimary {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.approveBtn {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.reviseBtn {
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  background-color: transparent;
+}
+
+.thumbBg { background-color: var(--color-bg-card); }
+
+.teamFooter {
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.cardHeader { border-bottom: 1px solid var(--color-border-light); }
+
+.badge { background-color: var(--badge-color, var(--color-primary)); }
+
+.linkPrimary { color: var(--color-primary); }
+
+.kpiCard {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.kpiCardHighlighted {
+  background-color: var(--color-stats-bg);
+  border: none;
+  color: var(--color-stats-text);
+}
+
+.kpiLabel { color: var(--color-text-muted); }
+.kpiCardHighlighted .kpiLabel { color: rgba(255, 255, 255, 0.7); }
+
+.kpiIcon {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.kpiCardHighlighted .kpiIcon {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.kpiChangePos { color: var(--color-accent); }
+.kpiChangeNeg { color: var(--color-error); }
+.kpiCardHighlighted .kpiChangePos,
+.kpiCardHighlighted .kpiChangeNeg { color: rgba(255, 255, 255, 0.8); }
+
+.kpiChangeNone { color: var(--color-text-muted); }
+.kpiCardHighlighted .kpiChangeNone { color: rgba(255, 255, 255, 0.5); }
+
+.borderMuted { border-color: var(--color-border); }
+.doneText { color: var(--color-accent); }
+.notDoneText { color: var(--color-text-muted); }
+
+.platformDot { background-color: var(--platform-color, var(--color-text-muted)); }
+
+.statusBadge {
+  background-color: var(--badge-bg);
+  color: var(--badge-fg);
+}
+
+.emptyText { color: var(--color-text-2); }
+
+.primaryBtn {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.weekDayCircle {
+  background-color: transparent;
+  color: var(--color-text);
+}
+.weekDayCircleToday {
+  background-color: var(--color-primary);
+  color: #fff;
+}

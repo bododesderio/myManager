@@ -148,7 +148,7 @@ export default function SignupForm() {
                     onClick={() => setAccountType(type)}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       accountType === type
-                        ? 'border-[#7F77DD] bg-[#7F77DD]/5'
+                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -173,20 +173,20 @@ export default function SignupForm() {
                     if (!workspaceName) setWorkspaceName(`${e.target.value} Workspace`);
                     if (!workspaceSlug) setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                   }}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                 />
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <input type="text" required minLength={2} aria-label="First name" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
-                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 <input type="text" required minLength={2} aria-label="Last name" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
-                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
               </div>
 
               <div>
                 <input type="email" required aria-label="Email address" autoComplete="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {email && !emailValid && (
                   <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
                 )}
@@ -194,7 +194,7 @@ export default function SignupForm() {
 
               <div>
                 <input type="password" required minLength={8} aria-label="Password" autoComplete="new-password" placeholder="Password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {password && (
                   <div className="flex gap-1 mt-2">
                     {[1, 2, 3, 4].map((i) => (
@@ -209,14 +209,14 @@ export default function SignupForm() {
               </div>
 
               <select value={country} onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent">
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Select country</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
 
               {accountType === 'company' && (
                 <select value={teamSize} onChange={(e) => setTeamSize(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent">
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                   <option value="">Team size</option>
                   {TEAM_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -225,14 +225,14 @@ export default function SignupForm() {
               <button
                 onClick={nextStep}
                 disabled={!isStep1Valid}
-                className="w-full py-2.5 bg-[#7F77DD] text-white rounded-lg font-medium text-sm hover:bg-[#5B54A6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Continue
               </button>
 
               <p className="text-center text-sm text-gray-500">
                 Already have an account?{' '}
-                <Link href="/login" className="text-[#7F77DD] hover:underline">Log in</Link>
+                <Link href="/login" className="text-[var(--color-primary)] hover:underline">Log in</Link>
               </p>
             </div>
           )}
@@ -246,7 +246,7 @@ export default function SignupForm() {
               </div>
 
               <input type="text" placeholder="Workspace name" value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent" />
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
 
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Workspace URL</label>
@@ -258,7 +258,7 @@ export default function SignupForm() {
               </div>
 
               <select value={industry} onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#7F77DD] focus:border-transparent">
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Industry</option>
                 {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
               </select>
@@ -269,7 +269,7 @@ export default function SignupForm() {
 
               <div className="flex gap-3">
                 <button onClick={prevStep} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Back</button>
-                <button onClick={nextStep} className="flex-1 py-2.5 bg-[#7F77DD] text-white rounded-lg font-medium text-sm hover:bg-[#5B54A6]">Continue</button>
+                <button onClick={nextStep} className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)]">Continue</button>
               </div>
             </div>
           )}
@@ -286,7 +286,7 @@ export default function SignupForm() {
                 <span className={billingCycle === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}>Monthly</span>
                 <button
                   onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${billingCycle === 'annual' ? 'bg-[#7F77DD]' : 'bg-gray-300'}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${billingCycle === 'annual' ? 'bg-[var(--color-primary)]' : 'bg-gray-300'}`}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${billingCycle === 'annual' ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
@@ -304,7 +304,7 @@ export default function SignupForm() {
                     key={plan.slug}
                     onClick={() => setSelectedPlan(plan.slug)}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
-                      selectedPlan === plan.slug ? 'border-[#7F77DD] bg-[#7F77DD]/5' : 'border-gray-200 hover:border-gray-300'
+                      selectedPlan === plan.slug ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <p className="font-semibold text-gray-900">{plan.name}</p>
@@ -329,7 +329,7 @@ export default function SignupForm() {
                 <button
                   onClick={nextStep}
                   disabled={loading}
-                  className="flex-1 py-2.5 bg-[#7F77DD] text-white rounded-lg font-medium text-sm hover:bg-[#5B54A6] disabled:opacity-50"
+                  className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
                 >
                   {loading ? 'Creating account...' : selectedPlan === 'free' ? 'Start for free \u2192' : 'Continue to payment'}
                 </button>
@@ -340,8 +340,8 @@ export default function SignupForm() {
           {/* Step 3/4: Email verification */}
           {((step === 3 && accountType === 'individual') || (step === 4 && accountType === 'company')) && (
             <div className="space-y-6 text-center">
-              <div className="w-16 h-16 mx-auto bg-[#7F77DD]/10 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-[#7F77DD]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-16 h-16 mx-auto bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -355,7 +355,7 @@ export default function SignupForm() {
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resendingVerification}
-                className="text-sm text-[#7F77DD] hover:underline disabled:opacity-50"
+                className="text-sm text-[var(--color-primary)] hover:underline disabled:opacity-50"
               >
                 {resendingVerification ? 'Resending verification email...' : 'Resend verification email'}
               </button>

@@ -1,0 +1,25 @@
+.headerBorder {
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.tabButton {
+  color: rgb(100 116 139);
+  border-bottom: 2px solid transparent;
+}
+
+.tabButtonActive {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+.tabBadge {
+  background-color: var(--accent);
+}
+
+.barFill {
+  height: var(--bar-height, 6%);
+}
+
+.shareFill {
+  width: var(--share, 4%);
+}

@@ -26,8 +26,43 @@ async function main() {
   await seedTestimonials();
   // 10. Nav links
   await seedNavLinks();
+  // 11. Stock images (admin-editable via SystemConfig under category "stock_images")
+  await seedStockImages();
 
   console.log('\n✅ All seeds completed.');
+}
+
+// ─── Stock Images (admin-editable) ────────────────────────
+async function seedStockImages() {
+  console.log('🖼  Seeding stock image URLs...');
+  // Free Unsplash photos. Admins can swap these via /superadmin/settings → Stock Images.
+  // is_secret=false so they're returned to the public marketing site.
+  const stockImages: Array<{ key: string; value: string }> = [
+    { key: 'hero_dashboard', value: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&q=80' },
+    { key: 'hero_team', value: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80' },
+    { key: 'feature_compose', value: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1200&q=80' },
+    { key: 'feature_analytics', value: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80' },
+    { key: 'feature_collaboration', value: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&q=80' },
+    { key: 'feature_calendar', value: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1200&q=80' },
+    { key: 'feature_ai', value: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80' },
+    { key: 'feature_publishing', value: 'https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=1200&q=80' },
+    { key: 'about_office', value: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80' },
+    { key: 'about_team_meeting', value: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1600&q=80' },
+    { key: 'blog_default_cover', value: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80' },
+    { key: 'pricing_hero', value: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=80' },
+    { key: 'cta_background', value: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1600&q=80' },
+    { key: 'testimonial_default_avatar', value: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&q=80' },
+    { key: 'avatar_placeholder', value: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&q=80' },
+  ];
+
+  for (const img of stockImages) {
+    await prisma.systemConfig.upsert({
+      where: { key: img.key },
+      update: { value: img.value, category: 'stock_images', is_secret: false },
+      create: { key: img.key, value: img.value, category: 'stock_images', is_secret: false },
+    });
+  }
+  console.log(`   ✓ ${stockImages.length} stock image URLs seeded`);
 }
 
 // ─── Brand Config ─────────────────────────────────────────
@@ -765,6 +800,13 @@ async function seedFaq() {
     { question: 'Is there a free trial for paid plans?', answer: 'We don\'t offer traditional free trials, but our Free plan is available forever with no credit card required. This lets you try the core features before deciding to upgrade. All paid plans also come with a 14-day money-back guarantee.', order_index: 3 },
     { question: 'What is included in the Custom plan?', answer: 'The Custom plan is designed for agencies and enterprises with specific needs. It includes unlimited posts, unlimited connected accounts, unlimited team seats, white-label reports, API access, dedicated support, and a custom SLA. Contact our sales team to discuss your requirements.', order_index: 4 },
     { question: 'Do you offer discounts for NGOs or schools?', answer: 'Yes! We offer 50% off any paid plan for registered NGOs, educational institutions, and non-profit organisations. Contact us at sales@mymanager.app with proof of your organisation\'s status and we\'ll set up your discounted account within 24 hours.', order_index: 5 },
+    { question: 'How does scheduling across timezones work?', answer: 'You can pick any timezone when scheduling a post. The post is converted to UTC under the hood and published at the exact moment you specified, regardless of where you or your team are located.', order_index: 6 },
+    { question: 'Can multiple team members manage the same workspace?', answer: 'Absolutely. Invite teammates from Settings → Team. Each member can be an Owner, Admin, Editor, or Viewer with different permissions. Editors can create and schedule posts; viewers can only see analytics.', order_index: 7 },
+    { question: 'What social platforms do you support?', answer: 'We support Facebook, Instagram, X (Twitter), LinkedIn, TikTok, YouTube, Pinterest, Threads, WhatsApp Business, and Google Business Profile. New platforms are added based on customer demand.', order_index: 8 },
+    { question: 'Do you store my passwords or post content forever?', answer: 'We never store passwords for your social accounts — we use OAuth tokens that you can revoke at any time. Post content is encrypted at rest and you can delete any post or your entire workspace permanently from Settings → Privacy.', order_index: 9 },
+    { question: 'Can I import my existing content from Hootsuite or Buffer?', answer: 'Yes. Contact our support team and we can help you migrate scheduled posts, drafts, and media libraries from Hootsuite, Buffer, Later, or SproutSocial. Migration is free for paid plans.', order_index: 10 },
+    { question: 'How accurate are the analytics?', answer: 'Analytics are pulled directly from each platform\'s official API every 6 hours, so they match what you see in Facebook Insights, Instagram Insights, etc. Real-time analytics are available for Pro plans and above.', order_index: 11 },
+    { question: 'Is there a mobile app?', answer: 'Yes, myManager has native iOS and Android apps available on the App Store and Play Store. The mobile app supports composing, scheduling, approvals, and analytics — everything except admin settings.', order_index: 12 },
   ];
 
   for (const item of items) {
@@ -778,7 +820,7 @@ async function seedFaq() {
       await prisma.faqItem.create({ data: { ...item, page: 'pricing', category: 'general' } });
     }
   }
-  console.log('  ✓ 6 FAQ items');
+  console.log('  ✓ 13 FAQ items');
 }
 
 // ─── Testimonials ─────────────────────────────────────────
@@ -801,6 +843,30 @@ async function seedTestimonials() {
       author_avatar_color: '#EA580C', company: 'Dakar Fashion House', placement: 'pricing',
       quote: 'As a solo founder, I needed something affordable that could handle Instagram, TikTok, and Facebook. myManager\'s free plan let me start immediately, and the AI captions feature in French is incredible.',
       order_index: 2,
+    },
+    {
+      author_name: 'James Okello', author_role: 'Marketing Director', author_initials: 'JO',
+      author_avatar_color: '#2563EB', company: 'East African Bank', placement: 'features',
+      quote: 'The approvals workflow saved us from countless compliance headaches. Every post now goes through legal review before going live, and the audit trail is exactly what our regulators wanted.',
+      order_index: 3,
+    },
+    {
+      author_name: 'Amara Nwosu', author_role: 'Content Creator', author_initials: 'AN',
+      author_avatar_color: '#D97706', company: '@amara.lifestyle', placement: 'about',
+      quote: 'I post on 5 platforms every day and used to spend 3 hours managing it. With myManager I do the same work in 30 minutes. The AI hashtag suggestions alone are worth the price.',
+      order_index: 4,
+    },
+    {
+      author_name: 'Tendai Mukamuri', author_role: 'Operations Lead', author_initials: 'TM',
+      author_avatar_color: '#16A34A', company: 'Harare Wellness Co.', placement: 'home',
+      quote: 'We manage social for 12 wellness brands. The team collaboration features and per-client reporting let us scale without hiring more people. Mobile money support sealed the deal.',
+      order_index: 5,
+    },
+    {
+      author_name: 'Yusuf Hassan', author_role: 'Founder', author_initials: 'YH',
+      author_avatar_color: '#7F77DD', company: 'Mogadishu Tech Hub', placement: 'pricing',
+      quote: 'I run a small dev shop and we needed marketing tools that work in low-bandwidth environments. myManager loads fast even on 3G and the offline scheduling is perfect for our team.',
+      order_index: 6,
     },
   ];
 

@@ -3,6 +3,7 @@
 import { useAdminQueue } from '@/lib/hooks/useAdmin';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import styles from './QueueContent.module.css';
 
 export function QueueContent() {
   const { data, isLoading, dataUpdatedAt } = useAdminQueue();
@@ -98,8 +99,8 @@ export function QueueContent() {
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-24 rounded-full bg-gray-200">
                     <div
-                      className="h-2 rounded-full bg-brand-primary"
-                      style={{ width: `${job.progress}%` }}
+                      className={`h-2 rounded-full bg-brand-primary ${styles.progressFill}`}
+                      style={{ ['--progress' as string]: `${job.progress}%` } as React.CSSProperties}
                     />
                   </div>
                   <span className="text-xs text-gray-500">{job.progress}%</span>

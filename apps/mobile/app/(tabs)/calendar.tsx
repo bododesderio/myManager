@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { styles } from './calendar.styles';
 import { useState, useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
@@ -200,36 +201,3 @@ export default function CalendarScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: { paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  title: { fontSize: 24, fontWeight: '700', color: '#1a1a1a' },
-  monthNav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16 },
-  navArrow: { fontSize: 20, color: '#7F77DD', fontWeight: '600', paddingHorizontal: 8 },
-  monthLabel: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
-  weekHeader: { flexDirection: 'row', paddingHorizontal: 8 },
-  weekDay: { flex: 1, alignItems: 'center', paddingVertical: 8 },
-  weekDayText: { fontSize: 12, fontWeight: '600', color: '#999' },
-  daysGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 8 },
-  dayCell: { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' },
-  dayCellSelected: { backgroundColor: '#7F77DD', borderRadius: 20 },
-  dayCellToday: { borderWidth: 1, borderColor: '#7F77DD', borderRadius: 20 },
-  dayText: { fontSize: 14, color: '#1a1a1a' },
-  dayTextSelected: { color: '#fff', fontWeight: '600' },
-  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#7F77DD', marginTop: 2 },
-  events: { flex: 1, paddingHorizontal: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#eee' },
-  eventsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  eventsTitle: { fontSize: 16, fontWeight: '600', color: '#1a1a1a' },
-  newBtn: { paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#7F77DD', borderRadius: 6 },
-  newBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
-  emptyState: { alignItems: 'center', paddingVertical: 32 },
-  emptyText: { fontSize: 14, color: '#999' },
-  errorBox: { backgroundColor: '#FEE2E2', padding: 12, borderRadius: 8 },
-  errorText: { color: '#991B1B' },
-  retryText: { color: '#7F77DD', fontWeight: '600', marginTop: 4 },
-  postCard: { padding: 12, borderWidth: 1, borderColor: '#eee', borderRadius: 8, marginBottom: 8 },
-  postCaption: { fontSize: 14, fontWeight: '500', color: '#1a1a1a' },
-  postTime: { fontSize: 12, color: '#777', marginTop: 4 },
-  postPlatforms: { fontSize: 11, color: '#7F77DD', marginTop: 2 },
-});

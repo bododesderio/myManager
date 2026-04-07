@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Route } from 'next';
 import { MobileNavMenu } from './MobileNavMenu';
+import { MarketingNavLinks } from './MarketingNavLinks';
 import { fetchServerApi } from '@/lib/api/server';
 
 interface NavLink {
@@ -41,19 +41,8 @@ export async function MarketingNavbar() {
           <Image src="/images/logo.svg" alt={brand.app_name} width={140} height={32} priority />
         </Link>
 
-        {/* Center nav links — hidden on mobile */}
-        <ul className="hidden items-center gap-6 md:flex">
-          {links.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href as Route}
-                className="text-[13px] font-medium text-text-2 transition-colors hover:text-primary"
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {/* Center nav links — client island for active route highlight */}
+        <MarketingNavLinks links={links} />
 
         {/* Right actions — hidden on mobile */}
         <div className="hidden items-center gap-4 md:flex">

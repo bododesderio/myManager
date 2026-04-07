@@ -1,0 +1,95 @@
+.brandActive {
+  background-color: var(--color-brand-primary, #6366f1);
+}
+
+.brandText {
+  color: var(--color-brand-primary, #6366f1);
+}
+
+.brandBorder {
+  border-color: var(--color-brand-primary, #6366f1);
+}
+
+.tabActive {
+  border-color: var(--color-brand-primary, #6366f1);
+  color: var(--color-brand-primary, #6366f1);
+}
+
+.dynBg { background-color: var(--dyn-bg); }
+.dynFg { color: var(--dyn-fg); }
+.dynBorder { border-color: var(--dyn-border); }
+
+.previewCanvas {
+  background-color: var(--canvas-bg);
+  font-family: var(--canvas-font);
+  min-height: 420px;
+}
+
+.navBar {
+  background-color: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+  padding: var(--nav-padding);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.brandSquare { background-color: var(--sq-color); }
+
+.brandLabel {
+  color: var(--label-color);
+  font-family: var(--label-font);
+}
+
+.mutedBlock {
+  background-color: var(--block-color);
+  opacity: var(--block-opacity, 1);
+}
+
+.cta {
+  background-color: var(--cta-bg);
+  border-radius: var(--cta-radius);
+}
+
+.hero {
+  background-color: var(--hero-bg);
+  padding: var(--hero-padding);
+}
+
+.heroCta {
+  background-color: var(--cta-bg);
+  color: #fff;
+  border-radius: var(--cta-radius);
+}
+
+.cardsRow {
+  padding: var(--row-padding);
+}
+
+.previewCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+}
+
+.dashboardWrap {
+  min-height: 420px;
+}
+
+.sidebar {
+  background-color: var(--sb-bg);
+}
+
+.topbar {
+  background-color: var(--tb-bg);
+  border-bottom: 1px solid var(--tb-border);
+}
+
+.contentArea {
+  padding: var(--content-padding);
+}
+
+.tableRowBtn {
+  background-color: var(--row-bg);
+  border-radius: var(--row-radius);
+  opacity: var(--row-opacity, 1);
+}

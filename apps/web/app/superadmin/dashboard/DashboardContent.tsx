@@ -5,6 +5,7 @@ import type { Route } from 'next';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
+import styles from './DashboardContent.module.css';
 
 interface AdminMetricsResponse {
   mrr: number;
@@ -199,8 +200,8 @@ export default function DashboardContent() {
               <div key={row.month} className="flex flex-1 flex-col items-center gap-2">
                 <div className="text-xs text-gray-400">${Math.round(row.mrr).toLocaleString()}</div>
                 <div
-                  className="w-full rounded-t-md bg-brand-primary/80"
-                  style={{ height: `${Math.max((row.mrr / maxMrr) * 100, 6)}%` }}
+                  className={`w-full rounded-t-md bg-brand-primary/80 ${styles.barFill}`}
+                  style={{ ['--bar-height' as string]: `${Math.max((row.mrr / maxMrr) * 100, 6)}%` } as React.CSSProperties}
                 />
                 <div className="text-xs text-gray-500">{row.month.slice(5)}</div>
               </div>

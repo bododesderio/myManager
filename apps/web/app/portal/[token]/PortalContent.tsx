@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
+import styles from './PortalContent.module.css';
 
 type Tab = 'overview' | 'approvals' | 'calendar' | 'reports';
 
@@ -204,8 +205,8 @@ function OverviewTab({ data }: { data: PortalData }) {
               <div key={item.week} className="flex flex-1 flex-col items-center gap-2">
                 <div className="text-xs text-slate-400">{formatNumber(item.value)}</div>
                 <div
-                  className="w-full rounded-t-md bg-brand-primary/80"
-                  style={{ height: `${Math.max((item.value / maxReach) * 100, 6)}%` }}
+                  className={`w-full rounded-t-md bg-brand-primary/80 ${styles.barFill}`}
+                  style={{ ['--bar-height' as string]: `${Math.max((item.value / maxReach) * 100, 6)}%` } as React.CSSProperties}
                 />
                 <div className="text-xs text-slate-500">{item.week}</div>
               </div>
@@ -228,8 +229,8 @@ function OverviewTab({ data }: { data: PortalData }) {
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
-                      className="h-full rounded-full bg-brand-primary"
-                      style={{ width: `${Math.max(share, 4)}%` }}
+                      className={`h-full rounded-full bg-brand-primary ${styles.shareFill}`}
+                      style={{ ['--share' as string]: `${Math.max(share, 4)}%` } as React.CSSProperties}
                     />
                   </div>
                 </div>
@@ -526,7 +527,7 @@ export default function PortalContent({ token }: { token: string }) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b bg-white" style={{ borderColor: 'rgba(15, 23, 42, 0.08)' }}>
+      <header className={`border-b bg-white ${styles.headerBorder}`}>
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -547,7 +548,7 @@ export default function PortalContent({ token }: { token: string }) {
         </div>
       </header>
 
-      <nav className="border-b bg-white" style={{ borderColor: 'rgba(15, 23, 42, 0.08)' }}>
+      <nav className={`border-b bg-white ${styles.headerBorder}`}>
         <div className="mx-auto flex max-w-6xl gap-6 overflow-x-auto px-6">
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
@@ -556,17 +557,13 @@ export default function PortalContent({ token }: { token: string }) {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className="relative whitespace-nowrap py-4 text-sm font-semibold transition"
-                style={{
-                  color: active ? accent : 'rgb(100 116 139)',
-                  borderBottom: active ? `2px solid ${accent}` : '2px solid transparent',
-                }}
+                className={`relative whitespace-nowrap py-4 text-sm font-semibold transition ${active ? styles.tabButtonActive : styles.tabButton}`}
+                style={{ ['--accent' as string]: accent } as React.CSSProperties}
               >
                 {tab.label}
                 {tab.badge ? (
                   <span
-                    className="ml-2 rounded-full px-2 py-0.5 text-xs text-white"
-                    style={{ backgroundColor: accent }}
+                    className={`ml-2 rounded-full px-2 py-0.5 text-xs text-white ${styles.tabBadge}`}
                   >
                     {tab.badge}
                   </span>

@@ -13,6 +13,7 @@ import { RichTextEditor } from '@/components/RichTextEditor';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import styles from './BioContent.module.css';
 
 interface BioLink {
   id: string;
@@ -385,13 +386,13 @@ export function BioContent() {
                   }`}
                 >
                   <span
-                    className="inline-block h-4 w-4 rounded-full"
+                    className={`inline-block h-4 w-4 rounded-full ${styles.swatch}`}
                     style={{
-                      backgroundColor:
+                      ['--swatch-color' as string]:
                         color.value === 'brand-primary'
                           ? 'var(--color-brand-primary, #6366f1)'
                           : color.value,
-                    }}
+                    } as React.CSSProperties}
                   />
                   {color.name}
                 </button>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Redirect } from 'expo-router';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
+import { styles } from './index.styles';
 import { useAuthStore } from '@/store/authStore';
 
 export default function Index() {
@@ -20,12 +21,3 @@ export default function Index() {
 
   return <Redirect href={isAuthenticated ? '/(tabs)/home' : '/(auth)/login'} />;
 }
-
-const styles = StyleSheet.create({
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-});

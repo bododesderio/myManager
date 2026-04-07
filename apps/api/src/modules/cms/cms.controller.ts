@@ -49,6 +49,13 @@ export class CmsController {
     return this.cmsService.getPublicPage(slug);
   }
 
+  @Get('cms/stock-images')
+  @Public()
+  @ApiOperation({ summary: 'Get all stock image URLs (admin-editable, public)' })
+  async getStockImages() {
+    return this.cmsService.getStockImages();
+  }
+
   // ───────────────────────────────────────────────
   // Admin endpoints
   // ───────────────────────────────────────────────

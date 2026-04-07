@@ -1,0 +1,33 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  header: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff',
+    borderBottomWidth: 1, borderBottomColor: '#eee',
+  },
+  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
+  saveText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  content: { flex: 1, padding: 16 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  section: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#f9f9f9', marginBottom: 12 },
+  textArea: { minHeight: 80, textAlignVertical: 'top' },
+  addLinkText: { color: '#7F77DD', fontSize: 14, fontWeight: '600' },
+  linkCard: { backgroundColor: '#f9f9f9', borderRadius: 8, padding: 12, marginBottom: 8 },
+  linkInput: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#eee', borderRadius: 6, padding: 8, marginBottom: 6, fontSize: 14 },
+  removeLinkText: { color: '#F44336', fontSize: 13, fontWeight: '600', alignSelf: 'flex-end' },
+  emptyState: { alignItems: 'center', paddingVertical: 20 },
+  emptyText: { fontSize: 14, color: '#999' },
+  previewContainer: { alignItems: 'center', paddingVertical: 24, backgroundColor: '#f9f9f9', borderRadius: 12 },
+  previewAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#7F77DD', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  previewAvatarText: { color: '#fff', fontSize: 24, fontWeight: '700' },
+  previewTitle: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginBottom: 4 },
+  previewDescription: { fontSize: 14, color: '#666', marginBottom: 12 },
+  previewLinkPill: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginTop: 6, borderWidth: 1, borderColor: '#eee' },
+  previewLinkText: { color: '#1a1a1a', fontSize: 14, fontWeight: '500' },
+});

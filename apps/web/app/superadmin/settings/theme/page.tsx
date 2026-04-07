@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import styles from './page.module.css';
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -204,10 +205,9 @@ function PillToggle<T extends string>({
           onClick={() => onChange(opt.value)}
           className={`px-3 py-1.5 text-xs font-medium transition ${
             value === opt.value
-              ? 'bg-brand-primary text-white'
+              ? `bg-brand-primary text-white ${styles.brandActive}`
               : 'bg-white text-gray-600 hover:bg-gray-50'
           }`}
-          style={value === opt.value ? { backgroundColor: 'var(--color-brand-primary, #6366f1)' } : undefined}
         >
           {opt.label}
         </button>
@@ -352,14 +352,9 @@ export default function AdminThemeSettingsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
-                ? 'border-b-2 text-brand-primary'
+                ? `border-b-2 text-brand-primary ${styles.tabActive}`
                 : 'text-gray-500 hover:text-gray-700'
             }`}
-            style={
-              activeTab === tab.key
-                ? { borderColor: 'var(--color-brand-primary, #6366f1)', color: 'var(--color-brand-primary, #6366f1)' }
-                : undefined
-            }
           >
             {tab.label}
           </button>
@@ -432,13 +427,11 @@ function PresetsPanel({
         return (
           <div
             key={preset.id}
-            className="relative rounded-brand border bg-white p-4 shadow-sm transition hover:shadow-md"
-            style={{ borderColor: isActive ? 'var(--color-brand-primary, #6366f1)' : undefined }}
+            className={`relative rounded-brand border bg-white p-4 shadow-sm transition hover:shadow-md ${isActive ? styles.brandBorder : ''}`}
           >
             {isActive && (
               <span
-                className="absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold text-white"
-                style={{ backgroundColor: 'var(--color-brand-primary, #6366f1)' }}
+                className={`absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold text-white ${styles.brandActive}`}
               >
                 Active
               </span>
@@ -446,21 +439,21 @@ function PresetsPanel({
 
             {/* Mini preview */}
             <div
-              className="mb-3 flex h-16 overflow-hidden rounded"
-              style={{ backgroundColor: preset.colors.background }}
+              className={`mb-3 flex h-16 overflow-hidden rounded ${styles.dynBg}`}
+              style={{ ['--dyn-bg' as string]: preset.colors.background } as React.CSSProperties}
             >
               <div
-                className="w-6"
-                style={{ backgroundColor: preset.colors.primaryDark }}
+                className={`w-6 ${styles.dynBg}`}
+                style={{ ['--dyn-bg' as string]: preset.colors.primaryDark } as React.CSSProperties}
               />
               <div className="flex flex-1 flex-col">
                 <div
-                  className="h-6"
-                  style={{ backgroundColor: preset.colors.primary }}
+                  className={`h-6 ${styles.dynBg}`}
+                  style={{ ['--dyn-bg' as string]: preset.colors.primary } as React.CSSProperties}
                 />
                 <div
-                  className="flex-1"
-                  style={{ backgroundColor: preset.colors.surface }}
+                  className={`flex-1 ${styles.dynBg}`}
+                  style={{ ['--dyn-bg' as string]: preset.colors.surface } as React.CSSProperties}
                 />
               </div>
             </div>
@@ -473,8 +466,8 @@ function PresetsPanel({
               {preset.swatches.map((swatch, i) => (
                 <span
                   key={i}
-                  className="inline-block h-5 w-5 rounded-full border border-gray-200"
-                  style={{ backgroundColor: swatch }}
+                  className={`inline-block h-5 w-5 rounded-full border border-gray-200 ${styles.dynBg}`}
+                  style={{ ['--dyn-bg' as string]: swatch } as React.CSSProperties}
                 />
               ))}
             </div>
@@ -486,9 +479,8 @@ function PresetsPanel({
               className={`mt-4 w-full rounded-brand px-3 py-1.5 text-xs font-semibold transition ${
                 isActive
                   ? 'cursor-default bg-gray-100 text-gray-400'
-                  : 'bg-brand-primary text-white hover:opacity-90'
+                  : `bg-brand-primary text-white hover:opacity-90 ${styles.brandActive}`
               }`}
-              style={!isActive ? { backgroundColor: 'var(--color-brand-primary, #6366f1)' } : undefined}
             >
               {isActive ? 'Currently active' : 'Apply preset'}
             </button>
@@ -509,7 +501,7 @@ function PresetsPanel({
         </div>
         <h3 className="font-heading text-sm font-semibold text-gray-700">Custom Theme</h3>
         <p className="mt-0.5 text-xs text-gray-500">Build your own from scratch</p>
-        <span className="mt-3 text-xs font-semibold text-brand-primary" style={{ color: 'var(--color-brand-primary, #6366f1)' }}>
+        <span className={`mt-3 text-xs font-semibold text-brand-primary ${styles.brandText}`}>
           Open theme builder &rarr;
         </span>
       </button>
@@ -720,31 +712,34 @@ function BuilderPanel({
         </div>
 
         <div
-          className="flex-1 overflow-hidden rounded-brand border shadow-sm"
+          className={`flex-1 overflow-hidden rounded-brand border shadow-sm ${styles.previewCanvas}`}
           style={{
-            backgroundColor: colors.background,
-            fontFamily: typography.bodyFont,
-            minHeight: 420,
-          }}
+            ['--canvas-bg' as string]: colors.background,
+            ['--canvas-font' as string]: typography.bodyFont,
+          } as React.CSSProperties}
         >
           {previewScope === 'marketing' ? (
             /* Marketing preview */
             <div className="flex h-full flex-col">
               {/* Nav bar */}
               <div
-                className="flex items-center justify-between px-4"
-                style={{ backgroundColor: colors.surface, borderBottom: `1px solid ${colors.border}`, padding: densityPadding, paddingTop: '8px', paddingBottom: '8px' }}
+                className={`flex items-center justify-between px-4 ${styles.navBar}`}
+                style={{
+                  ['--nav-bg' as string]: colors.surface,
+                  ['--nav-border' as string]: colors.border,
+                  ['--nav-padding' as string]: densityPadding,
+                } as React.CSSProperties}
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-6 w-6 rounded" style={{ backgroundColor: colors.primary }} />
-                  <span className="text-sm font-semibold" style={{ color: colors.textPrimary, fontFamily: typography.headingFont }}>Brand</span>
+                  <div className={`h-6 w-6 rounded ${styles.brandSquare}`} style={{ ['--sq-color' as string]: colors.primary } as React.CSSProperties} />
+                  <span className={`text-sm font-semibold ${styles.brandLabel}`} style={{ ['--label-color' as string]: colors.textPrimary, ['--label-font' as string]: typography.headingFont } as React.CSSProperties}>Brand</span>
                 </div>
                 <div className="flex gap-2">
-                  <div className="h-3 w-10 rounded" style={{ backgroundColor: colors.textMuted, opacity: 0.4 }} />
-                  <div className="h-3 w-10 rounded" style={{ backgroundColor: colors.textMuted, opacity: 0.4 }} />
+                  <div className={`h-3 w-10 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textMuted, ['--block-opacity' as string]: '0.4' } as React.CSSProperties} />
+                  <div className={`h-3 w-10 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textMuted, ['--block-opacity' as string]: '0.4' } as React.CSSProperties} />
                   <div
-                    className="h-6 px-3 flex items-center text-xs text-white font-medium"
-                    style={{ backgroundColor: colors.primary, borderRadius: radiusValue(radius.button) }}
+                    className={`h-6 px-3 flex items-center text-xs text-white font-medium ${styles.cta}`}
+                    style={{ ['--cta-bg' as string]: colors.primary, ['--cta-radius' as string]: radiusValue(radius.button) } as React.CSSProperties}
                   >
                     CTA
                   </div>
@@ -752,95 +747,98 @@ function BuilderPanel({
               </div>
 
               {/* Hero */}
-              <div className="flex flex-col items-center justify-center py-10" style={{ backgroundColor: colors.primary, padding: densityPadding }}>
-                <div className="h-4 w-48 rounded" style={{ backgroundColor: colors.primaryLight, opacity: 0.5 }} />
-                <div className="mt-2 h-3 w-64 rounded" style={{ backgroundColor: colors.primaryLight, opacity: 0.3 }} />
+              <div
+                className={`flex flex-col items-center justify-center py-10 ${styles.hero}`}
+                style={{ ['--hero-bg' as string]: colors.primary, ['--hero-padding' as string]: densityPadding } as React.CSSProperties}
+              >
+                <div className={`h-4 w-48 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.primaryLight, ['--block-opacity' as string]: '0.5' } as React.CSSProperties} />
+                <div className={`mt-2 h-3 w-64 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.primaryLight, ['--block-opacity' as string]: '0.3' } as React.CSSProperties} />
                 <div
-                  className="mt-4 h-8 px-5 flex items-center text-xs font-semibold"
-                  style={{ backgroundColor: colors.accent, color: '#fff', borderRadius: radiusValue(radius.button) }}
+                  className={`mt-4 h-8 px-5 flex items-center text-xs font-semibold ${styles.heroCta}`}
+                  style={{ ['--cta-bg' as string]: colors.accent, ['--cta-radius' as string]: radiusValue(radius.button) } as React.CSSProperties}
                 >
                   Get Started
                 </div>
               </div>
 
               {/* Cards row */}
-              <div className="flex gap-3 p-4" style={{ padding: densityPadding }}>
+              <div className={`flex gap-3 p-4 ${styles.cardsRow}`} style={{ ['--row-padding' as string]: densityPadding } as React.CSSProperties}>
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="flex-1 p-3"
+                    className={`flex-1 p-3 ${styles.previewCard}`}
                     style={{
-                      backgroundColor: colors.surface,
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: radiusValue(radius.card),
-                    }}
+                      ['--card-bg' as string]: colors.surface,
+                      ['--card-border' as string]: colors.border,
+                      ['--card-radius' as string]: radiusValue(radius.card),
+                    } as React.CSSProperties}
                   >
-                    <div className="h-3 w-16 rounded" style={{ backgroundColor: colors.textPrimary, opacity: 0.15 }} />
-                    <div className="mt-2 h-2 w-full rounded" style={{ backgroundColor: colors.textMuted, opacity: 0.2 }} />
-                    <div className="mt-1 h-2 w-3/4 rounded" style={{ backgroundColor: colors.textMuted, opacity: 0.15 }} />
+                    <div className={`h-3 w-16 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textPrimary, ['--block-opacity' as string]: '0.15' } as React.CSSProperties} />
+                    <div className={`mt-2 h-2 w-full rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textMuted, ['--block-opacity' as string]: '0.2' } as React.CSSProperties} />
+                    <div className={`mt-1 h-2 w-3/4 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textMuted, ['--block-opacity' as string]: '0.15' } as React.CSSProperties} />
                   </div>
                 ))}
               </div>
             </div>
           ) : (
             /* Dashboard preview */
-            <div className="flex h-full" style={{ minHeight: 420 }}>
+            <div className={`flex h-full ${styles.dashboardWrap}`}>
               {/* Sidebar */}
-              <div className="w-14 shrink-0 flex flex-col items-center gap-3 py-3" style={{ backgroundColor: colors.primaryDark }}>
-                <div className="h-6 w-6 rounded" style={{ backgroundColor: colors.primaryLight, opacity: 0.5 }} />
+              <div className={`w-14 shrink-0 flex flex-col items-center gap-3 py-3 ${styles.sidebar}`} style={{ ['--sb-bg' as string]: colors.primaryDark } as React.CSSProperties}>
+                <div className={`h-6 w-6 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.primaryLight, ['--block-opacity' as string]: '0.5' } as React.CSSProperties} />
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-5 w-5 rounded" style={{ backgroundColor: colors.primaryLight, opacity: i === 1 ? 0.8 : 0.25 }} />
+                  <div key={i} className={`h-5 w-5 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.primaryLight, ['--block-opacity' as string]: i === 1 ? '0.8' : '0.25' } as React.CSSProperties} />
                 ))}
               </div>
 
               <div className="flex-1 flex flex-col">
                 {/* Top bar */}
                 <div
-                  className="flex items-center justify-between px-4 py-2"
-                  style={{ backgroundColor: colors.surface, borderBottom: `1px solid ${colors.border}` }}
+                  className={`flex items-center justify-between px-4 py-2 ${styles.topbar}`}
+                  style={{ ['--tb-bg' as string]: colors.surface, ['--tb-border' as string]: colors.border } as React.CSSProperties}
                 >
-                  <div className="h-3 w-24 rounded" style={{ backgroundColor: colors.textPrimary, opacity: 0.15 }} />
-                  <div className="h-6 w-6 rounded-full" style={{ backgroundColor: colors.primary, opacity: 0.3 }} />
+                  <div className={`h-3 w-24 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textPrimary, ['--block-opacity' as string]: '0.15' } as React.CSSProperties} />
+                  <div className={`h-6 w-6 rounded-full ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.primary, ['--block-opacity' as string]: '0.3' } as React.CSSProperties} />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 p-4 space-y-3" style={{ padding: densityPadding }}>
+                <div className={`flex-1 p-4 space-y-3 ${styles.contentArea}`} style={{ ['--content-padding' as string]: densityPadding } as React.CSSProperties}>
                   {/* Stat cards */}
                   <div className="flex gap-3">
                     {[colors.primary, colors.accent, colors.primaryLight].map((c, i) => (
                       <div
                         key={i}
-                        className="flex-1 p-3"
+                        className={`flex-1 p-3 ${styles.previewCard}`}
                         style={{
-                          backgroundColor: colors.surface,
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: radiusValue(radius.card),
-                        }}
+                          ['--card-bg' as string]: colors.surface,
+                          ['--card-border' as string]: colors.border,
+                          ['--card-radius' as string]: radiusValue(radius.card),
+                        } as React.CSSProperties}
                       >
-                        <div className="h-2 w-10 rounded" style={{ backgroundColor: colors.textMuted, opacity: 0.3 }} />
-                        <div className="mt-2 h-4 w-12 rounded" style={{ backgroundColor: c, opacity: 0.6 }} />
+                        <div className={`h-2 w-10 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textMuted, ['--block-opacity' as string]: '0.3' } as React.CSSProperties} />
+                        <div className={`mt-2 h-4 w-12 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: c, ['--block-opacity' as string]: '0.6' } as React.CSSProperties} />
                       </div>
                     ))}
                   </div>
 
                   {/* Table placeholder */}
                   <div
-                    className="p-3 space-y-2"
+                    className={`p-3 space-y-2 ${styles.previewCard}`}
                     style={{
-                      backgroundColor: colors.surface,
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: radiusValue(radius.card),
-                    }}
+                      ['--card-bg' as string]: colors.surface,
+                      ['--card-border' as string]: colors.border,
+                      ['--card-radius' as string]: radiusValue(radius.card),
+                    } as React.CSSProperties}
                   >
                     {[1, 2, 3, 4].map((row) => (
                       <div key={row} className="flex gap-3 items-center">
-                        <div className="h-2 w-1/4 rounded" style={{ backgroundColor: colors.textPrimary, opacity: row === 1 ? 0.2 : 0.08 }} />
-                        <div className="h-2 w-1/3 rounded" style={{ backgroundColor: colors.textSecondary, opacity: row === 1 ? 0.15 : 0.06 }} />
-                        <div className="h-2 w-1/6 rounded" style={{ backgroundColor: colors.textMuted, opacity: row === 1 ? 0.15 : 0.06 }} />
+                        <div className={`h-2 w-1/4 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textPrimary, ['--block-opacity' as string]: row === 1 ? '0.2' : '0.08' } as React.CSSProperties} />
+                        <div className={`h-2 w-1/3 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textSecondary, ['--block-opacity' as string]: row === 1 ? '0.15' : '0.06' } as React.CSSProperties} />
+                        <div className={`h-2 w-1/6 rounded ${styles.mutedBlock}`} style={{ ['--block-color' as string]: colors.textMuted, ['--block-opacity' as string]: row === 1 ? '0.15' : '0.06' } as React.CSSProperties} />
                         <div className="flex-1" />
                         <div
-                          className="h-5 w-12 flex items-center justify-center text-[9px] text-white font-medium"
-                          style={{ backgroundColor: row === 1 ? colors.primary : 'transparent', borderRadius: radiusValue(radius.button), opacity: row === 1 ? 1 : 0 }}
+                          className={`h-5 w-12 flex items-center justify-center text-[9px] text-white font-medium ${styles.tableRowBtn}`}
+                          style={{ ['--row-bg' as string]: row === 1 ? colors.primary : 'transparent', ['--row-radius' as string]: radiusValue(radius.button), ['--row-opacity' as string]: row === 1 ? '1' : '0' } as React.CSSProperties}
                         >
                           {row === 1 ? 'View' : ''}
                         </div>
@@ -874,8 +872,7 @@ function BuilderPanel({
               type="button"
               onClick={onSave}
               disabled={saving}
-              className="rounded-brand px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-              style={{ backgroundColor: 'var(--color-brand-primary, #6366f1)' }}
+              className={`rounded-brand px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50 ${styles.brandActive}`}
             >
               {saving ? 'Saving...' : 'Save & apply platform-wide \u2192'}
             </button>
@@ -923,9 +920,8 @@ function ModeScopePanel({
             <label
               key={opt.value}
               className={`flex cursor-pointer items-start gap-3 rounded-brand border p-3 transition ${
-                defaultMode === opt.value ? 'border-brand-primary bg-indigo-50/50' : 'border-gray-200 hover:border-gray-300'
+                defaultMode === opt.value ? `border-brand-primary bg-indigo-50/50 ${styles.brandBorder}` : 'border-gray-200 hover:border-gray-300'
               }`}
-              style={defaultMode === opt.value ? { borderColor: 'var(--color-brand-primary, #6366f1)' } : undefined}
             >
               <input
                 type="radio"
@@ -959,9 +955,8 @@ function ModeScopePanel({
             aria-checked={allowUserOverride}
             onClick={() => onToggleOverride(!allowUserOverride)}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
-              allowUserOverride ? 'bg-brand-primary' : 'bg-gray-300'
+              allowUserOverride ? `bg-brand-primary ${styles.brandActive}` : 'bg-gray-300'
             }`}
-            style={allowUserOverride ? { backgroundColor: 'var(--color-brand-primary, #6366f1)' } : undefined}
           >
             <span
               className={`pointer-events-none inline-block h-5 w-5 translate-y-0.5 rounded-full bg-white shadow transition-transform ${
