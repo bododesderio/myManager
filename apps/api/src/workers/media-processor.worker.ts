@@ -6,7 +6,6 @@ import { promisify } from 'util';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-// @ts-expect-error sharp types not installed
 import sharp from 'sharp';
 
 const execFileAsync = promisify(execFile);
