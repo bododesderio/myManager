@@ -2,6 +2,12 @@ import type { ReactNode } from 'react';
 import { MarketingNavbar } from '@/components/marketing/MarketingNavbar';
 import { MarketingFooter } from '@/components/marketing/MarketingFooter';
 
+// Force dynamic rendering for the entire marketing tree so the navbar/footer
+// always fetch fresh CMS data from the API. Otherwise Next.js builds these
+// pages statically inside the docker build sandbox where the API isn't
+// reachable, baking in empty fallbacks.
+export const dynamic = 'force-dynamic';
+
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <div

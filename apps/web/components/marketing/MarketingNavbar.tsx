@@ -23,7 +23,12 @@ async function getNavLinks(): Promise<NavLink[]> {
     {},
     { label: 'marketing nav links' },
   );
-  return data.main_nav ?? [];
+  // Always prepend Home so users have an obvious way back to the landing page.
+  // Filter out any duplicate Home from the CMS payload.
+  const cmsLinks = (data.main_nav ?? []).filter(
+    (l) => l.href !== '/' && l.label.toLowerCase() !== 'home',
+  );
+  return [{ label: 'Home', href: '/' }, ...cmsLinks];
 }
 
 async function getBrand(): Promise<BrandConfig> {
@@ -48,13 +53,13 @@ export async function MarketingNavbar() {
         <div className="hidden items-center gap-4 md:flex">
           <Link
             href="/login"
-            className="text-[13px] text-text-2 transition-colors hover:text-primary"
+            className="text-[13px] font-semibold text-text transition-colors hover:text-primary"
           >
             Sign in
           </Link>
           <Link
             href="/signup"
-            className="rounded-btn bg-primary px-4 py-2 text-[11px] font-bold text-white transition hover:bg-[var(--color-primary-dark)] hover:shadow-lg"
+            className="rounded-btn bg-primary px-4 py-2 text-[11px] font-bold text-white shadow-md transition hover:bg-[var(--color-primary-dark)] hover:shadow-lg"
           >
             Get started free
           </Link>

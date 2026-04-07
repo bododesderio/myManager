@@ -46,7 +46,7 @@ export function MobileNavMenu({ links }: MobileNavMenuProps) {
                 <Link
                   href={link.href as Route}
                   onClick={() => setOpen(false)}
-                  className="block text-[13px] font-medium text-text-2 transition-colors hover:text-primary"
+                  className="block text-[14px] font-semibold text-text transition-colors hover:text-primary"
                 >
                   {link.label}
                 </Link>
@@ -58,7 +58,7 @@ export function MobileNavMenu({ links }: MobileNavMenuProps) {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="text-[13px] text-text-2 transition-colors hover:text-primary"
+              className="text-[14px] font-semibold text-text transition-colors hover:text-primary"
             >
               Sign in
             </Link>
