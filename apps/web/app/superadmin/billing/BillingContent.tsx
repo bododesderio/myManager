@@ -30,13 +30,13 @@ export function BillingContent() {
         <h1 className="font-heading text-2xl font-bold">Billing Management</h1>
         <div className="flex gap-2">
           <Link
-            href="/admin/billing/overrides"
+            href="/superadmin/billing/overrides"
             className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
           >
             Overrides
           </Link>
           <Link
-            href="/admin/billing/leads"
+            href="/superadmin/billing/leads"
             className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
           >
             Leads

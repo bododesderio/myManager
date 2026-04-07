@@ -89,11 +89,19 @@ export function LoginForm() {
       const session = await sessionRes.json();
 
       if (session?.user?.is_superadmin) {
-        router.push('/admin/dashboard' as Route);
-      } else {
-        const callbackUrl = getSafeRedirectUrl(searchParams.get('next') || searchParams.get('callbackUrl'));
-        router.push(callbackUrl as Route);
+        // Workspace login is for workspace users only. Superadmins must use /superadmin/login.
+        // Clear the session that NextAuth just created and surface a clear error.
+        const { signOut } = await import('next-auth/react');
+        await signOut({ redirect: false });
+        setError(
+          'Superadmin accounts cannot use the workspace portal. Please sign in at /superadmin/login instead.',
+        );
+        setLoading(false);
+        return;
       }
+
+      const callbackUrl = getSafeRedirectUrl(searchParams.get('next') || searchParams.get('callbackUrl'));
+      router.push(callbackUrl as Route);
       router.refresh();
     } catch {
       setError('Something went wrong. Please try again.');

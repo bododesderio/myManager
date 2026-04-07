@@ -14,11 +14,18 @@ export function middleware(request: NextRequest) {
     request.cookies.get('__Secure-next-auth.session-token')?.value;
 
   const isPortalRoute = pathname.startsWith('/portal');
-  const isAdminRoute = pathname.startsWith('/admin');
+  const isSuperadminRoute = pathname.startsWith('/superadmin');
+  const isLegacyAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
   const isUserRoute = pathname.startsWith('/user');
   const isProtectedDashboardRoute = isDashboardRoute(pathname);
   const isCheckoutRoute = pathname.startsWith('/signup/checkout');
   const isPublicAuthRoute = isAuthRoute(pathname);
+
+  // 301 redirect legacy /admin/* to /superadmin/* (after rename)
+  if (isLegacyAdminRoute) {
+    const newPath = pathname.replace(/^\/admin/, '/superadmin') || '/superadmin/dashboard';
+    return NextResponse.redirect(new URL(newPath, request.url), 301);
+  }
 
   const accountStatus = request.cookies.get('account_status')?.value;
   const isPendingPayment = accountStatus === 'PENDING_PAYMENT';
@@ -48,14 +55,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  if ((isAdminRoute || isUserRoute || isProtectedDashboardRoute) && !token) {
-    const url = new URL('/login', request.url);
+  if ((isSuperadminRoute || isUserRoute || isProtectedDashboardRoute) && !token) {
+    const url = new URL(isSuperadminRoute ? '/superadmin/login' : '/login', request.url);
     url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
   }
 
-  if (pathname === '/admin') {
-    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  if (pathname === '/superadmin') {
+    return NextResponse.redirect(new URL('/superadmin/dashboard', request.url));
   }
 
   return NextResponse.next();
@@ -65,6 +72,8 @@ export const config = {
   matcher: [
     '/admin',
     '/admin/:path*',
+    '/superadmin',
+    '/superadmin/:path*',
     '/user/:path*',
     '/home',
     '/home/:path*',

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/store/authStore';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SettingsItem {
   label: string;
@@ -19,14 +20,15 @@ const settingsItems: SettingsItem[] = [
 ];
 
 export default function SettingsScreen() {
-  const { user, clearAuth } = useAuthStore();
+  const { user } = useAuthStore();
+  const { logout } = useAuth();
 
   const displayName = user?.name || 'User';
   const displayEmail = user?.email || 'Not signed in';
   const avatarInitial = displayName.charAt(0).toUpperCase();
 
-  const handleSignOut = () => {
-    clearAuth();
+  const handleSignOut = async () => {
+    await logout();
     router.replace('/');
   };
 

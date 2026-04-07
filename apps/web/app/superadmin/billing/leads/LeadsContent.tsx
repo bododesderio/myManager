@@ -18,7 +18,7 @@ export function LeadsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/billing" className="text-sm text-brand-primary hover:underline">
+        <Link href="/superadmin/billing" className="text-sm text-brand-primary hover:underline">
           &larr; Billing
         </Link>
       </div>

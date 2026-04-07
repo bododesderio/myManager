@@ -14,7 +14,7 @@ export function PlansContent() {
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">Plans</h1>
         <Link
-          href="/admin/plans/new"
+          href="/superadmin/plans/new"
           className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
         >
           Create Plan

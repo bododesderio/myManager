@@ -21,7 +21,7 @@ export const authRoutePrefixes = ['/login', '/signup', '/reset-password', '/veri
 
 export const middlewareMatcher = [
   '/admin',
-  '/admin/:path*',
+  '/superadmin/:path*',
   '/user/:path*',
   '/home',
   '/home/:path*',

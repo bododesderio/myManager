@@ -83,7 +83,7 @@ export function PlanEditContent({ id }: { id: string }) {
   if (!plan) {
     return (
       <div className="space-y-4">
-        <Link href="/admin/plans" className="text-sm text-brand-primary hover:underline">&larr; Plans</Link>
+        <Link href="/superadmin/plans" className="text-sm text-brand-primary hover:underline">&larr; Plans</Link>
         <p className="text-gray-500">Plan not found.</p>
       </div>
     );
@@ -92,7 +92,7 @@ export function PlanEditContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/plans" className="text-sm text-brand-primary hover:underline">
+        <Link href="/superadmin/plans" className="text-sm text-brand-primary hover:underline">
           &larr; Plans
         </Link>
       </div>

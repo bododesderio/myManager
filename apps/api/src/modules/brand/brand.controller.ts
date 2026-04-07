@@ -1,6 +1,8 @@
 import { Controller, Get, Put, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { BrandService } from './brand.service';
+import { SuperAdmin } from '../../common/decorators/super-admin.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('Brand')
 @Controller('brand')
@@ -8,14 +10,16 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get platform brand configuration (public, cached)' })
   async getPlatformBrand() {
     return this.brandService.getPlatformBrand();
   }
 
   @Put()
+  @SuperAdmin()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update platform brand configuration (superadmin)' })
+  @ApiOperation({ summary: 'Update platform brand configuration (superadmin only)' })
   async updatePlatformBrand(@Body() body: Record<string, unknown>) {
     return this.brandService.updatePlatformBrand(body);
   }

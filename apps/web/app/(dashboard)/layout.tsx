@@ -25,6 +25,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     redirect('/login');
   }
 
+  // Superadmin and workspace users are mutually exclusive: superadmins must use the
+  // /superadmin portal. They are not permitted to act as a workspace user without
+  // logging out first. (See /superadmin/layout.tsx for the inverse check.)
+  if (session.user.is_superadmin) {
+    redirect('/superadmin/dashboard');
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Suspense fallback={<div className="w-16 shrink-0 border-r border-border bg-bg" />}>

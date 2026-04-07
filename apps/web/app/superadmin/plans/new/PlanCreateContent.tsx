@@ -50,7 +50,7 @@ export function PlanCreateContent() {
       {
         onSuccess: () => {
           toast({ title: 'Plan created', variant: 'success' });
-          router.push('/admin/plans' as Route);
+          router.push('/superadmin/plans' as Route);
         },
         onError: () => toast({ title: 'Failed to create plan', variant: 'error' }),
       },
@@ -60,7 +60,7 @@ export function PlanCreateContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/plans" className="text-sm text-brand-primary hover:underline">
+        <Link href="/superadmin/plans" className="text-sm text-brand-primary hover:underline">
           &larr; Plans
         </Link>
       </div>

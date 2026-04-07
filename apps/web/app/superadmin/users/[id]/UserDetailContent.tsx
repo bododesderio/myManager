@@ -63,7 +63,7 @@ export function UserDetailContent({ id }: { id: string }) {
   if (!user) {
     return (
       <div className="space-y-4">
-        <Link href="/admin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
+        <Link href="/superadmin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
         <p className="text-gray-500">User not found.</p>
       </div>
     );
@@ -72,7 +72,7 @@ export function UserDetailContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
+        <Link href="/superadmin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
       </div>
 
       <div className="flex items-center justify-between">

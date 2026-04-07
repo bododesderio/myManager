@@ -264,7 +264,7 @@ export function PageEditorContent({ slug }: { slug: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/content/pages" className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+        <Link href="/superadmin/content/pages" className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>

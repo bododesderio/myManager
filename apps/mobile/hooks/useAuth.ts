@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   name: string;
   avatarUrl?: string;
+  is_superadmin?: boolean;
 }
 
 interface LoginResponse {
@@ -43,6 +44,12 @@ export function useAuth() {
           email,
           password,
         });
+        if (data.user.is_superadmin) {
+          setLoading(false);
+          throw new Error(
+            'Superadmin accounts cannot sign in on mobile. Please use the web admin portal.',
+          );
+        }
         setAuth(data.user, data.accessToken);
       } catch (error) {
         setLoading(false);
