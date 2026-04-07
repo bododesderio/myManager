@@ -191,6 +191,41 @@ Caption: ${data.caption}`,
     return { predictionId: response.data.id, status: response.data.status, creditsUsed: 5 };
   }
 
+  async checkGrammar(text: string, language: string = 'en-US') {
+    if (!text || text.trim().length === 0) {
+      return { matches: [], language, configured: false };
+    }
+    const url = this.configService.get<string>('LANGUAGETOOL_URL');
+    if (!url) {
+      return {
+        matches: [],
+        language,
+        configured: false,
+        message: 'LANGUAGETOOL_URL not configured; grammar check is disabled.',
+      };
+    }
+    try {
+      const params = new URLSearchParams({ text, language });
+      const res = await axios.post(`${url}/v2/check`, params.toString(), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: 10000,
+      });
+      const matches = (res.data?.matches ?? []).map((m: any) => ({
+        message: m.message,
+        shortMessage: m.shortMessage,
+        offset: m.offset,
+        length: m.length,
+        replacements: (m.replacements ?? []).slice(0, 5).map((r: any) => r.value),
+        rule: m.rule?.id,
+        category: m.rule?.category?.name,
+      }));
+      return { matches, language, configured: true };
+    } catch (err) {
+      this.logger.warn(`LanguageTool check failed: ${(err as Error).message}`);
+      return { matches: [], language, configured: true, error: (err as Error).message };
+    }
+  }
+
   async getCredits(userId: string, _workspaceId: string) {
     const used = await this.repository.getMonthlyUsage(userId);
     const limit = await this.repository.getCreditLimit(userId);

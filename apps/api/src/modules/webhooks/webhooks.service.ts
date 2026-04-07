@@ -31,23 +31,27 @@ export class WebhooksService {
 
   async create(
     userId: string,
-    data: { workspaceId: string; url: string; events: string[]; secret?: string },
+    data: { workspaceId: string; url: string; events: string[]; secret?: string; provider?: string },
   ) {
     const secret = data.secret || crypto.randomBytes(32).toString('hex');
+    const provider = ['generic', 'slack', 'zapier', 'make'].includes(data.provider ?? '')
+      ? data.provider!
+      : 'generic';
     const endpoint = await this.repository.create({
       workspace_id: data.workspaceId,
       url: data.url,
       events: data.events,
       secret,
       is_active: true,
-    });
+      provider,
+    } as any);
 
     await this.auditService.log('webhook_endpoint_created', {
       userId,
       workspaceId: data.workspaceId,
       resourceType: 'webhook_endpoint',
       resourceId: endpoint.id,
-      metadata: { url: data.url, events: data.events },
+      metadata: { url: data.url, events: data.events, provider },
     });
 
     return endpoint;

@@ -1,0 +1,81 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Active users",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "mymanager_active_users", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" } } }
+    },
+    {
+      "type": "stat",
+      "title": "Active subscriptions",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "mymanager_subscriptions_active", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "API uptime (s)",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "mymanager_api_uptime_seconds", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "Heap used (MB)",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "mymanager_nodejs_heap_used_bytes / 1024 / 1024", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP requests / sec",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum by (method, status) (rate(mymanager_http_requests_total[5m]))",
+          "legendFormat": "{{method}} {{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Posts by status",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "mymanager_posts_total",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Publishing queue depth",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+      "targets": [
+        {
+          "expr": "mymanager_publishing_queue_depth",
+          "legendFormat": "{{queue}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "tags": ["mymanager"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "myManager Overview",
+  "uid": "mymanager-overview",
+  "version": 1,
+  "weekStart": ""
+}

@@ -95,6 +95,7 @@ export class MediaProcessorWorker {
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mm-video-'));
     const inputPath = path.join(tmpDir, 'input' + path.extname(r2Key));
     const thumbPath = path.join(tmpDir, 'thumb.jpg');
+    const audioPath = path.join(tmpDir, 'audio.mp3');
 
     try {
       // Download original from R2
@@ -151,6 +152,49 @@ export class MediaProcessorWorker {
         thumbnail: `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${thumbKey}`,
       };
 
+      // Generate captions via OpenAI Whisper if configured and clip is short enough
+      let captions: { text: string; language: string } | undefined;
+      const openaiKey = process.env.OPENAI_API_KEY;
+      const maxDurationForCaptions = parseInt(process.env.WHISPER_MAX_SECONDS ?? '600', 10);
+      if (openaiKey && (durationSec ?? 0) > 0 && (durationSec ?? Infinity) <= maxDurationForCaptions) {
+        try {
+          // Extract mono 16kHz mp3 (Whisper-friendly, smaller upload)
+          await execFileAsync('ffmpeg', [
+            '-y',
+            '-i', inputPath,
+            '-vn',
+            '-ac', '1',
+            '-ar', '16000',
+            '-b:a', '64k',
+            audioPath,
+          ]);
+
+          const audioBuffer = await fs.readFile(audioPath);
+          const form = new FormData();
+          form.append(
+            'file',
+            new Blob([audioBuffer], { type: 'audio/mpeg' }),
+            'audio.mp3',
+          );
+          form.append('model', 'whisper-1');
+          form.append('response_format', 'verbose_json');
+
+          const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${openaiKey}` },
+            body: form as any,
+          });
+          if (whisperRes.ok) {
+            const data = (await whisperRes.json()) as { text: string; language?: string };
+            captions = { text: data.text, language: data.language ?? 'en' };
+          }
+        } catch (err) {
+          // Caption generation is best-effort; never fail the whole job over it.
+          // eslint-disable-next-line no-console
+          console.warn('Whisper caption generation failed:', (err as Error).message);
+        }
+      }
+
       await this.prisma.mediaAsset.update({
         where: { id: mediaId },
         data: {
@@ -158,6 +202,7 @@ export class MediaProcessorWorker {
           height,
           duration_seconds: durationSec,
           variants,
+          ...(captions && { alt_text: captions.text.slice(0, 500) }),
         },
       });
     } finally {

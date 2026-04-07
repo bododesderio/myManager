@@ -1,0 +1,20 @@
+# Prometheus scrape config for myManager API.
+#
+# Drop this file into your Prometheus config dir (or merge under scrape_configs).
+# The /metrics endpoint is gated behind METRICS_TOKEN — set the same token in
+# the bearer_token field below.
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+scrape_configs:
+  - job_name: 'mymanager-api'
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets: ['api:3001']
+    # /metrics requires the METRICS_TOKEN header. Prometheus uses Authorization: Bearer.
+    # The myManager API also accepts an x-metrics-token header — most setups will need
+    # an http_sd_config / proxy in front of the metrics endpoint to translate.
+    bearer_token: 'REPLACE_WITH_METRICS_TOKEN'

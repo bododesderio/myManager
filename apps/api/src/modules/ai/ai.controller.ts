@@ -33,6 +33,12 @@ export class AiController {
     });
   }
 
+  @Post('grammar/check')
+  @ApiOperation({ summary: 'Check text grammar via LanguageTool' })
+  async checkGrammar(@Body() body: { text: string; language?: string }) {
+    return this.aiService.checkGrammar(body.text, body.language);
+  }
+
   @Post('caption/translate')
   @ApiOperation({ summary: 'Translate a caption to another language' })
   async translateCaption(@Req() req: Request, @Body() body: {

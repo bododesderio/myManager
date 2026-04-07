@@ -1718,6 +1718,9 @@ model WebhookEndpoint {
   events       String[]
   secret       String
   is_active    Boolean  @default(true)
+  // Provider hint enables payload shaping for known integrations.
+  // Values: "generic" (default), "slack", "zapier", "make"
+  provider     String   @default("generic")
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
