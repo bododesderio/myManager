@@ -56,7 +56,7 @@ export function middleware(request: NextRequest) {
   }
 
   if ((isSuperadminRoute || isUserRoute || isProtectedDashboardRoute) && !token) {
-    const url = new URL(isSuperadminRoute ? '/superadmin/login' : '/login', request.url);
+    const url = new URL('/login', request.url);
     url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
   }
