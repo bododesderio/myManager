@@ -18,6 +18,7 @@ import { ReportGeneratorWorker } from './report-generator.worker';
 import { EmailWorker } from './email.worker';
 import { NotificationWorker } from './notification.worker';
 import { WebhookDeliveryWorker } from './webhook-delivery.worker';
+import { MediaProcessorWorker } from './media-processor.worker';
 import type { PublishJobData } from './platforms/base.worker';
 
 @Processor('publishing-facebook')
@@ -210,6 +211,19 @@ export class WebhookDeliveryProcessor {
     this.worker = new WebhookDeliveryWorker(prisma);
   }
   @Process('deliver')
+  handle(job: Job<any>) {
+    return this.worker.process(job);
+  }
+}
+
+@Processor('media-processing')
+@Injectable()
+export class MediaProcessingProcessor {
+  private readonly worker: MediaProcessorWorker;
+  constructor(prisma: PrismaService) {
+    this.worker = new MediaProcessorWorker(prisma);
+  }
+  @Process('process')
   handle(job: Job<any>) {
     return this.worker.process(job);
   }

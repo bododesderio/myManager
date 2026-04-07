@@ -114,7 +114,7 @@ export class AnalyticsSyncWorker {
     return { likes: video.like_count || 0, comments: video.comment_count || 0, shares: video.share_count || 0, impressions: video.view_count || 0, reach: 0, clicks: 0, engagements: (video.like_count || 0) + (video.comment_count || 0) + (video.share_count || 0) };
   }
 
-  private async fetchYouTubeMetrics(videoId: string, token: string) {
+  private async fetchYouTubeMetrics(videoId: string, token: string): Promise<Record<string, number>> {
     try {
       const resp = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
         headers: { Authorization: `Bearer ${token}` },
@@ -137,7 +137,7 @@ export class AnalyticsSyncWorker {
     }
   }
 
-  private async fetchPinterestMetrics(pinId: string, token: string) {
+  private async fetchPinterestMetrics(pinId: string, token: string): Promise<Record<string, number>> {
     try {
       const resp = await axios.get(`https://api.pinterest.com/v5/pins/${pinId}/analytics`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -158,7 +158,7 @@ export class AnalyticsSyncWorker {
     }
   }
 
-  private async fetchThreadsMetrics(mediaId: string, token: string) {
+  private async fetchThreadsMetrics(mediaId: string, token: string): Promise<Record<string, number>> {
     try {
       const resp = await axios.get(`https://graph.threads.net/v1.0/${mediaId}/insights`, {
         params: { metric: 'views,likes,replies,reposts,quotes', access_token: token },
@@ -183,7 +183,7 @@ export class AnalyticsSyncWorker {
     }
   }
 
-  private async fetchGoogleBusinessMetrics(postId: string, token: string) {
+  private async fetchGoogleBusinessMetrics(postId: string, token: string): Promise<Record<string, number>> {
     // GBP local-post insights API: requires location resource. postId is expected to be the
     // full localPosts/{id} resource path; if not, skip cleanly.
     try {
@@ -211,7 +211,7 @@ export class AnalyticsSyncWorker {
     }
   }
 
-  private async fetchWhatsAppMetrics(messageId: string, token: string) {
+  private async fetchWhatsAppMetrics(messageId: string, token: string): Promise<Record<string, number>> {
     // WhatsApp Cloud API does not expose per-message analytics; use message_status webhooks instead.
     // We return zero metrics so the row is created but is not misleading.
     void messageId;

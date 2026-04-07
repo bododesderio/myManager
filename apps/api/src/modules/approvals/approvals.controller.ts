@@ -38,8 +38,19 @@ export class ApprovalsController {
   }
 
   @Post(':postId/reject')
-  @ApiOperation({ summary: 'Request revisions on a post' })
+  @ApiOperation({ summary: 'Reject a post' })
   async reject(
+    @Param('postId') postId: string,
+    @Req() req: Request,
+    @Body() body: { comment: string },
+  ) {
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.approvalsService.reject(postId, userId, body.comment);
+  }
+
+  @Post(':postId/request-revision')
+  @ApiOperation({ summary: 'Request revisions on a post' })
+  async requestRevision(
     @Param('postId') postId: string,
     @Req() req: Request,
     @Body() body: { comment: string },

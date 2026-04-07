@@ -91,7 +91,22 @@ export class MediaProcessorWorker {
     });
   }
 
+  private async hasFfmpeg(): Promise<boolean> {
+    try {
+      await execFileAsync('ffmpeg', ['-version']);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private async processVideo(mediaId: string, r2Key: string): Promise<void> {
+    if (!(await this.hasFfmpeg())) {
+      // eslint-disable-next-line no-console
+      console.warn(`Skipping video processing for ${mediaId}: ffmpeg not available in PATH`);
+      return;
+    }
+
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mm-video-'));
     const inputPath = path.join(tmpDir, 'input' + path.extname(r2Key));
     const thumbPath = path.join(tmpDir, 'thumb.jpg');

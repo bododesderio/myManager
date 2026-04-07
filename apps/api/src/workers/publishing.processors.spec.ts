@@ -19,6 +19,7 @@ import {
   EmailDeliveryProcessor,
   PushNotificationProcessor,
   WebhookDeliveryProcessor,
+  MediaProcessingProcessor,
 } from './publishing.processors';
 
 const allProcessors = {
@@ -38,11 +39,12 @@ const allProcessors = {
   EmailDeliveryProcessor,
   PushNotificationProcessor,
   WebhookDeliveryProcessor,
+  MediaProcessingProcessor,
 };
 
 describe('publishing processors module', () => {
-  it('exports 16 processor classes', () => {
-    expect(Object.keys(allProcessors)).toHaveLength(16);
+  it('exports 17 processor classes', () => {
+    expect(Object.keys(allProcessors)).toHaveLength(17);
   });
 
   it.each(Object.entries(allProcessors))(

@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ApprovalsRepository } from './approvals.repository';
 
-type ApprovalStatus = 'draft' | 'pending_approval' | 'approved' | 'revision_requested' | 'published';
+type ApprovalStatus = 'draft' | 'pending_approval' | 'approved' | 'revision_requested' | 'rejected' | 'published';
 
 const VALID_TRANSITIONS: Record<string, ApprovalStatus[]> = {
   draft: ['pending_approval'],
-  pending_approval: ['approved', 'revision_requested'],
+  pending_approval: ['approved', 'revision_requested', 'rejected'],
   revision_requested: ['pending_approval'],
+  rejected: ['draft', 'pending_approval'],
   approved: ['published', 'draft'],
 };
 
@@ -54,6 +55,17 @@ export class ApprovalsService {
     await this.repository.createApprovalEvent(postId, reviewerId, 'revision_requested', comment);
 
     return { message: 'Revision requested', postId };
+  }
+
+  async reject(postId: string, reviewerId: string, comment: string) {
+    const post = await this.repository.findPostById(postId);
+    if (!post) throw new NotFoundException('Post not found');
+    this.validateTransition(post.status, 'rejected');
+
+    await this.repository.updatePostStatus(postId, 'rejected');
+    await this.repository.createApprovalEvent(postId, reviewerId, 'rejected', comment);
+
+    return { message: 'Post rejected', postId };
   }
 
   async addComment(postId: string, userId: string, data: {

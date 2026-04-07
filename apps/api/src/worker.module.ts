@@ -43,6 +43,7 @@ import {
   EmailDeliveryProcessor,
   PushNotificationProcessor,
   WebhookDeliveryProcessor,
+  MediaProcessingProcessor,
 } from './workers/publishing.processors';
 
 @Module({
@@ -81,6 +82,7 @@ import {
       { name: 'email-delivery' },
       { name: 'push-notifications' },
       { name: 'webhook-delivery' },
+      { name: 'media-processing' },
       { name: 'publishing-facebook' },
       { name: 'publishing-instagram' },
       { name: 'publishing-x' },
@@ -134,6 +136,7 @@ import {
     EmailDeliveryProcessor,
     PushNotificationProcessor,
     WebhookDeliveryProcessor,
+    MediaProcessingProcessor,
   ],
 })
 export class WorkerModule {}
