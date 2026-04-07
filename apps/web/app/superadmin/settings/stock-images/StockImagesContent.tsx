@@ -153,8 +153,10 @@ function Row({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={value} alt={row.key} className={styles.previewImg} />
       </div>
-      <label className={styles.label}>{row.key}</label>
+      <label className={styles.label} htmlFor={`stock-${row.key}`}>{row.key}</label>
       <input
+        id={`stock-${row.key}`}
+        aria-label={`URL for ${row.key}`}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         className={styles.input}
