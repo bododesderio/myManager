@@ -2,11 +2,50 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
 import { useChangePassword } from '@/hooks/useSettings';
+import {
+  authenticate,
+  isBiometricAvailable,
+  isBiometricEnabled,
+  setBiometricEnabled,
+  getSupportedTypes,
+} from '@/services/biometricAuth';
 
 export default function SecuritySettingsScreen() {
   const [twoFactor, setTwoFactor] = useState(false);
   const [biometric, setBiometric] = useState(false);
+  const [biometricLabel, setBiometricLabel] = useState('Biometric Login');
+
+  useEffect(() => {
+    (async () => {
+      if (await isBiometricAvailable()) {
+        const types = await getSupportedTypes();
+        if (types.length > 0) setBiometricLabel(types.join(' / '));
+        setBiometric(await isBiometricEnabled());
+      }
+    })();
+  }, []);
+
+  async function handleBiometricToggle(value: boolean) {
+    if (value) {
+      const available = await isBiometricAvailable();
+      if (!available) {
+        Alert.alert('Not available', 'No biometric is enrolled on this device.');
+        return;
+      }
+      const ok = await authenticate('Confirm to enable biometric sign-in');
+      if (!ok) {
+        Alert.alert('Cancelled', 'Biometric verification failed.');
+        return;
+      }
+      await setBiometricEnabled(true);
+      setBiometric(true);
+    } else {
+      await setBiometricEnabled(false);
+      setBiometric(false);
+    }
+  }
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -108,14 +147,14 @@ export default function SecuritySettingsScreen() {
           </View>
           <View style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Biometric Login</Text>
+              <Text style={styles.settingLabel}>{biometricLabel}</Text>
               <Text style={styles.settingDescription}>
-                Use Face ID or fingerprint to sign in
+                Use {biometricLabel.toLowerCase()} to sign in
               </Text>
             </View>
             <Switch
               value={biometric}
-              onValueChange={setBiometric}
+              onValueChange={handleBiometricToggle}
               trackColor={{ false: '#ddd', true: '#7F77DD' }}
               thumbColor="#fff"
             />

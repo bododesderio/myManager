@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { setLanguage, getCurrentLanguage, SUPPORTED_LANGUAGES } from '@/services/i18n';
 
 interface Language {
   code: string;
@@ -9,36 +10,54 @@ interface Language {
   nativeName: string;
 }
 
-const languages: Language[] = [
+const ALL_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'es', name: 'Spanish', nativeName: 'Espanol' },
-  { code: 'fr', name: 'French', nativeName: 'Francais' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Portugues' },
-  { code: 'it', name: 'Italian', nativeName: 'Italiano' },
-  { code: 'ja', name: 'Japanese', nativeName: 'Nihongo' },
-  { code: 'ko', name: 'Korean', nativeName: 'Hangugeo' },
-  { code: 'zh', name: 'Chinese', nativeName: 'Zhongwen' },
-  { code: 'ar', name: 'Arabic', nativeName: 'Al-Arabiyyah' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'fr', name: 'French', nativeName: 'Français' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+  { code: 'sw', name: 'Swahili', nativeName: 'Kiswahili' },
 ];
 
 export default function LanguageSettingsScreen() {
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(getCurrentLanguage());
+  const [saving, setSaving] = useState(false);
 
-  const renderItem = ({ item }: { item: Language }) => (
-    <TouchableOpacity
-      style={[styles.languageRow, selectedLanguage === item.code && styles.languageRowSelected]}
-      onPress={() => setSelectedLanguage(item.code)}
-    >
-      <View>
-        <Text style={styles.languageName}>{item.name}</Text>
-        <Text style={styles.nativeName}>{item.nativeName}</Text>
-      </View>
-      {selectedLanguage === item.code && (
-        <Text style={styles.checkmark}>V</Text>
-      )}
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    setSelectedLanguage(getCurrentLanguage());
+  }, []);
+
+  async function handleSelect(code: string) {
+    if (code === selectedLanguage) return;
+    setSaving(true);
+    try {
+      await setLanguage(code);
+      setSelectedLanguage(code);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const renderItem = ({ item }: { item: Language }) => {
+    const supported = SUPPORTED_LANGUAGES.includes(item.code);
+    return (
+      <TouchableOpacity
+        style={[
+          styles.languageRow,
+          selectedLanguage === item.code && styles.languageRowSelected,
+          !supported && { opacity: 0.4 },
+        ]}
+        onPress={() => supported && handleSelect(item.code)}
+        disabled={!supported || saving}
+      >
+        <View>
+          <Text style={styles.languageName}>{item.name}</Text>
+          <Text style={styles.nativeName}>{item.nativeName}</Text>
+        </View>
+        {selectedLanguage === item.code && <Text style={styles.checkmark}>✓</Text>}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,11 +66,11 @@ export default function LanguageSettingsScreen() {
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Language</Text>
-        <View style={{ width: 40 }} />
+        {saving ? <ActivityIndicator size="small" color="#7F77DD" /> : <View style={{ width: 40 }} />}
       </View>
 
       <FlatList
-        data={languages}
+        data={ALL_LANGUAGES}
         renderItem={renderItem}
         keyExtractor={(item) => item.code}
         contentContainerStyle={styles.list}
@@ -61,59 +80,21 @@ export default function LanguageSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff',
+    borderBottomWidth: 1, borderBottomColor: '#eee',
   },
-  backText: {
-    fontSize: 16,
-    color: '#7F77DD',
-    fontWeight: '600',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
-  list: {
-    padding: 16,
-  },
+  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
+  list: { padding: 16 },
   languageRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 8,
   },
-  languageRowSelected: {
-    borderWidth: 2,
-    borderColor: '#7F77DD',
-  },
-  languageName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1a1a1a',
-  },
-  nativeName: {
-    fontSize: 13,
-    color: '#999',
-    marginTop: 2,
-  },
-  checkmark: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#7F77DD',
-  },
+  languageRowSelected: { borderWidth: 2, borderColor: '#7F77DD' },
+  languageName: { fontSize: 16, fontWeight: '500', color: '#1a1a1a' },
+  nativeName: { fontSize: 13, color: '#999', marginTop: 2 },
+  checkmark: { fontSize: 20, fontWeight: '700', color: '#7F77DD' },
 });

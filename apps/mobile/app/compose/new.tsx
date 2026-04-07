@@ -7,12 +7,21 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
 import { useCreatePost, useSchedulePost } from '@/hooks/usePosts';
+import { useUploadMedia } from '@/hooks/useMedia';
 import { useWorkspaceStore } from '@/store/workspaceStore';
+
+interface UploadedMedia {
+  id: string;
+  uri: string;
+  filename: string;
+}
 
 export default function NewComposeScreen() {
   const [content, setContent] = useState('');
@@ -20,11 +29,78 @@ export default function NewComposeScreen() {
   const [scheduledAt, setScheduledAt] = useState<string | null>(null);
   const [showScheduleInput, setShowScheduleInput] = useState(false);
 
+  const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([]);
+
   const currentWorkspace = useWorkspaceStore((s) => s.currentWorkspace);
   const createPost = useCreatePost();
   const schedulePost = useSchedulePost();
+  const uploadMedia = useUploadMedia();
 
-  const isMutating = createPost.isPending || schedulePost.isPending;
+  const isMutating = createPost.isPending || schedulePost.isPending || uploadMedia.isPending;
+
+  async function pickFromLibrary() {
+    if (!currentWorkspace) {
+      Alert.alert('No workspace', 'Select a workspace first.');
+      return;
+    }
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (perm.status !== 'granted') {
+      Alert.alert('Permission needed', 'Allow photo library access to attach media.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true,
+      quality: 0.85,
+    });
+    if (result.canceled) return;
+    await uploadAssets(result.assets);
+  }
+
+  async function captureFromCamera() {
+    if (!currentWorkspace) {
+      Alert.alert('No workspace', 'Select a workspace first.');
+      return;
+    }
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (perm.status !== 'granted') {
+      Alert.alert('Permission needed', 'Allow camera access to capture media.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({ quality: 0.85 });
+    if (result.canceled) return;
+    await uploadAssets(result.assets);
+  }
+
+  async function uploadAssets(assets: ImagePicker.ImagePickerAsset[]) {
+    if (!currentWorkspace) return;
+    for (const asset of assets) {
+      try {
+        const filename = asset.fileName ?? asset.uri.split('/').pop() ?? `media-${Date.now()}`;
+        const mimeType =
+          asset.mimeType ?? (asset.type === 'video' ? 'video/mp4' : 'image/jpeg');
+        const result: any = await uploadMedia.mutateAsync({
+          uri: asset.uri,
+          filename,
+          mimeType,
+          workspaceId: currentWorkspace.id,
+        });
+        const media = result?.media ?? result;
+        if (media?.id) {
+          setUploadedMedia((prev) => [
+            ...prev,
+            { id: media.id, uri: media.url ?? asset.uri, filename },
+          ]);
+        }
+      } catch (err: any) {
+        Alert.alert('Upload failed', err?.message ?? `Failed to upload ${asset.fileName}`);
+      }
+    }
+  }
+
+  function removeMedia(id: string) {
+    setUploadedMedia((prev) => prev.filter((m) => m.id !== id));
+  }
 
   const platforms = ['Facebook', 'Instagram', 'Twitter', 'LinkedIn', 'TikTok'];
 
@@ -58,7 +134,7 @@ export default function NewComposeScreen() {
         content: content.trim(),
         platforms: selectedPlatforms,
         status: 'draft',
-        mediaUrls: [],
+        mediaUrls: uploadedMedia.map((m) => m.id),
       },
       {
         onSuccess: () => {
@@ -97,7 +173,7 @@ export default function NewComposeScreen() {
         content: content.trim(),
         platforms: selectedPlatforms,
         scheduledAt,
-        mediaUrls: [],
+        mediaUrls: uploadedMedia.map((m) => m.id),
       },
       {
         onSuccess: () => {
@@ -127,7 +203,7 @@ export default function NewComposeScreen() {
         content: content.trim(),
         platforms: selectedPlatforms,
         status: 'draft',
-        mediaUrls: [],
+        mediaUrls: uploadedMedia.map((m) => m.id),
       },
       {
         onSuccess: () => {
@@ -200,19 +276,33 @@ export default function NewComposeScreen() {
         <View style={styles.mediaSection}>
           <Text style={styles.sectionLabel}>Media</Text>
           <View style={styles.mediaButtons}>
-            <TouchableOpacity style={styles.mediaButton} disabled={isMutating}>
+            <TouchableOpacity style={styles.mediaButton} onPress={captureFromCamera} disabled={isMutating}>
               <Text style={styles.mediaButtonIcon}>📷</Text>
               <Text style={styles.mediaButtonText}>Camera</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton} disabled={isMutating}>
+            <TouchableOpacity style={styles.mediaButton} onPress={pickFromLibrary} disabled={isMutating}>
               <Text style={styles.mediaButtonIcon}>🖼️</Text>
               <Text style={styles.mediaButtonText}>Gallery</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton} disabled={isMutating}>
-              <Text style={styles.mediaButtonIcon}>📁</Text>
-              <Text style={styles.mediaButtonText}>Files</Text>
-            </TouchableOpacity>
           </View>
+          {uploadMedia.isPending && (
+            <View style={styles.uploadingRow}>
+              <ActivityIndicator size="small" color="#7F77DD" />
+              <Text style={styles.uploadingText}>Uploading…</Text>
+            </View>
+          )}
+          {uploadedMedia.length > 0 && (
+            <ScrollView horizontal style={styles.mediaPreview} showsHorizontalScrollIndicator={false}>
+              {uploadedMedia.map((m) => (
+                <View key={m.id} style={styles.mediaThumb}>
+                  <Image source={{ uri: m.uri }} style={styles.mediaImage} />
+                  <TouchableOpacity style={styles.removeMediaBtn} onPress={() => removeMedia(m.id)}>
+                    <Text style={styles.removeMediaText}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          )}
         </View>
 
         <View style={styles.scheduleSection}>
@@ -446,4 +536,15 @@ const styles = StyleSheet.create({
   disabledText: {
     color: '#ccc',
   },
+  uploadingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 8 },
+  uploadingText: { fontSize: 13, color: '#7F77DD' },
+  mediaPreview: { marginTop: 12 },
+  mediaThumb: { marginRight: 8, position: 'relative' },
+  mediaImage: { width: 80, height: 80, borderRadius: 8, backgroundColor: '#eee' },
+  removeMediaBtn: {
+    position: 'absolute', top: -6, right: -6,
+    width: 20, height: 20, borderRadius: 10, backgroundColor: '#000',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  removeMediaText: { color: '#fff', fontSize: 14, lineHeight: 16 },
 });
