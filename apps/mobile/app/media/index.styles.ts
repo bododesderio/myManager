@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -17,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   title: {
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
   },
   uploadText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   filterRow: {
@@ -44,7 +45,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   filterChipActive: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
   },
   filterText: {
     fontSize: 13,
@@ -93,7 +94,7 @@ export const styles = StyleSheet.create({
     marginBottom: 24,
   },
   uploadButton: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 12,
@@ -111,7 +112,7 @@ export const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 14,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
 });

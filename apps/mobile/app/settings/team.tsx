@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import {
   View,
   Text,
@@ -113,7 +114,7 @@ export default function TeamSettingsScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#7F77DD" />
+          <ActivityIndicator size="large" color=colors.primary />
         </View>
       ) : error ? (
         <View style={styles.loadingContainer}>

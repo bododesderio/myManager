@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -7,13 +8,13 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff',
     borderBottomWidth: 1, borderBottomColor: '#eee',
   },
-  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  backText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
-  refreshText: { fontSize: 14, color: '#7F77DD', fontWeight: '600' },
+  refreshText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
   content: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   errorText: { color: '#F44336', marginBottom: 8 },
-  retryText: { color: '#7F77DD', fontWeight: '600' },
+  retryText: { color: colors.primary, fontWeight: '600' },
   accountRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 16,
@@ -22,7 +23,7 @@ export const styles = StyleSheet.create({
   accountInfo: { flex: 1 },
   platformName: { fontSize: 16, fontWeight: '500', color: '#1a1a1a' },
   accountName: { fontSize: 13, color: '#999', marginTop: 2 },
-  connectButton: { backgroundColor: '#7F77DD', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 },
+  connectButton: { backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8 },
   disconnectButton: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#F44336' },
   connectButtonText: { color: '#fff', fontSize: 14, fontWeight: '600' },
   disconnectButtonText: { color: '#F44336' },

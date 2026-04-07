@@ -6,17 +6,20 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { initI18n } from '../services/i18n';
+import { loadBrand } from '../services/brandLoader';
 
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const [i18nReady, setI18nReady] = useState(false);
+  const [bootReady, setBootReady] = useState(false);
 
   useEffect(() => {
-    initI18n().finally(() => setI18nReady(true));
+    // Initialize i18n and brand colors in parallel BEFORE rendering any screen.
+    // Both are non-critical: failures fall back to seeded defaults in colors.ts / i18n.ts.
+    Promise.allSettled([initI18n(), loadBrand()]).finally(() => setBootReady(true));
   }, []);
 
-  if (!i18nReady) {
+  if (!bootReady) {
     return null;
   }
 

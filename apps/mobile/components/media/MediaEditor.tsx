@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { useState, useCallback } from 'react';
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   saveText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#7F77DD',
+    color: colors.primary,
   },
   disabledText: {
     opacity: 0.5,
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   resetText: {
-    color: '#7F77DD',
+    color: colors.primary,
     fontSize: 14,
     fontWeight: '500',
   },

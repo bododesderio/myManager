@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Alert } from 'react-native';
 import { styles } from './notifications.styles';
 import { router } from 'expo-router';
@@ -79,7 +80,7 @@ export default function NotificationsSettingsScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#7F77DD" />
+          <ActivityIndicator color=colors.primary />
         </View>
       ) : (
         <ScrollView style={styles.content}>
@@ -94,7 +95,7 @@ export default function NotificationsSettingsScreen() {
                 <Switch
                   value={push[setting.key] ?? false}
                   onValueChange={() => togglePush(setting.key)}
-                  trackColor={{ false: '#ddd', true: '#7F77DD' }}
+                  trackColor={{ false: '#ddd', true: colors.primary }}
                   thumbColor="#fff"
                 />
               </View>
@@ -111,7 +112,7 @@ export default function NotificationsSettingsScreen() {
               <Switch
                 value={emailDigest}
                 onValueChange={toggleEmailDigest}
-                trackColor={{ false: '#ddd', true: '#7F77DD' }}
+                trackColor={{ false: '#ddd', true: colors.primary }}
                 thumbColor="#fff"
               />
             </View>

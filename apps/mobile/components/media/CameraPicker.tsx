@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   button: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 32,

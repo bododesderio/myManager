@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { styles } from './[id].styles';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -37,7 +38,7 @@ export default function ProjectDetailScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#7F77DD" />
+          <ActivityIndicator color=colors.primary />
         </View>
       ) : isError || !project ? (
         <View style={styles.center}>

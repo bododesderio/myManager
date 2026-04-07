@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { styles } from './home.styles';
 import { router } from 'expo-router';
@@ -89,7 +90,7 @@ export default function HomeScreen() {
 
       <ScrollView
         style={styles.scrollView}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7F77DD" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor=colors.primary />}
       >
         <View style={styles.quickActions}>
           {quickActions.map((action) => (
@@ -106,7 +107,7 @@ export default function HomeScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#7F77DD" />
+            <ActivityIndicator size="large" color=colors.primary />
           </View>
         ) : error ? (
           <View style={styles.section}>

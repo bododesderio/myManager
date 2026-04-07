@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,7 +13,7 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  backText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
   list: { padding: 16 },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 12 },
@@ -23,15 +24,15 @@ export const styles = StyleSheet.create({
   actionBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', borderWidth: 1 },
   approveBtn: { backgroundColor: '#10B981', borderColor: '#10B981' },
   approveText: { color: '#fff', fontSize: 13, fontWeight: '600' },
-  revisionBtn: { borderColor: '#7F77DD' },
-  revisionText: { color: '#7F77DD', fontSize: 13, fontWeight: '600' },
+  revisionBtn: { borderColor: colors.primary },
+  revisionText: { color: colors.primary, fontSize: 13, fontWeight: '600' },
   rejectBtn: { borderColor: '#F44336' },
   rejectText: { color: '#F44336', fontSize: 13, fontWeight: '600' },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginBottom: 8 },
   emptyText: { fontSize: 14, color: '#999', textAlign: 'center' },
   errorText: { fontSize: 14, color: '#F44336', textAlign: 'center', marginBottom: 8 },
-  retryText: { fontSize: 14, color: '#7F77DD', fontWeight: '600' },
+  retryText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalCard: { backgroundColor: '#fff', padding: 20, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   modalTitle: { fontSize: 18, fontWeight: '700', color: '#1a1a1a', marginBottom: 8 },
@@ -40,6 +41,6 @@ export const styles = StyleSheet.create({
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 16 },
   cancelBtn: { paddingHorizontal: 16, paddingVertical: 10 },
   cancelText: { color: '#666', fontSize: 14, fontWeight: '600' },
-  saveBtn: { backgroundColor: '#7F77DD', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
+  saveBtn: { backgroundColor: colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
   saveText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });

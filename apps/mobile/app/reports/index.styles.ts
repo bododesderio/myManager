@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -17,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   title: {

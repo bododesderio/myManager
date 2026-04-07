@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -21,7 +22,7 @@ export const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   newButton: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -45,7 +46,7 @@ export const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: '#7F77DD',
+    borderBottomColor: colors.primary,
   },
   tabText: {
     fontSize: 14,
@@ -53,7 +54,7 @@ export const styles = StyleSheet.create({
     color: '#999',
   },
   tabTextActive: {
-    color: '#7F77DD',
+    color: colors.primary,
   },
   list: {
     padding: 16,
@@ -99,7 +100,7 @@ export const styles = StyleSheet.create({
     marginBottom: 24,
   },
   createButton: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 12,
@@ -117,7 +118,7 @@ export const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 14,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
 });

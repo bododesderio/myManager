@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -16,7 +17,7 @@ export const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   title: {
@@ -34,7 +35,7 @@ export const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -99,7 +100,7 @@ export const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 14,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
 });

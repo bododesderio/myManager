@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,9 +13,9 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  backText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
-  editText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  editText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   content: { flex: 1, padding: 16 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   statusBadge: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, marginBottom: 16 },
@@ -30,14 +31,14 @@ export const styles = StyleSheet.create({
   analyticsPlatform: { fontSize: 13, fontWeight: '600', color: '#333', marginBottom: 6 },
   metricsRow: { flexDirection: 'row', gap: 12 },
   metricItem: { flex: 1, alignItems: 'center' },
-  metricValue: { fontSize: 18, fontWeight: '700', color: '#7F77DD' },
+  metricValue: { fontSize: 18, fontWeight: '700', color: colors.primary },
   metricLabel: { fontSize: 11, color: '#999', marginTop: 2 },
   actions: { flexDirection: 'row', gap: 12, marginBottom: 32 },
-  actionButton: { flex: 1, borderWidth: 1, borderColor: '#7F77DD', borderRadius: 12, padding: 14, alignItems: 'center' },
-  actionButtonText: { color: '#7F77DD', fontSize: 15, fontWeight: '600' },
+  actionButton: { flex: 1, borderWidth: 1, borderColor: colors.primary, borderRadius: 12, padding: 14, alignItems: 'center' },
+  actionButtonText: { color: colors.primary, fontSize: 15, fontWeight: '600' },
   deleteButton: { borderColor: '#F44336' },
   deleteButtonText: { color: '#F44336', fontSize: 15, fontWeight: '600' },
   errorText: { color: '#F44336', marginBottom: 8, paddingHorizontal: 32, textAlign: 'center' },
-  retryBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: '#7F77DD', borderRadius: 6 },
+  retryBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: colors.primary, borderRadius: 6 },
   retryText: { color: '#fff', fontWeight: '600' },
 });

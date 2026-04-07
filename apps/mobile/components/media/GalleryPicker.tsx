@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useState, useCallback } from 'react';
 import { Image } from 'expo-image';
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   doneText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#7F77DD',
+    color: colors.primary,
   },
   doneTextDisabled: {
     opacity: 0.4,
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   },
   addMoreButton: {
     alignSelf: 'center',
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 12,
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   permissionButton: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 12,

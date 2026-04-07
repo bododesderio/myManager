@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, TouchableOpacity, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { styles } from './index.styles';
 import { router } from 'expo-router';
@@ -87,7 +88,7 @@ export default function MediaScreen() {
 
       {loading ? (
         <View style={styles.emptyState}>
-          <ActivityIndicator size="large" color="#7F77DD" />
+          <ActivityIndicator size="large" color=colors.primary />
         </View>
       ) : error ? (
         <View style={styles.emptyState}>

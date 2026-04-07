@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,9 +13,9 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  backText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
-  addText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  addText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   list: { padding: 16 },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 12 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
@@ -26,10 +27,10 @@ export const styles = StyleSheet.create({
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginBottom: 8 },
   emptyText: { fontSize: 14, color: '#999', textAlign: 'center', marginBottom: 24 },
-  createButton: { backgroundColor: '#7F77DD', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
+  createButton: { backgroundColor: colors.primary, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
   createButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   errorText: { fontSize: 14, color: '#F44336', textAlign: 'center', marginBottom: 8 },
-  retryText: { fontSize: 14, color: '#7F77DD', fontWeight: '600' },
+  retryText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalCard: { backgroundColor: '#fff', padding: 20, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   modalTitle: { fontSize: 18, fontWeight: '700', color: '#1a1a1a', marginBottom: 16 },
@@ -38,6 +39,6 @@ export const styles = StyleSheet.create({
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 20 },
   cancelBtn: { paddingHorizontal: 16, paddingVertical: 10 },
   cancelText: { color: '#666', fontSize: 14, fontWeight: '600' },
-  saveBtn: { backgroundColor: '#7F77DD', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
+  saveBtn: { backgroundColor: colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
   saveText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });

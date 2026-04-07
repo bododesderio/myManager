@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { styles } from './analytics.styles';
 import { useState } from 'react';
@@ -63,7 +64,7 @@ export default function AnalyticsScreen() {
 
         {overview.isLoading && (
           <View style={styles.center}>
-            <ActivityIndicator color="#7F77DD" />
+            <ActivityIndicator color=colors.primary />
           </View>
         )}
 
@@ -92,7 +93,7 @@ export default function AnalyticsScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Top Performing Posts</Text>
               {topPosts.isLoading ? (
-                <ActivityIndicator color="#7F77DD" />
+                <ActivityIndicator color=colors.primary />
               ) : topPostsList.length === 0 ? (
                 <View style={styles.emptyState}>
                   <Text style={styles.emptyText}>No data available for this period</Text>

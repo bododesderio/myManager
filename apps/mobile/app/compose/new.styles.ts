@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -25,7 +26,7 @@ export const styles = StyleSheet.create({
   },
   nextText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   scrollContent: {
@@ -51,7 +52,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   platformChipActive: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
   },
   platformChipText: {
     fontSize: 13,
@@ -108,7 +109,7 @@ export const styles = StyleSheet.create({
   },
   scheduleToggleText: {
     fontSize: 14,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '500',
   },
   scheduleInputContainer: {
@@ -137,20 +138,20 @@ export const styles = StyleSheet.create({
   scheduleButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#7F77DD',
+    borderColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   scheduleButtonText: {
-    color: '#7F77DD',
+    color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },
   publishButton: {
     flex: 1,
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -171,7 +172,7 @@ export const styles = StyleSheet.create({
     color: '#ccc',
   },
   uploadingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 8 },
-  uploadingText: { fontSize: 13, color: '#7F77DD' },
+  uploadingText: { fontSize: 13, color: colors.primary },
   mediaPreview: { marginTop: 12 },
   mediaThumb: { marginRight: 8, position: 'relative' },
   mediaImage: { width: 80, height: 80, borderRadius: 8, backgroundColor: '#eee' },

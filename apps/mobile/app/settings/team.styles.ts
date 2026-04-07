@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -17,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   title: {
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
   },
   inviteText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   list: {
@@ -45,7 +46,7 @@ export const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -82,7 +83,7 @@ export const styles = StyleSheet.create({
   },
   inviteButton: {
     borderWidth: 1,
-    borderColor: '#7F77DD',
+    borderColor: colors.primary,
     borderStyle: 'dashed',
     borderRadius: 12,
     padding: 16,
@@ -90,7 +91,7 @@ export const styles = StyleSheet.create({
     marginTop: 8,
   },
   inviteButtonText: {
-    color: '#7F77DD',
+    color: colors.primary,
     fontSize: 15,
     fontWeight: '600',
   },
@@ -108,7 +109,7 @@ export const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 14,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   emptyText: {
@@ -122,12 +123,12 @@ export const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
   roleRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
   rolePill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#ddd' },
-  rolePillActive: { backgroundColor: '#7F77DD', borderColor: '#7F77DD' },
+  rolePillActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   rolePillText: { fontSize: 13, color: '#666', textTransform: 'capitalize' },
   rolePillTextActive: { color: '#fff', fontWeight: '600' },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 20 },
   cancelBtn: { paddingHorizontal: 16, paddingVertical: 10 },
   cancelText: { color: '#666', fontSize: 14, fontWeight: '600' },
-  saveBtn: { backgroundColor: '#7F77DD', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
+  saveBtn: { backgroundColor: colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
   saveText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });

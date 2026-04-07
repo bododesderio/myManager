@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -17,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   title: {
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
   },
   publishText: {
     fontSize: 16,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   platformTabs: {
@@ -44,7 +45,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   platformTabActive: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
   },
   platformTabText: {
     fontSize: 13,
@@ -77,7 +78,7 @@ export const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

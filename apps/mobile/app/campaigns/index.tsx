@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import {
   View,
   Text,
@@ -78,7 +79,7 @@ export default function CampaignsScreen() {
 
       {isLoading ? (
         <View style={styles.emptyState}>
-          <ActivityIndicator size="large" color="#7F77DD" />
+          <ActivityIndicator size="large" color=colors.primary />
         </View>
       ) : isError ? (
         <View style={styles.emptyState}>

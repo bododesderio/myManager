@@ -6,11 +6,11 @@
  */
 
 const FALLBACK_BRAND = {
-  primary_color: '#7F77DD',
-  primary_dark: '#534AB7',
-  primary_light: '#E8E6F8',
-  secondary_color: '#534AB7',
-  accent_color: '#1D9E75',
+  primary_color: '#6D5AE8',
+  primary_dark: '#4A36D4',
+  primary_light: '#EEEBFE',
+  secondary_color: '#FF5C7A',
+  accent_color: '#10B981',
   app_name: 'myManager',
 };
 

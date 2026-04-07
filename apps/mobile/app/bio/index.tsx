@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { styles } from './index.styles';
 import { router } from 'expo-router';
@@ -99,7 +100,7 @@ export default function BioScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#7F77DD" />
+          <ActivityIndicator color=colors.primary />
         </View>
       ) : (
         <ScrollView style={styles.content}>

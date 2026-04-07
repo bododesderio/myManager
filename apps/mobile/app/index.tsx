@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { useEffect } from 'react';
 import { Redirect } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
@@ -14,7 +15,7 @@ export default function Index() {
   if (isLoading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#7F77DD" />
+        <ActivityIndicator size="large" color=colors.primary />
       </View>
     );
   }

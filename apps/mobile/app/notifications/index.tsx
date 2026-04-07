@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import {
   View,
   Text,
@@ -97,7 +98,7 @@ export default function NotificationsScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#7F77DD" />
+          <ActivityIndicator color=colors.primary />
         </View>
       ) : isError ? (
         <View style={styles.center}>

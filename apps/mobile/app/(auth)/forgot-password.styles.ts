@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -16,7 +17,7 @@ export const styles = StyleSheet.create({
     left: 24,
   },
   backText: {
-    color: '#7F77DD',
+    color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#7F77DD',
+    color: colors.primary,
     marginBottom: 8,
   },
   subtitle: {
@@ -48,7 +49,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   button: {
-    backgroundColor: '#7F77DD',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

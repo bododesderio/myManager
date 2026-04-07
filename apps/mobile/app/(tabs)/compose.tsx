@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { styles } from './compose.styles';
 import { router } from 'expo-router';
@@ -75,7 +76,7 @@ export default function ComposeTabScreen() {
 
       {loading ? (
         <View style={styles.emptyState}>
-          <ActivityIndicator size="large" color="#7F77DD" />
+          <ActivityIndicator size="large" color=colors.primary />
         </View>
       ) : error ? (
         <View style={styles.emptyState}>

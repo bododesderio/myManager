@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   submitText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#7F77DD',
+    color: colors.primary,
   },
   submitDisabled: {
     opacity: 0.4,

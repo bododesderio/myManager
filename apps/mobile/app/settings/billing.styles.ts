@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -7,16 +8,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fff',
     borderBottomWidth: 1, borderBottomColor: '#eee',
   },
-  backText: { fontSize: 16, color: '#7F77DD', fontWeight: '600' },
+  backText: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   title: { fontSize: 18, fontWeight: '600', color: '#1a1a1a' },
   content: { flex: 1, padding: 16 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  currentPlan: { backgroundColor: '#7F77DD', borderRadius: 12, padding: 24, alignItems: 'center', marginBottom: 16 },
+  currentPlan: { backgroundColor: colors.primary, borderRadius: 12, padding: 24, alignItems: 'center', marginBottom: 16 },
   planLabel: { fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
   planName: { fontSize: 28, fontWeight: '700', color: '#fff', marginBottom: 4 },
   planPrice: { fontSize: 16, color: 'rgba(255,255,255,0.9)' },
   planStatus: { fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 6 },
-  upgradeButton: { backgroundColor: '#7F77DD', borderRadius: 12, padding: 16, alignItems: 'center', marginBottom: 16 },
+  upgradeButton: { backgroundColor: colors.primary, borderRadius: 12, padding: 16, alignItems: 'center', marginBottom: 16 },
   upgradeButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   section: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16 },
   sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },

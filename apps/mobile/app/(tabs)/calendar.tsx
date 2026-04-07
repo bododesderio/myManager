@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { styles } from './calendar.styles';
 import { useState, useMemo } from 'react';
@@ -164,7 +165,7 @@ export default function CalendarScreen() {
         {!workspaceId && (
           <Text style={styles.emptyText}>No workspace selected.</Text>
         )}
-        {isLoading && <ActivityIndicator color="#7F77DD" style={{ marginTop: 16 }} />}
+        {isLoading && <ActivityIndicator color=colors.primary style={{ marginTop: 16 }} />}
         {isError && (
           <View style={styles.errorBox}>
             <Text style={styles.errorText}>Failed to load calendar.</Text>

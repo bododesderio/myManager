@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -44,7 +45,7 @@ export const styles = StyleSheet.create({
   },
   actionIcon: {
     fontSize: 20,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '700',
     marginBottom: 4,
   },
@@ -77,7 +78,7 @@ export const styles = StyleSheet.create({
   },
   emptyLink: {
     fontSize: 14,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '600',
   },
   metricsRow: {
@@ -94,7 +95,7 @@ export const styles = StyleSheet.create({
   metricValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#7F77DD',
+    color: colors.primary,
   },
   metricLabel: {
     fontSize: 12,

@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Linking } from 'react-native';
 import { styles } from './accounts.styles';
 import { router } from 'expo-router';
@@ -90,7 +91,7 @@ export default function AccountsSettingsScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#7F77DD" />
+          <ActivityIndicator color=colors.primary />
         </View>
       ) : isError ? (
         <View style={styles.center}>

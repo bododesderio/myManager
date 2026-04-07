@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -18,7 +19,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   periodButton: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#f0f0f0' },
-  periodButtonActive: { backgroundColor: '#7F77DD' },
+  periodButtonActive: { backgroundColor: colors.primary },
   periodText: { fontSize: 13, fontWeight: '500', color: '#666' },
   periodTextActive: { color: '#fff' },
   content: { flex: 1, padding: 16 },
@@ -34,7 +35,7 @@ export const styles = StyleSheet.create({
   errorSection: { backgroundColor: '#FEE2E2' },
   errorText: { color: '#991B1B', marginBottom: 8 },
   retryBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#fff', borderRadius: 6 },
-  retryText: { color: '#7F77DD', fontWeight: '600' },
+  retryText: { color: colors.primary, fontWeight: '600' },
   postRow: { paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#eee' },
   postCaption: { fontSize: 14, color: '#1a1a1a', fontWeight: '500' },
   postMeta: { fontSize: 12, color: '#777', marginTop: 2 },

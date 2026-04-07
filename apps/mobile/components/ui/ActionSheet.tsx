@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
 
 interface ActionSheetOption {
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 18,
-    color: '#7F77DD',
+    color: colors.primary,
     fontWeight: '500',
   },
   destructiveText: {

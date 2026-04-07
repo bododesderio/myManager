@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, ScrollView, TouchableOpacity, Switch, TextInput, Alert } from 'react-native';
 import { styles } from './security.styles';
 import { router } from 'expo-router';
@@ -142,7 +143,7 @@ export default function SecuritySettingsScreen() {
             <Switch
               value={twoFactor}
               onValueChange={setTwoFactor}
-              trackColor={{ false: '#ddd', true: '#7F77DD' }}
+              trackColor={{ false: '#ddd', true: colors.primary }}
               thumbColor="#fff"
             />
           </View>
@@ -156,7 +157,7 @@ export default function SecuritySettingsScreen() {
             <Switch
               value={biometric}
               onValueChange={handleBiometricToggle}
-              trackColor={{ false: '#ddd', true: '#7F77DD' }}
+              trackColor={{ false: '#ddd', true: colors.primary }}
               thumbColor="#fff"
             />
           </View>

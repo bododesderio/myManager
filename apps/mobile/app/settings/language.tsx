@@ -1,3 +1,4 @@
+import { colors } from '@/theme/colors';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { styles } from './language.styles';
 import { router } from 'expo-router';
@@ -67,7 +68,7 @@ export default function LanguageSettingsScreen() {
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Language</Text>
-        {saving ? <ActivityIndicator size="small" color="#7F77DD" /> : <View style={{ width: 40 }} />}
+        {saving ? <ActivityIndicator size="small" color=colors.primary /> : <View style={{ width: 40 }} />}
       </View>
 
       <FlatList
