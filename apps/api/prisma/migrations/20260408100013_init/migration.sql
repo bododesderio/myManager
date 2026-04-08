@@ -1,6 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "public";
-
 -- CreateEnum
 CREATE TYPE "UserStatus" AS ENUM ('PENDING_PAYMENT', 'PENDING_VERIFICATION', 'ACTIVE', 'SUSPENDED', 'DEACTIVATED');
 
@@ -14,13 +11,13 @@ CREATE TYPE "WorkspaceRole" AS ENUM ('OWNER', 'ADMIN', 'MEMBER');
 CREATE TYPE "MemberStatus" AS ENUM ('ACTIVE', 'SOFT_LOCKED', 'REMOVED');
 
 -- CreateEnum
-CREATE TYPE "SubStatus" AS ENUM ('ACTIVE', 'PAST_DUE', 'GRACE_PERIOD', 'CANCELLED', 'PENDING_PAYMENT');
+CREATE TYPE "SubStatus" AS ENUM ('ACTIVE', 'PAST_DUE', 'GRACE_PERIOD', 'CANCELLING', 'CANCELLED', 'SUPERSEDED', 'PENDING_PAYMENT');
 
 -- CreateEnum
 CREATE TYPE "BillingCycle" AS ENUM ('MONTHLY', 'ANNUAL');
 
 -- CreateEnum
-CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REVISION_REQUESTED', 'PENDING_CLIENT_APPROVAL', 'APPROVED_BY_CLIENT', 'SCHEDULED', 'PUBLISHING', 'PUBLISHED', 'FAILED', 'CANCELLED');
+CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REVISION_REQUESTED', 'PENDING_CLIENT_APPROVAL', 'APPROVED_BY_CLIENT', 'SCHEDULED', 'QUEUED', 'PUBLISHING', 'PUBLISHED', 'PARTIALLY_PUBLISHED', 'FAILED', 'CANCELLED', 'DELETED');
 
 -- CreateEnum
 CREATE TYPE "CmsFieldType" AS ENUM ('TEXT', 'TEXTAREA', 'RICHTEXT', 'URL', 'IMAGE_URL', 'COLOR', 'BOOLEAN', 'NUMBER', 'JSON');
@@ -509,6 +506,18 @@ CREATE TABLE "whatsapp_contact_lists" (
 );
 
 -- CreateTable
+CREATE TABLE "whatsapp_contacts" (
+    "id" TEXT NOT NULL,
+    "list_id" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "name" TEXT,
+    "opted_in" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "whatsapp_contacts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "posts" (
     "id" TEXT NOT NULL,
     "workspace_id" TEXT NOT NULL,
@@ -830,8 +839,10 @@ CREATE TABLE "brand_configs" (
     "favicon_url" TEXT,
     "support_email" TEXT NOT NULL DEFAULT 'support@mymanager.app',
     "sales_email" TEXT NOT NULL DEFAULT 'sales@mymanager.app',
-    "footer_made_in" TEXT NOT NULL DEFAULT 'Made with care in Kampala, Uganda',
-    "footer_copyright" TEXT NOT NULL DEFAULT '© 2025–2026 MyManager Ltd. All rights reserved.',
+    "footer_made_in" TEXT NOT NULL DEFAULT 'Developed from Uganda',
+    "footer_copyright" TEXT NOT NULL DEFAULT '© 2025–2026 myManager. All rights reserved.',
+    "footer_attribution_text" TEXT NOT NULL DEFAULT 'Developed by Rooibok Technologies Limited',
+    "footer_attribution_url" TEXT NOT NULL DEFAULT 'https://rooibok.net',
     "meta_title_suffix" TEXT NOT NULL DEFAULT '— myManager',
     "google_analytics_id" TEXT,
     "maintenance_mode" BOOLEAN NOT NULL DEFAULT false,
@@ -1146,7 +1157,10 @@ CREATE TABLE "social_comments" (
     "text" TEXT NOT NULL,
     "sentiment" TEXT,
     "is_reply" BOOLEAN NOT NULL DEFAULT false,
+    "is_hidden" BOOLEAN NOT NULL DEFAULT false,
     "replied_at" TIMESTAMP(3),
+    "reply_text" TEXT,
+    "reply_user_id" TEXT,
     "fetched_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "social_comments_pkey" PRIMARY KEY ("id")
@@ -1296,6 +1310,7 @@ CREATE TABLE "webhook_endpoints" (
     "events" TEXT[],
     "secret" TEXT NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "provider" TEXT NOT NULL DEFAULT 'generic',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -1400,6 +1415,19 @@ CREATE TABLE "audit_logs" (
     CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "system_configs" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "is_secret" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "system_configs_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -1452,6 +1480,15 @@ CREATE UNIQUE INDEX "plans_slug_key" ON "plans"("slug");
 CREATE UNIQUE INDEX "subscriptions_workspace_id_key" ON "subscriptions"("workspace_id");
 
 -- CreateIndex
+CREATE INDEX "billing_history_workspace_id_created_at_idx" ON "billing_history"("workspace_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "billing_history_user_id_created_at_idx" ON "billing_history"("user_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "billing_history_flutterwave_ref_idx" ON "billing_history"("flutterwave_ref");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "workspaces_slug_key" ON "workspaces"("slug");
 
 -- CreateIndex
@@ -1477,6 +1514,12 @@ CREATE UNIQUE INDEX "workspace_approval_configs_workspace_id_key" ON "workspace_
 
 -- CreateIndex
 CREATE UNIQUE INDEX "workspace_brand_configs_workspace_id_key" ON "workspace_brand_configs"("workspace_id");
+
+-- CreateIndex
+CREATE INDEX "projects_workspace_id_created_at_idx" ON "projects"("workspace_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "projects_workspace_id_status_idx" ON "projects"("workspace_id", "status");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "projects_workspace_id_slug_key" ON "projects"("workspace_id", "slug");
@@ -1509,6 +1552,12 @@ CREATE UNIQUE INDEX "platform_content_types_platform_id_content_type_id_key" ON 
 CREATE UNIQUE INDEX "social_accounts_workspace_id_platform_id_platform_user_id_key" ON "social_accounts"("workspace_id", "platform_id", "platform_user_id");
 
 -- CreateIndex
+CREATE INDEX "whatsapp_contacts_list_id_idx" ON "whatsapp_contacts"("list_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "whatsapp_contacts_list_id_phone_key" ON "whatsapp_contacts"("list_id", "phone");
+
+-- CreateIndex
 CREATE INDEX "posts_workspace_id_status_idx" ON "posts"("workspace_id", "status");
 
 -- CreateIndex
@@ -1522,6 +1571,12 @@ CREATE INDEX "posts_workspace_id_published_at_idx" ON "posts"("workspace_id", "p
 
 -- CreateIndex
 CREATE INDEX "posts_project_id_status_idx" ON "posts"("project_id", "status");
+
+-- CreateIndex
+CREATE INDEX "posts_workspace_id_status_scheduled_at_idx" ON "posts"("workspace_id", "status", "scheduled_at");
+
+-- CreateIndex
+CREATE INDEX "posts_user_id_created_at_idx" ON "posts"("user_id", "created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "post_platform_results_post_id_platform_key" ON "post_platform_results"("post_id", "platform");
@@ -1545,6 +1600,9 @@ CREATE INDEX "post_comments_post_id_idx" ON "post_comments"("post_id");
 CREATE INDEX "approval_events_post_id_idx" ON "approval_events"("post_id");
 
 -- CreateIndex
+CREATE INDEX "campaigns_workspace_id_created_at_idx" ON "campaigns"("workspace_id", "created_at");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "campaign_posts_campaign_id_post_id_key" ON "campaign_posts"("campaign_id", "post_id");
 
 -- CreateIndex
@@ -1552,6 +1610,9 @@ CREATE UNIQUE INDEX "media_assets_r2_key_key" ON "media_assets"("r2_key");
 
 -- CreateIndex
 CREATE INDEX "media_assets_workspace_id_idx" ON "media_assets"("workspace_id");
+
+-- CreateIndex
+CREATE INDEX "media_assets_user_id_created_at_idx" ON "media_assets"("user_id", "created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "post_analytics_post_id_platform_key" ON "post_analytics"("post_id", "platform");
@@ -1569,7 +1630,16 @@ CREATE UNIQUE INDEX "best_times_workspace_id_platform_day_of_week_hour_key" ON "
 CREATE INDEX "notifications_user_id_read_idx" ON "notifications"("user_id", "read");
 
 -- CreateIndex
+CREATE INDEX "notifications_user_id_read_created_at_idx" ON "notifications"("user_id", "read", "created_at");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "notification_preferences_user_id_event_type_channel_key" ON "notification_preferences"("user_id", "event_type", "channel");
+
+-- CreateIndex
+CREATE INDEX "report_configs_workspace_id_created_at_idx" ON "report_configs"("workspace_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "report_configs_workspace_id_is_active_idx" ON "report_configs"("workspace_id", "is_active");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "cms_pages_slug_key" ON "cms_pages"("slug");
@@ -1638,6 +1708,12 @@ CREATE UNIQUE INDEX "competitor_profiles_workspace_id_platform_platform_id_key" 
 CREATE UNIQUE INDEX "competitor_snapshots_competitor_profile_id_date_key" ON "competitor_snapshots"("competitor_profile_id", "date");
 
 -- CreateIndex
+CREATE INDEX "webhook_deliveries_webhook_endpoint_id_created_at_idx" ON "webhook_deliveries"("webhook_endpoint_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "webhook_deliveries_next_retry_at_idx" ON "webhook_deliveries"("next_retry_at");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "api_keys_key_hash_key" ON "api_keys"("key_hash");
 
 -- CreateIndex
@@ -1648,6 +1724,15 @@ CREATE INDEX "audit_logs_workspace_id_created_at_idx" ON "audit_logs"("workspace
 
 -- CreateIndex
 CREATE INDEX "audit_logs_user_id_created_at_idx" ON "audit_logs"("user_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_workspace_id_action_created_at_idx" ON "audit_logs"("workspace_id", "action", "created_at");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "system_configs_key_key" ON "system_configs"("key");
+
+-- CreateIndex
+CREATE INDEX "system_configs_category_idx" ON "system_configs"("category");
 
 -- AddForeignKey
 ALTER TABLE "user_preferences" ADD CONSTRAINT "user_preferences_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1674,10 +1759,10 @@ ALTER TABLE "password_reset_tokens" ADD CONSTRAINT "password_reset_tokens_user_i
 ALTER TABLE "email_verification_tokens" ADD CONSTRAINT "email_verification_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_plan_id_fkey" FOREIGN KEY ("plan_id") REFERENCES "plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1686,13 +1771,13 @@ ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_plan_id_fkey" FOREIGN 
 ALTER TABLE "subscription_items" ADD CONSTRAINT "subscription_items_subscription_id_fkey" FOREIGN KEY ("subscription_id") REFERENCES "subscriptions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "billing_history" ADD CONSTRAINT "billing_history_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "billing_history" ADD CONSTRAINT "billing_history_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "plan_overrides" ADD CONSTRAINT "plan_overrides_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "plan_overrides" ADD CONSTRAINT "plan_overrides_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "plan_overrides" ADD CONSTRAINT "plan_overrides_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "plan_overrides" ADD CONSTRAINT "plan_overrides_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "plan_overrides" ADD CONSTRAINT "plan_overrides_plan_id_fkey" FOREIGN KEY ("plan_id") REFERENCES "plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1710,7 +1795,7 @@ ALTER TABLE "workspace_members" ADD CONSTRAINT "workspace_members_workspace_id_f
 ALTER TABLE "workspace_invitations" ADD CONSTRAINT "workspace_invitations_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "workspace_invitations" ADD CONSTRAINT "workspace_invitations_invited_by_id_fkey" FOREIGN KEY ("invited_by_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "workspace_invitations" ADD CONSTRAINT "workspace_invitations_invited_by_id_fkey" FOREIGN KEY ("invited_by_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "workspace_approval_configs" ADD CONSTRAINT "workspace_approval_configs_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1762,6 +1847,9 @@ ALTER TABLE "platform_board_cache" ADD CONSTRAINT "platform_board_cache_platform
 
 -- AddForeignKey
 ALTER TABLE "whatsapp_contact_lists" ADD CONSTRAINT "whatsapp_contact_lists_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "whatsapp_contacts" ADD CONSTRAINT "whatsapp_contacts_list_id_fkey" FOREIGN KEY ("list_id") REFERENCES "whatsapp_contact_lists"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "posts" ADD CONSTRAINT "posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1824,7 +1912,7 @@ ALTER TABLE "campaign_posts" ADD CONSTRAINT "campaign_posts_campaign_id_fkey" FO
 ALTER TABLE "campaign_posts" ADD CONSTRAINT "campaign_posts_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "media_assets" ADD CONSTRAINT "media_assets_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "media_assets" ADD CONSTRAINT "media_assets_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "post_analytics" ADD CONSTRAINT "post_analytics_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1860,13 +1948,16 @@ ALTER TABLE "cms_sections" ADD CONSTRAINT "cms_sections_page_id_fkey" FOREIGN KE
 ALTER TABLE "cms_fields" ADD CONSTRAINT "cms_fields_section_id_fkey" FOREIGN KEY ("section_id") REFERENCES "cms_sections"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "blog_posts" ADD CONSTRAINT "blog_posts_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "blog_posts" ADD CONSTRAINT "blog_posts_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ai_credit_usage" ADD CONSTRAINT "ai_credit_usage_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "utm_configs" ADD CONSTRAINT "utm_configs_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "social_comments" ADD CONSTRAINT "social_comments_reply_user_id_fkey" FOREIGN KEY ("reply_user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "comment_assignments" ADD CONSTRAINT "comment_assignments_social_comment_id_fkey" FOREIGN KEY ("social_comment_id") REFERENCES "social_comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1911,10 +2002,10 @@ ALTER TABLE "webhook_deliveries" ADD CONSTRAINT "webhook_deliveries_webhook_endp
 ALTER TABLE "api_keys" ADD CONSTRAINT "api_keys_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "data_export_requests" ADD CONSTRAINT "data_export_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "data_export_requests" ADD CONSTRAINT "data_export_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "deletion_requests" ADD CONSTRAINT "deletion_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "deletion_requests" ADD CONSTRAINT "deletion_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "cookie_consents" ADD CONSTRAINT "cookie_consents_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1924,4 +2015,3 @@ ALTER TABLE "user_email_preferences" ADD CONSTRAINT "user_email_preferences_user
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
