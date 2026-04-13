@@ -10,6 +10,7 @@ interface NewsletterFormProps {
 
 export function NewsletterForm({ title, description, disclaimer }: NewsletterFormProps) {
   const [email, setEmail] = useState('');
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -19,7 +20,7 @@ export function NewsletterForm({ title, description, disclaimer }: NewsletterFor
 
     setStatus('loading');
     try {
-      const res = await fetch('/api/v1/newsletter/subscribe', {
+      const res = await fetch(API_URL + '/api/v1/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

@@ -43,7 +43,7 @@ export async function MarketingNavbar() {
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/images/logo.svg" alt={brand.app_name} width={140} height={32} priority />
+          <span className="text-[18px] font-extrabold text-text"><span className="text-primary">my</span>Manager</span>
         </Link>
 
         {/* Center nav links — client island for active route highlight */}

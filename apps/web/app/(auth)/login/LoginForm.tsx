@@ -145,7 +145,7 @@ export function LoginForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-border rounded-input px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              className="w-full border border-border rounded-input bg-white text-gray-900 px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
             />
           </div>
 
@@ -162,7 +162,7 @@ export function LoginForm() {
               required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-border rounded-input px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none pr-10"
+                className="w-full border border-border rounded-input bg-white text-gray-900 px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none pr-10"
               />
               <button
                 type="button"
@@ -221,7 +221,7 @@ export function LoginForm() {
                 value={totpCode}
                 onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="Enter 6-digit code"
-                className="w-full border border-border rounded-input px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                className="w-full border border-border rounded-input bg-white text-gray-900 px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
               />
               <p className="mt-1 text-[11px] text-text-muted">
                 Use the code from your authenticator app.

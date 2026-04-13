@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #6D5AE8;
+  --color-primary-dark: #4A36D4;
+  --color-primary-light: #EEEBFE;
+  --color-primary-border: #C8C2F8;
+  --color-secondary: #FF5C7A;
+  --color-secondary-dark: #E63462;
+  --color-secondary-light: #FFEBF0;
+  --color-accent: #10B981;
+  --color-accent-light: #D1FAE5;
+  --color-tertiary: #06B6D4;
+  --color-quaternary: #F59E0B;
+  --color-text: #111111;
+  --color-text-2: #555555;
+  --color-text-muted: #aaaaaa;
+  --color-bg: #ffffff;
+  --color-bg-2: #F8F7FF;
+  --color-bg-card: #f7f6f2;
+  --color-border: #e8e6e0;
+  --color-border-light: #f0efe8;
+  --color-error: #E24B4A;
+  --color-error-light: #FCEBEB;
+  --color-warning: #EF9F27;
+  --color-warning-light: #FAEEDA;
+  --color-stats-bg: #4A36D4;
+  --color-stats-text: #ffffff;
+}
+
 /* ═══════════════════════════════════════════════════════════
    DESIGN SYSTEM — Vibrant Dawn (enhanced palette)
    All colors/radii/fonts via CSS custom properties.
@@ -278,23 +306,23 @@ code, pre, kbd, samp {
    ═══════════════════════════════════════════════════════════ */
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out both;
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
 .animate-fade-in-down {
-  animation: fadeInDown 0.6s ease-out both;
+  animation: fadeInDown 0.6s ease-out forwards;
 }
 
 .animate-slide-in-left {
-  animation: slideInLeft 0.6s ease-out both;
+  animation: slideInLeft 0.6s ease-out forwards;
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out both;
+  animation: slideInRight 0.6s ease-out forwards;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.5s ease-out both;
+  animation: scaleIn 0.5s ease-out forwards;
 }
 
 .animate-float {
@@ -446,4 +474,28 @@ input, textarea, select {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-muted);
+}
+
+/* Ensure elements don't stay invisible if already in viewport on load */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-down,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-scale-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Disable SSR-broken animations — content must be visible */
+.animate-fade-in-up,
+.animate-fade-in-down,
+.animate-slide-in-left,
+.animate-slide-in-right,
+.animate-scale-in {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }

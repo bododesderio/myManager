@@ -10,9 +10,9 @@ export default function TermsOfServicePage() {
     <main className="min-h-screen px-4 py-20">
       <div className="mx-auto max-w-3xl">
         <h1 className="font-heading text-4xl font-extrabold">Terms of Service</h1>
-        <p className="mt-4 text-sm text-gray-500">Last updated: March 1, 2026</p>
+        <p className="mt-4 text-sm text-text-muted">Last updated: March 1, 2026</p>
 
-        <div className="mt-10 space-y-8 text-gray-700 leading-relaxed">
+        <div className="mt-10 space-y-8 text-text-2 leading-relaxed">
           <section>
             <h2 className="font-heading text-xl font-bold">1. Acceptance of Terms</h2>
             <p className="mt-3">

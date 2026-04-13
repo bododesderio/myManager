@@ -119,7 +119,7 @@ export default async function FeaturesPage() {
                 <p className="animate-fade-in-up delay-100 mt-2 text-[15px] text-text-2">{group.description}</p>
               )}
               <div className="mt-8 grid gap-6 md:grid-cols-3">
-                {group.features.map((feature, fi) => (
+                {( group.features || [] ).map((feature, fi) => (
                   <div
                     key={feature.title}
                     className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-6 ${theme.accent} ${['', 'delay-100', 'delay-200'][fi] || ''}`}

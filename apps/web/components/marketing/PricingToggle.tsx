@@ -70,7 +70,7 @@ export function PricingToggle({ plans }: { plans: Plan[] }) {
       <div className="mx-auto mb-10 flex items-center justify-center gap-3">
         <span className={`text-[13px] font-medium transition-colors ${!annual ? 'text-text' : 'text-text-muted'}`}>
           Monthly
-        </span>
+
         <button
           type="button"
           onClick={() => setAnnual(!annual)}
@@ -83,11 +83,11 @@ export function PricingToggle({ plans }: { plans: Plan[] }) {
         </button>
         <span className={`text-[13px] font-medium transition-colors ${annual ? 'text-text' : 'text-text-muted'}`}>
           Annual
-        </span>
+
         {annual && (
           <span className="animate-scale-in rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[10px] font-bold text-white">
             Save 20%
-          </span>
+
         )}
       </div>
 
@@ -115,14 +115,17 @@ export function PricingToggle({ plans }: { plans: Plan[] }) {
               {highlighted && (
                 <span className="absolute -top-0 left-1/2 -translate-x-1/2 translate-y-2 rounded-full bg-gradient-to-r from-primary to-[var(--color-primary-dark)] px-3 py-1 text-[10px] font-bold text-white shadow-md">
                   Most popular
-                </span>
+
               )}
 
               <h3 className="mt-3 text-[15px] font-bold text-text">{plan.name}</h3>
               <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-[32px] font-extrabold text-text">
-                  {priceNum === 0 ? 'Free' : `$${priceNum}`}
-                </span>
+                <span className="relative inline-block min-w-[90px]">
+                  <span key={annual ? 'annual' : 'monthly'} className="inline-block text-[32px] font-extrabold text-text tabular-nums transition-all duration-300">
+                    {priceNum === 0 ? 'Free' : `$${priceNum}`}
+
+
+
                 {period && <span className="text-[13px] text-text-muted">{period}</span>}
               </div>
               <p className="mt-2 text-[12px] text-text-2">{plan.description}</p>

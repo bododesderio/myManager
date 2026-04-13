@@ -166,3 +166,25 @@
     padding: 48px 40px;
   }
 }
+
+.card input,
+.card select,
+.card textarea {
+  background-color: #f9f9f9;
+  color: #111111;
+}
+
+.card label {
+  color: #555555;
+}
+
+.card p,
+.card h1,
+.card h2,
+.card span:not([class*="text-primary"]) {
+  color: var(--color-text, #111111);
+}
+
+.card { color: #111111 !important; }
+.card input, .card select, .card textarea { background-color: #ffffff; color: #111111; border-color: #e8e6e0; }
+.card label, .card p, .card span { color: inherit; }

@@ -90,7 +90,7 @@ export default async function BlogPage() {
                 key={cat.id || cat.slug || cat.name}
                 className="card-hover cursor-pointer rounded-full border border-border bg-white px-4 py-1.5 text-[12px] font-medium text-text-2 hover:border-primary hover:text-primary"
               >
-                {cat.name || cat}
+                {cat.category || cat.name || String(cat)}
               </span>
             ))}
           </div>
@@ -203,9 +203,9 @@ export default async function BlogPage() {
                       key={cat.id || cat.slug || cat.name}
                       className="flex items-center justify-between text-[13px]"
                     >
-                      <span className="text-text-2">{cat.name || cat}</span>
-                      {cat.count != null && (
-                        <span className="rounded-full bg-[var(--color-primary-light)] px-2 py-0.5 text-[10px] font-medium text-primary">{cat.count}</span>
+                      <span className="text-text-2">{cat.category || cat.name || String(cat)}</span>
+                      {(cat.post_count ?? cat.count) != null && (
+                        <span className="rounded-full bg-[var(--color-primary-light)] px-2 py-0.5 text-[10px] font-medium text-primary">{cat.post_count ?? cat.count}</span>
                       )}
                     </div>
                   ))}

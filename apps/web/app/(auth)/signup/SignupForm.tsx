@@ -136,8 +136,8 @@ export default function SignupForm() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
-                <p className="text-sm text-gray-500 mt-1">Get started with MyManager</p>
+                <h1 className="text-2xl font-bold text-text">Create your account</h1>
+                <p className="text-sm text-text-2 mt-1">Get started with MyManager</p>
               </div>
 
               {/* Account type toggle */}
@@ -149,11 +149,11 @@ export default function SignupForm() {
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       accountType === type
                         ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-border hover:border-border'
                     }`}
                   >
-                    <p className="font-medium text-gray-900 capitalize">{type === 'individual' ? 'Individual / Creator' : 'Company / Agency'}</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="font-medium text-text capitalize">{type === 'individual' ? 'Individual / Creator' : 'Company / Agency'}</p>
+                    <p className="text-xs text-text-2 mt-1">
                       {type === 'individual' ? 'Personal social media management' : 'Team collaboration & client management'}
                     </p>
                   </button>
@@ -173,20 +173,20 @@ export default function SignupForm() {
                     if (!workspaceName) setWorkspaceName(`${e.target.value} Workspace`);
                     if (!workspaceSlug) setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                   }}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                 />
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <input type="text" required minLength={2} aria-label="First name" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
-                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 <input type="text" required minLength={2} aria-label="Last name" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
-                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
               </div>
 
               <div>
                 <input type="email" required aria-label="Email address" autoComplete="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {email && !emailValid && (
                   <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
                 )}
@@ -194,7 +194,7 @@ export default function SignupForm() {
 
               <div>
                 <input type="password" required minLength={8} aria-label="Password" autoComplete="new-password" placeholder="Password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {password && (
                   <div className="flex gap-1 mt-2">
                     {[1, 2, 3, 4].map((i) => (
@@ -209,14 +209,14 @@ export default function SignupForm() {
               </div>
 
               <select value={country} onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Select country</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
 
               {accountType === 'company' && (
                 <select value={teamSize} onChange={(e) => setTeamSize(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                   <option value="">Team size</option>
                   {TEAM_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -230,7 +230,7 @@ export default function SignupForm() {
                 Continue
               </button>
 
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-text-2">
                 Already have an account?{' '}
                 <Link href="/login" className="text-[var(--color-primary)] hover:underline">Log in</Link>
               </p>
@@ -241,24 +241,24 @@ export default function SignupForm() {
           {step === 2 && accountType === 'company' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Set up your workspace</h1>
-                <p className="text-sm text-gray-500 mt-1">This is where your team will collaborate</p>
+                <h1 className="text-2xl font-bold text-text">Set up your workspace</h1>
+                <p className="text-sm text-text-2 mt-1">This is where your team will collaborate</p>
               </div>
 
               <input type="text" placeholder="Workspace name" value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
 
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Workspace URL</label>
-                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                  <span className="px-3 bg-gray-50 text-sm text-gray-400 border-r border-gray-300 py-2.5">mymanager.com/</span>
+                <label className="text-xs text-text-2 mb-1 block">Workspace URL</label>
+                <div className="flex items-center border border-border rounded-lg overflow-hidden">
+                  <span className="px-3 bg-bg-2 text-sm text-text-muted border-r border-border py-2.5">mymanager.com/</span>
                   <input type="text" value={workspaceSlug} onChange={(e) => setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    className="flex-1 px-3 py-2.5 text-sm focus:outline-none" />
+                    className="flex-1 px-3 py-2.5 bg-white text-gray-900 text-sm focus:outline-none" />
                 </div>
               </div>
 
               <select value={industry} onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                className="w-full px-4 py-2.5 bg-white text-gray-900 border border-border bg-white text-gray-900 rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Industry</option>
                 {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
               </select>
@@ -268,7 +268,7 @@ export default function SignupForm() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={prevStep} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Back</button>
+                <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
                 <button onClick={nextStep} className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)]">Continue</button>
               </div>
             </div>
@@ -278,19 +278,19 @@ export default function SignupForm() {
           {((step === 2 && accountType === 'individual') || (step === 3 && accountType === 'company')) && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Choose your plan</h1>
-                <p className="text-sm text-gray-500 mt-1">Start free, upgrade anytime</p>
+                <h1 className="text-2xl font-bold text-text">Choose your plan</h1>
+                <p className="text-sm text-text-2 mt-1">Start free, upgrade anytime</p>
               </div>
 
               <div className="flex items-center justify-center gap-3 text-sm">
-                <span className={billingCycle === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}>Monthly</span>
+                <span className={billingCycle === 'monthly' ? 'text-text font-medium' : 'text-text-2'}>Monthly</span>
                 <button
                   onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
                   className={`relative w-11 h-6 rounded-full transition-colors ${billingCycle === 'annual' ? 'bg-[var(--color-primary)]' : 'bg-gray-300'}`}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${billingCycle === 'annual' ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
-                <span className={billingCycle === 'annual' ? 'text-gray-900 font-medium' : 'text-gray-500'}>Annual <span className="text-green-600 text-xs">-22%</span></span>
+                <span className={billingCycle === 'annual' ? 'text-text font-medium' : 'text-text-2'}>Annual <span className="text-green-600 text-xs">-22%</span></span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -304,28 +304,28 @@ export default function SignupForm() {
                     key={plan.slug}
                     onClick={() => setSelectedPlan(plan.slug)}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
-                      selectedPlan === plan.slug ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-gray-200 hover:border-gray-300'
+                      selectedPlan === plan.slug ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-border hover:border-border'
                     }`}
                   >
-                    <p className="font-semibold text-gray-900">{plan.name}</p>
-                    <p className="text-lg font-bold text-gray-900 mt-1">
+                    <p className="font-semibold text-text">{plan.name}</p>
+                    <p className="text-lg font-bold text-text mt-1">
                       {plan.price === 0 ? 'Free' : `$${plan.price}/mo`}
                     </p>
                     <ul className="mt-3 space-y-1">
                       {plan.features.map((f) => (
-                        <li key={f} className="text-xs text-gray-500">{'\u2713'} {f}</li>
+                        <li key={f} className="text-xs text-text-2">{'\u2713'} {f}</li>
                       ))}
                     </ul>
                   </button>
                 ))}
               </div>
 
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-text-muted text-center">
                 MTN MoMo &middot; Airtel Money &middot; Visa/Mastercard &middot; Google Pay &middot; Apple Pay
               </p>
 
               <div className="flex gap-3">
-                <button onClick={prevStep} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Back</button>
+                <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
                 <button
                   onClick={nextStep}
                   disabled={loading}
@@ -346,8 +346,8 @@ export default function SignupForm() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Check your inbox</h1>
-                <p className="text-sm text-gray-500 mt-2">
+                <h1 className="text-2xl font-bold text-text">Check your inbox</h1>
+                <p className="text-sm text-text-2 mt-2">
                   We&apos;ve sent a verification link to <strong>{email}</strong>
                 </p>
               </div>
