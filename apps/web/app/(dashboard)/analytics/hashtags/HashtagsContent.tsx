@@ -26,7 +26,7 @@ export function HashtagsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/analytics" className="text-sm text-brand-primary hover:underline">
+        <Link href="/analytics" className="text-sm text-primary hover:underline">
           &larr; Analytics
         </Link>
       </div>
@@ -46,7 +46,7 @@ export function HashtagsContent() {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-text-2">
@@ -55,13 +55,13 @@ export function HashtagsContent() {
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
       </div>
 
       {/* Hashtags table */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Top Performing Hashtags</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -72,11 +72,11 @@ export function HashtagsContent() {
             {hashtags.map((tag: Record<string, unknown>, i: number) => (
               <div
                 key={(tag.hashtag as string) ?? i}
-                className="flex items-center justify-between rounded-brand border px-4 py-3"
+                className="flex items-center justify-between rounded-brand border border-border px-4 py-3"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium text-text-muted">#{i + 1}</span>
-                  <span className="font-medium text-brand-primary">
+                  <span className="font-medium text-primary">
                     {tag.hashtag as string}
                   </span>
                 </div>

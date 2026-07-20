@@ -50,7 +50,7 @@ export function TemplatesContent() {
         </div>
         <Link
           href="/compose?newTemplate=true"
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           Create Template
         </Link>
@@ -59,7 +59,7 @@ export function TemplatesContent() {
       {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : !Array.isArray(templates) || templates.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
@@ -69,7 +69,7 @@ export function TemplatesContent() {
           <p className="mt-1 text-sm text-text-2">Create reusable templates to speed up your workflow.</p>
           <Link
             href="/compose?newTemplate=true"
-            className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+            className="mt-4 inline-block rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
             Create Your First Template
           </Link>
@@ -84,7 +84,7 @@ export function TemplatesContent() {
             return (
               <div
                 key={template.id}
-                className="group rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
+                className="group rounded-brand border border-border bg-bg p-5 shadow-sm transition hover:border-primary"
               >
                 <div className="flex items-start justify-between">
                   <h3 className="font-heading font-semibold">{name}</h3>
@@ -107,19 +107,19 @@ export function TemplatesContent() {
                 <div className="mt-4 flex gap-2">
                   <Link
                     href={`/compose?templateId=${template.id}`}
-                    className="rounded-brand bg-brand-primary px-3 py-1 text-xs font-medium text-white transition hover:bg-brand-primary-dark"
+                    className="rounded-brand bg-primary px-3 py-1 text-xs font-medium text-white transition hover:bg-primary-dark"
                   >
                     Use
                   </Link>
                   <Link
                     href={`/compose?templateId=${template.id}&edit=true`}
-                    className="rounded-brand border px-3 py-1 text-xs font-medium transition hover:border-brand-primary"
+                    className="rounded-brand border border-border px-3 py-1 text-xs font-medium transition hover:border-primary"
                   >
                     Edit
                   </Link>
                   <button
                     onClick={() => handleDelete(template.id)}
-                    className="rounded-brand border px-3 py-1 text-xs font-medium text-red-500 transition hover:border-red-500"
+                    className="rounded-brand border border-border px-3 py-1 text-xs font-medium text-red-500 transition hover:border-red-500"
                   >
                     Delete
                   </button>
@@ -141,7 +141,7 @@ export function TemplatesContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

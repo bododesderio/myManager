@@ -118,7 +118,7 @@ export function LegalContent() {
     return (
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Legal Content</h1>
-        <div className="rounded-brand border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-red-700">{error}</p>
           <button
             onClick={() => void load()}
@@ -136,13 +136,13 @@ export function LegalContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <button onClick={handleBack} className="text-sm text-brand-primary hover:underline">
+          <button onClick={handleBack} className="text-sm text-primary hover:underline">
             &larr; Back to list
           </button>
           <h1 className="font-heading text-2xl font-bold">Edit: {editingDoc.name}</h1>
         </div>
 
-        <div className="space-y-4 rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="space-y-4 rounded-brand border border-border bg-bg p-6 shadow-sm">
           <RichTextEditor
             value={editedBody}
             onChange={setEditedBody}
@@ -153,13 +153,13 @@ export function LegalContent() {
             <button
               onClick={() => void handleSave()}
               disabled={saving}
-              className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+              className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               onClick={handleBack}
-              className="rounded-brand border px-4 py-2 text-sm font-semibold text-text-2 transition hover:bg-bg-2"
+              className="rounded-brand border border-border px-4 py-2 text-sm font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Cancel
             </button>
@@ -176,11 +176,11 @@ export function LegalContent() {
       <p className="text-sm text-text-2">Manage legal documents and policies.</p>
 
       {docs.length === 0 ? (
-        <div className="rounded-brand border bg-bg p-8 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
           <p className="text-text-muted">No legal documents found.</p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <div className="divide-y">
             {docs.map((doc) => (
               <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
@@ -216,7 +216,7 @@ export function LegalContent() {
                   </span>
                   <button
                     onClick={() => handleEdit(doc)}
-                    className="text-sm text-brand-primary hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     Edit
                   </button>

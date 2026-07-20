@@ -30,15 +30,15 @@ export function ApiHealthContent() {
 
       {health?.uptime != null && (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Uptime</p>
             <p className="mt-1 text-2xl font-bold">{health.uptime}</p>
           </div>
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Response Time</p>
             <p className="mt-1 text-2xl font-bold">{health.responseTime ?? '--'}</p>
           </div>
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Status</p>
             <p className="mt-1 text-2xl font-bold">
               <span
@@ -56,7 +56,7 @@ export function ApiHealthContent() {
       {isLoading ? (
         <TableSkeleton rows={8} cols={4} />
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">

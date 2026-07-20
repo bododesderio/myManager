@@ -60,14 +60,14 @@ export function PlanCreateContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/superadmin/plans" className="text-sm text-brand-primary hover:underline">
+        <Link href="/superadmin/plans" className="text-sm text-primary hover:underline">
           &larr; Plans
         </Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Create New Plan</h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <div className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
           <div>
             <label htmlFor="planName" className="block text-sm font-medium text-text-2">
               Plan Name
@@ -78,7 +78,7 @@ export function PlanCreateContent() {
               required
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
           <div>
@@ -91,7 +91,7 @@ export function PlanCreateContent() {
               value={form.slug}
               onChange={(e) => update('slug', e.target.value)}
               placeholder={form.name.toLowerCase().replace(/\s+/g, '-') || 'auto-generated'}
-              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -106,7 +106,7 @@ export function PlanCreateContent() {
                 step="0.01"
                 value={form.monthlyPrice}
                 onChange={(e) => update('monthlyPrice', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -120,13 +120,13 @@ export function PlanCreateContent() {
                 step="0.01"
                 value={form.yearlyPrice}
                 onChange={(e) => update('yearlyPrice', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">Limits</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -139,7 +139,7 @@ export function PlanCreateContent() {
                 min="1"
                 value={form.maxAccounts}
                 onChange={(e) => update('maxAccounts', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -152,7 +152,7 @@ export function PlanCreateContent() {
                 min="1"
                 value={form.maxMembers}
                 onChange={(e) => update('maxMembers', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -165,7 +165,7 @@ export function PlanCreateContent() {
                 min="1"
                 value={form.maxStorage}
                 onChange={(e) => update('maxStorage', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -178,13 +178,13 @@ export function PlanCreateContent() {
                 min="0"
                 value={form.maxPosts}
                 onChange={(e) => update('maxPosts', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">Features</h2>
           <div>
             <label htmlFor="features" className="block text-sm font-medium text-text-2">
@@ -196,7 +196,7 @@ export function PlanCreateContent() {
               value={form.features}
               onChange={(e) => update('features', e.target.value)}
               placeholder="Analytics dashboard&#10;AI caption writer&#10;Team collaboration"
-              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
         </div>
@@ -204,7 +204,7 @@ export function PlanCreateContent() {
         <button
           type="submit"
           disabled={createPlan.isPending}
-          className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+          className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
         >
           {createPlan.isPending ? 'Creating...' : 'Create Plan'}
         </button>

@@ -74,7 +74,7 @@ export default async function ContactPage() {
           {/* ── SIDEBAR INFO ── */}
           <aside className="animate-fade-in-up delay-300 space-y-6 pt-10 lg:pt-0">
             {/* Email contacts */}
-            <div className="card-hover rounded-card border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
+            <div className="card-hover rounded-card border border-border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
               <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Email Us</h3>
               <div className="mt-4 space-y-3 text-[13px]">
                 <div>
@@ -94,7 +94,7 @@ export default async function ContactPage() {
 
             {/* Social Links */}
             {socialLinks.length > 0 && (
-              <div className="card-hover rounded-card border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
+              <div className="card-hover rounded-card border border-border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Follow Us</h3>
                 <div className="mt-4 space-y-2">
                   {socialLinks.map((link) => (
@@ -114,7 +114,7 @@ export default async function ContactPage() {
 
             {/* Office */}
             {brand.address && (
-              <div className="card-hover rounded-card border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
+              <div className="card-hover rounded-card border border-border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Office</h3>
                 <p className="mt-3 text-[13px] text-text-2 whitespace-pre-line">{brand.address}</p>
               </div>

@@ -62,7 +62,7 @@ export function AnalyticsContent() {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-text-2">
@@ -71,19 +71,19 @@ export function AnalyticsContent() {
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
         <div className="ml-auto flex gap-2">
           <Link
             href="/analytics/hashtags"
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
           >
             Hashtag Analytics
           </Link>
           <Link
             href="/analytics/benchmarks"
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
           >
             Benchmarks
           </Link>
@@ -94,7 +94,7 @@ export function AnalyticsContent() {
       {overview.isLoading ? (
         <StatCardSkeletonGrid count={4} />
       ) : overview.isError ? (
-        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load analytics overview. {(overview.error as Error)?.message ?? ''}{' '}
           <button type="button" onClick={() => overview.refetch()} className="ml-1 underline">
             Retry
@@ -111,7 +111,7 @@ export function AnalyticsContent() {
               value: stats?.engagementRate != null ? `${stats.engagementRate}%` : '-',
             },
           ].map((metric) => (
-            <div key={metric.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+            <div key={metric.label} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
               <p className="text-sm text-text-2">{metric.label}</p>
               <p className="mt-1 text-2xl font-bold">
                 {typeof metric.value === 'number'
@@ -124,7 +124,7 @@ export function AnalyticsContent() {
       )}
 
       {/* Time-series chart */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Engagement Over Time</h2>
         {daily.isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -161,14 +161,14 @@ export function AnalyticsContent() {
       </div>
 
       {/* Top posts table */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Top Posts</h2>
         {topPosts.isLoading ? (
           <div className="mt-4">
             <TableSkeleton rows={5} cols={4} />
           </div>
         ) : topPosts.isError ? (
-          <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mt-4 rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             Failed to load top posts. {(topPosts.error as Error)?.message ?? ''}{' '}
             <button type="button" onClick={() => topPosts.refetch()} className="ml-1 underline">
               Retry
@@ -211,7 +211,7 @@ export function AnalyticsContent() {
           <Link
             key={platform}
             href={`/analytics/${platform.toLowerCase()}`}
-            className="rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
+            className="rounded-brand border border-border bg-bg p-5 shadow-sm transition hover:border-primary"
           >
             <h3 className="font-heading font-semibold">{platform}</h3>
             <p className="mt-1 text-sm text-text-2">View detailed {platform} analytics</p>

@@ -18,7 +18,7 @@ export default function AuthLoading() {
       <span className="sr-only">Loading</span>
       <div
         aria-hidden="true"
-        className="w-full max-w-md animate-pulse space-y-4 rounded-brand border border-border bg-bg-card p-8 shadow-sm"
+        className="w-full max-w-md animate-pulse space-y-4 rounded-brand border border-border border-border bg-bg-card p-8 shadow-sm"
       >
         <SkeletonBar className="mx-auto h-7 w-40" />
         <SkeletonBar className="mx-auto h-3 w-56" />

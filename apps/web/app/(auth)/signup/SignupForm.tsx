@@ -173,20 +173,20 @@ export default function SignupForm() {
                     if (!workspaceName) setWorkspaceName(`${e.target.value} Workspace`);
                     if (!workspaceSlug) setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                   }}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                 />
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <input type="text" required minLength={2} aria-label="First name" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
-                  className="px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 <input type="text" required minLength={2} aria-label="Last name" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
-                  className="px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
               </div>
 
               <div>
                 <input type="email" required aria-label="Email address" autoComplete="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {email && !emailValid && (
                   <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
                 )}
@@ -194,7 +194,7 @@ export default function SignupForm() {
 
               <div>
                 <input type="password" required minLength={8} aria-label="Password" autoComplete="new-password" placeholder="Password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {password && (
                   <div className="flex gap-1 mt-2">
                     {[1, 2, 3, 4].map((i) => (
@@ -209,14 +209,14 @@ export default function SignupForm() {
               </div>
 
               <select value={country} onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Select country</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
 
               {accountType === 'company' && (
                 <select value={teamSize} onChange={(e) => setTeamSize(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                   <option value="">Team size</option>
                   {TEAM_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -246,11 +246,11 @@ export default function SignupForm() {
               </div>
 
               <input type="text" placeholder="Workspace name" value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)}
-                className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
 
               <div>
                 <label className="text-xs text-text-2 mb-1 block">Workspace URL</label>
-                <div className="flex items-center border border-border rounded-lg overflow-hidden">
+                <div className="flex items-center border border-border border-border rounded-lg overflow-hidden">
                   <span className="px-3 bg-bg-2 text-sm text-text-muted border-r border-border py-2.5">mymanager.com/</span>
                   <input type="text" value={workspaceSlug} onChange={(e) => setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                     className="flex-1 px-3 py-2.5 bg-bg text-text text-sm focus:outline-none" />
@@ -258,7 +258,7 @@ export default function SignupForm() {
               </div>
 
               <select value={industry} onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-4 py-2.5 bg-bg text-text border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Industry</option>
                 {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
               </select>
@@ -268,7 +268,7 @@ export default function SignupForm() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
+                <button onClick={prevStep} className="px-6 py-2.5 border border-border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
                 <button onClick={nextStep} className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)]">Continue</button>
               </div>
             </div>
@@ -325,7 +325,7 @@ export default function SignupForm() {
               </p>
 
               <div className="flex gap-3">
-                <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
+                <button onClick={prevStep} className="px-6 py-2.5 border border-border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
                 <button
                   onClick={nextStep}
                   disabled={loading}

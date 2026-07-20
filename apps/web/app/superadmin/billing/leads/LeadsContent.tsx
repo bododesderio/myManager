@@ -18,7 +18,7 @@ export function LeadsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/superadmin/billing" className="text-sm text-brand-primary hover:underline">
+        <Link href="/superadmin/billing" className="text-sm text-primary hover:underline">
           &larr; Billing
         </Link>
       </div>
@@ -28,7 +28,7 @@ export function LeadsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">

@@ -31,7 +31,7 @@ export default async function ReportRenderPage({ params }: ReportRenderPageProps
               { label: 'Followers Gained', value: '+2,100' },
               { label: 'Posts Published', value: '86' },
             ].map((metric) => (
-              <div key={metric.label} className="rounded border p-4 text-center">
+              <div key={metric.label} className="rounded border border-border p-4 text-center">
                 <p className="text-xs text-text-2">{metric.label}</p>
                 <p className="mt-1 text-xl font-bold">{metric.value}</p>
               </div>
@@ -41,7 +41,7 @@ export default async function ReportRenderPage({ params }: ReportRenderPageProps
 
         <section className="mt-8">
           <h2 className="font-heading text-xl font-bold">Platform Breakdown</h2>
-          <div className="mt-4 h-64 rounded border border-dashed border-border flex items-center justify-center text-sm text-text-muted">
+          <div className="mt-4 h-64 rounded border border-border border-dashed border-border flex items-center justify-center text-sm text-text-muted">
             Platform performance chart renders here for PDF export.
           </div>
         </section>
@@ -50,7 +50,7 @@ export default async function ReportRenderPage({ params }: ReportRenderPageProps
           <h2 className="font-heading text-xl font-bold">Top Performing Posts</h2>
           <div className="mt-4 space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded border p-4">
+              <div key={i} className="rounded border border-border p-4">
                 <p className="text-sm text-text-2">Top performing post #{i} content preview...</p>
                 <div className="mt-2 flex gap-4 text-xs text-text-2">
                   <span>Impressions: {(5000 - i * 500).toLocaleString()}</span>

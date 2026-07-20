@@ -10,6 +10,7 @@ import {
   useVerifyTwoFactor,
 } from '@/lib/hooks/useUser';
 import { useToast } from '@/providers/ToastProvider';
+import { Button } from '@mymanager/ui';
 
 export default function SecurityContent() {
   const { data: preferences, isLoading: isLoadingPreferences } = usePreferences();
@@ -117,13 +118,13 @@ export default function SecurityContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Security</h1>
 
       <div className="max-w-2xl space-y-6">
         {/* Change Password */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Change Password</h2>
           <div className="mt-4 space-y-4">
             <div>
@@ -133,7 +134,7 @@ export default function SecurityContent() {
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -143,7 +144,7 @@ export default function SecurityContent() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -153,21 +154,21 @@ export default function SecurityContent() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
           <button
             onClick={handleChangePassword}
             disabled={changePassword.isPending}
-            className="mt-4 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="mt-4 rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {changePassword.isPending ? 'Updating...' : 'Update Password'}
           </button>
         </div>
 
         {/* Two-Factor Authentication */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Two-Factor Authentication</h2>
           <p className="mt-2 text-sm text-text-2">Add an extra layer of security to your account.</p>
           <div className="mt-4 flex items-center gap-3">
@@ -184,7 +185,7 @@ export default function SecurityContent() {
               className={`rounded-brand px-4 py-2 text-sm font-medium transition ${
                 twoFAEnabled
                   ? 'cursor-default border border-border text-text-2'
-                  : 'border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white'
+                  : 'border border-primary text-primary hover:bg-primary hover:text-white'
               }`}
             >
               {enableTwoFactor.isPending ? 'Starting...' : twoFAEnabled ? '2FA Active' : 'Enable 2FA'}
@@ -192,7 +193,7 @@ export default function SecurityContent() {
           </div>
 
           {twoFAEnabled && (
-            <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4">
+            <div className="mt-4 rounded-brand border border-border border-red-200 bg-red-50 p-4">
               <h3 className="text-sm font-semibold text-red-800">Disable Two-Factor Authentication</h3>
               <p className="mt-2 text-sm text-red-700">
                 Enter a current authenticator code to turn 2FA off for this account.
@@ -208,13 +209,13 @@ export default function SecurityContent() {
                     onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="123456"
                     maxLength={6}
-                    className="mt-1 block w-48 rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                    className="mt-1 block w-48 rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
                   />
                 </div>
                 <button
                   onClick={handleDisable2FA}
                   disabled={disableTwoFactor.isPending}
-                  className="rounded-brand border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                  className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
                 >
                   {disableTwoFactor.isPending ? 'Disabling...' : 'Disable 2FA'}
                 </button>
@@ -223,18 +224,18 @@ export default function SecurityContent() {
           )}
 
           {showSetup2FA && (
-            <div className="mt-4 rounded-brand border border-brand-primary/30 bg-brand-primary/5 p-4">
+            <div className="mt-4 rounded-brand border border-primary/30 bg-primary/5 p-4">
               <h3 className="text-sm font-semibold">Set up Two-Factor Authentication</h3>
               <p className="mt-2 text-sm text-text-2">
                 Add this setup key to your authenticator app, then enter the 6-digit code to finish setup.
               </p>
-              <div className="mt-4 rounded-brand border bg-bg p-4">
+              <div className="mt-4 rounded-brand border border-border bg-bg p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-text-2">Setup Key</p>
                 <p className="mt-2 break-all font-mono text-sm text-text">{setupData?.secret ?? '--'}</p>
                 {setupData?.qrCodeUrl && (
                   <a
                     href={setupData.qrCodeUrl}
-                    className="mt-3 inline-block text-sm text-brand-primary hover:underline"
+                    className="mt-3 inline-block text-sm text-primary hover:underline"
                   >
                     Open authenticator link
                   </a>
@@ -263,24 +264,21 @@ export default function SecurityContent() {
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="Enter 6-digit code"
                   maxLength={6}
-                  className="mt-1 block w-48 rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className="mt-1 block w-48 rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div className="mt-4 flex gap-2">
-                <button
-                  onClick={handleComplete2FASetup}
-                  disabled={verifyTwoFactor.isPending}
-                  className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
-                >
+                <Button onClick={handleComplete2FASetup}
+                  disabled={verifyTwoFactor.isPending}>
                   {verifyTwoFactor.isPending ? 'Verifying...' : 'Verify & Enable'}
-                </button>
+                </Button>
                 <button
                   onClick={() => {
                     setShowSetup2FA(false);
                     setSetupData(null);
                     setVerificationCode('');
                   }}
-                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -290,10 +288,10 @@ export default function SecurityContent() {
         </div>
 
         {/* Active Sessions */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Active Sessions</h2>
           <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between rounded-brand border px-4 py-3">
+            <div className="flex items-center justify-between rounded-brand border border-border px-4 py-3">
               <div>
                 <p className="text-sm font-medium">Current Session</p>
                 <p className="text-xs text-text-2">This device &middot; Active now</p>

@@ -69,7 +69,7 @@ export function AdminSidebar() {
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-56 flex-col border-r bg-bg">
       <div className="flex h-14 items-center border-b px-4">
-        <Link href="/superadmin/dashboard" className="text-lg font-bold text-brand-primary">
+        <Link href="/superadmin/dashboard" className="text-lg font-bold text-primary">
           Admin Panel
         </Link>
       </div>
@@ -88,7 +88,7 @@ export function AdminSidebar() {
                   href={item.href}
                   className={`flex items-center gap-2.5 rounded-brand px-3 py-1.5 text-sm transition ${
                     isActive
-                      ? 'bg-brand-primary/10 font-medium text-brand-primary'
+                      ? 'bg-primary/10 font-medium text-primary'
                       : 'text-text-2 hover:bg-bg-2'
                   }`}
                 >

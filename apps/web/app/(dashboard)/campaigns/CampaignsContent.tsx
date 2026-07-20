@@ -49,7 +49,7 @@ export function CampaignsContent() {
         </div>
         <Link
           href="/compose?type=campaign"
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           New Campaign
         </Link>
@@ -58,7 +58,7 @@ export function CampaignsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : campaigns.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -68,7 +68,7 @@ export function CampaignsContent() {
           <p className="mt-1 text-sm text-text-2">Create your first campaign to organize your posts.</p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -87,7 +87,7 @@ export function CampaignsContent() {
                   onClick={() => router.push(`/campaigns/${campaign.id}`)}
                 >
                   <td className="px-6 py-4">
-                    <span className="font-medium text-brand-primary">{campaign.name}</span>
+                    <span className="font-medium text-primary">{campaign.name}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span
@@ -130,7 +130,7 @@ export function CampaignsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

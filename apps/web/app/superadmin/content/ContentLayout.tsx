@@ -55,7 +55,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
                         href={item.href as Route}
                         className={`block rounded-md px-3 py-1.5 text-sm transition ${
                           isActive
-                            ? 'bg-brand-primary/10 font-semibold text-brand-primary'
+                            ? 'bg-primary/10 font-semibold text-primary'
                             : 'text-text-2 hover:bg-bg-2 hover:text-text'
                         }`}
                       >

@@ -31,7 +31,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/campaigns" className="text-sm text-brand-primary hover:underline">
+        <Link href="/campaigns" className="text-sm text-primary hover:underline">
           &larr; Campaigns
         </Link>
       </div>
@@ -64,12 +64,12 @@ export function CampaignDetailContent({ id }: { id: string }) {
             </p>
           </div>
           <div className="flex gap-2">
-            <button className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary">
+            <button className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary">
               Edit Campaign
             </button>
             <Link
               href={`/compose?campaignId=${id}`}
-              className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+              className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
             >
               Add Post
             </Link>
@@ -86,15 +86,15 @@ export function CampaignDetailContent({ id }: { id: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Total Posts</p>
             <p className="mt-1 text-2xl font-bold">{posts.length}</p>
           </div>
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Total Engagement</p>
             <p className="mt-1 text-2xl font-bold">{campaign.totalEngagement ?? '—'}</p>
           </div>
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Avg. Engagement Rate</p>
             <p className="mt-1 text-2xl font-bold">{campaign.avgEngagementRate ?? '—'}</p>
           </div>
@@ -102,7 +102,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
       )}
 
       {/* Posts table */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Campaign Posts</h2>
 
         {postsLoading ? (

@@ -140,7 +140,7 @@ function PlatformChips({ platforms }: { platforms: string[] }) {
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-brand border border-dashed bg-bg px-6 py-10 text-center shadow-sm">
+    <div className="rounded-brand border border-border border-dashed bg-bg px-6 py-10 text-center shadow-sm">
       <p className="text-sm font-semibold text-text">{title}</p>
       <p className="mt-2 text-sm text-text-2">{description}</p>
     </div>
@@ -157,7 +157,7 @@ function MetricCard({
   caption: string;
 }) {
   return (
-    <div className="rounded-brand border bg-bg p-5 shadow-sm">
+    <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</p>
       <p className="mt-2 text-2xl font-bold text-text">{value}</p>
       <p className="mt-1 text-sm text-text-2">{caption}</p>
@@ -195,7 +195,7 @@ function OverviewTab({ data }: { data: PortalData }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-brand border bg-bg p-5 shadow-sm xl:col-span-2">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold text-text">Weekly Reach</h2>
             <span className="text-xs text-text-muted">Last 4 weeks</span>
@@ -205,7 +205,7 @@ function OverviewTab({ data }: { data: PortalData }) {
               <div key={item.week} className="flex flex-1 flex-col items-center gap-2">
                 <div className="text-xs text-text-muted">{formatNumber(item.value)}</div>
                 <div
-                  className={`w-full rounded-t-md bg-brand-primary/80 ${styles.barFill}`}
+                  className={`w-full rounded-t-md bg-primary/80 ${styles.barFill}`}
                   style={{ ['--bar-height' as string]: `${Math.max((item.value / maxReach) * 100, 6)}%` } as React.CSSProperties}
                 />
                 <div className="text-xs text-text-2">{item.week}</div>
@@ -214,7 +214,7 @@ function OverviewTab({ data }: { data: PortalData }) {
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
           <h2 className="font-heading text-lg font-semibold text-text">Platform Mix</h2>
           <div className="mt-4 space-y-4">
             {data.platformBreakdown.map((item) => {
@@ -229,7 +229,7 @@ function OverviewTab({ data }: { data: PortalData }) {
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-bg-2">
                     <div
-                      className={`h-full rounded-full bg-brand-primary ${styles.shareFill}`}
+                      className={`h-full rounded-full bg-primary ${styles.shareFill}`}
                       style={{ ['--share' as string]: `${Math.max(share, 4)}%` } as React.CSSProperties}
                     />
                   </div>
@@ -243,7 +243,7 @@ function OverviewTab({ data }: { data: PortalData }) {
         </div>
       </div>
 
-      <div className="rounded-brand border bg-bg p-5 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
         <h2 className="font-heading text-lg font-semibold text-text">Top Performing Posts</h2>
         <div className="mt-4 space-y-3">
           {data.topPosts.map((post) => (
@@ -328,7 +328,7 @@ function ApprovalsTab({
       {approvals.map((item) => {
         const isBusy = busyId === item.id && (approveMutation.isPending || reviseMutation.isPending);
         return (
-          <div key={item.id} className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div key={item.id} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
@@ -356,7 +356,7 @@ function ApprovalsTab({
                   setComments((prev) => ({ ...prev, [item.id]: event.target.value }))
                 }
                 rows={3}
-                className="w-full rounded-brand border px-3 py-2 text-sm outline-none ring-0"
+                className="w-full rounded-brand border border-border px-3 py-2 text-sm outline-none ring-0"
                 placeholder="Optional note for approval, or required feedback for revisions."
               />
               <div className="flex flex-wrap gap-3">
@@ -382,7 +382,7 @@ function ApprovalsTab({
                       comment: (comments[item.id] ?? '').trim(),
                     })
                   }
-                  className="rounded-brand border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Request Revision
                 </button>
@@ -413,7 +413,7 @@ function CalendarTab({ scheduled }: { scheduled: PortalData['scheduled'] }) {
       {scheduled.map((item) => (
         <div
           key={item.id}
-          className="flex flex-col gap-3 rounded-brand border bg-bg px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
+          className="flex flex-col gap-3 rounded-brand border border-border bg-bg px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
         >
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -446,7 +446,7 @@ function ReportsTab({ reports }: { reports: PortalData['reports'] }) {
       {reports.map((report) => (
         <div
           key={report.id}
-          className="flex flex-col gap-3 rounded-brand border bg-bg px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
+          className="flex flex-col gap-3 rounded-brand border border-border bg-bg px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
         >
           <div>
             <p className="text-sm font-semibold text-text">{report.title}</p>
@@ -461,7 +461,7 @@ function ReportsTab({ reports }: { reports: PortalData['reports'] }) {
               href={report.file_url}
               target="_blank"
               rel="noreferrer"
-              className="rounded-brand border border-brand-primary/30 bg-brand-primary/5 px-4 py-2 text-sm font-semibold text-brand-primary transition hover:bg-brand-primary/10"
+              className="rounded-brand border border-primary/30 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10"
             >
               Open Report
             </a>
@@ -512,7 +512,7 @@ export default function PortalContent({ token }: { token: string }) {
   if (portalQuery.isError || !portalQuery.data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg-2 px-6 py-10">
-        <div className="max-w-lg rounded-brand border bg-bg p-8 text-center shadow-sm">
+        <div className="max-w-lg rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
           <h1 className="font-heading text-2xl font-bold text-text">Portal unavailable</h1>
           <p className="mt-3 text-sm text-text-2">
             This portal link is invalid, expired, or no longer active.

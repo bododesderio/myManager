@@ -91,7 +91,7 @@ export function VerifyEmailContent() {
           </p>
           <Link
             href="/login"
-            className="mt-6 inline-block text-sm font-medium text-brand-primary hover:underline"
+            className="mt-6 inline-block text-sm font-medium text-primary hover:underline"
           >
             Back to Log In
           </Link>
@@ -103,8 +103,8 @@ export function VerifyEmailContent() {
   // No token — show "check your email" message
   return (
     <div className="w-full max-w-md text-center">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/10">
-        <span className="text-3xl text-brand-primary">&#9993;</span>
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+        <span className="text-3xl text-primary">&#9993;</span>
       </div>
       <h1 className="mt-6 font-heading text-3xl font-extrabold">Check Your Email</h1>
       <p className="mt-4 text-text-2">
@@ -117,7 +117,7 @@ export function VerifyEmailContent() {
         <button
           onClick={handleResend}
           disabled={resending}
-          className="font-medium text-brand-primary hover:underline disabled:opacity-50"
+          className="font-medium text-primary hover:underline disabled:opacity-50"
         >
           {resending ? 'Resending...' : 'resend the verification email'}
         </button>
@@ -125,7 +125,7 @@ export function VerifyEmailContent() {
       </p>
       <Link
         href="/login"
-        className="mt-8 inline-block text-sm font-medium text-brand-primary hover:underline"
+        className="mt-8 inline-block text-sm font-medium text-primary hover:underline"
       >
         Back to Log In
       </Link>

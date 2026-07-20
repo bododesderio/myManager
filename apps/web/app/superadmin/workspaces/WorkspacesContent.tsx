@@ -14,7 +14,7 @@ export function WorkspacesContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">

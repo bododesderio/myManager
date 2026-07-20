@@ -174,13 +174,13 @@ function ColorPickerField({
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-9 cursor-pointer rounded border border-border p-0.5"
+          className="h-9 w-9 cursor-pointer rounded border border-border border-border p-0.5"
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm font-mono focus:border-brand-primary focus:outline-none"
+          className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm font-mono focus:border-primary focus:outline-none"
         />
       </div>
     </div>
@@ -197,7 +197,7 @@ function PillToggle<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex rounded-brand border border-border overflow-hidden">
+    <div className="inline-flex rounded-brand border border-border border-border overflow-hidden">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -205,7 +205,7 @@ function PillToggle<T extends string>({
           onClick={() => onChange(opt.value)}
           className={`px-3 py-1.5 text-xs font-medium transition ${
             value === opt.value
-              ? `bg-brand-primary text-white ${styles.brandActive}`
+              ? `bg-primary text-white ${styles.brandActive}`
               : 'bg-bg text-text-2 hover:bg-bg-2'
           }`}
         >
@@ -352,7 +352,7 @@ export default function AdminThemeSettingsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
-                ? `border-b-2 text-brand-primary ${styles.tabActive}`
+                ? `border-b-2 text-primary ${styles.tabActive}`
                 : 'text-text-2 hover:text-text-2'
             }`}
           >
@@ -479,7 +479,7 @@ function PresetsPanel({
               className={`mt-4 w-full rounded-brand px-3 py-1.5 text-xs font-semibold transition ${
                 isActive
                   ? 'cursor-default bg-bg-2 text-text-muted'
-                  : `bg-brand-primary text-white hover:opacity-90 ${styles.brandActive}`
+                  : `bg-primary text-white hover:opacity-90 ${styles.brandActive}`
               }`}
             >
               {isActive ? 'Currently active' : 'Apply preset'}
@@ -501,7 +501,7 @@ function PresetsPanel({
         </div>
         <h3 className="font-heading text-sm font-semibold text-text-2">Custom Theme</h3>
         <p className="mt-0.5 text-xs text-text-2">Build your own from scratch</p>
-        <span className={`mt-3 text-xs font-semibold text-brand-primary ${styles.brandText}`}>
+        <span className={`mt-3 text-xs font-semibold text-primary ${styles.brandText}`}>
           Open theme builder &rarr;
         </span>
       </button>
@@ -570,7 +570,7 @@ function BuilderPanel({
       {/* Controls sidebar */}
       <div className="w-full shrink-0 space-y-5 lg:w-[280px]">
         {/* Colors */}
-        <div className="rounded-brand border bg-bg p-4 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">Colors</h2>
           <div className="mt-3 space-y-3">
             <ColorPickerField label="Primary" value={colors.primary} onChange={(v) => onUpdateColor('primary', v)} />
@@ -587,7 +587,7 @@ function BuilderPanel({
         </div>
 
         {/* Dark mode colors (collapsible) */}
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <button
             type="button"
             onClick={onToggleDarkColors}
@@ -616,7 +616,7 @@ function BuilderPanel({
         </div>
 
         {/* Typography */}
-        <div className="rounded-brand border bg-bg p-4 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">Typography</h2>
           <div className="mt-3 space-y-3">
             <div>
@@ -624,7 +624,7 @@ function BuilderPanel({
               <select
                 value={typography.headingFont}
                 onChange={(e) => onTypographyChange({ ...typography, headingFont: e.target.value })}
-                className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -636,7 +636,7 @@ function BuilderPanel({
               <select
                 value={typography.bodyFont}
                 onChange={(e) => onTypographyChange({ ...typography, bodyFont: e.target.value })}
-                className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -647,7 +647,7 @@ function BuilderPanel({
         </div>
 
         {/* Border radius */}
-        <div className="rounded-brand border bg-bg p-4 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">Border Radius</h2>
           <div className="mt-3 space-y-3">
             <div>
@@ -680,7 +680,7 @@ function BuilderPanel({
         </div>
 
         {/* UI Density */}
-        <div className="rounded-brand border bg-bg p-4 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">UI Density</h2>
           <div className="mt-3">
             <PillToggle
@@ -852,11 +852,11 @@ function BuilderPanel({
         </div>
 
         {/* Sticky save bar */}
-        <div className="sticky bottom-0 mt-4 flex items-center justify-between gap-3 rounded-brand border bg-bg p-4 shadow-sm">
+        <div className="sticky bottom-0 mt-4 flex items-center justify-between gap-3 rounded-brand border border-border bg-bg p-4 shadow-sm">
           <button
             type="button"
             onClick={onReset}
-            className="rounded-brand border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
+            className="rounded-brand border border-border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
           >
             Reset to default
           </button>
@@ -864,7 +864,7 @@ function BuilderPanel({
             <button
               type="button"
               onClick={onSaveAsPreset}
-              className="rounded-brand border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
+              className="rounded-brand border border-border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Save as preset
             </button>
@@ -912,7 +912,7 @@ function ModeScopePanel({
   return (
     <div className="max-w-2xl space-y-6">
       {/* Default mode */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Default Mode</h2>
         <p className="mt-1 text-xs text-text-2">Choose the default color mode for all users.</p>
         <div className="mt-4 space-y-3">
@@ -920,7 +920,7 @@ function ModeScopePanel({
             <label
               key={opt.value}
               className={`flex cursor-pointer items-start gap-3 rounded-brand border p-3 transition ${
-                defaultMode === opt.value ? `border-brand-primary bg-indigo-50/50 ${styles.brandBorder}` : 'border-border-light hover:border-border'
+                defaultMode === opt.value ? `border-primary bg-indigo-50/50 ${styles.brandBorder}` : 'border-border-light hover:border-border'
               }`}
             >
               <input
@@ -941,7 +941,7 @@ function ModeScopePanel({
       </div>
 
       {/* Allow user override */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-heading text-lg font-semibold">Allow User Override</h2>
@@ -955,7 +955,7 @@ function ModeScopePanel({
             aria-checked={allowUserOverride}
             onClick={() => onToggleOverride(!allowUserOverride)}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
-              allowUserOverride ? `bg-brand-primary ${styles.brandActive}` : 'bg-border'
+              allowUserOverride ? `bg-primary ${styles.brandActive}` : 'bg-border'
             }`}
           >
             <span
@@ -968,7 +968,7 @@ function ModeScopePanel({
       </div>
 
       {/* Dark mode color overrides */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Dark Mode Color Overrides</h2>
         <p className="mt-1 text-xs text-text-2">
           Customize the colors used when dark mode is active.
@@ -983,7 +983,7 @@ function ModeScopePanel({
       </div>
 
       {/* Scope rules table */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Scope Rules</h2>
         <p className="mt-1 text-xs text-text-2">
           Read-only overview of how theme modes are applied across different areas.

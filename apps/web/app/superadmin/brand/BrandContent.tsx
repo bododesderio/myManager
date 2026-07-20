@@ -101,7 +101,7 @@ export function BrandContent() {
       </p>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">
             Platform Identity
           </h2>
@@ -120,7 +120,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, app_name: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -137,7 +137,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, app_tagline: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <FileUpload
@@ -157,7 +157,7 @@ export function BrandContent() {
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Theme</h2>
           <div className="mt-4 grid grid-cols-3 gap-4">
             <div>
@@ -170,7 +170,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, color_primary: e.target.value })
                 }
-                className="mt-1 h-10 w-full rounded border"
+                className="mt-1 h-10 w-full rounded border border-border"
               />
             </div>
             <div>
@@ -183,7 +183,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, color_primary_dark: e.target.value })
                 }
-                className="mt-1 h-10 w-full rounded border"
+                className="mt-1 h-10 w-full rounded border border-border"
               />
             </div>
             <div>
@@ -196,13 +196,13 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, color_accent: e.target.value })
                 }
-                className="mt-1 h-10 w-full rounded border"
+                className="mt-1 h-10 w-full rounded border border-border"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Typography</h2>
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
@@ -219,7 +219,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, font_heading: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -236,13 +236,13 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, font_body: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">
             Support & Footer
           </h2>
@@ -257,7 +257,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, support_email: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -270,7 +270,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, sales_email: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -283,7 +283,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, footer_made_in: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -296,7 +296,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, footer_copyright: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -312,7 +312,7 @@ export function BrandContent() {
                     footer_attribution_text: e.target.value,
                   })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -325,7 +325,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, footer_attribution_url: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -338,7 +338,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, meta_title_suffix: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
@@ -347,7 +347,7 @@ export function BrandContent() {
         <button
           onClick={() => void handleSave()}
           disabled={saving}
-          className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-60"
+          className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
         >
           {saving ? "Saving..." : "Save Brand Config"}
         </button>

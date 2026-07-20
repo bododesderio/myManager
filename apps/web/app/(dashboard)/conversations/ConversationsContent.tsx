@@ -95,7 +95,7 @@ export function ConversationsContent() {
           <select
             value={platformFilter}
             onChange={(e) => setPlatformFilter(e.target.value)}
-            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           >
             {PLATFORMS.map((p) => (
               <option key={p} value={p}>
@@ -109,7 +109,7 @@ export function ConversationsContent() {
       {isLoading ? (
         <TableSkeleton rows={6} cols={4} />
       ) : comments.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -126,7 +126,7 @@ export function ConversationsContent() {
           </p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <div className="divide-y">
             {comments.map((comment: any) => {
               const platform = comment.platform || 'unknown';
@@ -168,19 +168,19 @@ export function ConversationsContent() {
                           setExpandedReply(isExpanded ? null : comment.id);
                           setReplyText('');
                         }}
-                        className="rounded-brand border px-3 py-1 text-sm transition hover:border-brand-primary"
+                        className="rounded-brand border border-border px-3 py-1 text-sm transition hover:border-primary"
                       >
                         Reply
                       </button>
                       <div className="relative">
                         <button
                           onClick={() => setAssigningId(isAssigning ? null : comment.id)}
-                          className="rounded-brand border px-3 py-1 text-sm transition hover:border-brand-primary"
+                          className="rounded-brand border border-border px-3 py-1 text-sm transition hover:border-primary"
                         >
                           Assign
                         </button>
                         {isAssigning && (
-                          <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-brand border bg-bg py-1 shadow-lg">
+                          <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-brand border border-border bg-bg py-1 shadow-lg">
                             {members.length === 0 ? (
                               <p className="px-3 py-2 text-sm text-text-muted">No members found</p>
                             ) : (
@@ -215,12 +215,12 @@ export function ConversationsContent() {
                           if (e.key === 'Enter') handleReply(comment.id);
                         }}
                         placeholder="Type a reply..."
-                        className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                        className="flex-1 rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
                       />
                       <button
                         onClick={() => handleReply(comment.id)}
                         disabled={replyMutation.isPending || !replyText.trim()}
-                        className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+                        className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
                       >
                         {replyMutation.isPending ? 'Sending...' : 'Send'}
                       </button>

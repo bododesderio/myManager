@@ -34,7 +34,7 @@ export function WorkspaceSwitcher() {
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-2 rounded-brand px-2 py-1.5 text-sm text-text-2 hover:bg-bg-2"
       >
-        <div className="h-6 w-6 rounded-md bg-brand-primary/20 flex items-center justify-center text-xs font-bold text-brand-primary">
+        <div className="h-6 w-6 rounded-md bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
           {activeWorkspace?.name?.[0]?.toUpperCase() || 'W'}
         </div>
         <span className="flex-1 truncate text-left text-xs font-medium">
@@ -46,7 +46,7 @@ export function WorkspaceSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 z-50 mt-1 rounded-brand border bg-bg py-1 shadow-lg">
+        <div className="absolute left-0 right-0 z-50 mt-1 rounded-brand border border-border bg-bg py-1 shadow-lg">
           {workspaces.map((workspace) => (
             <button
               key={workspace.id}
@@ -55,10 +55,10 @@ export function WorkspaceSwitcher() {
                 setOpen(false);
               }}
               className={`flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-bg-2 ${
-                workspace.id === activeWorkspaceId ? 'bg-brand-primary/5 text-brand-primary' : 'text-text-2'
+                workspace.id === activeWorkspaceId ? 'bg-primary/5 text-primary' : 'text-text-2'
               }`}
             >
-              <div className="h-6 w-6 rounded-md bg-brand-primary/20 flex items-center justify-center text-xs font-bold text-brand-primary">
+              <div className="h-6 w-6 rounded-md bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
                 {workspace.name[0]?.toUpperCase()}
               </div>
               <span className="truncate">{workspace.name}</span>

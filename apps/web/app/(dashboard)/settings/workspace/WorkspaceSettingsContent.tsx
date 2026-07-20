@@ -58,12 +58,12 @@ export default function WorkspaceSettingsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Workspace Settings</h1>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">General</h2>
           <div className="mt-4 space-y-4">
             <div>
@@ -78,7 +78,7 @@ export default function WorkspaceSettingsContent() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={`mt-1 block w-full rounded-brand border px-4 py-2 focus:outline-none ${
-                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
+                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-primary'
                 }`}
               />
               {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
@@ -97,7 +97,7 @@ export default function WorkspaceSettingsContent() {
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   className={`block flex-1 rounded-brand border px-4 py-2 focus:outline-none ${
-                    errors.slug ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
+                    errors.slug ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-primary'
                   }`}
                 />
               </div>
@@ -117,7 +117,7 @@ export default function WorkspaceSettingsContent() {
             type="button"
             onClick={handleSave}
             disabled={updateWorkspace.isPending || !isValid}
-            className="mt-6 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="mt-6 rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {updateWorkspace.isPending ? 'Saving...' : 'Save Changes'}
           </button>

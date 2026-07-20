@@ -80,13 +80,13 @@ export function BlogListContent() {
         </div>
         <Link
           href={'/admin/content/blog/new' as Route}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           New Post
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-brand border bg-bg shadow-sm">
+      <div className="overflow-hidden rounded-brand border border-border bg-bg shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>
@@ -101,7 +101,7 @@ export function BlogListContent() {
             {posts.map((post) => (
               <tr key={post.id} className="hover:bg-bg-2">
                 <td className="px-6 py-4">
-                  <Link href={`/admin/content/blog/${post.id}` as Route} className="font-medium text-text hover:text-brand-primary">
+                  <Link href={`/admin/content/blog/${post.id}` as Route} className="font-medium text-text hover:text-primary">
                     {post.title}
                   </Link>
                   <p className="font-mono text-xs text-text-muted">/{post.slug}</p>
@@ -122,7 +122,7 @@ export function BlogListContent() {
                 </td>
                 <td className="px-4 py-4 text-text-2">{formatDate(post.published_at)}</td>
                 <td className="px-4 py-4 text-right">
-                  <Link href={`/admin/content/blog/${post.id}` as Route} className="text-sm text-brand-primary hover:underline">
+                  <Link href={`/admin/content/blog/${post.id}` as Route} className="text-sm text-primary hover:underline">
                     Edit
                   </Link>
                   <button onClick={() => void handleDelete(post.id)} className="ml-3 text-sm text-red-500 hover:underline">

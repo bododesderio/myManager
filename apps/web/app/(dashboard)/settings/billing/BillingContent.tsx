@@ -67,13 +67,13 @@ function BillingContentInner() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Billing</h1>
 
       <div className="max-w-3xl space-y-6">
         {/* Current Plan */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Current Plan</h2>
           <div className="mt-4 flex items-center justify-between">
             <div>
@@ -89,7 +89,7 @@ function BillingContentInner() {
               {sub?.status === 'active' && (
                 <button
                   onClick={() => setShowCancelConfirm(true)}
-                  className="rounded-brand border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
                 >
                   Cancel
                 </button>
@@ -97,7 +97,7 @@ function BillingContentInner() {
             </div>
           </div>
           {showCancelConfirm && (
-            <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4">
+            <div className="mt-4 rounded-brand border border-border border-red-200 bg-red-50 p-4">
               <p className="text-sm text-red-700">
                 Are you sure? Your subscription will remain active until the end of the current billing period.
               </p>
@@ -111,7 +111,7 @@ function BillingContentInner() {
                 </button>
                 <button
                   onClick={() => setShowCancelConfirm(false)}
-                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Keep Subscription
                 </button>
@@ -122,7 +122,7 @@ function BillingContentInner() {
 
         {/* Plan comparison grid */}
         {planList.length > 0 && (
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Available Plans</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-3">
               {planList.map((plan: any) => {
@@ -131,7 +131,7 @@ function BillingContentInner() {
                   <div
                     key={plan.id}
                     className={`rounded-brand border p-5 ${
-                      isCurrent ? 'border-brand-primary bg-brand-primary/5' : 'border-border-light'
+                      isCurrent ? 'border-primary bg-primary/5' : 'border-border-light'
                     }`}
                   >
                     <h3 className="font-heading font-semibold">{plan.name}</h3>
@@ -154,8 +154,8 @@ function BillingContentInner() {
                       disabled={isCurrent || changePlan.isPending}
                       className={`mt-4 w-full rounded-brand px-4 py-2 text-sm font-semibold transition ${
                         isCurrent
-                          ? 'border border-brand-primary bg-bg text-brand-primary cursor-default'
-                          : 'bg-brand-primary text-white hover:bg-brand-primary-dark disabled:opacity-50'
+                          ? 'border border-primary bg-bg text-primary cursor-default'
+                          : 'bg-primary text-white hover:bg-primary-dark disabled:opacity-50'
                       }`}
                     >
                       {isCurrent ? 'Current Plan' : 'Switch to this plan'}
@@ -168,7 +168,7 @@ function BillingContentInner() {
         )}
 
         {/* Billing History */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Billing History</h2>
           {invoices.length === 0 ? (
             <p className="mt-4 text-sm text-text-2">No billing history yet.</p>
@@ -201,7 +201,7 @@ function BillingContentInner() {
                         href={invoice.invoice_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-brand-primary hover:underline"
+                        className="text-sm text-primary hover:underline"
                       >
                         Download
                       </a>

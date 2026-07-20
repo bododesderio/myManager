@@ -59,18 +59,18 @@ export default function LanguageContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Language &amp; Region</h1>
 
       <div className="max-w-2xl space-y-6">
         {/* Language */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Language</h2>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="mt-4 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.value} value={lang.value}>
@@ -81,12 +81,12 @@ export default function LanguageContent() {
         </div>
 
         {/* Currency */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Currency</h2>
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="mt-4 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
           >
             {CURRENCIES.map((cur) => (
               <option key={cur.value} value={cur.value}>
@@ -99,7 +99,7 @@ export default function LanguageContent() {
         <button
           onClick={handleSave}
           disabled={updatePreferences.isPending}
-          className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+          className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
         >
           {updatePreferences.isPending ? 'Saving...' : 'Save Preferences'}
         </button>

@@ -85,13 +85,13 @@ export function FileUpload({
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className="relative rounded-brand border-2 border-dashed border-border p-4 transition hover:border-brand-primary"
+        className="relative rounded-brand border-2 border-dashed border-border p-4 transition hover:border-primary"
       >
         {value && isImage && (
           <div className="mb-3 flex items-center gap-3">
             {/* Upload previews can be temporary or third-party URLs that are not suitable for next/image optimization. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={value} alt="Preview" className="h-16 w-16 rounded border object-cover" />
+            <img src={value} alt="Preview" className="h-16 w-16 rounded border border-border object-cover" />
             <span className="truncate text-xs text-text-2">{value}</span>
           </div>
         )}
@@ -106,7 +106,7 @@ export function FileUpload({
           <div className="mb-3">
             <div className="h-1.5 w-full rounded-full bg-border">
               <div
-                className="h-1.5 rounded-full bg-brand-primary transition-all"
+                className="h-1.5 rounded-full bg-primary transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -119,7 +119,7 @@ export function FileUpload({
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="rounded-brand bg-brand-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="rounded-brand bg-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {value ? 'Replace' : 'Upload'}
           </button>

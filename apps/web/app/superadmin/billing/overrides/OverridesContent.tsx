@@ -44,7 +44,7 @@ export function OverridesContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/superadmin/billing" className="text-sm text-brand-primary hover:underline">
+        <Link href="/superadmin/billing" className="text-sm text-primary hover:underline">
           &larr; Billing
         </Link>
       </div>
@@ -53,14 +53,14 @@ export function OverridesContent() {
         <h1 className="font-heading text-2xl font-bold">Billing Overrides</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           {showForm ? 'Cancel' : 'Add Override'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
+        <form onSubmit={handleCreate} className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">New Override</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -73,7 +73,7 @@ export function OverridesContent() {
                 required
                 value={form.workspaceId}
                 onChange={(e) => setForm((p) => ({ ...p, workspaceId: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -84,7 +84,7 @@ export function OverridesContent() {
                 id="overrideType"
                 value={form.type}
                 onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               >
                 <option value="discount">Discount</option>
                 <option value="free_trial">Free Trial Extension</option>
@@ -102,7 +102,7 @@ export function OverridesContent() {
                 required
                 value={form.details}
                 onChange={(e) => setForm((p) => ({ ...p, details: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -114,14 +114,14 @@ export function OverridesContent() {
                 type="date"
                 value={form.expiresAt}
                 onChange={(e) => setForm((p) => ({ ...p, expiresAt: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
           <button
             type="submit"
             disabled={createOverride.isPending}
-            className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {createOverride.isPending ? 'Creating...' : 'Create Override'}
           </button>
@@ -131,7 +131,7 @@ export function OverridesContent() {
       {isLoading ? (
         <TableSkeleton rows={3} cols={4} />
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">

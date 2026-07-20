@@ -25,7 +25,7 @@ export function CurrencyDisplay({ currency, amount }: CurrencyDisplayProps) {
   }
 
   return (
-    <span className="rounded-brand border px-2 py-1 text-xs font-medium text-text-2">
+    <span className="rounded-brand border border-border px-2 py-1 text-xs font-medium text-text-2">
       {symbol} {currency}
     </span>
   );

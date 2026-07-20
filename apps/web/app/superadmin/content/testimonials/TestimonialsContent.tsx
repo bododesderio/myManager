@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import styles from './TestimonialsContent.module.css';
+import { Button } from '@mymanager/ui';
 
 interface Testimonial {
   id: string;
@@ -117,7 +118,7 @@ export function TestimonialsContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none';
 
   if (loading) {
     return (
@@ -139,12 +140,9 @@ export function TestimonialsContent() {
           <h1 className="font-heading text-2xl font-bold">Testimonials</h1>
           <p className="mt-1 text-sm text-text-2">Manage customer testimonials</p>
         </div>
-        <button
-          onClick={openNewModal}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
-        >
+        <Button onClick={openNewModal}>
           Add Testimonial
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -191,7 +189,7 @@ export function TestimonialsContent() {
             <div className="mt-4 flex gap-2 border-t pt-3">
               <button
                 onClick={() => setEditItem(item)}
-                className="text-xs text-brand-primary hover:underline"
+                className="text-xs text-primary hover:underline"
               >
                 Edit
               </button>
@@ -206,7 +204,7 @@ export function TestimonialsContent() {
         ))}
 
         {items.length === 0 && (
-          <div className="col-span-full rounded-brand border bg-bg py-12 text-center text-text-muted">
+          <div className="col-span-full rounded-brand border border-border bg-bg py-12 text-center text-text-muted">
             No testimonials yet.
           </div>
         )}
@@ -263,7 +261,7 @@ export function TestimonialsContent() {
                     onChange={(e) =>
                       setEditItem({ ...editItem, author_avatar_color: e.target.value })
                     }
-                    className="mt-1 h-[38px] w-full cursor-pointer rounded border"
+                    className="mt-1 h-[38px] w-full cursor-pointer rounded border border-border"
                   />
                 </div>
                 <div>
@@ -322,7 +320,7 @@ export function TestimonialsContent() {
                         setEditItem({ ...editItem, is_visible: !editItem.is_visible })
                       }
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                        editItem.is_visible ? 'bg-brand-primary' : 'bg-border'
+                        editItem.is_visible ? 'bg-primary' : 'bg-border'
                       }`}
                     >
                       <span
@@ -339,13 +337,13 @@ export function TestimonialsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setEditItem(null)}
-                className="rounded-brand border px-4 py-2 text-sm text-text-2 transition hover:bg-bg-2"
+                className="rounded-brand border border-border px-4 py-2 text-sm text-text-2 transition hover:bg-bg-2"
               >
                 Cancel
               </button>
               <button
                 onClick={() => void saveItem()}
-                className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+                className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
               >
                 Save
               </button>

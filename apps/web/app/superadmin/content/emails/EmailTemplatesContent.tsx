@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { Button } from '@mymanager/ui';
 
 interface EmailTemplate {
   id: string;
@@ -136,7 +137,7 @@ export function EmailTemplatesContent() {
     return (
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Email Templates</h1>
-        <div className="rounded-brand border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-red-700">{error}</p>
           <button
             onClick={() => void load()}
@@ -154,12 +155,12 @@ export function EmailTemplatesContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <button onClick={handleBack} className="text-sm text-brand-primary hover:underline">
+          <button onClick={handleBack} className="text-sm text-primary hover:underline">
             &larr; Back to list
           </button>
           <h1 className="font-heading text-2xl font-bold">Preview: {editingTemplate.name}</h1>
         </div>
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <p className="mb-2 text-sm text-text-2">Subject: {editingTemplate.subject}</p>
           <div
             className="prose max-w-none"
@@ -175,7 +176,7 @@ export function EmailTemplatesContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <button onClick={handleBack} className="text-sm text-brand-primary hover:underline">
+          <button onClick={handleBack} className="text-sm text-primary hover:underline">
             &larr; Back to list
           </button>
           <h1 className="font-heading text-2xl font-bold">
@@ -183,14 +184,14 @@ export function EmailTemplatesContent() {
           </h1>
         </div>
 
-        <div className="space-y-4 rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="space-y-4 rounded-brand border border-border bg-bg p-6 shadow-sm">
           <div>
             <label className="mb-1 block text-sm font-medium text-text-2">Template Name</label>
             <input
               type="text"
               value={editingTemplate.name ?? ''}
               onChange={(e) => setEditingTemplate((prev) => ({ ...prev, name: e.target.value }))}
-              className="w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              className="w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Welcome Email"
             />
           </div>
@@ -200,7 +201,7 @@ export function EmailTemplatesContent() {
               type="text"
               value={editingTemplate.subject ?? ''}
               onChange={(e) => setEditingTemplate((prev) => ({ ...prev, subject: e.target.value }))}
-              className="w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              className="w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Welcome to {{appName}}"
             />
           </div>
@@ -210,7 +211,7 @@ export function EmailTemplatesContent() {
               type="text"
               value={editingTemplate.trigger ?? ''}
               onChange={(e) => setEditingTemplate((prev) => ({ ...prev, trigger: e.target.value }))}
-              className="w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              className="w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. On signup"
             />
           </div>
@@ -226,13 +227,13 @@ export function EmailTemplatesContent() {
             <button
               onClick={() => void handleSave()}
               disabled={saving}
-              className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+              className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : mode === 'create' ? 'Create Template' : 'Save Changes'}
             </button>
             <button
               onClick={handleBack}
-              className="rounded-brand border px-4 py-2 text-sm font-semibold text-text-2 transition hover:bg-bg-2"
+              className="rounded-brand border border-border px-4 py-2 text-sm font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Cancel
             </button>
@@ -247,26 +248,23 @@ export function EmailTemplatesContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">Email Templates</h1>
-        <button
-          onClick={handleCreate}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
-        >
+        <Button onClick={handleCreate}>
           New Template
-        </button>
+        </Button>
       </div>
 
       {templates.length === 0 ? (
-        <div className="rounded-brand border bg-bg p-8 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
           <p className="text-text-muted">No email templates yet.</p>
           <button
             onClick={handleCreate}
-            className="mt-3 text-sm font-semibold text-brand-primary hover:underline"
+            className="mt-3 text-sm font-semibold text-primary hover:underline"
           >
             Create your first template
           </button>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <div className="divide-y">
             {templates.map((template) => (
               <div key={template.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
@@ -279,7 +277,7 @@ export function EmailTemplatesContent() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(template)}
-                    className="text-sm text-brand-primary hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     Edit
                   </button>

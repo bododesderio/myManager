@@ -56,7 +56,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={`/projects/${id}`} className="text-sm text-brand-primary hover:underline">
+        <Link href={`/projects/${id}`} className="text-sm text-primary hover:underline">
           &larr; Project #{id}
         </Link>
       </div>
@@ -71,7 +71,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
       ) : (
         <div className="max-w-2xl space-y-6">
           {/* General settings */}
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">General</h2>
             <div className="mt-4 space-y-4">
               <div>
@@ -83,7 +83,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <div>
@@ -100,7 +100,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
                 <button
                   onClick={handleSave}
                   disabled={updateProject.isPending}
-                  className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+                  className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
                 >
                   {updateProject.isPending ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -109,19 +109,19 @@ export function ProjectSettingsContent({ id }: { id: string }) {
           </div>
 
           {/* Member management */}
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Members</h2>
             <p className="mt-2 text-sm text-text-2">Manage team members assigned to this project.</p>
             <Link
               href={`/projects/${id}`}
-              className="mt-4 inline-block rounded-brand border border-brand-primary px-4 py-2 text-sm font-medium text-brand-primary transition hover:bg-brand-primary hover:text-white"
+              className="mt-4 inline-block rounded-brand border border-primary px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
             >
               Manage Members
             </Link>
           </div>
 
           {/* Danger zone */}
-          <div className="rounded-brand border border-red-200 bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border border-red-200 bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold text-red-600">Danger Zone</h2>
             <p className="mt-2 text-sm text-text-2">
               Permanently delete this project and all associated data.
@@ -148,7 +148,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

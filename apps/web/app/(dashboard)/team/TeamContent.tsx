@@ -84,7 +84,7 @@ export function TeamContent() {
         </div>
         <button
           onClick={() => setShowInviteForm(true)}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           Invite Member
         </button>
@@ -92,7 +92,7 @@ export function TeamContent() {
 
       {/* Invite form */}
       {showInviteForm && (
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Invite a Team Member</h2>
           <form onSubmit={handleInvite} className="mt-4 flex flex-wrap items-end gap-4">
             <div className="flex-1">
@@ -106,7 +106,7 @@ export function TeamContent() {
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="colleague@example.com"
                 required
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
             <div>
@@ -117,7 +117,7 @@ export function TeamContent() {
                 id="inviteRole"
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value)}
-                className="mt-1 block rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                className="mt-1 block rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -130,14 +130,14 @@ export function TeamContent() {
               <button
                 type="submit"
                 disabled={inviteMember.isPending}
-                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+                className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
               >
                 {inviteMember.isPending ? 'Sending...' : 'Send Invite'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowInviteForm(false)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>
@@ -150,12 +150,12 @@ export function TeamContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : members.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <h3 className="font-heading text-lg font-semibold text-text">No team members</h3>
           <p className="mt-1 text-sm text-text-2">Invite someone to get started.</p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -185,7 +185,7 @@ export function TeamContent() {
                         <select
                           value={member.role}
                           onChange={(e) => handleRoleChange(memberId, e.target.value)}
-                          className="rounded-brand border border-border px-2 py-1 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                          className="rounded-brand border border-border border-border px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         >
                           {ROLES.filter((r) => r !== 'owner').map((r) => (
                             <option key={r} value={r}>
@@ -227,7 +227,7 @@ export function TeamContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setRemovingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

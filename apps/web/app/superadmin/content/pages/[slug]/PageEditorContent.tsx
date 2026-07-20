@@ -84,7 +84,7 @@ function FieldRenderer({
   const [jsonError, setJsonError] = useState<string | null>(null);
 
   const baseInput =
-    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none';
 
   switch (field.field_type) {
     case 'TEXT':
@@ -125,7 +125,7 @@ function FieldRenderer({
             type="color"
             value={field.value || '#000000'}
             onChange={(e) => onChange(e.target.value)}
-            className="h-10 w-14 cursor-pointer rounded border"
+            className="h-10 w-14 cursor-pointer rounded border border-border"
           />
           <input type="text" value={field.value} onChange={(e) => onChange(e.target.value)} className={`${baseInput} w-32`} />
         </div>
@@ -136,7 +136,7 @@ function FieldRenderer({
           type="button"
           onClick={() => onChange(field.value === 'true' ? 'false' : 'true')}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-            field.value === 'true' ? 'bg-brand-primary' : 'bg-border'
+            field.value === 'true' ? 'bg-primary' : 'bg-border'
           }`}
         >
           <span
@@ -254,7 +254,7 @@ export function PageEditorContent({ slug }: { slug: string }) {
     return (
       <div className="space-y-4">
         <h1 className="font-heading text-2xl font-bold">Page Editor</h1>
-        <div className="rounded-brand border bg-bg p-6 text-sm text-text-2">
+        <div className="rounded-brand border border-border bg-bg p-6 text-sm text-text-2">
           This page could not be loaded from the CMS.
         </div>
       </div>

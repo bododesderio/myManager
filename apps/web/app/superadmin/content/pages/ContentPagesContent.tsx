@@ -70,7 +70,7 @@ export function ContentPagesContent() {
         <p className="mt-1 text-sm text-text-2">Edit live CMS page sections, fields, and metadata</p>
       </div>
 
-      <div className="rounded-brand border bg-bg shadow-sm">
+      <div className="rounded-brand border border-border bg-bg shadow-sm">
         <div className="divide-y">
           {sortedPages.map((page) => (
             <Link

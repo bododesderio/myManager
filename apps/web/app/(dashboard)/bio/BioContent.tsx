@@ -167,7 +167,7 @@ export function BioContent() {
             Create a branded link-in-bio page for your profiles.
           </p>
         </div>
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -187,7 +187,7 @@ export function BioContent() {
           <button
             onClick={handleCreate}
             disabled={createBioPage.isPending}
-            className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="mt-4 inline-block rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {createBioPage.isPending ? 'Creating...' : 'Create Bio Page'}
           </button>
@@ -209,7 +209,7 @@ export function BioContent() {
         <button
           onClick={handleSave}
           disabled={updateBioPage.isPending}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
         >
           {updateBioPage.isPending ? 'Saving...' : 'Publish Changes'}
         </button>
@@ -219,7 +219,7 @@ export function BioContent() {
         {/* Editor */}
         <div className="space-y-4">
           {/* Profile section */}
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Profile</h2>
             <div className="mt-4 space-y-4">
               <div>
@@ -232,7 +232,7 @@ export function BioContent() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="@myaccount"
-                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div>
@@ -256,11 +256,11 @@ export function BioContent() {
           </div>
 
           {/* Links section */}
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Links</h2>
             <div className="mt-4 space-y-3">
               {links.map((link, index) => (
-                <div key={link.id} className="rounded-brand border px-4 py-3">
+                <div key={link.id} className="rounded-brand border border-border px-4 py-3">
                   {editingLinkId === link.id ? (
                     <div className="space-y-2">
                       <input
@@ -268,18 +268,18 @@ export function BioContent() {
                         value={link.label}
                         onChange={(e) => updateLink(link.id, 'label', e.target.value)}
                         placeholder="Label"
-                        className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                       <input
                         type="text"
                         value={link.url}
                         onChange={(e) => updateLink(link.id, 'url', e.target.value)}
                         placeholder="URL"
-                        className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                       <button
                         onClick={() => setEditingLinkId(null)}
-                        className="text-xs font-medium text-brand-primary hover:underline"
+                        className="text-xs font-medium text-primary hover:underline"
                       >
                         Done
                       </button>
@@ -308,7 +308,7 @@ export function BioContent() {
                       </div>
                       <button
                         onClick={() => setEditingLinkId(link.id)}
-                        className="text-xs text-brand-primary hover:underline"
+                        className="text-xs text-primary hover:underline"
                       >
                         Edit
                       </button>
@@ -324,26 +324,26 @@ export function BioContent() {
               ))}
 
               {showAddLink ? (
-                <div className="rounded-brand border border-dashed border-brand-primary p-4">
+                <div className="rounded-brand border border-dashed border-primary p-4">
                   <div className="space-y-2">
                     <input
                       type="text"
                       value={newLinkLabel}
                       onChange={(e) => setNewLinkLabel(e.target.value)}
                       placeholder="Link label"
-                      className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                      className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                     />
                     <input
                       type="text"
                       value={newLinkUrl}
                       onChange={(e) => setNewLinkUrl(e.target.value)}
                       placeholder="https://..."
-                      className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                      className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={addLink}
-                        className="rounded-brand bg-brand-primary px-3 py-1 text-xs font-semibold text-white transition hover:bg-brand-primary-dark"
+                        className="rounded-brand bg-primary px-3 py-1 text-xs font-semibold text-white transition hover:bg-primary-dark"
                       >
                         Add
                       </button>
@@ -353,7 +353,7 @@ export function BioContent() {
                           setNewLinkLabel('');
                           setNewLinkUrl('');
                         }}
-                        className="rounded-brand border px-3 py-1 text-xs font-medium transition hover:border-brand-primary"
+                        className="rounded-brand border border-border px-3 py-1 text-xs font-medium transition hover:border-primary"
                       >
                         Cancel
                       </button>
@@ -363,7 +363,7 @@ export function BioContent() {
               ) : (
                 <button
                   onClick={() => setShowAddLink(true)}
-                  className="w-full rounded-brand border border-dashed border-border px-4 py-3 text-sm text-text-2 transition hover:border-brand-primary hover:text-brand-primary"
+                  className="w-full rounded-brand border border-border border-dashed border-border px-4 py-3 text-sm text-text-2 transition hover:border-primary hover:text-primary"
                 >
                   + Add Link
                 </button>
@@ -372,7 +372,7 @@ export function BioContent() {
           </div>
 
           {/* Theme / Color picker */}
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Theme</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {THEME_COLORS.map((color) => (
@@ -381,8 +381,8 @@ export function BioContent() {
                   onClick={() => setThemeColor(color.value)}
                   className={`flex items-center gap-2 rounded-brand border px-3 py-2 text-sm transition ${
                     themeColor === color.value
-                      ? 'border-brand-primary bg-brand-primary/5 font-medium text-brand-primary'
-                      : 'hover:border-brand-primary'
+                      ? 'border-primary bg-primary/5 font-medium text-primary'
+                      : 'hover:border-primary'
                   }`}
                 >
                   <span
@@ -390,7 +390,7 @@ export function BioContent() {
                     style={{
                       ['--swatch-color' as string]:
                         color.value === 'brand-primary'
-                          ? 'var(--color-brand-primary, #6366f1)'
+                          ? 'var(--color-primary)'
                           : color.value,
                     } as React.CSSProperties}
                   />
@@ -401,17 +401,17 @@ export function BioContent() {
           </div>
 
           {/* Analytics */}
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Analytics</h2>
             <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="rounded-brand border p-4 text-center">
-                <p className="text-2xl font-bold text-brand-primary">
+              <div className="rounded-brand border border-border p-4 text-center">
+                <p className="text-2xl font-bold text-primary">
                   {analytics.totalClicks ?? analytics.total_clicks ?? 0}
                 </p>
                 <p className="mt-1 text-xs text-text-2">Total Clicks</p>
               </div>
-              <div className="rounded-brand border p-4 text-center">
-                <p className="text-2xl font-bold text-brand-primary">{links.length}</p>
+              <div className="rounded-brand border border-border p-4 text-center">
+                <p className="text-2xl font-bold text-primary">{links.length}</p>
                 <p className="mt-1 text-xs text-text-2">Active Links</p>
               </div>
             </div>
@@ -436,7 +436,7 @@ export function BioContent() {
 
         {/* Preview */}
         <div className="flex justify-center lg:sticky lg:top-6 lg:self-start">
-          <div className="w-80 rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="w-80 rounded-brand border border-border bg-bg p-6 shadow-sm">
             <div className="text-center">
               {avatarUrl ? (
                 <Image
@@ -448,7 +448,7 @@ export function BioContent() {
                   unoptimized
                 />
               ) : (
-                <div className="mx-auto h-20 w-20 rounded-full bg-brand-primary/10" />
+                <div className="mx-auto h-20 w-20 rounded-full bg-primary/10" />
               )}
               <h3 className="mt-4 font-heading font-bold">{title || '@myaccount'}</h3>
               <p className="mt-1 text-sm text-text-2">
@@ -465,7 +465,7 @@ export function BioContent() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-brand border border-brand-primary px-4 py-3 text-center text-sm font-medium text-brand-primary transition hover:bg-brand-primary hover:text-white"
+                    className="block rounded-brand border border-primary px-4 py-3 text-center text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
                   >
                     {link.label}
                   </a>

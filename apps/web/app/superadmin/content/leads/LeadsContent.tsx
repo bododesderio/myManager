@@ -85,7 +85,7 @@ export function LeadsContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none';
 
   if (loading) {
     return (
@@ -134,7 +134,7 @@ export function LeadsContent() {
         })}
       </div>
 
-      <div className="overflow-hidden rounded-brand border bg-bg shadow-sm">
+      <div className="overflow-hidden rounded-brand border border-border bg-bg shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>

@@ -95,19 +95,19 @@ export function CalendarContent() {
         </div>
         <Link
           href="/compose"
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           New Post
         </Link>
       </div>
 
-      <div className="rounded-brand border bg-bg shadow-sm">
+      <div className="rounded-brand border border-border bg-bg shadow-sm">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <button
             type="button"
             aria-label="Previous month"
             onClick={goPrev}
-            className="text-sm font-medium text-text-2 hover:text-brand-primary"
+            className="text-sm font-medium text-text-2 hover:text-primary"
           >
             &larr; Previous
           </button>
@@ -116,7 +116,7 @@ export function CalendarContent() {
             type="button"
             aria-label="Next month"
             onClick={goNext}
-            className="text-sm font-medium text-text-2 hover:text-brand-primary"
+            className="text-sm font-medium text-text-2 hover:text-primary"
           >
             Next &rarr;
           </button>
@@ -164,13 +164,13 @@ export function CalendarContent() {
                     }}
                     aria-label={`${dayNum}: ${dayPosts.length} posts`}
                     className={`min-h-[60px] border-b border-r p-2 text-left text-xs transition hover:bg-bg-2 sm:min-h-[100px] ${
-                      isToday ? 'bg-brand-primary/5' : ''
+                      isToday ? 'bg-primary/5' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <span
                         className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                          isToday ? 'bg-brand-primary text-white' : 'text-text-2'
+                          isToday ? 'bg-primary text-white' : 'text-text-2'
                         }`}
                       >
                         {dayNum}
@@ -242,7 +242,7 @@ export function CalendarContent() {
             </div>
             <ul className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
               {openDayPosts.map((post: any) => (
-                <li key={post.id} className="rounded-brand border p-3 text-sm">
+                <li key={post.id} className="rounded-brand border border-border p-3 text-sm">
                   <div className="flex items-center gap-2">
                     {(post.platforms ?? []).map((p: string) => (
                       <span
@@ -259,7 +259,7 @@ export function CalendarContent() {
                   <p className="mt-2 line-clamp-3 text-text">{post.caption || post.title || 'Untitled post'}</p>
                   <Link
                     href={`/posts/${post.id}`}
-                    className="mt-2 inline-block text-xs text-brand-primary hover:underline"
+                    className="mt-2 inline-block text-xs text-primary hover:underline"
                   >
                     Open post →
                   </Link>
@@ -269,7 +269,7 @@ export function CalendarContent() {
             <div className="mt-4 flex justify-end">
               <Link
                 href={`/compose?date=${openDate}`}
-                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-primary-dark"
+                className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
               >
                 + New post on this day
               </Link>
