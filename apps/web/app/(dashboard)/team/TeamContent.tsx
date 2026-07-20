@@ -80,7 +80,7 @@ export function TeamContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Team</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage team members and their roles.</p>
+          <p className="mt-1 text-sm text-text-2">Manage team members and their roles.</p>
         </div>
         <button
           onClick={() => setShowInviteForm(true)}
@@ -92,11 +92,11 @@ export function TeamContent() {
 
       {/* Invite form */}
       {showInviteForm && (
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Invite a Team Member</h2>
           <form onSubmit={handleInvite} className="mt-4 flex flex-wrap items-end gap-4">
             <div className="flex-1">
-              <label htmlFor="inviteEmail" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="inviteEmail" className="block text-sm font-medium text-text-2">
                 Email Address
               </label>
               <input
@@ -106,18 +106,18 @@ export function TeamContent() {
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="colleague@example.com"
                 required
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
               />
             </div>
             <div>
-              <label htmlFor="inviteRole" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="inviteRole" className="block text-sm font-medium text-text-2">
                 Role
               </label>
               <select
                 id="inviteRole"
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value)}
-                className="mt-1 block rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                className="mt-1 block rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
               >
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -150,15 +150,15 @@ export function TeamContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : members.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No team members</h3>
-          <p className="mt-1 text-sm text-gray-500">Invite someone to get started.</p>
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <h3 className="font-heading text-lg font-semibold text-text">No team members</h3>
+          <p className="mt-1 text-sm text-text-2">Invite someone to get started.</p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Member</th>
                 <th className="px-6 py-3 font-medium">Role</th>
                 <th className="px-6 py-3 font-medium">Joined</th>
@@ -171,11 +171,11 @@ export function TeamContent() {
                 const isOwner = (member.role || '').toLowerCase() === 'owner';
 
                 return (
-                  <tr key={memberId || member.email} className="hover:bg-gray-50">
+                  <tr key={memberId || member.email} className="hover:bg-bg-2">
                     <td className="px-6 py-4">
                       <p className="font-medium">{member.name || member.email}</p>
                       {member.name && (
-                        <p className="text-sm text-gray-500">{member.email}</p>
+                        <p className="text-sm text-text-2">{member.email}</p>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -185,7 +185,7 @@ export function TeamContent() {
                         <select
                           value={member.role}
                           onChange={(e) => handleRoleChange(memberId, e.target.value)}
-                          className="rounded-brand border border-gray-300 px-2 py-1 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                          className="rounded-brand border border-border px-2 py-1 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
                         >
                           {ROLES.filter((r) => r !== 'owner').map((r) => (
                             <option key={r} value={r}>
@@ -195,7 +195,7 @@ export function TeamContent() {
                         </select>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-text-2">
                       {member.joinedAt || member.joined_at || member.createdAt || member.created_at || '—'}
                     </td>
                     <td className="px-6 py-4">
@@ -219,9 +219,9 @@ export function TeamContent() {
       {/* Remove confirmation modal */}
       {removingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Remove Member</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to remove this member from the workspace?
             </p>
             <div className="mt-6 flex justify-end gap-3">

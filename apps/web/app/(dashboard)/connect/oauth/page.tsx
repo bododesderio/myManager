@@ -49,11 +49,11 @@ export default function OAuthCallbackPage() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="max-w-sm rounded-brand border bg-white p-8 text-center shadow-sm">
+      <div className="max-w-sm rounded-brand border bg-bg p-8 text-center shadow-sm">
         {status === 'loading' && (
           <>
             <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
-            <p className="text-sm text-gray-600">{message}</p>
+            <p className="text-sm text-text-2">{message}</p>
           </>
         )}
         {status === 'success' && (
@@ -63,8 +63,8 @@ export default function OAuthCallbackPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="font-semibold text-gray-900">{message}</p>
-            <p className="mt-2 text-xs text-gray-500">Redirecting...</p>
+            <p className="font-semibold text-text">{message}</p>
+            <p className="mt-2 text-xs text-text-2">Redirecting...</p>
           </>
         )}
         {status === 'error' && (
@@ -74,7 +74,7 @@ export default function OAuthCallbackPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <p className="font-semibold text-gray-900">{message}</p>
+            <p className="font-semibold text-text">{message}</p>
             <button
               onClick={() => router.push('/settings/accounts')}
               className="mt-4 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"

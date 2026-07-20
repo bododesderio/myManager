@@ -52,7 +52,7 @@ export default function WorkspaceSettingsContent() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-sm text-gray-500">Loading workspace...</div>;
+    return <div className="flex items-center justify-center py-12 text-sm text-text-2">Loading workspace...</div>;
   }
 
   return (
@@ -63,11 +63,11 @@ export default function WorkspaceSettingsContent() {
       <h1 className="font-heading text-2xl font-bold">Workspace Settings</h1>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">General</h2>
           <div className="mt-4 space-y-4">
             <div>
-              <label htmlFor="wsName" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="wsName" className="block text-sm font-medium text-text-2">
                 Workspace Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -78,17 +78,17 @@ export default function WorkspaceSettingsContent() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={`mt-1 block w-full rounded-brand border px-4 py-2 focus:outline-none ${
-                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
                 }`}
               />
               {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
             </div>
             <div>
-              <label htmlFor="wsSlug" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="wsSlug" className="block text-sm font-medium text-text-2">
                 Workspace URL <span className="text-red-500">*</span>
               </label>
               <div className="mt-1 flex items-center">
-                <span className="text-sm text-gray-500">mymanager.app/</span>
+                <span className="text-sm text-text-2">mymanager.app/</span>
                 <input
                   id="wsSlug"
                   type="text"
@@ -97,14 +97,14 @@ export default function WorkspaceSettingsContent() {
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   className={`block flex-1 rounded-brand border px-4 py-2 focus:outline-none ${
-                    errors.slug ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                    errors.slug ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
                   }`}
                 />
               </div>
               {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
             </div>
             <div>
-              <label htmlFor="wsDesc" className="block text-sm font-medium text-gray-700">Description</label>
+              <label htmlFor="wsDesc" className="block text-sm font-medium text-text-2">Description</label>
               <RichTextEditor
                 value={description}
                 onChange={(html) => setDescription(html)}

@@ -107,8 +107,8 @@ export function LegalContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="h-64 animate-pulse rounded-brand bg-gray-100" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
+        <div className="h-64 animate-pulse rounded-brand bg-bg-2" />
       </div>
     );
   }
@@ -142,7 +142,7 @@ export function LegalContent() {
           <h1 className="font-heading text-2xl font-bold">Edit: {editingDoc.name}</h1>
         </div>
 
-        <div className="space-y-4 rounded-brand border bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-brand border bg-bg p-6 shadow-sm">
           <RichTextEditor
             value={editedBody}
             onChange={setEditedBody}
@@ -159,7 +159,7 @@ export function LegalContent() {
             </button>
             <button
               onClick={handleBack}
-              className="rounded-brand border px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-brand border px-4 py-2 text-sm font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Cancel
             </button>
@@ -173,20 +173,20 @@ export function LegalContent() {
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl font-bold">Legal Content</h1>
-      <p className="text-sm text-gray-500">Manage legal documents and policies.</p>
+      <p className="text-sm text-text-2">Manage legal documents and policies.</p>
 
       {docs.length === 0 ? (
-        <div className="rounded-brand border bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-400">No legal documents found.</p>
+        <div className="rounded-brand border bg-bg p-8 text-center shadow-sm">
+          <p className="text-text-muted">No legal documents found.</p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <div className="divide-y">
             {docs.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
+              <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
                 <div>
                   <p className="font-medium">{doc.name}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-text-2">
                     Updated: {new Date(doc.lastUpdated).toLocaleDateString()}
                   </p>
                 </div>
@@ -195,12 +195,12 @@ export function LegalContent() {
                     onClick={() => void handleToggleStatus(doc)}
                     disabled={toggling === doc.id}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50 ${
-                      doc.status === 'published' ? 'bg-green-600' : 'bg-gray-300'
+                      doc.status === 'published' ? 'bg-green-600' : 'bg-border'
                     }`}
                     title={doc.status === 'published' ? 'Click to unpublish' : 'Click to publish'}
                   >
                     <span
-                      className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                      className={`inline-block h-4 w-4 rounded-full bg-bg shadow transition-transform ${
                         doc.status === 'published' ? 'translate-x-[22px]' : 'translate-x-1'
                       }`}
                     />

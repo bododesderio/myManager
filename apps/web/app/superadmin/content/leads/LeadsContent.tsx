@@ -85,13 +85,13 @@ export function LeadsContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="h-64 animate-pulse rounded-brand bg-gray-100" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
+        <div className="h-64 animate-pulse rounded-brand bg-bg-2" />
       </div>
     );
   }
@@ -100,7 +100,7 @@ export function LeadsContent() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-bold">Contact Leads</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-text-2">
           {leads.length} lead{leads.length !== 1 ? 's' : ''} in the current view
         </p>
       </div>
@@ -111,7 +111,7 @@ export function LeadsContent() {
           className={`rounded-full px-3 py-1 text-xs font-medium transition ${
             statusFilter === 'ALL'
               ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-bg-2 text-text-2 hover:bg-border'
           }`}
         >
           All
@@ -125,7 +125,7 @@ export function LeadsContent() {
               className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                 statusFilter === status
                   ? `${cfg.bg} ${cfg.text} ring-2 ring-offset-1`
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-bg-2 text-text-2 hover:bg-border'
               }`}
             >
               {cfg.label}
@@ -134,9 +134,9 @@ export function LeadsContent() {
         })}
       </div>
 
-      <div className="overflow-hidden rounded-brand border bg-white shadow-sm">
+      <div className="overflow-hidden rounded-brand border bg-bg shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
+          <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>
               <th className="px-6 py-3">Contact</th>
               <th className="px-4 py-3">Company</th>
@@ -153,14 +153,14 @@ export function LeadsContent() {
                 <tr key={lead.id} className="group">
                   <td colSpan={5} className="p-0">
                     <div
-                      className="flex cursor-pointer items-center hover:bg-gray-50"
+                      className="flex cursor-pointer items-center hover:bg-bg-2"
                       onClick={() => setExpandedId(isExpanded ? null : lead.id)}
                     >
                       <div className="flex-1 px-6 py-3">
                         <p className="font-medium">{lead.name}</p>
-                        <p className="text-xs text-gray-400">{lead.email}</p>
+                        <p className="text-xs text-text-muted">{lead.email}</p>
                       </div>
-                      <div className="w-32 px-4 py-3 text-gray-600">{lead.company || 'Unknown'}</div>
+                      <div className="w-32 px-4 py-3 text-text-2">{lead.company || 'Unknown'}</div>
                       <div className="w-32 px-4 py-3">
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text}`}
@@ -168,26 +168,26 @@ export function LeadsContent() {
                           {cfg.label}
                         </span>
                       </div>
-                      <div className="w-28 px-4 py-3 text-xs text-gray-500">
+                      <div className="w-28 px-4 py-3 text-xs text-text-2">
                         {lead.assigned_to || 'Unassigned'}
                       </div>
-                      <div className="w-28 px-4 py-3 text-xs text-gray-500">
+                      <div className="w-28 px-4 py-3 text-xs text-text-2">
                         {formatDate(lead.created_at)}
                       </div>
                     </div>
 
                     {isExpanded && (
-                      <div className="border-t bg-gray-50 px-6 py-4">
+                      <div className="border-t bg-bg-2 px-6 py-4">
                         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                           <div>
-                            <h4 className="text-xs font-semibold uppercase text-gray-400">Message</h4>
-                            <p className="mt-1 whitespace-pre-wrap text-sm text-gray-700">
+                            <h4 className="text-xs font-semibold uppercase text-text-muted">Message</h4>
+                            <p className="mt-1 whitespace-pre-wrap text-sm text-text-2">
                               {lead.message || 'No message.'}
                             </p>
                           </div>
                           <div className="space-y-4">
                             <div>
-                              <label className="text-xs font-semibold uppercase text-gray-400">Notes</label>
+                              <label className="text-xs font-semibold uppercase text-text-muted">Notes</label>
                               <RichTextEditor
                                 value={lead.notes ?? ''}
                                 onChange={(html) =>
@@ -203,7 +203,7 @@ export function LeadsContent() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-xs font-semibold uppercase text-gray-400">Status</label>
+                                <label className="text-xs font-semibold uppercase text-text-muted">Status</label>
                                 <select
                                   value={lead.status}
                                   onChange={(e) =>
@@ -221,7 +221,7 @@ export function LeadsContent() {
                                 </select>
                               </div>
                               <div>
-                                <label className="text-xs font-semibold uppercase text-gray-400">
+                                <label className="text-xs font-semibold uppercase text-text-muted">
                                   Assigned To
                                 </label>
                                 <input
@@ -256,7 +256,7 @@ export function LeadsContent() {
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                <td colSpan={5} className="px-6 py-8 text-center text-text-muted">
                   No leads matching this filter.
                 </td>
               </tr>

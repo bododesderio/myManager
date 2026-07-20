@@ -15,16 +15,16 @@ const TYPE_FILTERS = [
 function getMediaIcon(mimeType: string) {
   if (mimeType?.startsWith('video/')) {
     return (
-      <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
       </svg>
     );
   }
   if (mimeType?.includes('gif')) {
-    return <span className="text-sm font-bold text-gray-400">GIF</span>;
+    return <span className="text-sm font-bold text-text-muted">GIF</span>;
   }
   return (
-    <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   );
@@ -105,7 +105,7 @@ export function MediaContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Media Library</h1>
-          <p className="mt-1 text-sm text-gray-500">Upload and manage your images, videos, and files.</p>
+          <p className="mt-1 text-sm text-text-2">Upload and manage your images, videos, and files.</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -135,7 +135,7 @@ export function MediaContent() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="flex-1 rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+          className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
         />
         <select
           value={typeFilter}
@@ -143,7 +143,7 @@ export function MediaContent() {
             setTypeFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-brand border border-gray-300 px-4 py-2 text-sm"
+          className="rounded-brand border border-border px-4 py-2 text-sm"
         >
           {TYPE_FILTERS.map((f) => (
             <option key={f.value} value={f.value}>
@@ -158,7 +158,7 @@ export function MediaContent() {
           {Array.from({ length: 12 }, (_, i) => (
             <div
               key={i}
-              className="aspect-square animate-pulse rounded-brand border bg-gray-100"
+              className="aspect-square animate-pulse rounded-brand border bg-bg-2"
             />
           ))}
         </div>
@@ -170,14 +170,14 @@ export function MediaContent() {
           </button>
         </div>
       ) : !Array.isArray(mediaItems) || mediaItems.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No media found</h3>
-          <p className="mt-1 text-sm text-gray-500">Upload your first file to get started.</p>
+          <h3 className="font-heading text-lg font-semibold text-text">No media found</h3>
+          <p className="mt-1 text-sm text-text-2">Upload your first file to get started.</p>
           <button
             onClick={handleUpload}
             className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
@@ -197,7 +197,7 @@ export function MediaContent() {
               return (
                 <div
                   key={item.id}
-                  className="group relative aspect-square overflow-hidden rounded-brand border bg-gray-100 transition hover:border-brand-primary"
+                  className="group relative aspect-square overflow-hidden rounded-brand border bg-bg-2 transition hover:border-brand-primary"
                 >
                   {url && isImage ? (
                     <Image
@@ -239,7 +239,7 @@ export function MediaContent() {
 
           {/* Pagination */}
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-text-2">
               {total > 0 && (
                 <span>
                   Showing {(page - 1) * perPage + 1}-{Math.min(page * perPage, total)} of {total} items
@@ -276,9 +276,9 @@ export function MediaContent() {
       {/* Delete confirmation modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Delete Media</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to delete this file? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-3">

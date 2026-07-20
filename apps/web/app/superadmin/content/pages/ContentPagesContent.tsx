@@ -55,9 +55,9 @@ export function ContentPagesContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 animate-pulse rounded-brand bg-gray-100" />
+          <div key={i} className="h-16 animate-pulse rounded-brand bg-bg-2" />
         ))}
       </div>
     );
@@ -67,20 +67,20 @@ export function ContentPagesContent() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-bold">Content Pages</h1>
-        <p className="mt-1 text-sm text-gray-500">Edit live CMS page sections, fields, and metadata</p>
+        <p className="mt-1 text-sm text-text-2">Edit live CMS page sections, fields, and metadata</p>
       </div>
 
-      <div className="rounded-brand border bg-white shadow-sm">
+      <div className="rounded-brand border bg-bg shadow-sm">
         <div className="divide-y">
           {sortedPages.map((page) => (
             <Link
               key={page.id}
               href={`/admin/content/pages/${page.slug}` as Route}
-              className="flex items-center justify-between px-6 py-4 transition hover:bg-gray-50"
+              className="flex items-center justify-between px-6 py-4 transition hover:bg-bg-2"
             >
               <div>
                 <p className="font-medium">{page.title}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-text-2">
                   <span className="font-mono text-xs">/{page.slug}</span> &middot;{' '}
                   {page.sections?.length ?? 0} sections &middot; Updated {timeAgo(page.updated_at)}
                 </p>
@@ -93,7 +93,7 @@ export function ContentPagesContent() {
                 >
                   {page.is_published ? 'Published' : 'Draft'}
                 </span>
-                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-4 w-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -101,7 +101,7 @@ export function ContentPagesContent() {
           ))}
 
           {sortedPages.length === 0 && (
-            <div className="px-6 py-12 text-center text-gray-400">No CMS pages found.</div>
+            <div className="px-6 py-12 text-center text-text-muted">No CMS pages found.</div>
           )}
         </div>
       </div>

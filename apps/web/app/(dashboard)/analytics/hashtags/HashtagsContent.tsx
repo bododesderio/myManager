@@ -33,14 +33,14 @@ export function HashtagsContent() {
 
       <div>
         <h1 className="font-heading text-2xl font-bold">Hashtag Analytics</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-text-2">
           Track hashtag performance and discover trends.
         </p>
       </div>
 
       {/* Date range filter */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           From
           <input
             type="date"
@@ -49,7 +49,7 @@ export function HashtagsContent() {
             className="rounded-brand border px-3 py-1.5 text-sm"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           To
           <input
             type="date"
@@ -61,7 +61,7 @@ export function HashtagsContent() {
       </div>
 
       {/* Hashtags table */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Top Performing Hashtags</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -75,12 +75,12 @@ export function HashtagsContent() {
                 className="flex items-center justify-between rounded-brand border px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-400">#{i + 1}</span>
+                  <span className="text-sm font-medium text-text-muted">#{i + 1}</span>
                   <span className="font-medium text-brand-primary">
                     {tag.hashtag as string}
                   </span>
                 </div>
-                <div className="flex gap-6 text-sm text-gray-500">
+                <div className="flex gap-6 text-sm text-text-2">
                   <span>{((tag.reach as number) ?? 0).toLocaleString()} reach</span>
                   <span>{((tag.posts as number) ?? 0).toLocaleString()} posts</span>
                   <span>
@@ -94,7 +94,7 @@ export function HashtagsContent() {
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-text-muted">
             No hashtag data available for this range.
           </p>
         )}

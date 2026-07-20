@@ -210,15 +210,15 @@ export function ComposeContent() {
       {/* ==================== LEFT: Composer ==================== */}
       <div className="lg:col-span-2 space-y-4">
         {/* --- Account Selection --- */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
-          <h2 className="font-heading text-sm font-semibold text-gray-700">Select Accounts</h2>
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <h2 className="font-heading text-sm font-semibold text-text-2">Select Accounts</h2>
 
           {accountsLoading && (
-            <p className="mt-3 text-sm text-gray-400">Loading accounts...</p>
+            <p className="mt-3 text-sm text-text-muted">Loading accounts...</p>
           )}
 
           {!accountsLoading && activeAccounts.length === 0 && (
-            <p className="mt-3 text-sm text-gray-400">
+            <p className="mt-3 text-sm text-text-muted">
               No connected accounts found. Connect one in Settings.
             </p>
           )}
@@ -236,7 +236,7 @@ export function ComposeContent() {
                   className={`flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition ${
                     selected
                       ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-medium'
-                      : 'border-gray-300 hover:border-brand-primary hover:text-brand-primary'
+                      : 'border-border hover:border-brand-primary hover:text-brand-primary'
                   }`}
                 >
                   {account.avatar_url ? (
@@ -252,7 +252,7 @@ export function ComposeContent() {
                     <span className={`inline-block h-3 w-3 rounded-full ${colorDot}`} />
                   )}
                   <span>{account.display_name || account.platform_username}</span>
-                  <span className="text-xs text-gray-400 capitalize">
+                  <span className="text-xs text-text-muted capitalize">
                     {account.platform}
                   </span>
                 </button>
@@ -262,8 +262,8 @@ export function ComposeContent() {
         </div>
 
         {/* --- Content Textarea --- */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
-          <label htmlFor="compose-caption" className="block text-sm font-semibold text-gray-700">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <label htmlFor="compose-caption" className="block text-sm font-semibold text-text-2">
             Content
           </label>
           <textarea
@@ -272,12 +272,12 @@ export function ComposeContent() {
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             placeholder="What would you like to share?"
-            className="mt-2 block w-full resize-none rounded-brand border border-gray-300 px-4 py-3 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+            className="mt-2 block w-full resize-none rounded-brand border border-border px-4 py-3 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
           />
           <div className="mt-3 flex items-center justify-between text-sm">
             <span
               className={
-                caption.length > charLimit ? 'font-semibold text-red-600' : 'text-gray-500'
+                caption.length > charLimit ? 'font-semibold text-red-600' : 'text-text-2'
               }
             >
               {caption.length.toLocaleString()} / {charLimit.toLocaleString()} characters
@@ -286,8 +286,8 @@ export function ComposeContent() {
         </div>
 
         {/* --- Media Upload --- */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
-          <h2 className="font-heading text-sm font-semibold text-gray-700">Media</h2>
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <h2 className="font-heading text-sm font-semibold text-text-2">Media</h2>
 
           <button
             type="button"
@@ -302,11 +302,11 @@ export function ComposeContent() {
             className={`mt-3 flex w-full cursor-pointer flex-col items-center justify-center rounded-brand border-2 border-dashed px-6 py-8 transition ${
               isDragging
                 ? 'border-brand-primary bg-brand-primary/5'
-                : 'border-gray-300 hover:border-brand-primary'
+                : 'border-border hover:border-brand-primary'
             }`}
           >
             <svg
-              className="mb-2 h-8 w-8 text-gray-400"
+              className="mb-2 h-8 w-8 text-text-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -319,7 +319,7 @@ export function ComposeContent() {
                 d="M12 16v-8m0 0l-3 3m3-3l3 3M3 16.5V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-1.5M6.75 12l-1.72-1.72a1.5 1.5 0 010-2.12L12 1.5l6.97 6.66a1.5 1.5 0 010 2.12L17.25 12"
               />
             </svg>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-text-2">
               Drag &amp; drop files here, or{' '}
               <span className="font-medium text-brand-primary">browse</span>
             </p>
@@ -337,7 +337,7 @@ export function ComposeContent() {
           />
 
           {uploadMedia.isPending && (
-            <div className="mt-2 flex items-center gap-2 text-xs text-gray-500" role="status" aria-live="polite">
+            <div className="mt-2 flex items-center gap-2 text-xs text-text-2" role="status" aria-live="polite">
               <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
               Uploading {uploadedMedia.length > 0 ? `(${uploadedMedia.length} done)` : ''}…
             </div>
@@ -359,7 +359,7 @@ export function ComposeContent() {
                       unoptimized
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gray-100 text-xs text-gray-500">
+                    <div className="flex h-full w-full items-center justify-center bg-bg-2 text-xs text-text-2">
                       {m.name.slice(0, 8)}
                     </div>
                   )}
@@ -377,8 +377,8 @@ export function ComposeContent() {
         </div>
 
         {/* --- Schedule / Submit --- */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
-          <h2 className="font-heading text-sm font-semibold text-gray-700">Schedule</h2>
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <h2 className="font-heading text-sm font-semibold text-text-2">Schedule</h2>
 
           {caption.length > charLimit && (
             <p className="mt-2 text-sm font-medium text-red-600">
@@ -425,7 +425,7 @@ export function ComposeContent() {
                 setSubmitMode('draft');
                 handleSubmit('draft');
               }}
-              className="rounded-brand border px-6 py-2 text-sm font-semibold text-gray-600 transition hover:border-gray-400 disabled:opacity-50"
+              className="rounded-brand border px-6 py-2 text-sm font-semibold text-text-2 transition hover:border-border disabled:opacity-50"
             >
               {isSubmitting && submitMode === 'draft' ? 'Saving...' : 'Save Draft'}
             </button>
@@ -436,7 +436,7 @@ export function ComposeContent() {
               <div>
                 <label
                   htmlFor="schedule-datetime"
-                  className="mb-1 block text-xs font-medium text-gray-600"
+                  className="mb-1 block text-xs font-medium text-text-2"
                 >
                   Date &amp; Time
                 </label>
@@ -446,7 +446,7 @@ export function ComposeContent() {
                   value={scheduledAt}
                   onChange={(e) => setScheduledAt(e.target.value)}
                   min={new Date().toISOString().slice(0, 16)}
-                  className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
                 />
               </div>
               <button
@@ -464,11 +464,11 @@ export function ComposeContent() {
 
       {/* ==================== RIGHT: Preview ==================== */}
       <div className="hidden space-y-4 lg:block">
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
-          <h2 className="font-heading text-sm font-semibold text-gray-700">Preview</h2>
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <h2 className="font-heading text-sm font-semibold text-text-2">Preview</h2>
 
           {selectedAccountIds.size === 0 ? (
-            <p className="mt-4 text-sm text-gray-400">
+            <p className="mt-4 text-sm text-text-muted">
               Select an account to see a preview of your post.
             </p>
           ) : (
@@ -485,7 +485,7 @@ export function ComposeContent() {
                         <span
                           className={`inline-block h-3 w-3 rounded-full ${colorDot}`}
                         />
-                        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-text-2">
                           {account.platform}
                         </span>
                       </div>
@@ -503,7 +503,7 @@ export function ComposeContent() {
                               unoptimized
                             />
                           ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-xs font-bold text-text-2">
                               {(account.display_name || account.platform_username)
                                 .charAt(0)
                                 .toUpperCase()}
@@ -513,16 +513,16 @@ export function ComposeContent() {
                             <p className="text-sm font-semibold leading-tight">
                               {account.display_name || account.platform_username}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-text-muted">
                               @{account.platform_username}
                             </p>
                           </div>
                         </div>
 
                         {/* Caption preview */}
-                        <p className="mt-3 whitespace-pre-wrap text-sm text-gray-700">
+                        <p className="mt-3 whitespace-pre-wrap text-sm text-text-2">
                           {caption || (
-                            <span className="italic text-gray-300">Your content here...</span>
+                            <span className="italic text-text-muted">Your content here...</span>
                           )}
                         </p>
 
@@ -543,7 +543,7 @@ export function ComposeContent() {
                               ) : (
                                 <div
                                   key={m.id}
-                                  className="flex h-24 items-center justify-center bg-gray-100 text-xs text-gray-400"
+                                  className="flex h-24 items-center justify-center bg-bg-2 text-xs text-text-muted"
                                 >
                                   {m.name}
                                 </div>

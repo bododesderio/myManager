@@ -70,7 +70,7 @@ export function TestimonialCarousel() {
       {testimonials.length > 1 && (
         <div className="flex gap-1.5 mt-3 justify-center">
           {testimonials.map((_, i) => (
-            <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/30'}`} />
+            <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-4 bg-bg' : 'w-1.5 bg-white/30'}`} />
           ))}
         </div>
       )}

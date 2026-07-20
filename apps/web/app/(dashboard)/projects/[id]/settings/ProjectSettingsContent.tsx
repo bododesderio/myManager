@@ -71,11 +71,11 @@ export function ProjectSettingsContent({ id }: { id: string }) {
       ) : (
         <div className="max-w-2xl space-y-6">
           {/* General settings */}
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">General</h2>
             <div className="mt-4 space-y-4">
               <div>
-                <label htmlFor="projectName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="projectName" className="block text-sm font-medium text-text-2">
                   Project Name
                 </label>
                 <input
@@ -83,11 +83,11 @@ export function ProjectSettingsContent({ id }: { id: string }) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
                 />
               </div>
               <div>
-                <label htmlFor="projectDesc" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="projectDesc" className="block text-sm font-medium text-text-2">
                   Description
                 </label>
                 <RichTextEditor
@@ -109,9 +109,9 @@ export function ProjectSettingsContent({ id }: { id: string }) {
           </div>
 
           {/* Member management */}
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Members</h2>
-            <p className="mt-2 text-sm text-gray-500">Manage team members assigned to this project.</p>
+            <p className="mt-2 text-sm text-text-2">Manage team members assigned to this project.</p>
             <Link
               href={`/projects/${id}`}
               className="mt-4 inline-block rounded-brand border border-brand-primary px-4 py-2 text-sm font-medium text-brand-primary transition hover:bg-brand-primary hover:text-white"
@@ -121,9 +121,9 @@ export function ProjectSettingsContent({ id }: { id: string }) {
           </div>
 
           {/* Danger zone */}
-          <div className="rounded-brand border border-red-200 bg-white p-6 shadow-sm">
+          <div className="rounded-brand border border-red-200 bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold text-red-600">Danger Zone</h2>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Permanently delete this project and all associated data.
             </p>
             <button
@@ -139,9 +139,9 @@ export function ProjectSettingsContent({ id }: { id: string }) {
       {/* Delete confirmation modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold text-red-600">Delete Project</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               This will permanently delete the project and all associated data. This action cannot be
               undone.
             </p>

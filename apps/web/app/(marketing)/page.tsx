@@ -128,7 +128,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Right — Dashboard preview */}
-            <div className="animate-fade-in-up delay-300 animate-float rounded-[16px] border border-border bg-white p-2 shadow-[var(--shadow-float)] overflow-hidden">
+            <div className="animate-fade-in-up delay-300 animate-float rounded-[16px] border border-border bg-bg p-2 shadow-[var(--shadow-float)] overflow-hidden">
               <Image
                 src="/images/hero-dashboard.svg"
                 alt="myManager Dashboard Preview"
@@ -153,7 +153,7 @@ export default async function LandingPage() {
             {(platforms.length ? platforms : []).map((p: any, i: number) => (
               <span
                 key={p.id || p.slug}
-                className={`animate-fade-in-up card-hover flex w-full items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-[12px] font-medium text-text ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-600', 'delay-700'][i] || 'delay-700'}`}
+                className={`animate-fade-in-up card-hover flex w-full items-center justify-center gap-2 rounded-full border border-border bg-bg px-4 py-2 text-[12px] font-medium text-text ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-600', 'delay-700'][i] || 'delay-700'}`}
               >
                 <PlatformIcon platform={p.slug || p.name || ''} size={18} />
                 <span className="truncate">{p.name}</span>
@@ -164,7 +164,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="bg-white py-16">
+      <section className="bg-bg py-16">
         <div className="mx-auto max-w-5xl px-5">
           <div className="animate-fade-in-up text-center">
             <p className="text-[11px] font-bold uppercase tracking-wide text-primary">
@@ -183,7 +183,7 @@ export default async function LandingPage() {
               return (
                 <div
                   key={feat.title}
-                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-5 ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'][i] || 'delay-500'}`}
+                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-bg p-5 ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'][i] || 'delay-500'}`}
                 >
                   <div className={`flex h-10 w-10 items-center justify-center rounded-icon ${color.bg}`}>
                     <svg className={`h-5 w-5 ${color.text}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

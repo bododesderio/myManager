@@ -39,7 +39,7 @@ export function MobileNavMenu({ links }: MobileNavMenuProps) {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute left-0 top-16 z-50 w-full border-b border-border bg-white px-6 py-4">
+        <div className="absolute left-0 top-16 z-50 w-full border-b border-border bg-bg px-6 py-4">
           <ul className="flex flex-col gap-3">
             {links.map((link) => (
               <li key={link.href}>

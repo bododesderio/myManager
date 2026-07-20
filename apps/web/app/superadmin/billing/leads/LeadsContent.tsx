@@ -8,7 +8,7 @@ const statusStyles: Record<string, string> = {
   new: 'bg-blue-100 text-blue-800',
   contacted: 'bg-yellow-100 text-yellow-800',
   qualified: 'bg-green-100 text-green-800',
-  closed: 'bg-gray-100 text-gray-800',
+  closed: 'bg-bg-2 text-text',
 };
 
 export function LeadsContent() {
@@ -28,10 +28,10 @@ export function LeadsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Contact</th>
                 <th className="px-6 py-3 font-medium">Company</th>
                 <th className="px-6 py-3 font-medium">Source</th>
@@ -42,7 +42,7 @@ export function LeadsContent() {
             <tbody className="divide-y">
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-text-2">
                     No leads found.
                   </td>
                 </tr>
@@ -56,20 +56,20 @@ export function LeadsContent() {
                     status: string;
                     createdAt: string;
                   }) => (
-                    <tr key={lead.id} className="hover:bg-gray-50">
+                    <tr key={lead.id} className="hover:bg-bg-2">
                       <td className="px-6 py-4 font-medium">{lead.name}</td>
                       <td className="px-6 py-4 text-sm">{lead.company}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{lead.source}</td>
+                      <td className="px-6 py-4 text-sm text-text-2">{lead.source}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                            statusStyles[lead.status.toLowerCase()] ?? 'bg-gray-100 text-gray-800'
+                            statusStyles[lead.status.toLowerCase()] ?? 'bg-bg-2 text-text'
                           }`}
                         >
                           {lead.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-text-2">
                         {new Date(lead.createdAt).toLocaleDateString()}
                       </td>
                     </tr>

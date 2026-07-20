@@ -53,7 +53,7 @@ export default function NotificationsContent() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-sm text-gray-500">Loading preferences...</div>;
+    return <div className="flex items-center justify-center py-12 text-sm text-text-2">Loading preferences...</div>;
   }
 
   return (
@@ -63,15 +63,15 @@ export default function NotificationsContent() {
       </div>
       <h1 className="font-heading text-2xl font-bold">Notification Settings</h1>
 
-      <div className="max-w-3xl rounded-brand border bg-white shadow-sm">
+      <div className="max-w-3xl rounded-brand border bg-bg shadow-sm">
         {/* Header row */}
         <div className="flex items-center border-b px-6 py-3">
           <div className="flex-1">
-            <span className="text-sm font-medium text-gray-700">Event</span>
+            <span className="text-sm font-medium text-text-2">Event</span>
           </div>
           {CHANNELS.map((ch) => (
             <div key={ch} className="w-20 text-center">
-              <span className="text-sm font-medium text-gray-700">{CHANNEL_LABELS[ch]}</span>
+              <span className="text-sm font-medium text-text-2">{CHANNEL_LABELS[ch]}</span>
             </div>
           ))}
         </div>
@@ -82,7 +82,7 @@ export default function NotificationsContent() {
             <div key={event.id} className="flex items-center px-6 py-4">
               <div className="flex-1">
                 <p className="font-medium">{event.label}</p>
-                <p className="text-sm text-gray-500">{event.description}</p>
+                <p className="text-sm text-text-2">{event.description}</p>
               </div>
               {CHANNELS.map((ch) => (
                 <div key={ch} className="flex w-20 justify-center">
@@ -90,12 +90,12 @@ export default function NotificationsContent() {
                     type="button"
                     onClick={() => toggle(event.id, ch)}
                     className={`relative h-6 w-11 rounded-full transition-colors ${
-                      localPrefs[event.id]?.[ch] ? 'bg-brand-primary' : 'bg-gray-300'
+                      localPrefs[event.id]?.[ch] ? 'bg-brand-primary' : 'bg-border'
                     }`}
                     aria-label={`${event.label} ${CHANNEL_LABELS[ch]}`}
                   >
                     <span
-                      className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                      className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-bg shadow transition-transform ${
                         localPrefs[event.id]?.[ch] ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />

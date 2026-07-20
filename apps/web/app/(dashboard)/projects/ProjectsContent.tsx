@@ -60,7 +60,7 @@ export function ProjectsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Projects</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage client projects and workspaces.</p>
+          <p className="mt-1 text-sm text-text-2">Manage client projects and workspaces.</p>
         </div>
         <button
           onClick={() => setCreating(true)}
@@ -73,25 +73,25 @@ export function ProjectsContent() {
       {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : projects.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2 12.5l4.5 4.5L12 12m0 0l5.5 5m-5.5-5V3" />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No projects yet</h3>
-          <p className="mt-1 text-sm text-gray-500">Create a project to start organizing your work.</p>
+          <h3 className="font-heading text-lg font-semibold text-text">No projects yet</h3>
+          <p className="mt-1 text-sm text-text-2">Create a project to start organizing your work.</p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project: any) => (
-            <div key={project.id} className="group relative rounded-brand border bg-white p-5 shadow-sm transition hover:border-brand-primary">
+            <div key={project.id} className="group relative rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary">
               <Link href={`/projects/${project.id}`} className="absolute inset-0 z-10" />
               <h3 className="font-heading text-lg font-semibold">{project.name}</h3>
               {project.description && (
-                <p className="mt-1 line-clamp-2 text-sm text-gray-500">{project.description}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-text-2">{project.description}</p>
               )}
-              <div className="mt-3 flex gap-4 text-sm text-gray-500">
+              <div className="mt-3 flex gap-4 text-sm text-text-2">
                 <span>{project.memberCount ?? project.members ?? 0} members</span>
                 <span>{project.postCount ?? project.posts ?? 0} posts</span>
               </div>
@@ -113,11 +113,11 @@ export function ProjectsContent() {
       {/* Create modal */}
       {creating && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setCreating(false)}>
-          <div className="w-full max-w-md rounded-brand bg-white p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md rounded-brand bg-bg p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-heading text-lg font-semibold">New Project</h3>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Name *</label>
+                <label className="block text-sm font-medium text-text-2">Name *</label>
                 <input
                   type="text"
                   value={newName}
@@ -128,7 +128,7 @@ export function ProjectsContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-medium text-text-2">Description</label>
                 <textarea
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
@@ -158,9 +158,9 @@ export function ProjectsContent() {
       {/* Delete confirmation modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Delete Project</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to delete this project? All associated data will be lost.
             </p>
             <div className="mt-6 flex justify-end gap-3">

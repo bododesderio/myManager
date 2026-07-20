@@ -28,7 +28,7 @@ export function ForgotPasswordForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <p className="mt-4 text-gray-600">
+        <p className="mt-4 text-text-2">
           If an account with that email exists, we&apos;ve sent a password reset link.
         </p>
         <Link
@@ -45,7 +45,7 @@ export function ForgotPasswordForm() {
     <>
       <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-sm font-medium text-text-2">
             Email Address
           </label>
           <input
@@ -55,7 +55,7 @@ export function ForgotPasswordForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+            className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
           />
         </div>
 
@@ -68,7 +68,7 @@ export function ForgotPasswordForm() {
         </button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-600">
+      <div className="mt-6 text-center text-sm text-text-2">
         Remember your password?{' '}
         <Link href="/login" className="font-medium text-brand-primary hover:underline">
           Log in

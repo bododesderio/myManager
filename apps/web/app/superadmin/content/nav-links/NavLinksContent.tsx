@@ -161,14 +161,14 @@ export function NavLinksContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 animate-pulse rounded-brand bg-gray-100" />
+          <div key={i} className="h-32 animate-pulse rounded-brand bg-bg-2" />
         ))}
       </div>
     );
@@ -178,11 +178,11 @@ export function NavLinksContent() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-bold">Nav Links</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage navigation links by placement group</p>
+        <p className="mt-1 text-sm text-text-2">Manage navigation links by placement group</p>
       </div>
 
       {linksByPlacement.map((group) => (
-        <div key={group.key} className="rounded-brand border bg-white shadow-sm">
+        <div key={group.key} className="rounded-brand border bg-bg shadow-sm">
           <div className="flex items-center justify-between border-b px-6 py-3">
             <h2 className="font-heading text-base font-semibold">{group.label}</h2>
             <button
@@ -193,7 +193,7 @@ export function NavLinksContent() {
             </button>
           </div>
           {group.links.length === 0 ? (
-            <div className="px-6 py-6 text-center text-sm text-gray-400">No links in this group.</div>
+            <div className="px-6 py-6 text-center text-sm text-text-muted">No links in this group.</div>
           ) : (
             <div className="divide-y">
               {group.links.map((link, idx) => (
@@ -205,7 +205,7 @@ export function NavLinksContent() {
                     <button
                       onClick={() => void moveItem(link.id, group.key, 'up')}
                       disabled={idx === 0}
-                      className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                      className="text-text-muted hover:text-text-2 disabled:opacity-30"
                     >
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -214,7 +214,7 @@ export function NavLinksContent() {
                     <button
                       onClick={() => void moveItem(link.id, group.key, 'down')}
                       disabled={idx === group.links.length - 1}
-                      className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                      className="text-text-muted hover:text-text-2 disabled:opacity-30"
                     >
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -224,13 +224,13 @@ export function NavLinksContent() {
 
                   <div className="min-w-0 flex-1">
                     <span className="text-sm font-medium">{link.label}</span>
-                    <span className="ml-2 font-mono text-xs text-gray-400">{link.href}</span>
+                    <span className="ml-2 font-mono text-xs text-text-muted">{link.href}</span>
                   </div>
 
                   <div className="shrink-0 flex items-center gap-2">
                     <button
                       onClick={() => void toggleVisibility(link)}
-                      className="rounded p-1 text-gray-400 hover:bg-gray-100"
+                      className="rounded p-1 text-text-muted hover:bg-bg-2"
                       title={link.is_visible ? 'Hide' : 'Show'}
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -257,11 +257,11 @@ export function NavLinksContent() {
 
       {editItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-brand bg-white p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-brand bg-bg p-6 shadow-xl">
             <h2 className="font-heading text-lg font-semibold">{editItem.id ? 'Edit Link' : 'New Link'}</h2>
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Label</label>
+                <label className="block text-sm font-medium text-text-2">Label</label>
                 <input
                   type="text"
                   value={editItem.label}
@@ -271,7 +271,7 @@ export function NavLinksContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">URL / Href</label>
+                <label className="block text-sm font-medium text-text-2">URL / Href</label>
                 <input
                   type="text"
                   value={editItem.href}
@@ -287,7 +287,7 @@ export function NavLinksContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Placement</label>
+                <label className="block text-sm font-medium text-text-2">Placement</label>
                 <select
                   value={editItem.placement}
                   onChange={(e) => setEditItem({ ...editItem, placement: e.target.value })}
@@ -300,7 +300,7 @@ export function NavLinksContent() {
                   ))}
                 </select>
               </div>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-text-2">
                 <input
                   type="checkbox"
                   checked={editItem.is_visible}
@@ -312,7 +312,7 @@ export function NavLinksContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setEditItem(null)}
-                className="rounded-brand border px-4 py-2 text-sm text-gray-600 transition hover:bg-gray-50"
+                className="rounded-brand border px-4 py-2 text-sm text-text-2 transition hover:bg-bg-2"
               >
                 Cancel
               </button>

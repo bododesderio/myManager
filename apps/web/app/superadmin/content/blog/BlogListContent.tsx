@@ -63,9 +63,9 @@ export function BlogListContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 animate-pulse rounded-brand bg-gray-100" />
+          <div key={i} className="h-16 animate-pulse rounded-brand bg-bg-2" />
         ))}
       </div>
     );
@@ -76,7 +76,7 @@ export function BlogListContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Blog Posts</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage live blog articles</p>
+          <p className="mt-1 text-sm text-text-2">Manage live blog articles</p>
         </div>
         <Link
           href={'/admin/content/blog/new' as Route}
@@ -86,9 +86,9 @@ export function BlogListContent() {
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-brand border bg-white shadow-sm">
+      <div className="overflow-hidden rounded-brand border bg-bg shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
+          <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>
               <th className="px-6 py-3">Title</th>
               <th className="px-4 py-3">Category</th>
@@ -99,12 +99,12 @@ export function BlogListContent() {
           </thead>
           <tbody className="divide-y">
             {posts.map((post) => (
-              <tr key={post.id} className="hover:bg-gray-50">
+              <tr key={post.id} className="hover:bg-bg-2">
                 <td className="px-6 py-4">
-                  <Link href={`/admin/content/blog/${post.id}` as Route} className="font-medium text-gray-900 hover:text-brand-primary">
+                  <Link href={`/admin/content/blog/${post.id}` as Route} className="font-medium text-text hover:text-brand-primary">
                     {post.title}
                   </Link>
-                  <p className="font-mono text-xs text-gray-400">/{post.slug}</p>
+                  <p className="font-mono text-xs text-text-muted">/{post.slug}</p>
                 </td>
                 <td className="px-4 py-4">
                   <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
@@ -120,7 +120,7 @@ export function BlogListContent() {
                     {post.is_published ? 'Published' : 'Draft'}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-gray-500">{formatDate(post.published_at)}</td>
+                <td className="px-4 py-4 text-text-2">{formatDate(post.published_at)}</td>
                 <td className="px-4 py-4 text-right">
                   <Link href={`/admin/content/blog/${post.id}` as Route} className="text-sm text-brand-primary hover:underline">
                     Edit
@@ -133,7 +133,7 @@ export function BlogListContent() {
             ))}
             {posts.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                <td colSpan={5} className="px-6 py-8 text-center text-text-muted">
                   No blog posts yet.
                 </td>
               </tr>

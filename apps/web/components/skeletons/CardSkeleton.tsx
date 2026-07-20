@@ -1,7 +1,7 @@
 /**
  * Skeletons use theme tokens, not hardcoded greys.
  *
- * These previously used `bg-white` / `bg-gray-200`, which rendered as white
+ * These previously used `bg-bg` / `bg-border`, which rendered as white
  * blocks on the dark background (--color-bg is #0F172A in dark mode). Every
  * surface now resolves through the same CSS variables as the real content it
  * stands in for, so a skeleton looks like the thing that is loading.

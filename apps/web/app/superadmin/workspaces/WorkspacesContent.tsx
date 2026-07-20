@@ -14,10 +14,10 @@ export function WorkspacesContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Workspace</th>
                 <th className="px-6 py-3 font-medium">Owner</th>
                 <th className="px-6 py-3 font-medium">Plan</th>
@@ -29,7 +29,7 @@ export function WorkspacesContent() {
             <tbody className="divide-y">
               {workspaces.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-text-2">
                     No workspaces found.
                   </td>
                 </tr>
@@ -44,13 +44,13 @@ export function WorkspacesContent() {
                     postCount: number;
                     createdAt: string;
                   }) => (
-                    <tr key={ws.id} className="hover:bg-gray-50">
+                    <tr key={ws.id} className="hover:bg-bg-2">
                       <td className="px-6 py-4 font-medium">{ws.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{ws.ownerEmail}</td>
+                      <td className="px-6 py-4 text-sm text-text-2">{ws.ownerEmail}</td>
                       <td className="px-6 py-4 text-sm">{ws.plan}</td>
                       <td className="px-6 py-4 text-sm">{ws.memberCount}</td>
                       <td className="px-6 py-4 text-sm">{ws.postCount}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-text-2">
                         {new Date(ws.createdAt).toLocaleDateString()}
                       </td>
                     </tr>

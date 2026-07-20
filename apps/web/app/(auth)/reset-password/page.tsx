@@ -33,11 +33,11 @@ export default function ResetPasswordPage() {
       {/* Right Panel */}
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-[380px]">
-          <h1 className="text-[22px] font-bold text-gray-900">Reset Password</h1>
-          <p className="mt-2 text-[13px] text-gray-600">
+          <h1 className="text-[22px] font-bold text-text">Reset Password</h1>
+          <p className="mt-2 text-[13px] text-text-2">
             Enter your new password below.
           </p>
-          <Suspense fallback={<div className="mt-8 text-center text-[13px] text-gray-500">Loading...</div>}>
+          <Suspense fallback={<div className="mt-8 text-center text-[13px] text-text-2">Loading...</div>}>
             <ResetPasswordForm />
           </Suspense>
         </div>

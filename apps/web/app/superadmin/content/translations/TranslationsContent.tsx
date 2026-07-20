@@ -155,10 +155,10 @@ export function TranslationsContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-36 animate-pulse rounded-brand bg-gray-100" />
+            <div key={i} className="h-36 animate-pulse rounded-brand bg-bg-2" />
           ))}
         </div>
       </div>
@@ -223,15 +223,15 @@ export function TranslationsContent() {
         />
 
         {filteredTranslations.length === 0 ? (
-          <div className="rounded-brand border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-400">No translation keys found.</p>
+          <div className="rounded-brand border bg-bg p-8 text-center shadow-sm">
+            <p className="text-text-muted">No translation keys found.</p>
           </div>
         ) : (
           <div className="space-y-2">
             {filteredTranslations.map((t) => (
-              <div key={t.id} className="rounded-brand border bg-white p-4 shadow-sm">
+              <div key={t.id} className="rounded-brand border bg-bg p-4 shadow-sm">
                 <div className="mb-2 flex items-center justify-between">
-                  <code className="text-xs text-gray-500">{t.key}</code>
+                  <code className="text-xs text-text-2">{t.key}</code>
                   <button
                     onClick={() => void handleSave(t.id)}
                     disabled={saving}
@@ -241,7 +241,7 @@ export function TranslationsContent() {
                   </button>
                 </div>
                 {editingLang !== 'en' && (
-                  <p className="mb-2 text-sm text-gray-400">EN: {t.values.en ?? '—'}</p>
+                  <p className="mb-2 text-sm text-text-muted">EN: {t.values.en ?? '—'}</p>
                 )}
                 <input
                   type="text"
@@ -262,22 +262,22 @@ export function TranslationsContent() {
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl font-bold">Translations</h1>
-      <p className="text-sm text-gray-500">Manage translations for all supported languages.</p>
+      <p className="text-sm text-text-2">Manage translations for all supported languages.</p>
 
       <div className="grid gap-4 md:grid-cols-3">
         {languages.map((lang) => (
-          <div key={lang.code} className="rounded-brand border bg-white p-5 shadow-sm">
+          <div key={lang.code} className="rounded-brand border bg-bg p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <h3 className="font-heading font-semibold">{lang.name}</h3>
-              <span className="text-sm font-medium text-gray-500">{lang.code}</span>
+              <span className="text-sm font-medium text-text-2">{lang.code}</span>
             </div>
-            <p className="mt-1 text-xs text-gray-400">{lang.keyCount} keys</p>
+            <p className="mt-1 text-xs text-text-muted">{lang.keyCount} keys</p>
             <div className="mt-3">
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-text-2">
                 <span>Progress</span>
                 <span>{lang.progress}%</span>
               </div>
-              <div className="mt-1 h-2 rounded-full bg-gray-200">
+              <div className="mt-1 h-2 rounded-full bg-border">
                 <div
                   className={`h-2 rounded-full bg-brand-primary ${styles.progressFill}`}
                   style={{ ['--progress' as string]: `${lang.progress}%` } as React.CSSProperties}

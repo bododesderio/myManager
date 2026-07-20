@@ -60,11 +60,11 @@ export function OverridesContent() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="rounded-brand border bg-white p-6 shadow-sm space-y-4">
+        <form onSubmit={handleCreate} className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">New Override</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="workspaceId" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="workspaceId" className="block text-sm font-medium text-text-2">
                 Workspace ID
               </label>
               <input
@@ -73,18 +73,18 @@ export function OverridesContent() {
                 required
                 value={form.workspaceId}
                 onChange={(e) => setForm((p) => ({ ...p, workspaceId: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="overrideType" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="overrideType" className="block text-sm font-medium text-text-2">
                 Type
               </label>
               <select
                 id="overrideType"
                 value={form.type}
                 onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               >
                 <option value="discount">Discount</option>
                 <option value="free_trial">Free Trial Extension</option>
@@ -93,7 +93,7 @@ export function OverridesContent() {
               </select>
             </div>
             <div>
-              <label htmlFor="details" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="details" className="block text-sm font-medium text-text-2">
                 Details
               </label>
               <input
@@ -102,11 +102,11 @@ export function OverridesContent() {
                 required
                 value={form.details}
                 onChange={(e) => setForm((p) => ({ ...p, details: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="expiresAt" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="expiresAt" className="block text-sm font-medium text-text-2">
                 Expires
               </label>
               <input
@@ -114,7 +114,7 @@ export function OverridesContent() {
                 type="date"
                 value={form.expiresAt}
                 onChange={(e) => setForm((p) => ({ ...p, expiresAt: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
           </div>
@@ -131,10 +131,10 @@ export function OverridesContent() {
       {isLoading ? (
         <TableSkeleton rows={3} cols={4} />
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Workspace</th>
                 <th className="px-6 py-3 font-medium">Type</th>
                 <th className="px-6 py-3 font-medium">Details</th>
@@ -144,18 +144,18 @@ export function OverridesContent() {
             <tbody className="divide-y">
               {overrides.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-text-2">
                     No overrides found.
                   </td>
                 </tr>
               ) : (
                 overrides.map(
                   (o: { id: string; workspaceName: string; type: string; details: string; expiresAt: string }) => (
-                    <tr key={o.id} className="hover:bg-gray-50">
+                    <tr key={o.id} className="hover:bg-bg-2">
                       <td className="px-6 py-4 font-medium">{o.workspaceName}</td>
                       <td className="px-6 py-4 text-sm">{o.type}</td>
                       <td className="px-6 py-4 text-sm">{o.details}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-text-2">
                         {o.expiresAt ? new Date(o.expiresAt).toLocaleDateString() : 'Never'}
                       </td>
                     </tr>

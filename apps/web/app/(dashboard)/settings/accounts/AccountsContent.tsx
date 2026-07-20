@@ -20,7 +20,7 @@ export default function AccountsContent() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-sm text-gray-500">Loading accounts...</div>;
+    return <div className="flex items-center justify-center py-12 text-sm text-text-2">Loading accounts...</div>;
   }
 
   const accountList = (accounts as any[]) ?? [];
@@ -41,8 +41,8 @@ export default function AccountsContent() {
       </div>
 
       {accountList.length === 0 ? (
-        <div className="max-w-2xl rounded-brand border bg-white p-8 text-center shadow-sm">
-          <p className="text-sm text-gray-500">No social accounts connected yet.</p>
+        <div className="max-w-2xl rounded-brand border bg-bg p-8 text-center shadow-sm">
+          <p className="text-sm text-text-2">No social accounts connected yet.</p>
           <Link
             href={"/connect/oauth" as Route}
             className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-primary-dark"
@@ -55,14 +55,14 @@ export default function AccountsContent() {
           {accountList.map((account: any) => (
             <div
               key={account.id}
-              className="flex items-center justify-between rounded-brand border bg-white px-5 py-4 shadow-sm"
+              className="flex items-center justify-between rounded-brand border bg-bg px-5 py-4 shadow-sm"
             >
               <div>
                 <p className="font-medium">{account.platform}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-text-2">
                   {account.username ?? account.account_name}
                   {account.connected_at && (
-                    <span className="ml-2 text-xs text-gray-400">
+                    <span className="ml-2 text-xs text-text-muted">
                       Connected {new Date(account.connected_at).toLocaleDateString()}
                     </span>
                   )}
@@ -74,7 +74,7 @@ export default function AccountsContent() {
                         ? 'bg-green-100 text-green-800'
                         : account.status === 'expired'
                           ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
+                          : 'bg-bg-2 text-text'
                     }`}
                   >
                     {account.status}

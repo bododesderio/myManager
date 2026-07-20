@@ -125,8 +125,8 @@ export function EmailTemplatesContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="h-64 animate-pulse rounded-brand bg-gray-100" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
+        <div className="h-64 animate-pulse rounded-brand bg-bg-2" />
       </div>
     );
   }
@@ -159,8 +159,8 @@ export function EmailTemplatesContent() {
           </button>
           <h1 className="font-heading text-2xl font-bold">Preview: {editingTemplate.name}</h1>
         </div>
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
-          <p className="mb-2 text-sm text-gray-500">Subject: {editingTemplate.subject}</p>
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <p className="mb-2 text-sm text-text-2">Subject: {editingTemplate.subject}</p>
           <div
             className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editingTemplate.body ?? '') }}
@@ -183,9 +183,9 @@ export function EmailTemplatesContent() {
           </h1>
         </div>
 
-        <div className="space-y-4 rounded-brand border bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-brand border bg-bg p-6 shadow-sm">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Template Name</label>
+            <label className="mb-1 block text-sm font-medium text-text-2">Template Name</label>
             <input
               type="text"
               value={editingTemplate.name ?? ''}
@@ -195,7 +195,7 @@ export function EmailTemplatesContent() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Subject Line</label>
+            <label className="mb-1 block text-sm font-medium text-text-2">Subject Line</label>
             <input
               type="text"
               value={editingTemplate.subject ?? ''}
@@ -205,7 +205,7 @@ export function EmailTemplatesContent() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Trigger</label>
+            <label className="mb-1 block text-sm font-medium text-text-2">Trigger</label>
             <input
               type="text"
               value={editingTemplate.trigger ?? ''}
@@ -215,7 +215,7 @@ export function EmailTemplatesContent() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Body</label>
+            <label className="mb-1 block text-sm font-medium text-text-2">Body</label>
             <RichTextEditor
               value={editingTemplate.body ?? ''}
               onChange={(html) => setEditingTemplate((prev) => ({ ...prev, body: html }))}
@@ -232,7 +232,7 @@ export function EmailTemplatesContent() {
             </button>
             <button
               onClick={handleBack}
-              className="rounded-brand border px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-brand border px-4 py-2 text-sm font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Cancel
             </button>
@@ -256,8 +256,8 @@ export function EmailTemplatesContent() {
       </div>
 
       {templates.length === 0 ? (
-        <div className="rounded-brand border bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-400">No email templates yet.</p>
+        <div className="rounded-brand border bg-bg p-8 text-center shadow-sm">
+          <p className="text-text-muted">No email templates yet.</p>
           <button
             onClick={handleCreate}
             className="mt-3 text-sm font-semibold text-brand-primary hover:underline"
@@ -266,13 +266,13 @@ export function EmailTemplatesContent() {
           </button>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <div className="divide-y">
             {templates.map((template) => (
-              <div key={template.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
+              <div key={template.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
                 <div>
                   <p className="font-medium">{template.name}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-text-2">
                     Trigger: {template.trigger} &middot; Edited {template.lastEdited}
                   </p>
                 </div>
@@ -285,7 +285,7 @@ export function EmailTemplatesContent() {
                   </button>
                   <button
                     onClick={() => handlePreview(template)}
-                    className="text-sm text-gray-400 hover:underline"
+                    className="text-sm text-text-muted hover:underline"
                   >
                     Preview
                   </button>

@@ -45,14 +45,14 @@ export function BenchmarksContent() {
 
       <div>
         <h1 className="font-heading text-2xl font-bold">Industry Benchmarks</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-text-2">
           Compare your performance against industry averages.
         </p>
       </div>
 
       {/* Date range picker */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           From
           <input
             type="date"
@@ -61,7 +61,7 @@ export function BenchmarksContent() {
             className="rounded-brand border px-3 py-1.5 text-sm"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           To
           <input
             type="date"
@@ -73,11 +73,11 @@ export function BenchmarksContent() {
       </div>
 
       {/* Engagement rate trend chart */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Engagement Rate Trends</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
-            <div className="h-full w-full animate-pulse rounded bg-gray-100" />
+            <div className="h-full w-full animate-pulse rounded bg-bg-2" />
           </div>
         ) : trends.length > 0 ? (
           <div className="mt-4 h-64">
@@ -108,7 +108,7 @@ export function BenchmarksContent() {
             </ResponsiveContainer>
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-text-muted">
             No engagement trend data available for this range.
           </p>
         )}
@@ -122,16 +122,16 @@ export function BenchmarksContent() {
           {benchmarks.map((bench: Record<string, unknown>) => {
             const status = (bench.yours as number) >= (bench.industry as number) ? 'above' : 'below';
             return (
-              <div key={bench.metric as string} className="rounded-brand border bg-white p-5 shadow-sm">
+              <div key={bench.metric as string} className="rounded-brand border bg-bg p-5 shadow-sm">
                 <h3 className="font-heading font-semibold">{bench.metric as string}</h3>
                 <div className="mt-3 flex justify-between">
                   <div>
-                    <p className="text-xs text-gray-500">Your Performance</p>
+                    <p className="text-xs text-text-2">Your Performance</p>
                     <p className="text-lg font-bold">{String(bench.yours)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">Industry Average</p>
-                    <p className="text-lg font-bold text-gray-400">{String(bench.industry)}</p>
+                    <p className="text-xs text-text-2">Industry Average</p>
+                    <p className="text-lg font-bold text-text-muted">{String(bench.industry)}</p>
                   </div>
                 </div>
                 <p
@@ -155,18 +155,18 @@ export function BenchmarksContent() {
             const industryNum = typeof bench.industry === 'number' ? bench.industry : 0;
             const status = yoursNum >= industryNum ? 'above' : 'below';
             return (
-              <div key={bench.metric} className="rounded-brand border bg-white p-5 shadow-sm">
+              <div key={bench.metric} className="rounded-brand border bg-bg p-5 shadow-sm">
                 <h3 className="font-heading font-semibold">{bench.metric}</h3>
                 <div className="mt-3 flex justify-between">
                   <div>
-                    <p className="text-xs text-gray-500">Your Performance</p>
+                    <p className="text-xs text-text-2">Your Performance</p>
                     <p className="text-lg font-bold">
                       {typeof bench.yours === 'number' ? `${bench.yours}%` : bench.yours}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">Industry Average</p>
-                    <p className="text-lg font-bold text-gray-400">
+                    <p className="text-xs text-text-2">Industry Average</p>
+                    <p className="text-lg font-bold text-text-muted">
                       {typeof bench.industry === 'number' ? `${bench.industry}%` : bench.industry}
                     </p>
                   </div>

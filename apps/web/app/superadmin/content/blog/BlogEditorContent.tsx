@@ -147,13 +147,13 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="h-64 animate-pulse rounded-brand bg-gray-100" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
+        <div className="h-64 animate-pulse rounded-brand bg-bg-2" />
       </div>
     );
   }
@@ -162,7 +162,7 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={'/admin/content/blog' as Route} className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+          <Link href={'/admin/content/blog' as Route} className="rounded-md p-1 text-text-muted hover:bg-bg-2 hover:text-text-2">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -180,16 +180,16 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
+                <label className="block text-sm font-medium text-text-2">Title</label>
                 <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} className={inputCls} placeholder="Post title..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Slug</label>
+                <label className="block text-sm font-medium text-text-2">Slug</label>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400">/blog/</span>
+                  <span className="text-sm text-text-muted">/blog/</span>
                   <input
                     type="text"
                     value={form.slug}
@@ -204,10 +204,10 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
             </div>
           </div>
 
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Excerpt</label>
+                <label className="block text-sm font-medium text-text-2">Excerpt</label>
                 <RichTextEditor
                   value={form.excerpt}
                   onChange={(html) => update('excerpt', html)}
@@ -224,8 +224,8 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
             </div>
           </div>
 
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
-            <label className="mb-2 block text-sm font-medium text-gray-700">Body</label>
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+            <label className="mb-2 block text-sm font-medium text-text-2">Body</label>
             <RichTextEditor
               value={form.body}
               onChange={(html) => update('body', html)}
@@ -236,29 +236,29 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h3 className="font-heading text-sm font-semibold">Publish Settings</h3>
             <div className="mt-4 space-y-4">
-              <label className="flex items-center justify-between text-sm text-gray-700">
+              <label className="flex items-center justify-between text-sm text-text-2">
                 Published
                 <input type="checkbox" checked={form.is_published} onChange={(e) => update('is_published', e.target.checked)} />
               </label>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Published At</label>
+                <label className="block text-sm font-medium text-text-2">Published At</label>
                 <input type="datetime-local" value={form.published_at} onChange={(e) => update('published_at', e.target.value)} className={inputCls} />
               </div>
-              <label className="flex items-center justify-between text-sm text-gray-700">
+              <label className="flex items-center justify-between text-sm text-text-2">
                 Featured
                 <input type="checkbox" checked={form.is_featured} onChange={(e) => update('is_featured', e.target.checked)} />
               </label>
             </div>
           </div>
 
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h3 className="font-heading text-sm font-semibold">Organization</h3>
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <label className="block text-sm font-medium text-text-2">Category</label>
                 <select value={form.category} onChange={(e) => update('category', e.target.value)} className={inputCls}>
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -268,21 +268,21 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Tags</label>
+                <label className="block text-sm font-medium text-text-2">Tags</label>
                 <input type="text" value={form.tags} onChange={(e) => update('tags', e.target.value)} className={inputCls} placeholder="tag1, tag2, tag3" />
               </div>
             </div>
           </div>
 
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h3 className="font-heading text-sm font-semibold">SEO</h3>
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Meta Title</label>
+                <label className="block text-sm font-medium text-text-2">Meta Title</label>
                 <input type="text" value={form.meta_title} onChange={(e) => update('meta_title', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Meta Description</label>
+                <label className="block text-sm font-medium text-text-2">Meta Description</label>
                 <textarea rows={2} value={form.meta_desc} onChange={(e) => update('meta_desc', e.target.value)} className={inputCls} />
               </div>
               <FileUpload

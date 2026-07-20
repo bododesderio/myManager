@@ -53,8 +53,8 @@ export function UserDetailContent({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-6 w-24 animate-pulse rounded bg-gray-200" />
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-6 w-24 animate-pulse rounded bg-border" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         <StatCardSkeletonGrid count={4} />
       </div>
     );
@@ -64,7 +64,7 @@ export function UserDetailContent({ id }: { id: string }) {
     return (
       <div className="space-y-4">
         <Link href="/superadmin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
-        <p className="text-gray-500">User not found.</p>
+        <p className="text-text-2">User not found.</p>
       </div>
     );
   }
@@ -103,23 +103,23 @@ export function UserDetailContent({ id }: { id: string }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Profile</h2>
           <dl className="mt-4 space-y-3">
             <div>
-              <dt className="text-xs text-gray-500">Name</dt>
+              <dt className="text-xs text-text-2">Name</dt>
               <dd className="font-medium">{user.name ?? '--'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Email</dt>
+              <dt className="text-xs text-text-2">Email</dt>
               <dd className="font-medium">{user.email}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Plan</dt>
+              <dt className="text-xs text-text-2">Plan</dt>
               <dd className="font-medium">{user.plan ?? '--'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Status</dt>
+              <dt className="text-xs text-text-2">Status</dt>
               <dd>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -131,11 +131,11 @@ export function UserDetailContent({ id }: { id: string }) {
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Role</dt>
+              <dt className="text-xs text-text-2">Role</dt>
               <dd>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    user.is_superadmin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                    user.is_superadmin ? 'bg-purple-100 text-purple-800' : 'bg-bg-2 text-text'
                   }`}
                 >
                   {user.is_superadmin ? 'Superadmin' : 'User'}
@@ -143,11 +143,11 @@ export function UserDetailContent({ id }: { id: string }) {
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Two-Factor Authentication</dt>
+              <dt className="text-xs text-text-2">Two-Factor Authentication</dt>
               <dd>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    user.twoFactorEnabled ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'
+                    user.twoFactorEnabled ? 'bg-amber-100 text-amber-800' : 'bg-bg-2 text-text-2'
                   }`}
                 >
                   {user.twoFactorEnabled ? 'Enabled' : 'Disabled'}
@@ -155,7 +155,7 @@ export function UserDetailContent({ id }: { id: string }) {
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Joined</dt>
+              <dt className="text-xs text-text-2">Joined</dt>
               <dd className="font-medium">
                 {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '--'}
               </dd>
@@ -163,27 +163,27 @@ export function UserDetailContent({ id }: { id: string }) {
           </dl>
         </div>
 
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Usage</h2>
           <dl className="mt-4 space-y-3">
             <div>
-              <dt className="text-xs text-gray-500">Social Accounts</dt>
+              <dt className="text-xs text-text-2">Social Accounts</dt>
               <dd className="font-medium">
                 {user.usage?.socialAccounts ?? 0} / {user.limits?.socialAccounts ?? '--'}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Posts This Month</dt>
+              <dt className="text-xs text-text-2">Posts This Month</dt>
               <dd className="font-medium">{user.usage?.postsThisMonth ?? 0}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Storage Used</dt>
+              <dt className="text-xs text-text-2">Storage Used</dt>
               <dd className="font-medium">
                 {user.usage?.storageUsedGb ?? 0} GB / {user.limits?.storageGb ?? '--'} GB
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500">Team Members</dt>
+              <dt className="text-xs text-text-2">Team Members</dt>
               <dd className="font-medium">{user.usage?.teamMembers ?? 0}</dd>
             </div>
           </dl>
@@ -191,13 +191,13 @@ export function UserDetailContent({ id }: { id: string }) {
       </div>
 
       {user.workspaces?.length > 0 && (
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Workspaces</h2>
           <div className="mt-4 divide-y">
             {user.workspaces.map((ws: { id: string; name: string; role: string }) => (
               <div key={ws.id} className="flex items-center justify-between py-3">
                 <span className="font-medium">{ws.name}</span>
-                <span className="text-sm text-gray-500">{ws.role}</span>
+                <span className="text-sm text-text-2">{ws.role}</span>
               </div>
             ))}
           </div>

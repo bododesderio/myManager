@@ -110,7 +110,7 @@ export default async function FeaturesPage() {
         const theme = GROUP_THEMES[gi % GROUP_THEMES.length];
         const isAlt = gi % 2 !== 0;
         return (
-          <section key={group.title} className={isAlt ? 'bg-[var(--color-bg-2)] py-16' : 'bg-white py-16'}>
+          <section key={group.title} className={isAlt ? 'bg-[var(--color-bg-2)] py-16' : 'bg-bg py-16'}>
             <div className="mx-auto max-w-5xl px-5">
               <h2 className="animate-fade-in-up text-[11px] font-bold uppercase tracking-wide text-primary">
                 {group.title}
@@ -122,7 +122,7 @@ export default async function FeaturesPage() {
                 {( group.features || [] ).map((feature, fi) => (
                   <div
                     key={feature.title}
-                    className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-6 ${theme.accent} ${['', 'delay-100', 'delay-200'][fi] || ''}`}
+                    className={`animate-fade-in-up card-hover rounded-card border border-border bg-bg p-6 ${theme.accent} ${['', 'delay-100', 'delay-200'][fi] || ''}`}
                   >
                     <div className={`flex h-10 w-10 items-center justify-center rounded-icon ${theme.iconBg}`}>
                       <svg className={`h-5 w-5 ${theme.icon}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -141,7 +141,7 @@ export default async function FeaturesPage() {
 
       {/* ── PLATFORM TABLE ── */}
       {platforms.length > 0 && (
-        <section className="bg-white py-16">
+        <section className="bg-bg py-16">
           <div className="mx-auto max-w-5xl px-5">
             <div className="animate-fade-in-up text-center">
               <p className="text-[11px] font-bold uppercase tracking-wide text-primary">

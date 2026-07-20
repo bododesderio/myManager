@@ -84,7 +84,7 @@ function FieldRenderer({
   const [jsonError, setJsonError] = useState<string | null>(null);
 
   const baseInput =
-    'mt-1 block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
 
   switch (field.field_type) {
     case 'TEXT':
@@ -136,11 +136,11 @@ function FieldRenderer({
           type="button"
           onClick={() => onChange(field.value === 'true' ? 'false' : 'true')}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-            field.value === 'true' ? 'bg-brand-primary' : 'bg-gray-300'
+            field.value === 'true' ? 'bg-brand-primary' : 'bg-border'
           }`}
         >
           <span
-            className={`inline-block h-4 w-4 rounded-full bg-white transition ${
+            className={`inline-block h-4 w-4 rounded-full bg-bg transition ${
               field.value === 'true' ? 'translate-x-6' : 'translate-x-1'
             }`}
           />
@@ -242,9 +242,9 @@ export function PageEditorContent({ slug }: { slug: string }) {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         {[1, 2].map((i) => (
-          <div key={i} className="h-40 animate-pulse rounded-brand bg-gray-100" />
+          <div key={i} className="h-40 animate-pulse rounded-brand bg-bg-2" />
         ))}
       </div>
     );
@@ -254,7 +254,7 @@ export function PageEditorContent({ slug }: { slug: string }) {
     return (
       <div className="space-y-4">
         <h1 className="font-heading text-2xl font-bold">Page Editor</h1>
-        <div className="rounded-brand border bg-white p-6 text-sm text-gray-500">
+        <div className="rounded-brand border bg-bg p-6 text-sm text-text-2">
           This page could not be loaded from the CMS.
         </div>
       </div>
@@ -264,18 +264,18 @@ export function PageEditorContent({ slug }: { slug: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/superadmin/content/pages" className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+        <Link href="/superadmin/content/pages" className="rounded-md p-1 text-text-muted hover:bg-bg-2 hover:text-text-2">
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
           <h1 className="font-heading text-2xl font-bold">{pageData.title}</h1>
-          <p className="font-mono text-sm text-gray-500">/{pageData.slug}</p>
+          <p className="font-mono text-sm text-text-2">/{pageData.slug}</p>
         </div>
       </div>
 
-      <p className="text-xs text-gray-400">Changes auto-save after 800ms of inactivity.</p>
+      <p className="text-xs text-text-muted">Changes auto-save after 800ms of inactivity.</p>
 
       <div className="space-y-4">
         {pageData.sections
@@ -285,12 +285,12 @@ export function PageEditorContent({ slug }: { slug: string }) {
             return (
               <div
                 key={section.id}
-                className={`rounded-brand border bg-white shadow-sm ${!section.is_visible ? 'opacity-60' : ''}`}
+                className={`rounded-brand border bg-bg shadow-sm ${!section.is_visible ? 'opacity-60' : ''}`}
               >
                 <div className="flex items-center justify-between border-b px-6 py-3">
                   <button onClick={() => toggleCollapse(section.id)} className="flex items-center gap-2 font-heading text-base font-semibold">
                     <svg
-                      className={`h-4 w-4 text-gray-400 transition ${isCollapsed ? '' : 'rotate-90'}`}
+                      className={`h-4 w-4 text-text-muted transition ${isCollapsed ? '' : 'rotate-90'}`}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -298,12 +298,12 @@ export function PageEditorContent({ slug }: { slug: string }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                     {humanizeKey(section.section_key)}
-                    <span className="ml-2 text-xs font-normal text-gray-400">{section.section_key}</span>
+                    <span className="ml-2 text-xs font-normal text-text-muted">{section.section_key}</span>
                   </button>
 
                   <button
                     onClick={() => void toggleVisibility(section.id, section.is_visible)}
-                    className={`rounded p-1 transition hover:bg-gray-100 ${section.is_visible ? 'text-gray-500' : 'text-gray-300'}`}
+                    className={`rounded p-1 transition hover:bg-bg-2 ${section.is_visible ? 'text-text-2' : 'text-text-muted'}`}
                     title={section.is_visible ? 'Hide section' : 'Show section'}
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -319,9 +319,9 @@ export function PageEditorContent({ slug }: { slug: string }) {
                       .sort((a, b) => a.order_index - b.order_index)
                       .map((field) => (
                         <div key={field.id} className="py-4">
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
+                          <label className="mb-1 block text-sm font-medium text-text-2">
                             {humanizeKey(field.field_key)}
-                            <span className="ml-2 text-xs font-normal text-gray-400">{field.field_type}</span>
+                            <span className="ml-2 text-xs font-normal text-text-muted">{field.field_type}</span>
                           </label>
                           <FieldRenderer field={field} onChange={(value) => handleFieldChange(section.id, field.id, value)} />
                         </div>

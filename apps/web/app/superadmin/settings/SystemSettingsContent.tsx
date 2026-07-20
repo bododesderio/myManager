@@ -108,7 +108,7 @@ export function SystemSettingsContent() {
         <h1 className="font-heading text-2xl font-bold">System Settings</h1>
         <div className="animate-pulse space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 rounded-brand bg-gray-200" />
+            <div key={i} className="h-16 rounded-brand bg-border" />
           ))}
         </div>
       </div>
@@ -129,25 +129,25 @@ export function SystemSettingsContent() {
       </div>
 
       {/* Feature toggles */}
-      <div className="rounded-brand border bg-white shadow-sm">
+      <div className="rounded-brand border bg-bg shadow-sm">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Feature Flags</h2>
         <div className="divide-y">
           {toggles.map(({ key, label, description }) => (
             <div key={key} className="flex items-center justify-between px-6 py-4">
               <div>
                 <p className="font-medium">{label}</p>
-                <p className="text-sm text-gray-500">{description}</p>
+                <p className="text-sm text-text-2">{description}</p>
               </div>
               <button
                 onClick={() => toggleFeature(key)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                  brand?.features[key] ? 'bg-brand-primary' : 'bg-gray-200'
+                  brand?.features[key] ? 'bg-brand-primary' : 'bg-border'
                 }`}
                 role="switch"
                 aria-checked={brand?.features[key] ?? false}
               >
                 <span
-                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform ${
+                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-bg shadow ring-0 transition-transform ${
                     brand?.features[key] ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
@@ -158,22 +158,22 @@ export function SystemSettingsContent() {
       </div>
 
       {/* Sub-page links */}
-      <div className="rounded-brand border bg-white shadow-sm">
+      <div className="rounded-brand border bg-bg shadow-sm">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Configuration</h2>
         <div className="divide-y">
           {subPages.map(({ href, label, description }) => (
             <Link
               key={label}
               href={href}
-              className="flex items-center justify-between px-6 py-4 hover:bg-gray-50"
+              className="flex items-center justify-between px-6 py-4 hover:bg-bg-2"
             >
               <div>
                 <p className="font-medium text-brand-primary">{label}</p>
-                <p className="text-sm text-gray-500">{description}</p>
+                <p className="text-sm text-text-2">{description}</p>
               </div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-400"
+                className="h-5 w-5 text-text-muted"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >

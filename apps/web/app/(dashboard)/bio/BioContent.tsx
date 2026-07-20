@@ -142,7 +142,7 @@ export function BioContent() {
       <div className="space-y-6">
         <div>
           <h1 className="font-heading text-2xl font-bold">Bio Link Page</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-text-2">
             Create a branded link-in-bio page for your profiles.
           </p>
         </div>
@@ -163,13 +163,13 @@ export function BioContent() {
       <div className="space-y-6">
         <div>
           <h1 className="font-heading text-2xl font-bold">Bio Link Page</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-text-2">
             Create a branded link-in-bio page for your profiles.
           </p>
         </div>
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -178,10 +178,10 @@ export function BioContent() {
               />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">
+          <h3 className="font-heading text-lg font-semibold text-text">
             No bio page yet
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-text-2">
             Create a link-in-bio page to share all your important links in one place.
           </p>
           <button
@@ -202,7 +202,7 @@ export function BioContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Bio Link Page</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-text-2">
             Create a branded link-in-bio page for your profiles.
           </p>
         </div>
@@ -219,11 +219,11 @@ export function BioContent() {
         {/* Editor */}
         <div className="space-y-4">
           {/* Profile section */}
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Profile</h2>
             <div className="mt-4 space-y-4">
               <div>
-                <label htmlFor="bioTitle" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="bioTitle" className="block text-sm font-medium text-text-2">
                   Title
                 </label>
                 <input
@@ -232,11 +232,11 @@ export function BioContent() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="@myaccount"
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
                 />
               </div>
               <div>
-                <label htmlFor="bioDescription" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="bioDescription" className="block text-sm font-medium text-text-2">
                   Description
                 </label>
                 <RichTextEditor
@@ -256,7 +256,7 @@ export function BioContent() {
           </div>
 
           {/* Links section */}
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Links</h2>
             <div className="mt-4 space-y-3">
               {links.map((link, index) => (
@@ -268,14 +268,14 @@ export function BioContent() {
                         value={link.label}
                         onChange={(e) => updateLink(link.id, 'label', e.target.value)}
                         placeholder="Label"
-                        className="block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                       />
                       <input
                         type="text"
                         value={link.url}
                         onChange={(e) => updateLink(link.id, 'url', e.target.value)}
                         placeholder="URL"
-                        className="block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                       />
                       <button
                         onClick={() => setEditingLinkId(null)}
@@ -290,21 +290,21 @@ export function BioContent() {
                         <button
                           onClick={() => moveLink(index, 'up')}
                           disabled={index === 0}
-                          className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                          className="text-xs text-text-muted hover:text-text-2 disabled:opacity-30"
                         >
                           &#9650;
                         </button>
                         <button
                           onClick={() => moveLink(index, 'down')}
                           disabled={index === links.length - 1}
-                          className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                          className="text-xs text-text-muted hover:text-text-2 disabled:opacity-30"
                         >
                           &#9660;
                         </button>
                       </div>
                       <div className="min-w-0 flex-1">
                         <span className="text-sm font-medium">{link.label}</span>
-                        <span className="ml-2 truncate text-sm text-gray-400">{link.url}</span>
+                        <span className="ml-2 truncate text-sm text-text-muted">{link.url}</span>
                       </div>
                       <button
                         onClick={() => setEditingLinkId(link.id)}
@@ -331,14 +331,14 @@ export function BioContent() {
                       value={newLinkLabel}
                       onChange={(e) => setNewLinkLabel(e.target.value)}
                       placeholder="Link label"
-                      className="block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                      className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                     />
                     <input
                       type="text"
                       value={newLinkUrl}
                       onChange={(e) => setNewLinkUrl(e.target.value)}
                       placeholder="https://..."
-                      className="block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                      className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                     />
                     <div className="flex gap-2">
                       <button
@@ -363,7 +363,7 @@ export function BioContent() {
               ) : (
                 <button
                   onClick={() => setShowAddLink(true)}
-                  className="w-full rounded-brand border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 transition hover:border-brand-primary hover:text-brand-primary"
+                  className="w-full rounded-brand border border-dashed border-border px-4 py-3 text-sm text-text-2 transition hover:border-brand-primary hover:text-brand-primary"
                 >
                   + Add Link
                 </button>
@@ -372,7 +372,7 @@ export function BioContent() {
           </div>
 
           {/* Theme / Color picker */}
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Theme</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {THEME_COLORS.map((color) => (
@@ -401,30 +401,30 @@ export function BioContent() {
           </div>
 
           {/* Analytics */}
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Analytics</h2>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div className="rounded-brand border p-4 text-center">
                 <p className="text-2xl font-bold text-brand-primary">
                   {analytics.totalClicks ?? analytics.total_clicks ?? 0}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">Total Clicks</p>
+                <p className="mt-1 text-xs text-text-2">Total Clicks</p>
               </div>
               <div className="rounded-brand border p-4 text-center">
                 <p className="text-2xl font-bold text-brand-primary">{links.length}</p>
-                <p className="mt-1 text-xs text-gray-500">Active Links</p>
+                <p className="mt-1 text-xs text-text-2">Active Links</p>
               </div>
             </div>
             {(analytics.clicksPerLink || analytics.clicks_per_link) && (
               <div className="mt-4 space-y-2">
-                <h3 className="text-sm font-medium text-gray-700">Clicks per Link</h3>
+                <h3 className="text-sm font-medium text-text-2">Clicks per Link</h3>
                 {(analytics.clicksPerLink || analytics.clicks_per_link || []).map(
                   (entry: any) => (
                     <div
                       key={entry.linkId || entry.link_id || entry.label}
                       className="flex items-center justify-between text-sm"
                     >
-                      <span className="text-gray-600">{entry.label || entry.url || '-'}</span>
+                      <span className="text-text-2">{entry.label || entry.url || '-'}</span>
                       <span className="font-medium">{entry.clicks ?? 0}</span>
                     </div>
                   ),
@@ -436,7 +436,7 @@ export function BioContent() {
 
         {/* Preview */}
         <div className="flex justify-center lg:sticky lg:top-6 lg:self-start">
-          <div className="w-80 rounded-brand border bg-white p-6 shadow-sm">
+          <div className="w-80 rounded-brand border bg-bg p-6 shadow-sm">
             <div className="text-center">
               {avatarUrl ? (
                 <Image
@@ -451,13 +451,13 @@ export function BioContent() {
                 <div className="mx-auto h-20 w-20 rounded-full bg-brand-primary/10" />
               )}
               <h3 className="mt-4 font-heading font-bold">{title || '@myaccount'}</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-text-2">
                 {description || 'Your bio goes here'}
               </p>
             </div>
             <div className="mt-6 space-y-3">
               {links.length === 0 ? (
-                <p className="text-center text-sm text-gray-400">No links added yet.</p>
+                <p className="text-center text-sm text-text-muted">No links added yet.</p>
               ) : (
                 links.map((link) => (
                   <a

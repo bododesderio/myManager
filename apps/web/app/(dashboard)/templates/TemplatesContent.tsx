@@ -11,7 +11,7 @@ const PLATFORM_BADGES: Record<string, string> = {
   instagram: 'bg-pink-100 text-pink-700',
   facebook: 'bg-blue-100 text-blue-700',
   linkedin: 'bg-blue-100 text-blue-800',
-  tiktok: 'bg-gray-100 text-gray-800',
+  tiktok: 'bg-bg-2 text-text',
   youtube: 'bg-red-100 text-red-700',
 };
 
@@ -46,7 +46,7 @@ export function TemplatesContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Post Templates</h1>
-          <p className="mt-1 text-sm text-gray-500">Reusable templates to speed up content creation.</p>
+          <p className="mt-1 text-sm text-text-2">Reusable templates to speed up content creation.</p>
         </div>
         <Link
           href="/compose?newTemplate=true"
@@ -59,14 +59,14 @@ export function TemplatesContent() {
       {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : !Array.isArray(templates) || templates.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No templates yet</h3>
-          <p className="mt-1 text-sm text-gray-500">Create reusable templates to speed up your workflow.</p>
+          <h3 className="font-heading text-lg font-semibold text-text">No templates yet</h3>
+          <p className="mt-1 text-sm text-text-2">Create reusable templates to speed up your workflow.</p>
           <Link
             href="/compose?newTemplate=true"
             className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
@@ -84,20 +84,20 @@ export function TemplatesContent() {
             return (
               <div
                 key={template.id}
-                className="group rounded-brand border bg-white p-5 shadow-sm transition hover:border-brand-primary"
+                className="group rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
               >
                 <div className="flex items-start justify-between">
                   <h3 className="font-heading font-semibold">{name}</h3>
                 </div>
                 {description && (
-                  <p className="mt-2 line-clamp-2 text-sm text-gray-500">{description}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-text-2">{description}</p>
                 )}
                 {platforms.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1">
                     {platforms.map((p: string) => (
                       <span
                         key={p}
-                        className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium capitalize ${PLATFORM_BADGES[p] || 'bg-gray-100 text-gray-600'}`}
+                        className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium capitalize ${PLATFORM_BADGES[p] || 'bg-bg-2 text-text-2'}`}
                       >
                         {p}
                       </span>
@@ -133,9 +133,9 @@ export function TemplatesContent() {
       {/* Delete confirmation modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Delete Template</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to delete this template? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-3">

@@ -87,7 +87,7 @@ export default async function AboutPage() {
       )}
 
       {/* ── STORY ── */}
-      <section className="bg-white py-16">
+      <section className="bg-bg py-16">
         <div className="animate-fade-in-up mx-auto max-w-4xl space-y-6 px-5 text-[15px] leading-relaxed text-text-2">
           {story.label && (
             <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{story.label}</p>
@@ -113,7 +113,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── VALUES ── */}
-      <section className="bg-white py-16">
+      <section className="bg-bg py-16">
         <div className="mx-auto max-w-5xl px-5">
           <div className="animate-fade-in-up text-center">
             <p className="text-[11px] font-bold uppercase tracking-wide text-primary">{values.label || 'Our Values'}</p>
@@ -125,7 +125,7 @@ export default async function AboutPage() {
               return (
                 <div
                   key={value.title}
-                  className={`animate-fade-in-up card-hover rounded-card border border-border border-t-4 ${color.border} bg-white p-6 ${['', 'delay-100', 'delay-200'][i] || ''}`}
+                  className={`animate-fade-in-up card-hover rounded-card border border-border border-t-4 ${color.border} bg-bg p-6 ${['', 'delay-100', 'delay-200'][i] || ''}`}
                 >
                   <h3 className={`text-[14px] font-bold ${color.text}`}>{value.title}</h3>
                   <p className="mt-2 text-[13px] text-text-2">{value.description}</p>
@@ -148,7 +148,7 @@ export default async function AboutPage() {
               {teamMembers.map((member, i) => (
                 <div
                   key={member.name}
-                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-5 text-center ${['', 'delay-100', 'delay-200', 'delay-300'][i] || ''}`}
+                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-bg p-5 text-center ${['', 'delay-100', 'delay-200', 'delay-300'][i] || ''}`}
                 >
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[var(--color-primary-dark)] text-[20px] font-bold text-white shadow-md">
                     {member.avatar ? (

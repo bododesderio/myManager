@@ -80,37 +80,37 @@ export function FileUpload({
 
   return (
     <div className={className}>
-      {label && <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>}
+      {label && <label className="mb-1 block text-sm font-medium text-text-2">{label}</label>}
 
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className="relative rounded-brand border-2 border-dashed border-gray-300 p-4 transition hover:border-brand-primary"
+        className="relative rounded-brand border-2 border-dashed border-border p-4 transition hover:border-brand-primary"
       >
         {value && isImage && (
           <div className="mb-3 flex items-center gap-3">
             {/* Upload previews can be temporary or third-party URLs that are not suitable for next/image optimization. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={value} alt="Preview" className="h-16 w-16 rounded border object-cover" />
-            <span className="truncate text-xs text-gray-500">{value}</span>
+            <span className="truncate text-xs text-text-2">{value}</span>
           </div>
         )}
 
         {value && !isImage && (
           <div className="mb-3">
-            <span className="truncate text-xs text-gray-500">{value}</span>
+            <span className="truncate text-xs text-text-2">{value}</span>
           </div>
         )}
 
         {uploading && (
           <div className="mb-3">
-            <div className="h-1.5 w-full rounded-full bg-gray-200">
+            <div className="h-1.5 w-full rounded-full bg-border">
               <div
                 className="h-1.5 rounded-full bg-brand-primary transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">Uploading...</p>
+            <p className="mt-1 text-xs text-text-2">Uploading...</p>
           </div>
         )}
 
@@ -128,13 +128,13 @@ export function FileUpload({
             <button
               type="button"
               onClick={() => onChange('')}
-              className="text-sm text-gray-500 hover:text-red-500"
+              className="text-sm text-text-2 hover:text-red-500"
             >
               Remove
             </button>
           )}
 
-          <span className="text-xs text-gray-400">or drag and drop</span>
+          <span className="text-xs text-text-muted">or drag and drop</span>
         </div>
 
         <input

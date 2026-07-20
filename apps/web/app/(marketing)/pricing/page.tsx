@@ -76,7 +76,7 @@ export default async function PricingPage() {
             {FAQ_ITEMS.map((item, i) => (
               <div
                 key={item.q}
-                className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-5 ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'][i] || ''}`}
+                className={`animate-fade-in-up card-hover rounded-card border border-border bg-bg p-5 ${['', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'][i] || ''}`}
               >
                 <h3 className="text-[14px] font-bold text-text">{item.q}</h3>
                 <p className="mt-2 text-[13px] text-text-2">{item.a}</p>

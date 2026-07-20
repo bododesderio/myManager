@@ -22,7 +22,7 @@ export function WorkspaceSwitcher() {
 
   if (workspaces.length <= 1) {
     return (
-      <div className="px-2 py-1.5 text-xs font-medium text-gray-500 truncate">
+      <div className="px-2 py-1.5 text-xs font-medium text-text-2 truncate">
         {activeWorkspace?.name || 'My Workspace'}
       </div>
     );
@@ -32,7 +32,7 @@ export function WorkspaceSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-2 rounded-brand px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+        className="flex w-full items-center gap-2 rounded-brand px-2 py-1.5 text-sm text-text-2 hover:bg-bg-2"
       >
         <div className="h-6 w-6 rounded-md bg-brand-primary/20 flex items-center justify-center text-xs font-bold text-brand-primary">
           {activeWorkspace?.name?.[0]?.toUpperCase() || 'W'}
@@ -40,13 +40,13 @@ export function WorkspaceSwitcher() {
         <span className="flex-1 truncate text-left text-xs font-medium">
           {activeWorkspace?.name || 'Select Workspace'}
         </span>
-        <svg className="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="h-3 w-3 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 z-50 mt-1 rounded-brand border bg-white py-1 shadow-lg">
+        <div className="absolute left-0 right-0 z-50 mt-1 rounded-brand border bg-bg py-1 shadow-lg">
           {workspaces.map((workspace) => (
             <button
               key={workspace.id}
@@ -54,8 +54,8 @@ export function WorkspaceSwitcher() {
                 setActiveWorkspace(workspace.id);
                 setOpen(false);
               }}
-              className={`flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 ${
-                workspace.id === activeWorkspaceId ? 'bg-brand-primary/5 text-brand-primary' : 'text-gray-700'
+              className={`flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-bg-2 ${
+                workspace.id === activeWorkspaceId ? 'bg-brand-primary/5 text-brand-primary' : 'text-text-2'
               }`}
             >
               <div className="h-6 w-6 rounded-md bg-brand-primary/20 flex items-center justify-center text-xs font-bold text-brand-primary">

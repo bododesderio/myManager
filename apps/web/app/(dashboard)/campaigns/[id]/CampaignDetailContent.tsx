@@ -8,7 +8,7 @@ import { StatCardSkeleton } from '@/components/skeletons/StatCardSkeleton';
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
-  completed: 'bg-gray-100 text-gray-800',
+  completed: 'bg-bg-2 text-text',
   draft: 'bg-yellow-100 text-yellow-800',
 };
 
@@ -17,7 +17,7 @@ const PLATFORM_BADGES: Record<string, string> = {
   instagram: 'bg-pink-100 text-pink-700',
   facebook: 'bg-blue-100 text-blue-700',
   linkedin: 'bg-blue-100 text-blue-800',
-  tiktok: 'bg-gray-100 text-gray-800',
+  tiktok: 'bg-bg-2 text-text',
   youtube: 'bg-red-100 text-red-700',
 };
 
@@ -39,8 +39,8 @@ export function CampaignDetailContent({ id }: { id: string }) {
       {/* Campaign header */}
       {campaignLoading ? (
         <div className="animate-pulse space-y-3">
-          <div className="h-7 w-64 rounded bg-gray-200" />
-          <div className="h-4 w-40 rounded bg-gray-200" />
+          <div className="h-7 w-64 rounded bg-border" />
+          <div className="h-4 w-40 rounded bg-border" />
         </div>
       ) : (
         <div className="flex items-center justify-between">
@@ -51,13 +51,13 @@ export function CampaignDetailContent({ id }: { id: string }) {
               </h1>
               {campaign.status && (
                 <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[campaign.status] || 'bg-gray-100 text-gray-800'}`}
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[campaign.status] || 'bg-bg-2 text-text'}`}
                 >
                   {campaign.status}
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-text-2">
               {campaign.startDate || campaign.start_date
                 ? `${campaign.startDate || campaign.start_date} — ${campaign.endDate || campaign.end_date}`
                 : 'View and manage campaign posts and analytics.'}
@@ -86,23 +86,23 @@ export function CampaignDetailContent({ id }: { id: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Total Posts</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Total Posts</p>
             <p className="mt-1 text-2xl font-bold">{posts.length}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Total Engagement</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Total Engagement</p>
             <p className="mt-1 text-2xl font-bold">{campaign.totalEngagement ?? '—'}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Avg. Engagement Rate</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Avg. Engagement Rate</p>
             <p className="mt-1 text-2xl font-bold">{campaign.avgEngagementRate ?? '—'}</p>
           </div>
         </div>
       )}
 
       {/* Posts table */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Campaign Posts</h2>
 
         {postsLoading ? (
@@ -110,7 +110,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
             <TableSkeleton rows={4} cols={3} />
           </div>
         ) : posts.length === 0 ? (
-          <p className="mt-4 text-sm text-gray-500">No posts in this campaign yet.</p>
+          <p className="mt-4 text-sm text-text-2">No posts in this campaign yet.</p>
         ) : (
           <div className="mt-4 divide-y">
             {posts.map((post: any) => {
@@ -119,7 +119,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
               return (
                 <div key={post.id} className="flex items-center justify-between py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-gray-900">
+                    <p className="truncate font-medium text-text">
                       {caption.length > 80 ? caption.slice(0, 80) + '...' : caption}
                     </p>
                     {platforms.length > 0 && (
@@ -127,7 +127,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
                         {platforms.map((p: string) => (
                           <span
                             key={p}
-                            className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium capitalize ${PLATFORM_BADGES[p] || 'bg-gray-100 text-gray-600'}`}
+                            className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium capitalize ${PLATFORM_BADGES[p] || 'bg-bg-2 text-text-2'}`}
                           >
                             {p}
                           </span>
@@ -136,7 +136,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
                     )}
                   </div>
                   <span
-                    className={`ml-4 rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[post.status] || 'bg-gray-100 text-gray-800'}`}
+                    className={`ml-4 rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[post.status] || 'bg-bg-2 text-text'}`}
                   >
                     {post.status || 'draft'}
                   </span>

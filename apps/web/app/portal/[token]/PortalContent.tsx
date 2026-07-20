@@ -120,7 +120,7 @@ function statusTone(status: string) {
   if (status === 'PENDING_CLIENT_APPROVAL') {
     return 'bg-amber-100 text-amber-700';
   }
-  return 'bg-slate-100 text-slate-700';
+  return 'bg-bg-2 text-text-2';
 }
 
 function PlatformChips({ platforms }: { platforms: string[] }) {
@@ -129,7 +129,7 @@ function PlatformChips({ platforms }: { platforms: string[] }) {
       {platforms.map((platform) => (
         <span
           key={platform}
-          className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700"
+          className="rounded-full bg-bg-2 px-2 py-1 text-xs font-medium text-text-2"
         >
           {platform}
         </span>
@@ -140,9 +140,9 @@ function PlatformChips({ platforms }: { platforms: string[] }) {
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-brand border border-dashed bg-white px-6 py-10 text-center shadow-sm">
-      <p className="text-sm font-semibold text-slate-900">{title}</p>
-      <p className="mt-2 text-sm text-slate-500">{description}</p>
+    <div className="rounded-brand border border-dashed bg-bg px-6 py-10 text-center shadow-sm">
+      <p className="text-sm font-semibold text-text">{title}</p>
+      <p className="mt-2 text-sm text-text-2">{description}</p>
     </div>
   );
 }
@@ -157,10 +157,10 @@ function MetricCard({
   caption: string;
 }) {
   return (
-    <div className="rounded-brand border bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-2 text-2xl font-bold text-slate-900">{value}</p>
-      <p className="mt-1 text-sm text-slate-500">{caption}</p>
+    <div className="rounded-brand border bg-bg p-5 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</p>
+      <p className="mt-2 text-2xl font-bold text-text">{value}</p>
+      <p className="mt-1 text-sm text-text-2">{caption}</p>
     </div>
   );
 }
@@ -195,39 +195,39 @@ function OverviewTab({ data }: { data: PortalData }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-brand border bg-white p-5 shadow-sm xl:col-span-2">
+        <div className="rounded-brand border bg-bg p-5 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg font-semibold text-slate-900">Weekly Reach</h2>
-            <span className="text-xs text-slate-400">Last 4 weeks</span>
+            <h2 className="font-heading text-lg font-semibold text-text">Weekly Reach</h2>
+            <span className="text-xs text-text-muted">Last 4 weeks</span>
           </div>
           <div className="mt-6 flex h-48 items-end gap-3">
             {data.weeklyReach.map((item) => (
               <div key={item.week} className="flex flex-1 flex-col items-center gap-2">
-                <div className="text-xs text-slate-400">{formatNumber(item.value)}</div>
+                <div className="text-xs text-text-muted">{formatNumber(item.value)}</div>
                 <div
                   className={`w-full rounded-t-md bg-brand-primary/80 ${styles.barFill}`}
                   style={{ ['--bar-height' as string]: `${Math.max((item.value / maxReach) * 100, 6)}%` } as React.CSSProperties}
                 />
-                <div className="text-xs text-slate-500">{item.week}</div>
+                <div className="text-xs text-text-2">{item.week}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="rounded-brand border bg-white p-5 shadow-sm">
-          <h2 className="font-heading text-lg font-semibold text-slate-900">Platform Mix</h2>
+        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <h2 className="font-heading text-lg font-semibold text-text">Platform Mix</h2>
           <div className="mt-4 space-y-4">
             {data.platformBreakdown.map((item) => {
               const share = totalPlatformReach > 0 ? (item.reach / totalPlatformReach) * 100 : 0;
               return (
                 <div key={item.platform}>
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">{item.platform}</span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-sm font-medium text-text-2">{item.platform}</span>
+                    <span className="text-xs text-text-2">
                       {formatNumber(item.reach)} reach
                     </span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-2 overflow-hidden rounded-full bg-bg-2">
                     <div
                       className={`h-full rounded-full bg-brand-primary ${styles.shareFill}`}
                       style={{ ['--share' as string]: `${Math.max(share, 4)}%` } as React.CSSProperties}
@@ -237,26 +237,26 @@ function OverviewTab({ data }: { data: PortalData }) {
               );
             })}
             {data.platformBreakdown.length === 0 && (
-              <p className="text-sm text-slate-400">No analytics breakdown available yet.</p>
+              <p className="text-sm text-text-muted">No analytics breakdown available yet.</p>
             )}
           </div>
         </div>
       </div>
 
-      <div className="rounded-brand border bg-white p-5 shadow-sm">
-        <h2 className="font-heading text-lg font-semibold text-slate-900">Top Performing Posts</h2>
+      <div className="rounded-brand border bg-bg p-5 shadow-sm">
+        <h2 className="font-heading text-lg font-semibold text-text">Top Performing Posts</h2>
         <div className="mt-4 space-y-3">
           {data.topPosts.map((post) => (
             <div
               key={post.id}
-              className="rounded-brand bg-slate-50 px-4 py-3"
+              className="rounded-brand bg-bg-2 px-4 py-3"
             >
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-900">{post.caption}</p>
+                  <p className="text-sm font-medium text-text">{post.caption}</p>
                   <PlatformChips platforms={post.platforms} />
                 </div>
-                <div className="flex gap-4 text-xs text-slate-500">
+                <div className="flex gap-4 text-xs text-text-2">
                   <span>Reach {formatNumber(post.reach)}</span>
                   <span>Engagement {formatPercent(post.engagement_rate)}</span>
                   <span>{formatShortDate(post.published_at)}</span>
@@ -328,21 +328,21 @@ function ApprovalsTab({
       {approvals.map((item) => {
         const isBusy = busyId === item.id && (approveMutation.isPending || reviseMutation.isPending);
         return (
-          <div key={item.id} className="rounded-brand border bg-white p-5 shadow-sm">
+          <div key={item.id} className="rounded-brand border bg-bg p-5 shadow-sm">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`rounded-full px-2 py-1 text-xs font-semibold ${statusTone(item.status)}`}>
                     {statusLabel(item.status)}
                   </span>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-text-2">
                     Scheduled {formatDateTime(item.scheduled_at)}
                   </span>
                 </div>
-                <p className="text-sm font-medium text-slate-900">{item.caption}</p>
+                <p className="text-sm font-medium text-text">{item.caption}</p>
                 <PlatformChips platforms={item.platforms} />
                 {item.latest_comment && (
-                  <div className="rounded-brand bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                  <div className="rounded-brand bg-bg-2 px-3 py-2 text-sm text-slate-600">
                     Latest comment: {item.latest_comment}
                   </div>
                 )}
@@ -388,7 +388,7 @@ function ApprovalsTab({
                 </button>
               </div>
               {feedback[item.id] && (
-                <p className="text-sm text-slate-500">{feedback[item.id]}</p>
+                <p className="text-sm text-text-2">{feedback[item.id]}</p>
               )}
             </div>
           </div>
@@ -413,16 +413,16 @@ function CalendarTab({ scheduled }: { scheduled: PortalData['scheduled'] }) {
       {scheduled.map((item) => (
         <div
           key={item.id}
-          className="flex flex-col gap-3 rounded-brand border bg-white px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
+          className="flex flex-col gap-3 rounded-brand border bg-bg px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
         >
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className={`rounded-full px-2 py-1 text-xs font-semibold ${statusTone(item.status)}`}>
                 {statusLabel(item.status)}
               </span>
-              <span className="text-xs text-slate-500">{formatDateTime(item.scheduled_at)}</span>
+              <span className="text-xs text-text-2">{formatDateTime(item.scheduled_at)}</span>
             </div>
-            <p className="text-sm font-medium text-slate-900">{item.caption}</p>
+            <p className="text-sm font-medium text-text">{item.caption}</p>
             <PlatformChips platforms={item.platforms} />
           </div>
         </div>
@@ -446,11 +446,11 @@ function ReportsTab({ reports }: { reports: PortalData['reports'] }) {
       {reports.map((report) => (
         <div
           key={report.id}
-          className="flex flex-col gap-3 rounded-brand border bg-white px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
+          className="flex flex-col gap-3 rounded-brand border bg-bg px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between"
         >
           <div>
-            <p className="text-sm font-semibold text-slate-900">{report.title}</p>
-            <div className="mt-1 flex flex-wrap gap-3 text-xs text-slate-500">
+            <p className="text-sm font-semibold text-text">{report.title}</p>
+            <div className="mt-1 flex flex-wrap gap-3 text-xs text-text-2">
               <span>{statusLabel(report.status)}</span>
               <span>{report.file_format ?? 'Unknown format'}</span>
               <span>{formatShortDate(report.generated_at ?? report.created_at)}</span>
@@ -466,7 +466,7 @@ function ReportsTab({ reports }: { reports: PortalData['reports'] }) {
               Open Report
             </a>
           ) : (
-            <span className="text-sm text-slate-400">File pending upload</span>
+            <span className="text-sm text-text-muted">File pending upload</span>
           )}
         </div>
       ))}
@@ -495,15 +495,15 @@ export default function PortalContent({ token }: { token: string }) {
 
   if (portalQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 px-6 py-10">
+      <div className="min-h-screen bg-bg-2 px-6 py-10">
         <div className="mx-auto max-w-6xl space-y-6">
-          <div className="h-16 animate-pulse rounded-brand bg-slate-200" />
+          <div className="h-16 animate-pulse rounded-brand bg-border" />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="h-32 animate-pulse rounded-brand bg-slate-200" />
+              <div key={item} className="h-32 animate-pulse rounded-brand bg-border" />
             ))}
           </div>
-          <div className="h-80 animate-pulse rounded-brand bg-slate-200" />
+          <div className="h-80 animate-pulse rounded-brand bg-border" />
         </div>
       </div>
     );
@@ -511,10 +511,10 @@ export default function PortalContent({ token }: { token: string }) {
 
   if (portalQuery.isError || !portalQuery.data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-10">
-        <div className="max-w-lg rounded-brand border bg-white p-8 text-center shadow-sm">
-          <h1 className="font-heading text-2xl font-bold text-slate-900">Portal unavailable</h1>
-          <p className="mt-3 text-sm text-slate-500">
+      <div className="flex min-h-screen items-center justify-center bg-bg-2 px-6 py-10">
+        <div className="max-w-lg rounded-brand border bg-bg p-8 text-center shadow-sm">
+          <h1 className="font-heading text-2xl font-bold text-text">Portal unavailable</h1>
+          <p className="mt-3 text-sm text-text-2">
             This portal link is invalid, expired, or no longer active.
           </p>
         </div>
@@ -526,29 +526,29 @@ export default function PortalContent({ token }: { token: string }) {
   const accent = data.project.brand_config?.primary_color || 'var(--brand-primary)';
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className={`border-b bg-white ${styles.headerBorder}`}>
+    <div className="min-h-screen bg-bg-2">
+      <header className={`border-b bg-bg ${styles.headerBorder}`}>
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
               Managed by {data.project.agency_name}
             </p>
-            <h1 className="font-heading text-2xl font-bold text-slate-900">
+            <h1 className="font-heading text-2xl font-bold text-text">
               {data.project.name}
             </h1>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-text-2">
               {data.project.client_name}
               {data.project.client_email ? ` • ${data.project.client_email}` : ''}
             </p>
           </div>
-          <div className="text-right text-sm text-slate-500">
+          <div className="text-right text-sm text-text-2">
             <p>{data.token.label || 'Client portal'}</p>
             <p>Expires {formatShortDate(data.token.expires_at)}</p>
           </div>
         </div>
       </header>
 
-      <nav className={`border-b bg-white ${styles.headerBorder}`}>
+      <nav className={`border-b bg-bg ${styles.headerBorder}`}>
         <div className="mx-auto flex max-w-6xl gap-6 overflow-x-auto px-6">
           {tabs.map((tab) => {
             const active = activeTab === tab.id;

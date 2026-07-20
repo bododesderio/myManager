@@ -129,7 +129,7 @@ export function AuditLogContent() {
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">Audit Log</h1>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-gray-500">
+          <label className="flex items-center gap-2 text-sm text-text-2">
             <input
               type="checkbox"
               checked={autoRefresh}
@@ -140,7 +140,7 @@ export function AuditLogContent() {
           </label>
           <button
             onClick={handleExport}
-            className="rounded-brand border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            className="rounded-brand border border-border bg-bg px-4 py-2 text-sm font-medium hover:bg-bg-2"
           >
             Export CSV
           </button>
@@ -148,16 +148,16 @@ export function AuditLogContent() {
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-wrap items-end gap-3 rounded-brand border bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-end gap-3 rounded-brand border bg-bg p-4 shadow-sm">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-500">Action</label>
+          <label className="text-xs font-medium text-text-2">Action</label>
           <select
             value={action}
             onChange={(e) => {
               setAction(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
           >
             <option value="">All actions</option>
             {actions.map((a) => (
@@ -169,7 +169,7 @@ export function AuditLogContent() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-500">User ID</label>
+          <label className="text-xs font-medium text-text-2">User ID</label>
           <input
             type="text"
             placeholder="Search by user ID..."
@@ -178,12 +178,12 @@ export function AuditLogContent() {
               setUserId(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-500">Resource Type</label>
+          <label className="text-xs font-medium text-text-2">Resource Type</label>
           <input
             type="text"
             placeholder="e.g. user, post..."
@@ -192,12 +192,12 @@ export function AuditLogContent() {
               setResourceType(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-500">From</label>
+          <label className="text-xs font-medium text-text-2">From</label>
           <input
             type="date"
             value={fromDate}
@@ -205,12 +205,12 @@ export function AuditLogContent() {
               setFromDate(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-500">To</label>
+          <label className="text-xs font-medium text-text-2">To</label>
           <input
             type="date"
             value={toDate}
@@ -218,7 +218,7 @@ export function AuditLogContent() {
               setToDate(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
           />
         </div>
 
@@ -231,7 +231,7 @@ export function AuditLogContent() {
             setToDate('');
             setPage(1);
           }}
-          className="rounded-brand border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
+          className="rounded-brand border border-border px-3 py-2 text-sm text-text-2 hover:bg-bg-2"
         >
           Clear
         </button>
@@ -241,10 +241,10 @@ export function AuditLogContent() {
       {loading ? (
         <TableSkeleton rows={8} cols={6} />
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Timestamp</th>
                 <th className="px-6 py-3 font-medium">User</th>
                 <th className="px-6 py-3 font-medium">Action</th>
@@ -256,25 +256,25 @@ export function AuditLogContent() {
             <tbody className="divide-y">
               {entries.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-text-2">
                     No audit entries found.
                   </td>
                 </tr>
               ) : (
                 entries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <tr key={entry.id} className="hover:bg-bg-2">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-text-2">
                       {new Date(entry.timestamp).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-sm">{entry.userEmail}</td>
                     <td className="px-6 py-4">
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                      <span className="rounded-full bg-bg-2 px-2 py-0.5 text-xs font-medium text-text-2">
                         {entry.action}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{entry.resourceType}</td>
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">{entry.resourceId}</td>
-                    <td className="px-6 py-4 font-mono text-xs text-gray-400">{entry.ipAddress}</td>
+                    <td className="px-6 py-4 text-sm text-text-2">{entry.resourceType}</td>
+                    <td className="px-6 py-4 font-mono text-xs text-text-2">{entry.resourceId}</td>
+                    <td className="px-6 py-4 font-mono text-xs text-text-muted">{entry.ipAddress}</td>
                   </tr>
                 ))
               )}
@@ -293,7 +293,7 @@ export function AuditLogContent() {
           >
             Previous
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-text-2">
             Page {page} of {totalPages}
           </span>
           <button

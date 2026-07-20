@@ -15,8 +15,8 @@ const CKEditorWrapper = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-40 items-center justify-center rounded-brand border bg-gray-50">
-        <span className="text-sm text-gray-400">Loading editor...</span>
+      <div className="flex h-40 items-center justify-center rounded-brand border bg-bg-2">
+        <span className="text-sm text-text-muted">Loading editor...</span>
       </div>
     ),
   },
@@ -32,7 +32,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = 200 }
           type="button"
           onClick={() => setMode('visual')}
           className={`rounded px-2 py-1 text-xs font-medium ${
-            mode === 'visual' ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-600'
+            mode === 'visual' ? 'bg-brand-primary text-white' : 'bg-bg-2 text-text-2'
           }`}
         >
           Visual
@@ -41,7 +41,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = 200 }
           type="button"
           onClick={() => setMode('source')}
           className={`rounded px-2 py-1 text-xs font-medium ${
-            mode === 'source' ? 'bg-brand-primary text-white' : 'bg-gray-100 text-gray-600'
+            mode === 'source' ? 'bg-brand-primary text-white' : 'bg-bg-2 text-text-2'
           }`}
         >
           Source
@@ -61,7 +61,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = 200 }
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={10}
-          className="block w-full rounded-brand border border-gray-300 px-3 py-2 font-mono text-xs focus:border-brand-primary focus:outline-none"
+          className="block w-full rounded-brand border border-border px-3 py-2 font-mono text-xs focus:border-brand-primary focus:outline-none"
           style={{ minHeight }}
         />
       )}

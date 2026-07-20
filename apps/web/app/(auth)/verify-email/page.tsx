@@ -32,7 +32,7 @@ export default function VerifyEmailPage() {
 
       {/* Right Panel */}
       <div className="flex-1 flex items-center justify-center px-6">
-        <Suspense fallback={<div className="text-center text-[13px] text-gray-500">Loading...</div>}>
+        <Suspense fallback={<div className="text-center text-[13px] text-text-2">Loading...</div>}>
           <VerifyEmailContent />
         </Suspense>
       </div>
