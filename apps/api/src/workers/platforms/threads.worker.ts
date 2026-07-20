@@ -7,10 +7,10 @@ export class ThreadsWorker extends BasePublishingWorker {
   async buildPayload(post: Record<string, any>, account: Record<string, any>): Promise<PlatformPayload> {
     return {
       caption: (post.caption as string).substring(0, 500),
-      mediaUrls: post.media?.map((m: any) => m.mediaAsset.url) || [],
-      contentType: post.contentType as string,
-      platformOptions: { ...post.platformOptions?.threads, threadsUserId: account.platformAccountId },
-      linkUrl: post.linkUrl as string,
+      mediaUrls: post.media?.map((m: any) => m.media_asset.url) || [],
+      contentType: post.content_type as string,
+      platformOptions: { ...post.platform_options?.threads, threadsUserId: account.platform_user_id },
+      linkUrl: post.link_url as string,
     };
   }
 
