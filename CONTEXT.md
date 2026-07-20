@@ -67,13 +67,15 @@ Full detail in `docs/audit-2026-07-20.md`. Open items:
 
 ## Phase 2 — remaining work
 
-**Tenancy scoping — 4 of ~11 modules done.** Scoped: templates, bio-pages, rss,
-competitors. Still using bare-`id` lookups and needing the same treatment:
-`media`, `reports`, `webhooks`, `api-keys`, `comments`, `social-accounts`,
-`approvals`. (`users`, `plans`, `billing.plan`, `sales-leads` are legitimately
-global — do NOT scope those.)
+**Tenancy scoping — DONE.** All 11 workspace-scoped modules enforce tenancy in
+the WHERE clause: templates, bio-pages, rss, competitors, media, reports,
+webhooks, api-keys, comments, social-accounts. (`users`, `plans`,
+`billing.plan`, `sales-leads` are legitimately global — do NOT scope those.)
 Method that worked: change the repository signature first, then let `tsc`
 enumerate every call site. Do not grep for them.
+
+**CI gate — DONE.** `pnpm type-check` now passes 4/4 workspaces (was exit 2).
+Root scripts use `--continue` so every failing workspace is reported in one run.
 
 **Not started:**
 - Analytics aggregated in Node memory rather than SQL (`analytics.repository.ts:116-156`,
@@ -97,6 +99,10 @@ enumerate every call site. Do not grep for them.
   expands anonymous access — confirm that is intended before changing.
 
 ## Next steps
+0. **REQUIRES A HUMAN — cannot be done from the repo.** Enable branch protection
+   on `main` requiring the CI check to pass before merge. The gate itself was
+   never broken: CI exited 2 correctly and was merged past anyway. Until
+   protection is on, the next red pipeline lands the same way.
 1. Review/merge `fix/phase0-critical-security` (Phases 0 + 1 + partial 2).
    - Tune `PUPPETEER_POOL_SIZE` (default 2) to the worker's memory budget.
    - **Take a DB backup first**: the Float→Decimal cast in migration
