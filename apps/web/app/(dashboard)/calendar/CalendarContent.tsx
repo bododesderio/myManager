@@ -91,7 +91,7 @@ export function CalendarContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Content Calendar</h1>
-          <p className="mt-1 text-sm text-gray-500">Plan and visualize your content schedule.</p>
+          <p className="mt-1 text-sm text-text-2">Plan and visualize your content schedule.</p>
         </div>
         <Link
           href="/compose"
@@ -101,13 +101,13 @@ export function CalendarContent() {
         </Link>
       </div>
 
-      <div className="rounded-brand border bg-white shadow-sm">
+      <div className="rounded-brand border bg-bg shadow-sm">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <button
             type="button"
             aria-label="Previous month"
             onClick={goPrev}
-            className="text-sm font-medium text-gray-600 hover:text-brand-primary"
+            className="text-sm font-medium text-text-2 hover:text-brand-primary"
           >
             &larr; Previous
           </button>
@@ -116,7 +116,7 @@ export function CalendarContent() {
             type="button"
             aria-label="Next month"
             onClick={goNext}
-            className="text-sm font-medium text-gray-600 hover:text-brand-primary"
+            className="text-sm font-medium text-text-2 hover:text-brand-primary"
           >
             Next &rarr;
           </button>
@@ -126,7 +126,7 @@ export function CalendarContent() {
           {DAYS.map((day) => (
             <div
               key={day}
-              className="hidden border-b border-r px-3 py-2 text-center text-xs font-semibold text-gray-500 sm:block"
+              className="hidden border-b border-r px-3 py-2 text-center text-xs font-semibold text-text-2 sm:block"
             >
               {day}
             </div>
@@ -138,7 +138,7 @@ export function CalendarContent() {
                   key={i}
                   className="min-h-[100px] animate-pulse border-b border-r p-2"
                 >
-                  <div className="h-3 w-4 rounded bg-gray-200" />
+                  <div className="h-3 w-4 rounded bg-border" />
                 </div>
               ))
             : Array.from({ length: totalCells }, (_, i) => {
@@ -163,19 +163,19 @@ export function CalendarContent() {
                       else window.location.href = `/compose?date=${dateStr}`;
                     }}
                     aria-label={`${dayNum}: ${dayPosts.length} posts`}
-                    className={`min-h-[60px] border-b border-r p-2 text-left text-xs transition hover:bg-gray-50 sm:min-h-[100px] ${
+                    className={`min-h-[60px] border-b border-r p-2 text-left text-xs transition hover:bg-bg-2 sm:min-h-[100px] ${
                       isToday ? 'bg-brand-primary/5' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <span
                         className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                          isToday ? 'bg-brand-primary text-white' : 'text-gray-700'
+                          isToday ? 'bg-brand-primary text-white' : 'text-text-2'
                         }`}
                       >
                         {dayNum}
                       </span>
-                      <span className="text-xs text-gray-500 sm:hidden">
+                      <span className="text-xs text-text-2 sm:hidden">
                         {DAYS[(startDayOfWeek + dayNum - 1) % 7]}
                       </span>
                     </div>
@@ -185,7 +185,7 @@ export function CalendarContent() {
                             const platforms = post.platforms || [];
                             const platform = platforms[0] || 'default';
                             const color =
-                              PLATFORM_COLORS[platform] || 'bg-gray-400';
+                              PLATFORM_COLORS[platform] || 'bg-text-muted';
                             return (
                               <div
                                 key={post.id}
@@ -194,7 +194,7 @@ export function CalendarContent() {
                                 <span
                                   className={`inline-block h-2 w-2 flex-shrink-0 rounded-full ${color}`}
                                 />
-                                <span className="truncate text-[10px] text-gray-600">
+                                <span className="truncate text-[10px] text-text-2">
                                   {post.caption
                                     ? post.caption.slice(0, 20)
                                     : post.title?.slice(0, 20) || 'Post'}
@@ -203,7 +203,7 @@ export function CalendarContent() {
                             );
                           })}
                         {dayPosts.length > 3 && (
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] text-text-muted">
                             +{dayPosts.length - 3} more
                           </span>
                         )}
@@ -224,7 +224,7 @@ export function CalendarContent() {
           onClick={() => setOpenDate(null)}
         >
           <div
-            className="w-full max-w-lg rounded-brand bg-white p-6 shadow-lg"
+            className="w-full max-w-lg rounded-brand bg-bg p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between">
@@ -235,7 +235,7 @@ export function CalendarContent() {
                 type="button"
                 onClick={() => setOpenDate(null)}
                 aria-label="Close"
-                className="text-gray-400 hover:text-gray-600"
+                className="text-text-muted hover:text-text-2"
               >
                 ✕
               </button>
@@ -247,16 +247,16 @@ export function CalendarContent() {
                     {(post.platforms ?? []).map((p: string) => (
                       <span
                         key={p}
-                        className={`inline-block h-2 w-2 rounded-full ${PLATFORM_COLORS[p] ?? 'bg-gray-400'}`}
+                        className={`inline-block h-2 w-2 rounded-full ${PLATFORM_COLORS[p] ?? 'bg-text-muted'}`}
                       />
                     ))}
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-text-2">
                       {post.scheduled_at
                         ? new Date(post.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : ''}
                     </span>
                   </div>
-                  <p className="mt-2 line-clamp-3 text-gray-800">{post.caption || post.title || 'Untitled post'}</p>
+                  <p className="mt-2 line-clamp-3 text-text">{post.caption || post.title || 'Untitled post'}</p>
                   <Link
                     href={`/posts/${post.id}`}
                     className="mt-2 inline-block text-xs text-brand-primary hover:underline"

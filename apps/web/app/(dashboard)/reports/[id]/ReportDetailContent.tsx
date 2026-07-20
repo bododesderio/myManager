@@ -52,9 +52,9 @@ export function ReportDetailContent({ id }: { id: string }) {
             &larr; Reports
           </Link>
         </div>
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <h3 className="font-heading text-lg font-semibold text-gray-900">Report not found</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <h3 className="font-heading text-lg font-semibold text-text">Report not found</h3>
+          <p className="mt-1 text-sm text-text-2">
             This report may have been deleted or does not exist.
           </p>
         </div>
@@ -100,28 +100,28 @@ export function ReportDetailContent({ id }: { id: string }) {
       </div>
 
       {/* Report metadata */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Report Details</h2>
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
-            <p className="text-xs font-medium uppercase text-gray-500">Type</p>
+            <p className="text-xs font-medium uppercase text-text-2">Type</p>
             <p className="mt-1 text-sm font-medium">{reportType.toUpperCase()}</p>
           </div>
           {dateFrom && (
             <div>
-              <p className="text-xs font-medium uppercase text-gray-500">Date From</p>
+              <p className="text-xs font-medium uppercase text-text-2">Date From</p>
               <p className="mt-1 text-sm font-medium">{formatDate(dateFrom)}</p>
             </div>
           )}
           {dateTo && (
             <div>
-              <p className="text-xs font-medium uppercase text-gray-500">Date To</p>
+              <p className="text-xs font-medium uppercase text-text-2">Date To</p>
               <p className="mt-1 text-sm font-medium">{formatDate(dateTo)}</p>
             </div>
           )}
           {createdAt && (
             <div>
-              <p className="text-xs font-medium uppercase text-gray-500">Generated</p>
+              <p className="text-xs font-medium uppercase text-text-2">Generated</p>
               <p className="mt-1 text-sm font-medium">{formatDate(createdAt)}</p>
             </div>
           )}
@@ -129,7 +129,7 @@ export function ReportDetailContent({ id }: { id: string }) {
       </div>
 
       {/* Report preview */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Preview</h2>
         <div className="mt-4">
           {isPdf && downloadUrl ? (
@@ -139,11 +139,11 @@ export function ReportDetailContent({ id }: { id: string }) {
               className="h-[600px] w-full rounded-brand border"
             />
           ) : isPdf ? (
-            <div className="rounded-brand border border-dashed border-gray-300 p-12 text-center text-sm text-gray-400">
+            <div className="rounded-brand border border-dashed border-border p-12 text-center text-sm text-text-muted">
               PDF preview is not available. Download the file to view it.
             </div>
           ) : (
-            <div className="rounded-brand border border-dashed border-gray-300 p-12 text-center text-sm text-gray-400">
+            <div className="rounded-brand border border-dashed border-border p-12 text-center text-sm text-text-muted">
               CSV reports cannot be previewed. Please download the file to view the data.
             </div>
           )}
@@ -153,9 +153,9 @@ export function ReportDetailContent({ id }: { id: string }) {
       {/* Share modal */}
       {showShareModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Share Report</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Copy the link below to share this report with others.
             </p>
             <div className="mt-4">
@@ -163,7 +163,7 @@ export function ReportDetailContent({ id }: { id: string }) {
                 type="text"
                 readOnly
                 value={`${typeof window !== 'undefined' ? window.location.origin : ''}/reports/${id}`}
-                className="block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm text-gray-600 focus:outline-none"
+                className="block w-full rounded-brand border border-border px-4 py-2 text-sm text-text-2 focus:outline-none"
               />
             </div>
             <div className="mt-6 flex justify-end gap-3">

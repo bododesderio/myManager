@@ -163,14 +163,14 @@ export function FaqContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 animate-pulse rounded-brand bg-gray-100" />
+          <div key={i} className="h-20 animate-pulse rounded-brand bg-bg-2" />
         ))}
       </div>
     );
@@ -181,7 +181,7 @@ export function FaqContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">FAQ Manager</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage frequently asked questions</p>
+          <p className="mt-1 text-sm text-text-2">Manage frequently asked questions</p>
         </div>
         <button
           onClick={() => setNewItem(emptyItem())}
@@ -196,7 +196,7 @@ export function FaqContent() {
           <h3 className="mb-3 text-sm font-semibold">New FAQ Item</h3>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Question</label>
+              <label className="block text-sm font-medium text-text-2">Question</label>
               <input
                 type="text"
                 value={newItem.question}
@@ -206,7 +206,7 @@ export function FaqContent() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Answer</label>
+              <label className="block text-sm font-medium text-text-2">Answer</label>
               <RichTextEditor
                 value={newItem.answer}
                 onChange={(html) => setNewItem({ ...newItem, answer: html })}
@@ -215,7 +215,7 @@ export function FaqContent() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Page</label>
+              <label className="block text-sm font-medium text-text-2">Page</label>
               <input
                 type="text"
                 value={newItem.page}
@@ -233,7 +233,7 @@ export function FaqContent() {
               </button>
               <button
                 onClick={() => setNewItem(null)}
-                className="rounded-brand border px-4 py-1.5 text-sm text-gray-600 transition hover:bg-gray-50"
+                className="rounded-brand border px-4 py-1.5 text-sm text-text-2 transition hover:bg-bg-2"
               >
                 Cancel
               </button>
@@ -246,14 +246,14 @@ export function FaqContent() {
         {sortedItems.map((item, idx) => (
           <div
             key={item.id}
-            className={`rounded-brand border bg-white shadow-sm ${
+            className={`rounded-brand border bg-bg shadow-sm ${
               !item.is_visible ? 'opacity-60' : ''
             }`}
           >
             {editingId === item.id ? (
               <div className="space-y-3 p-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Question</label>
+                  <label className="block text-sm font-medium text-text-2">Question</label>
                   <input
                     type="text"
                     value={editForm.question}
@@ -263,7 +263,7 @@ export function FaqContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Answer</label>
+                  <label className="block text-sm font-medium text-text-2">Answer</label>
                   <RichTextEditor
                     value={editForm.answer}
                     onChange={(html) => setEditForm((prev) => ({ ...prev, answer: html }))}
@@ -272,7 +272,7 @@ export function FaqContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Page</label>
+                  <label className="block text-sm font-medium text-text-2">Page</label>
                   <input
                     type="text"
                     value={editForm.page}
@@ -290,7 +290,7 @@ export function FaqContent() {
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
-                    className="rounded-brand border px-4 py-1.5 text-sm text-gray-600 transition hover:bg-gray-50"
+                    className="rounded-brand border px-4 py-1.5 text-sm text-text-2 transition hover:bg-bg-2"
                   >
                     Cancel
                   </button>
@@ -302,7 +302,7 @@ export function FaqContent() {
                   <button
                     onClick={() => void moveItem(item.id, 'up')}
                     disabled={idx === 0}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                    className="text-text-muted hover:text-text-2 disabled:opacity-30"
                     title="Move up"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -312,7 +312,7 @@ export function FaqContent() {
                   <button
                     onClick={() => void moveItem(item.id, 'down')}
                     disabled={idx === sortedItems.length - 1}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                    className="text-text-muted hover:text-text-2 disabled:opacity-30"
                     title="Move down"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -322,16 +322,16 @@ export function FaqContent() {
                 </div>
 
                 <div className="min-w-0 flex-1 cursor-pointer" onClick={() => startEdit(item)}>
-                  <p className="font-medium text-gray-900">{item.question}</p>
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-500">{item.answer}</p>
-                  {item.page && <p className="mt-2 text-xs text-gray-400">Page: {item.page}</p>}
+                  <p className="font-medium text-text">{item.question}</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-text-2">{item.answer}</p>
+                  {item.page && <p className="mt-2 text-xs text-text-muted">Page: {item.page}</p>}
                 </div>
 
                 <div className="shrink-0 flex items-center gap-2">
                   <button
                     onClick={() => void toggleVisibility(item.id)}
-                    className={`rounded p-1 transition hover:bg-gray-100 ${
-                      item.is_visible ? 'text-gray-500' : 'text-gray-300'
+                    className={`rounded p-1 transition hover:bg-bg-2 ${
+                      item.is_visible ? 'text-text-2' : 'text-text-muted'
                     }`}
                     title={item.is_visible ? 'Hide' : 'Show'}
                   >
@@ -356,7 +356,7 @@ export function FaqContent() {
         ))}
 
         {items.length === 0 && (
-          <div className="rounded-brand border bg-white py-12 text-center text-gray-400">
+          <div className="rounded-brand border bg-bg py-12 text-center text-text-muted">
             No FAQ items found yet.
           </div>
         )}

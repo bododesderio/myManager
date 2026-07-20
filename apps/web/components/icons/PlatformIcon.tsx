@@ -90,7 +90,7 @@ export function PlatformIcon({ platform, size = 20, className = '' }: PlatformIc
       return (
         <div
           style={{ width: size, height: size }}
-          className={`flex items-center justify-center rounded-full bg-gray-400 text-white text-[10px] font-bold ${className}`}
+          className={`flex items-center justify-center rounded-full bg-text-muted text-white text-[10px] font-bold ${className}`}
         >
           {platform.charAt(0).toUpperCase()}
         </div>

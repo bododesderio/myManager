@@ -41,21 +41,21 @@ export function ProjectAnalyticsContent({ id }: { id: string }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Project Analytics</h1>
-          <p className="mt-1 text-sm text-gray-500">Performance overview for this project.</p>
+          <p className="mt-1 text-sm text-text-2">Performance overview for this project.</p>
         </div>
         <div className="flex items-center gap-2">
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
           />
-          <span className="text-sm text-gray-400">to</span>
+          <span className="text-sm text-text-muted">to</span>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
           />
         </div>
       </div>
@@ -65,22 +65,22 @@ export function ProjectAnalyticsContent({ id }: { id: string }) {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric) => (
-            <div key={metric.label} className="rounded-brand border bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">{metric.label}</p>
+            <div key={metric.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+              <p className="text-sm text-text-2">{metric.label}</p>
               <p className="mt-1 text-2xl font-bold">{metric.value}</p>
             </div>
           ))}
         </div>
       )}
 
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Performance Over Time</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-primary" />
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-border-light border-t-brand-primary" />
           </div>
         ) : (
-          <div className="mt-4 flex h-64 items-center justify-center text-sm text-gray-400">
+          <div className="mt-4 flex h-64 items-center justify-center text-sm text-text-muted">
             Project-specific analytics charts will render here.
           </div>
         )}

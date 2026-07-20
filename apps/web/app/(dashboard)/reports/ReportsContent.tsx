@@ -107,7 +107,7 @@ export function ReportsContent() {
       case 'failed':
         return 'bg-red-100 text-red-700';
       default:
-        return 'bg-gray-100 text-gray-600';
+        return 'bg-bg-2 text-text-2';
     }
   };
 
@@ -116,7 +116,7 @@ export function ReportsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Reports</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-text-2">
             Create and manage custom analytics reports.
           </p>
         </div>
@@ -131,9 +131,9 @@ export function ReportsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : reports.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -142,8 +142,8 @@ export function ReportsContent() {
               />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No reports yet</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <h3 className="font-heading text-lg font-semibold text-text">No reports yet</h3>
+          <p className="mt-1 text-sm text-text-2">
             Generate your first analytics report to get started.
           </p>
           <button
@@ -154,9 +154,9 @@ export function ReportsContent() {
           </button>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           {/* Table header */}
-          <div className="flex items-center gap-4 border-b px-6 py-3 text-xs font-semibold uppercase text-gray-500">
+          <div className="flex items-center gap-4 border-b px-6 py-3 text-xs font-semibold uppercase text-text-2">
             <div className="flex-1">Name</div>
             <div className="w-20 text-center">Type</div>
             <div className="w-28 text-center">Created</div>
@@ -172,22 +172,22 @@ export function ReportsContent() {
               return (
                 <div
                   key={report.id}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50"
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-bg-2"
                 >
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/reports/${report.id}`}
-                      className="font-medium text-gray-900 hover:text-brand-primary"
+                      className="font-medium text-text hover:text-brand-primary"
                     >
                       {report.name || 'Untitled Report'}
                     </Link>
                   </div>
                   <div className="w-20 text-center">
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                    <span className="rounded-full bg-bg-2 px-2 py-0.5 text-xs font-medium text-text-2">
                       {type}
                     </span>
                   </div>
-                  <div className="w-28 text-center text-sm text-gray-500">
+                  <div className="w-28 text-center text-sm text-text-2">
                     {createdAt ? formatDate(createdAt) : '-'}
                   </div>
                   <div className="w-24 text-center">
@@ -225,11 +225,11 @@ export function ReportsContent() {
       {/* Generate Report Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-md rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Generate Report</h3>
             <div className="mt-4 space-y-4">
               <div>
-                <label htmlFor="reportName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="reportName" className="block text-sm font-medium text-text-2">
                   Report Name *
                 </label>
                 <input
@@ -241,14 +241,14 @@ export function ReportsContent() {
                   onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Monthly Overview"
                   className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
-                    formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                    formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
                   }`}
                 />
                 {formErrors.name && <p className="mt-1 text-xs text-red-600">{formErrors.name}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="dateFrom" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="dateFrom" className="block text-sm font-medium text-text-2">
                     Date From *
                   </label>
                   <input
@@ -258,13 +258,13 @@ export function ReportsContent() {
                     value={formData.dateFrom}
                     onChange={(e) => setFormData((f) => ({ ...f, dateFrom: e.target.value }))}
                       className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
-                      formErrors.dateFrom ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                      formErrors.dateFrom ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
                     }`}
                   />
                   {formErrors.dateFrom && <p className="mt-1 text-xs text-red-600">{formErrors.dateFrom}</p>}
                 </div>
                 <div>
-                  <label htmlFor="dateTo" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="dateTo" className="block text-sm font-medium text-text-2">
                     Date To *
                   </label>
                   <input
@@ -275,14 +275,14 @@ export function ReportsContent() {
                     value={formData.dateTo}
                     onChange={(e) => setFormData((f) => ({ ...f, dateTo: e.target.value }))}
                       className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
-                      formErrors.dateTo ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-brand-primary'
+                      formErrors.dateTo ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
                     }`}
                   />
                   {formErrors.dateTo && <p className="mt-1 text-xs text-red-600">{formErrors.dateTo}</p>}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Report Type</label>
+                <label className="block text-sm font-medium text-text-2">Report Type</label>
                 <div className="mt-1 flex gap-3">
                   {(['pdf', 'csv'] as const).map((t) => (
                     <button
@@ -300,7 +300,7 @@ export function ReportsContent() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Platforms</label>
+                <label className="block text-sm font-medium text-text-2">Platforms</label>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {REPORT_PLATFORMS.map((p) => (
                     <button
@@ -340,9 +340,9 @@ export function ReportsContent() {
       {/* Delete confirmation modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Delete Report</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to delete this report? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-3">

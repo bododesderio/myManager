@@ -47,40 +47,40 @@ export default function ProfileContent() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-sm text-gray-500">Loading profile...</div>;
+    return <div className="flex items-center justify-center py-12 text-sm text-text-2">Loading profile...</div>;
   }
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-heading text-2xl font-bold">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage your account and workspace settings.</p>
+        <p className="mt-1 text-sm text-text-2">Manage your account and workspace settings.</p>
       </div>
 
       {/* Profile form */}
-      <div className="max-w-2xl rounded-brand border bg-white p-6 shadow-sm">
+      <div className="max-w-2xl rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Profile</h2>
         <div className="mt-4 space-y-4">
           <div>
-            <label htmlFor="profileName" className="block text-sm font-medium text-gray-700">Name</label>
+            <label htmlFor="profileName" className="block text-sm font-medium text-text-2">Name</label>
             <input
               id="profileName"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
             />
           </div>
           <div>
-            <label htmlFor="profileEmail" className="block text-sm font-medium text-gray-700">Email</label>
+            <label htmlFor="profileEmail" className="block text-sm font-medium text-text-2">Email</label>
             <input
               id="profileEmail"
               type="email"
               value={(profile as any)?.email ?? ''}
               readOnly
-              className="mt-1 block w-full rounded-brand border border-gray-200 bg-gray-50 px-4 py-2 text-gray-500 cursor-not-allowed"
+              className="mt-1 block w-full rounded-brand border border-border-light bg-bg-2 px-4 py-2 text-text-2 cursor-not-allowed"
             />
-            <p className="mt-1 text-xs text-gray-400">Email cannot be changed.</p>
+            <p className="mt-1 text-xs text-text-muted">Email cannot be changed.</p>
           </div>
           <FileUpload
             label="Avatar"
@@ -89,12 +89,12 @@ export default function ProfileContent() {
             accept="image/*"
           />
           <div>
-            <label htmlFor="profileTimezone" className="block text-sm font-medium text-gray-700">Timezone</label>
+            <label htmlFor="profileTimezone" className="block text-sm font-medium text-text-2">Timezone</label>
             <select
               id="profileTimezone"
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
             >
               <option value="UTC">UTC</option>
               <option value="America/New_York">America/New_York</option>
@@ -126,10 +126,10 @@ export default function ProfileContent() {
             <Link
               key={link.href}
               href={link.href as Route}
-              className="rounded-brand border bg-white p-5 shadow-sm transition hover:border-brand-primary"
+              className="rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
             >
               <h3 className="font-heading font-semibold">{link.label}</h3>
-              <p className="mt-1 text-sm text-gray-500">{link.description}</p>
+              <p className="mt-1 text-sm text-text-2">{link.description}</p>
             </Link>
           ))}
         </div>

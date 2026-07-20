@@ -108,7 +108,7 @@ export default function IntegrationsContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* API Keys */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">API Keys</h2>
             <button
@@ -121,14 +121,14 @@ export default function IntegrationsContent() {
 
           {showNewKey && (
             <div className="mt-4 rounded-brand border border-brand-primary/30 bg-brand-primary/5 p-4">
-              <label htmlFor="keyName" className="block text-sm font-medium text-gray-700">Key Name</label>
+              <label htmlFor="keyName" className="block text-sm font-medium text-text-2">Key Name</label>
               <input
                 id="keyName"
                 type="text"
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
                 placeholder="e.g. Production API"
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
               <div className="mt-3 flex gap-2">
                 <button
@@ -139,7 +139,7 @@ export default function IntegrationsContent() {
                 </button>
                 <button
                   onClick={() => { setShowNewKey(false); setNewKeyName(''); }}
-                  className="rounded-brand border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -148,15 +148,15 @@ export default function IntegrationsContent() {
           )}
 
           {apiKeys.length === 0 && !showNewKey ? (
-            <p className="mt-4 text-sm text-gray-500">No API keys created yet.</p>
+            <p className="mt-4 text-sm text-text-2">No API keys created yet.</p>
           ) : (
             <div className="mt-4 divide-y">
               {apiKeys.map((key) => (
                 <div key={key.id} className="flex items-center justify-between py-3">
                   <div>
                     <p className="text-sm font-medium">{key.name}</p>
-                    <p className="font-mono text-xs text-gray-500">{key.key.slice(0, 12)}...{key.key.slice(-4)}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="font-mono text-xs text-text-2">{key.key.slice(0, 12)}...{key.key.slice(-4)}</p>
+                    <p className="text-xs text-text-muted">
                       Created {new Date(key.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -173,7 +173,7 @@ export default function IntegrationsContent() {
         </div>
 
         {/* Webhook Endpoints */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">Webhook Endpoints</h2>
             <button
@@ -187,18 +187,18 @@ export default function IntegrationsContent() {
           {showNewWebhook && (
             <div className="mt-4 rounded-brand border border-brand-primary/30 bg-brand-primary/5 p-4">
               <div>
-                <label htmlFor="webhookUrl" className="block text-sm font-medium text-gray-700">Endpoint URL</label>
+                <label htmlFor="webhookUrl" className="block text-sm font-medium text-text-2">Endpoint URL</label>
                 <input
                   id="webhookUrl"
                   type="url"
                   value={newWebhookUrl}
                   onChange={(e) => setNewWebhookUrl(e.target.value)}
                   placeholder="https://example.com/webhook"
-                  className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
                 />
               </div>
               <div className="mt-3">
-                <p className="text-sm font-medium text-gray-700">Events</p>
+                <p className="text-sm font-medium text-text-2">Events</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {AVAILABLE_EVENTS.map((event) => (
                     <button
@@ -208,7 +208,7 @@ export default function IntegrationsContent() {
                       className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                         newWebhookEvents.includes(event)
                           ? 'bg-brand-primary text-white'
-                          : 'border border-gray-300 text-gray-700 hover:border-brand-primary'
+                          : 'border border-border text-text-2 hover:border-brand-primary'
                       }`}
                     >
                       {event}
@@ -225,7 +225,7 @@ export default function IntegrationsContent() {
                 </button>
                 <button
                   onClick={() => { setShowNewWebhook(false); setNewWebhookUrl(''); setNewWebhookEvents([]); }}
-                  className="rounded-brand border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -234,17 +234,17 @@ export default function IntegrationsContent() {
           )}
 
           {webhooks.length === 0 && !showNewWebhook ? (
-            <p className="mt-4 text-sm text-gray-500">No webhook endpoints configured yet.</p>
+            <p className="mt-4 text-sm text-text-2">No webhook endpoints configured yet.</p>
           ) : (
             <div className="mt-4 divide-y">
               {webhooks.map((webhook) => (
                 <div key={webhook.id} className="flex items-center justify-between py-3">
                   <div>
                     <p className="text-sm font-medium font-mono">{webhook.url}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-2">
                       Events: {webhook.events.join(', ')}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-text-muted">
                       Created {new Date(webhook.created_at).toLocaleDateString()}
                     </p>
                   </div>

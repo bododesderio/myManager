@@ -61,7 +61,7 @@ function BillingContentInner() {
   const isLoading = loadingSub || loadingPlans || loadingHistory;
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-sm text-gray-500">Loading billing...</div>;
+    return <div className="flex items-center justify-center py-12 text-sm text-text-2">Loading billing...</div>;
   }
 
   return (
@@ -73,12 +73,12 @@ function BillingContentInner() {
 
       <div className="max-w-3xl space-y-6">
         {/* Current Plan */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Current Plan</h2>
           <div className="mt-4 flex items-center justify-between">
             <div>
               <p className="text-xl font-bold">{sub?.plan_name ?? 'Free'}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-text-2">
                 {sub?.price ? `$${sub.price}/${sub.interval ?? 'month'}` : 'No active subscription'}
                 {sub?.current_period_end && (
                   <span> &middot; Renews {new Date(sub.current_period_end).toLocaleDateString()}</span>
@@ -111,7 +111,7 @@ function BillingContentInner() {
                 </button>
                 <button
                   onClick={() => setShowCancelConfirm(false)}
-                  className="rounded-brand border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Keep Subscription
                 </button>
@@ -122,7 +122,7 @@ function BillingContentInner() {
 
         {/* Plan comparison grid */}
         {planList.length > 0 && (
-          <div className="rounded-brand border bg-white p-6 shadow-sm">
+          <div className="rounded-brand border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Available Plans</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-3">
               {planList.map((plan: any) => {
@@ -131,16 +131,16 @@ function BillingContentInner() {
                   <div
                     key={plan.id}
                     className={`rounded-brand border p-5 ${
-                      isCurrent ? 'border-brand-primary bg-brand-primary/5' : 'border-gray-200'
+                      isCurrent ? 'border-brand-primary bg-brand-primary/5' : 'border-border-light'
                     }`}
                   >
                     <h3 className="font-heading font-semibold">{plan.name}</h3>
                     <p className="mt-1 text-2xl font-bold">
                       ${plan.price_monthly ?? plan.price}
-                      <span className="text-sm font-normal text-gray-500">/mo</span>
+                      <span className="text-sm font-normal text-text-2">/mo</span>
                     </p>
                     {plan.features && (
-                      <ul className="mt-3 space-y-1 text-sm text-gray-600">
+                      <ul className="mt-3 space-y-1 text-sm text-text-2">
                         {(plan.features as string[]).map((f: string) => (
                           <li key={f} className="flex items-start gap-1.5">
                             <span className="text-green-600">&#10003;</span>
@@ -154,7 +154,7 @@ function BillingContentInner() {
                       disabled={isCurrent || changePlan.isPending}
                       className={`mt-4 w-full rounded-brand px-4 py-2 text-sm font-semibold transition ${
                         isCurrent
-                          ? 'border border-brand-primary bg-white text-brand-primary cursor-default'
+                          ? 'border border-brand-primary bg-bg text-brand-primary cursor-default'
                           : 'bg-brand-primary text-white hover:bg-brand-primary-dark disabled:opacity-50'
                       }`}
                     >
@@ -168,10 +168,10 @@ function BillingContentInner() {
         )}
 
         {/* Billing History */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Billing History</h2>
           {invoices.length === 0 ? (
-            <p className="mt-4 text-sm text-gray-500">No billing history yet.</p>
+            <p className="mt-4 text-sm text-text-2">No billing history yet.</p>
           ) : (
             <div className="mt-4 divide-y">
               {invoices.map((invoice: any) => (
@@ -180,7 +180,7 @@ function BillingContentInner() {
                     <p className="text-sm font-medium">
                       {new Date(invoice.date ?? invoice.created_at).toLocaleDateString()}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-text-2">
                       ${invoice.amount ?? invoice.total}
                     </p>
                   </div>
@@ -191,7 +191,7 @@ function BillingContentInner() {
                           ? 'bg-green-100 text-green-800'
                           : invoice.status === 'failed'
                             ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
+                            : 'bg-bg-2 text-text'
                       }`}
                     >
                       {invoice.status}

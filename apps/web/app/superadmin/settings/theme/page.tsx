@@ -168,19 +168,19 @@ function ColorPickerField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium text-text-2">{label}</label>
       <div className="mt-1 flex items-center gap-2">
         <input
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-9 cursor-pointer rounded border border-gray-300 p-0.5"
+          className="h-9 w-9 cursor-pointer rounded border border-border p-0.5"
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm font-mono focus:border-brand-primary focus:outline-none"
+          className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm font-mono focus:border-brand-primary focus:outline-none"
         />
       </div>
     </div>
@@ -197,7 +197,7 @@ function PillToggle<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex rounded-brand border border-gray-300 overflow-hidden">
+    <div className="inline-flex rounded-brand border border-border overflow-hidden">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -206,7 +206,7 @@ function PillToggle<T extends string>({
           className={`px-3 py-1.5 text-xs font-medium transition ${
             value === opt.value
               ? `bg-brand-primary text-white ${styles.brandActive}`
-              : 'bg-white text-gray-600 hover:bg-gray-50'
+              : 'bg-bg text-text-2 hover:bg-bg-2'
           }`}
         >
           {opt.label}
@@ -338,13 +338,13 @@ export default function AdminThemeSettingsPage() {
     <div className="space-y-6" style={cssVars as React.CSSProperties}>
       <div>
         <h1 className="font-heading text-2xl font-bold">Theme Settings</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-text-2">
           Customize the visual appearance of the platform.
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-border-light">
         {TABS.map((tab) => (
           <button
             key={tab.key}
@@ -353,7 +353,7 @@ export default function AdminThemeSettingsPage() {
             className={`px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
                 ? `border-b-2 text-brand-primary ${styles.tabActive}`
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-text-2 hover:text-text-2'
             }`}
           >
             {tab.label}
@@ -427,7 +427,7 @@ function PresetsPanel({
         return (
           <div
             key={preset.id}
-            className={`relative rounded-brand border bg-white p-4 shadow-sm transition hover:shadow-md ${isActive ? styles.brandBorder : ''}`}
+            className={`relative rounded-brand border bg-bg p-4 shadow-sm transition hover:shadow-md ${isActive ? styles.brandBorder : ''}`}
           >
             {isActive && (
               <span
@@ -459,14 +459,14 @@ function PresetsPanel({
             </div>
 
             <h3 className="font-heading text-sm font-semibold">{preset.name}</h3>
-            <p className="mt-0.5 text-xs text-gray-500">{preset.description}</p>
+            <p className="mt-0.5 text-xs text-text-2">{preset.description}</p>
 
             {/* Swatches */}
             <div className="mt-3 flex gap-1.5">
               {preset.swatches.map((swatch, i) => (
                 <span
                   key={i}
-                  className={`inline-block h-5 w-5 rounded-full border border-gray-200 ${styles.dynBg}`}
+                  className={`inline-block h-5 w-5 rounded-full border border-border-light ${styles.dynBg}`}
                   style={{ ['--dyn-bg' as string]: swatch } as React.CSSProperties}
                 />
               ))}
@@ -478,7 +478,7 @@ function PresetsPanel({
               disabled={isActive}
               className={`mt-4 w-full rounded-brand px-3 py-1.5 text-xs font-semibold transition ${
                 isActive
-                  ? 'cursor-default bg-gray-100 text-gray-400'
+                  ? 'cursor-default bg-bg-2 text-text-muted'
                   : `bg-brand-primary text-white hover:opacity-90 ${styles.brandActive}`
               }`}
             >
@@ -492,15 +492,15 @@ function PresetsPanel({
       <button
         type="button"
         onClick={onOpenBuilder}
-        className="flex flex-col items-center justify-center rounded-brand border-2 border-dashed border-gray-300 bg-white p-4 text-center transition hover:border-gray-400 hover:shadow-sm"
+        className="flex flex-col items-center justify-center rounded-brand border-2 border-dashed border-border bg-bg p-4 text-center transition hover:border-border hover:shadow-sm"
       >
-        <div className="mb-2 flex h-16 w-full items-center justify-center rounded bg-gray-50">
-          <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <div className="mb-2 flex h-16 w-full items-center justify-center rounded bg-bg-2">
+          <svg className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
           </svg>
         </div>
-        <h3 className="font-heading text-sm font-semibold text-gray-700">Custom Theme</h3>
-        <p className="mt-0.5 text-xs text-gray-500">Build your own from scratch</p>
+        <h3 className="font-heading text-sm font-semibold text-text-2">Custom Theme</h3>
+        <p className="mt-0.5 text-xs text-text-2">Build your own from scratch</p>
         <span className={`mt-3 text-xs font-semibold text-brand-primary ${styles.brandText}`}>
           Open theme builder &rarr;
         </span>
@@ -570,7 +570,7 @@ function BuilderPanel({
       {/* Controls sidebar */}
       <div className="w-full shrink-0 space-y-5 lg:w-[280px]">
         {/* Colors */}
-        <div className="rounded-brand border bg-white p-4 shadow-sm">
+        <div className="rounded-brand border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">Colors</h2>
           <div className="mt-3 space-y-3">
             <ColorPickerField label="Primary" value={colors.primary} onChange={(v) => onUpdateColor('primary', v)} />
@@ -587,7 +587,7 @@ function BuilderPanel({
         </div>
 
         {/* Dark mode colors (collapsible) */}
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <button
             type="button"
             onClick={onToggleDarkColors}
@@ -595,7 +595,7 @@ function BuilderPanel({
           >
             <h2 className="font-heading text-sm font-semibold">Dark Mode Colors</h2>
             <svg
-              className={`h-4 w-4 text-gray-500 transition-transform ${darkColorsOpen ? 'rotate-180' : ''}`}
+              className={`h-4 w-4 text-text-2 transition-transform ${darkColorsOpen ? 'rotate-180' : ''}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -616,15 +616,15 @@ function BuilderPanel({
         </div>
 
         {/* Typography */}
-        <div className="rounded-brand border bg-white p-4 shadow-sm">
+        <div className="rounded-brand border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">Typography</h2>
           <div className="mt-3 space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Heading font</label>
+              <label className="block text-sm font-medium text-text-2">Heading font</label>
               <select
                 value={typography.headingFont}
                 onChange={(e) => onTypographyChange({ ...typography, headingFont: e.target.value })}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -632,11 +632,11 @@ function BuilderPanel({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Body font</label>
+              <label className="block text-sm font-medium text-text-2">Body font</label>
               <select
                 value={typography.bodyFont}
                 onChange={(e) => onTypographyChange({ ...typography, bodyFont: e.target.value })}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -647,11 +647,11 @@ function BuilderPanel({
         </div>
 
         {/* Border radius */}
-        <div className="rounded-brand border bg-white p-4 shadow-sm">
+        <div className="rounded-brand border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">Border Radius</h2>
           <div className="mt-3 space-y-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">Card</label>
+              <label className="mb-1 block text-xs font-medium text-text-2">Card</label>
               <PillToggle
                 options={[
                   { label: 'None', value: 'none' as const },
@@ -664,7 +664,7 @@ function BuilderPanel({
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">Button</label>
+              <label className="mb-1 block text-xs font-medium text-text-2">Button</label>
               <PillToggle
                 options={[
                   { label: 'None', value: 'none' as const },
@@ -680,7 +680,7 @@ function BuilderPanel({
         </div>
 
         {/* UI Density */}
-        <div className="rounded-brand border bg-white p-4 shadow-sm">
+        <div className="rounded-brand border bg-bg p-4 shadow-sm">
           <h2 className="font-heading text-sm font-semibold">UI Density</h2>
           <div className="mt-3">
             <PillToggle
@@ -700,7 +700,7 @@ function BuilderPanel({
       <div className="flex flex-1 flex-col">
         {/* Scope toggle */}
         <div className="mb-3 flex items-center gap-2">
-          <span className="text-xs font-medium text-gray-500">Preview:</span>
+          <span className="text-xs font-medium text-text-2">Preview:</span>
           <PillToggle
             options={[
               { label: 'Marketing', value: 'marketing' as const },
@@ -852,11 +852,11 @@ function BuilderPanel({
         </div>
 
         {/* Sticky save bar */}
-        <div className="sticky bottom-0 mt-4 flex items-center justify-between gap-3 rounded-brand border bg-white p-4 shadow-sm">
+        <div className="sticky bottom-0 mt-4 flex items-center justify-between gap-3 rounded-brand border bg-bg p-4 shadow-sm">
           <button
             type="button"
             onClick={onReset}
-            className="rounded-brand border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+            className="rounded-brand border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
           >
             Reset to default
           </button>
@@ -864,7 +864,7 @@ function BuilderPanel({
             <button
               type="button"
               onClick={onSaveAsPreset}
-              className="rounded-brand border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-brand border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Save as preset
             </button>
@@ -912,15 +912,15 @@ function ModeScopePanel({
   return (
     <div className="max-w-2xl space-y-6">
       {/* Default mode */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Default Mode</h2>
-        <p className="mt-1 text-xs text-gray-500">Choose the default color mode for all users.</p>
+        <p className="mt-1 text-xs text-text-2">Choose the default color mode for all users.</p>
         <div className="mt-4 space-y-3">
           {modeOptions.map((opt) => (
             <label
               key={opt.value}
               className={`flex cursor-pointer items-start gap-3 rounded-brand border p-3 transition ${
-                defaultMode === opt.value ? `border-brand-primary bg-indigo-50/50 ${styles.brandBorder}` : 'border-gray-200 hover:border-gray-300'
+                defaultMode === opt.value ? `border-brand-primary bg-indigo-50/50 ${styles.brandBorder}` : 'border-border-light hover:border-border'
               }`}
             >
               <input
@@ -933,7 +933,7 @@ function ModeScopePanel({
               />
               <div>
                 <span className="text-sm font-medium">{opt.label}</span>
-                <p className="text-xs text-gray-500">{opt.description}</p>
+                <p className="text-xs text-text-2">{opt.description}</p>
               </div>
             </label>
           ))}
@@ -941,11 +941,11 @@ function ModeScopePanel({
       </div>
 
       {/* Allow user override */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-heading text-lg font-semibold">Allow User Override</h2>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-text-2">
               When enabled, users can override the default mode in their personal settings.
             </p>
           </div>
@@ -955,11 +955,11 @@ function ModeScopePanel({
             aria-checked={allowUserOverride}
             onClick={() => onToggleOverride(!allowUserOverride)}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
-              allowUserOverride ? `bg-brand-primary ${styles.brandActive}` : 'bg-gray-300'
+              allowUserOverride ? `bg-brand-primary ${styles.brandActive}` : 'bg-border'
             }`}
           >
             <span
-              className={`pointer-events-none inline-block h-5 w-5 translate-y-0.5 rounded-full bg-white shadow transition-transform ${
+              className={`pointer-events-none inline-block h-5 w-5 translate-y-0.5 rounded-full bg-bg shadow transition-transform ${
                 allowUserOverride ? 'translate-x-[22px]' : 'translate-x-0.5'
               }`}
             />
@@ -968,9 +968,9 @@ function ModeScopePanel({
       </div>
 
       {/* Dark mode color overrides */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Dark Mode Color Overrides</h2>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-text-2">
           Customize the colors used when dark mode is active.
         </p>
         <div className="mt-4 grid grid-cols-2 gap-4">
@@ -983,15 +983,15 @@ function ModeScopePanel({
       </div>
 
       {/* Scope rules table */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Scope Rules</h2>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-text-2">
           Read-only overview of how theme modes are applied across different areas.
         </p>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <tr className="border-b border-border-light text-xs font-semibold uppercase tracking-wider text-text-2">
                 <th className="pb-2 pr-4">Area</th>
                 <th className="pb-2 pr-4">Default</th>
                 <th className="pb-2 pr-4">Respects OS</th>
@@ -1001,18 +1001,18 @@ function ModeScopePanel({
             <tbody>
               {SCOPE_ROWS.map((row) => (
                 <tr key={row.area} className="border-b border-gray-100 last:border-0">
-                  <td className="py-2.5 pr-4 font-medium text-gray-700">{row.area}</td>
-                  <td className="py-2.5 pr-4 text-gray-600">{row.default}</td>
+                  <td className="py-2.5 pr-4 font-medium text-text-2">{row.area}</td>
+                  <td className="py-2.5 pr-4 text-text-2">{row.default}</td>
                   <td className="py-2.5 pr-4">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      row.respectsOs === 'Yes' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
+                      row.respectsOs === 'Yes' ? 'bg-green-50 text-green-700' : 'bg-bg-2 text-text-2'
                     }`}>
                       {row.respectsOs}
                     </span>
                   </td>
                   <td className="py-2.5">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      row.userOverride === 'Yes' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
+                      row.userOverride === 'Yes' ? 'bg-green-50 text-green-700' : 'bg-bg-2 text-text-2'
                     }`}>
                       {row.userOverride}
                     </span>

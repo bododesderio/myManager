@@ -67,7 +67,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-56 flex-col border-r bg-white">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-56 flex-col border-r bg-bg">
       <div className="flex h-14 items-center border-b px-4">
         <Link href="/superadmin/dashboard" className="text-lg font-bold text-brand-primary">
           Admin Panel
@@ -77,7 +77,7 @@ export function AdminSidebar() {
       <nav className="flex-1 overflow-y-auto px-2 py-3">
         {navSections.map((section) => (
           <div key={section.title} className="mb-3">
-            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
               {section.title}
             </p>
             {section.items.map((item) => {
@@ -89,7 +89,7 @@ export function AdminSidebar() {
                   className={`flex items-center gap-2.5 rounded-brand px-3 py-1.5 text-sm transition ${
                     isActive
                       ? 'bg-brand-primary/10 font-medium text-brand-primary'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      : 'text-text-2 hover:bg-bg-2'
                   }`}
                 >
                   <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -126,7 +126,7 @@ function SignOutButton() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="flex w-full items-center gap-2 rounded-brand px-3 py-2 text-sm text-gray-600 transition hover:bg-red-50 hover:text-red-600"
+      className="flex w-full items-center gap-2 rounded-brand px-3 py-2 text-sm text-text-2 transition hover:bg-red-50 hover:text-red-600"
     >
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

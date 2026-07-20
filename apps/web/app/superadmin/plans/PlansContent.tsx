@@ -24,7 +24,7 @@ export function PlansContent() {
       {isLoading ? (
         <StatCardSkeletonGrid count={3} />
       ) : plans.length === 0 ? (
-        <p className="text-sm text-gray-500">No plans configured yet.</p>
+        <p className="text-sm text-text-2">No plans configured yet.</p>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
           {plans.map(
@@ -32,13 +32,13 @@ export function PlansContent() {
               <Link
                 key={plan.id}
                 href={`/admin/plans/${plan.id}` as Route}
-                className="rounded-brand border bg-white p-5 shadow-sm transition hover:border-brand-primary"
+                className="rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
               >
                 <h3 className="font-heading text-lg font-semibold">{plan.name}</h3>
                 <p className="mt-1 text-2xl font-bold">
                   {plan.monthlyPrice != null ? `$${plan.monthlyPrice}/mo` : 'Custom'}
                 </p>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-text-2">
                   {plan.subscriberCount ?? 0} active subscribers
                 </p>
               </Link>

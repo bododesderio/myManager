@@ -123,37 +123,37 @@ export default function SecurityContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Change Password */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Change Password</h2>
           <div className="mt-4 space-y-4">
             <div>
-              <label htmlFor="currentPw" className="block text-sm font-medium text-gray-700">Current Password</label>
+              <label htmlFor="currentPw" className="block text-sm font-medium text-text-2">Current Password</label>
               <input
                 id="currentPw"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="newPw" className="block text-sm font-medium text-gray-700">New Password</label>
+              <label htmlFor="newPw" className="block text-sm font-medium text-text-2">New Password</label>
               <input
                 id="newPw"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="confirmPw" className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+              <label htmlFor="confirmPw" className="block text-sm font-medium text-text-2">Confirm New Password</label>
               <input
                 id="confirmPw"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
           </div>
@@ -167,13 +167,13 @@ export default function SecurityContent() {
         </div>
 
         {/* Two-Factor Authentication */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Two-Factor Authentication</h2>
-          <p className="mt-2 text-sm text-gray-500">Add an extra layer of security to your account.</p>
+          <p className="mt-2 text-sm text-text-2">Add an extra layer of security to your account.</p>
           <div className="mt-4 flex items-center gap-3">
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                twoFAEnabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                twoFAEnabled ? 'bg-green-100 text-green-800' : 'bg-bg-2 text-text-2'
               }`}
             >
               {twoFAEnabled ? 'Enabled' : 'Disabled'}
@@ -183,7 +183,7 @@ export default function SecurityContent() {
               disabled={enableTwoFactor.isPending || isLoadingPreferences || twoFAEnabled}
               className={`rounded-brand px-4 py-2 text-sm font-medium transition ${
                 twoFAEnabled
-                  ? 'cursor-default border border-gray-300 text-gray-500'
+                  ? 'cursor-default border border-border text-text-2'
                   : 'border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white'
               }`}
             >
@@ -199,7 +199,7 @@ export default function SecurityContent() {
               </p>
               <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div>
-                  <label htmlFor="disable2faCode" className="block text-sm font-medium text-gray-700">Current 2FA Code</label>
+                  <label htmlFor="disable2faCode" className="block text-sm font-medium text-text-2">Current 2FA Code</label>
                   <input
                     id="disable2faCode"
                     type="text"
@@ -208,7 +208,7 @@ export default function SecurityContent() {
                     onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="123456"
                     maxLength={6}
-                    className="mt-1 block w-48 rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                    className="mt-1 block w-48 rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
                   />
                 </div>
                 <button
@@ -225,12 +225,12 @@ export default function SecurityContent() {
           {showSetup2FA && (
             <div className="mt-4 rounded-brand border border-brand-primary/30 bg-brand-primary/5 p-4">
               <h3 className="text-sm font-semibold">Set up Two-Factor Authentication</h3>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-text-2">
                 Add this setup key to your authenticator app, then enter the 6-digit code to finish setup.
               </p>
-              <div className="mt-4 rounded-brand border bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Setup Key</p>
-                <p className="mt-2 break-all font-mono text-sm text-gray-800">{setupData?.secret ?? '--'}</p>
+              <div className="mt-4 rounded-brand border bg-bg p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-2">Setup Key</p>
+                <p className="mt-2 break-all font-mono text-sm text-text">{setupData?.secret ?? '--'}</p>
                 {setupData?.qrCodeUrl && (
                   <a
                     href={setupData.qrCodeUrl}
@@ -246,7 +246,7 @@ export default function SecurityContent() {
                   <p className="mt-1 text-sm text-amber-800">Store these somewhere safe. Each code can be used once.</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     {setupData.backupCodes.map((code) => (
-                      <code key={code} className="rounded bg-white px-2 py-1 font-mono text-sm text-gray-800">
+                      <code key={code} className="rounded bg-bg px-2 py-1 font-mono text-sm text-text">
                         {code}
                       </code>
                     ))}
@@ -254,7 +254,7 @@ export default function SecurityContent() {
                 </div>
               )}
               <div className="mt-4">
-                <label htmlFor="verifyCode" className="block text-sm font-medium text-gray-700">Verification Code</label>
+                <label htmlFor="verifyCode" className="block text-sm font-medium text-text-2">Verification Code</label>
                 <input
                   id="verifyCode"
                   type="text"
@@ -263,7 +263,7 @@ export default function SecurityContent() {
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="Enter 6-digit code"
                   maxLength={6}
-                  className="mt-1 block w-48 rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className="mt-1 block w-48 rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
                 />
               </div>
               <div className="mt-4 flex gap-2">
@@ -280,7 +280,7 @@ export default function SecurityContent() {
                     setSetupData(null);
                     setVerificationCode('');
                   }}
-                  className="rounded-brand border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -290,13 +290,13 @@ export default function SecurityContent() {
         </div>
 
         {/* Active Sessions */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Active Sessions</h2>
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between rounded-brand border px-4 py-3">
               <div>
                 <p className="text-sm font-medium">Current Session</p>
-                <p className="text-xs text-gray-500">This device &middot; Active now</p>
+                <p className="text-xs text-text-2">This device &middot; Active now</p>
               </div>
               <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">Active</span>
             </div>

@@ -14,7 +14,7 @@ const PLATFORM_ICONS: Record<string, string> = {
   instagram: 'bg-pink-100 text-pink-700',
   twitter: 'bg-sky-100 text-sky-700',
   linkedin: 'bg-blue-100 text-blue-800',
-  tiktok: 'bg-gray-100 text-gray-800',
+  tiktok: 'bg-bg-2 text-text',
   youtube: 'bg-red-100 text-red-700',
 };
 
@@ -87,7 +87,7 @@ export function ConversationsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Conversations</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-text-2">
             Manage and reply to incoming comments across all platforms.
           </p>
         </div>
@@ -95,7 +95,7 @@ export function ConversationsContent() {
           <select
             value={platformFilter}
             onChange={(e) => setPlatformFilter(e.target.value)}
-            className="rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
           >
             {PLATFORMS.map((p) => (
               <option key={p} value={p}>
@@ -109,9 +109,9 @@ export function ConversationsContent() {
       {isLoading ? (
         <TableSkeleton rows={6} cols={4} />
       ) : comments.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -120,17 +120,17 @@ export function ConversationsContent() {
               />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No comments yet</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <h3 className="font-heading text-lg font-semibold text-text">No comments yet</h3>
+          <p className="mt-1 text-sm text-text-2">
             Incoming comments from your connected platforms will appear here.
           </p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <div className="divide-y">
             {comments.map((comment: any) => {
               const platform = comment.platform || 'unknown';
-              const badgeClass = PLATFORM_ICONS[platform] || 'bg-gray-100 text-gray-600';
+              const badgeClass = PLATFORM_ICONS[platform] || 'bg-bg-2 text-text-2';
               const isExpanded = expandedReply === comment.id;
               const isAssigning = assigningId === comment.id;
 
@@ -139,7 +139,7 @@ export function ConversationsContent() {
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-text">
                           {comment.authorName || comment.author_name || 'Unknown'}
                         </p>
                         <span
@@ -148,16 +148,16 @@ export function ConversationsContent() {
                           {platform}
                         </span>
                         {(comment.createdAt || comment.created_at) && (
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-text-muted">
                             {formatRelativeDate(comment.createdAt || comment.created_at)}
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-gray-700">
+                      <p className="mt-1 text-sm text-text-2">
                         {comment.text || comment.content || comment.body || ''}
                       </p>
                       {(comment.postTitle || comment.post_title) && (
-                        <p className="mt-1 text-xs text-gray-400">
+                        <p className="mt-1 text-xs text-text-muted">
                           on: {comment.postTitle || comment.post_title}
                         </p>
                       )}
@@ -180,9 +180,9 @@ export function ConversationsContent() {
                           Assign
                         </button>
                         {isAssigning && (
-                          <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-brand border bg-white py-1 shadow-lg">
+                          <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-brand border bg-bg py-1 shadow-lg">
                             {members.length === 0 ? (
-                              <p className="px-3 py-2 text-sm text-gray-400">No members found</p>
+                              <p className="px-3 py-2 text-sm text-text-muted">No members found</p>
                             ) : (
                               members.map((member: any) => (
                                 <button
@@ -193,7 +193,7 @@ export function ConversationsContent() {
                                       member.userId || member.user_id || member.id,
                                     )
                                   }
-                                  className="block w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+                                  className="block w-full px-3 py-2 text-left text-sm hover:bg-bg-2"
                                 >
                                   {member.name || member.email || 'Member'}
                                 </button>
@@ -215,7 +215,7 @@ export function ConversationsContent() {
                           if (e.key === 'Enter') handleReply(comment.id);
                         }}
                         placeholder="Type a reply..."
-                        className="flex-1 rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                        className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
                       />
                       <button
                         onClick={() => handleReply(comment.id)}

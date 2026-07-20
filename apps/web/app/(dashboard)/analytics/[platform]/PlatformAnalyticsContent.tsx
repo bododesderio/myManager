@@ -51,14 +51,14 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
 
       <div>
         <h1 className="font-heading text-2xl font-bold">{name} Analytics</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-text-2">
           Detailed performance metrics for your {name} accounts.
         </p>
       </div>
 
       {/* Date range picker */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           From
           <input
             type="date"
@@ -67,7 +67,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
             className="rounded-brand border px-3 py-1.5 text-sm"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           To
           <input
             type="date"
@@ -92,8 +92,8 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
               value: metrics?.engagementRate != null ? `${metrics.engagementRate}%` : '-',
             },
           ].map((metric) => (
-            <div key={metric.label} className="rounded-brand border bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">{metric.label}</p>
+            <div key={metric.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+              <p className="text-sm text-text-2">{metric.label}</p>
               <p className="mt-1 text-2xl font-bold">
                 {typeof metric.value === 'number'
                   ? metric.value.toLocaleString()
@@ -105,11 +105,11 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
       )}
 
       {/* Daily chart */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">{name} Engagement Over Time</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
-            <div className="h-full w-full animate-pulse rounded bg-gray-100" />
+            <div className="h-full w-full animate-pulse rounded bg-bg-2" />
           </div>
         ) : dailyData.length > 0 ? (
           <div className="mt-4 h-64">
@@ -137,14 +137,14 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
             </ResponsiveContainer>
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-text-muted">
             No daily data available for this range.
           </p>
         )}
       </div>
 
       {/* Top posts section */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Top Posts</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -157,14 +157,14 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
                 <span className="text-sm font-medium">
                   {(post.caption as string)?.slice(0, 80) ?? `Post #${post.id}`}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-text-2">
                   {(post.engagements as number)?.toLocaleString()} engagements
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-text-2">
             Your best-performing {name} posts will appear here.
           </p>
         )}

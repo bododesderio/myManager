@@ -73,8 +73,8 @@ export function PlanEditContent({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-6 w-24 animate-pulse rounded bg-gray-200" />
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-6 w-24 animate-pulse rounded bg-border" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         <StatCardSkeletonGrid count={3} />
       </div>
     );
@@ -84,7 +84,7 @@ export function PlanEditContent({ id }: { id: string }) {
     return (
       <div className="space-y-4">
         <Link href="/superadmin/plans" className="text-sm text-brand-primary hover:underline">&larr; Plans</Link>
-        <p className="text-gray-500">Plan not found.</p>
+        <p className="text-text-2">Plan not found.</p>
       </div>
     );
   }
@@ -109,27 +109,27 @@ export function PlanEditContent({ id }: { id: string }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-brand border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Active Subscribers</p>
+        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <p className="text-sm text-text-2">Active Subscribers</p>
           <p className="mt-1 text-2xl font-bold">{plan.subscriberCount ?? 0}</p>
         </div>
-        <div className="rounded-brand border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Monthly Revenue</p>
+        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <p className="text-sm text-text-2">Monthly Revenue</p>
           <p className="mt-1 text-2xl font-bold">
             ${((plan.subscriberCount ?? 0) * (plan.monthlyPrice ?? 0)).toLocaleString()}
           </p>
         </div>
-        <div className="rounded-brand border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Churn Rate</p>
+        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <p className="text-sm text-text-2">Churn Rate</p>
           <p className="mt-1 text-2xl font-bold">{plan.churnRate ?? '0'}%</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <div className="rounded-brand border bg-white p-6 shadow-sm space-y-4">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">Plan Configuration</h2>
           <div>
-            <label htmlFor="planName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="planName" className="block text-sm font-medium text-text-2">
               Plan Name
             </label>
             <input
@@ -138,11 +138,11 @@ export function PlanEditContent({ id }: { id: string }) {
               required
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
             />
           </div>
           <div>
-            <label htmlFor="planSlug" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="planSlug" className="block text-sm font-medium text-text-2">
               Slug
             </label>
             <input
@@ -150,12 +150,12 @@ export function PlanEditContent({ id }: { id: string }) {
               type="text"
               value={form.slug}
               onChange={(e) => update('slug', e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="monthlyPrice" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="monthlyPrice" className="block text-sm font-medium text-text-2">
                 Monthly Price (USD)
               </label>
               <input
@@ -165,11 +165,11 @@ export function PlanEditContent({ id }: { id: string }) {
                 step="0.01"
                 value={form.monthlyPrice}
                 onChange={(e) => update('monthlyPrice', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="yearlyPrice" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="yearlyPrice" className="block text-sm font-medium text-text-2">
                 Yearly Price (USD)
               </label>
               <input
@@ -179,17 +179,17 @@ export function PlanEditContent({ id }: { id: string }) {
                 step="0.01"
                 value={form.yearlyPrice}
                 onChange={(e) => update('yearlyPrice', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-brand border bg-white p-6 shadow-sm space-y-4">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">Limits</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="maxAccounts" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="maxAccounts" className="block text-sm font-medium text-text-2">
                 Max Social Accounts
               </label>
               <input
@@ -198,11 +198,11 @@ export function PlanEditContent({ id }: { id: string }) {
                 min="1"
                 value={form.maxAccounts}
                 onChange={(e) => update('maxAccounts', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="maxMembers" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="maxMembers" className="block text-sm font-medium text-text-2">
                 Max Team Members
               </label>
               <input
@@ -211,11 +211,11 @@ export function PlanEditContent({ id }: { id: string }) {
                 min="1"
                 value={form.maxMembers}
                 onChange={(e) => update('maxMembers', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="maxStorage" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="maxStorage" className="block text-sm font-medium text-text-2">
                 Storage (GB)
               </label>
               <input
@@ -224,11 +224,11 @@ export function PlanEditContent({ id }: { id: string }) {
                 min="1"
                 value={form.maxStorage}
                 onChange={(e) => update('maxStorage', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor="maxPosts" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="maxPosts" className="block text-sm font-medium text-text-2">
                 Posts per Month
               </label>
               <input
@@ -237,16 +237,16 @@ export function PlanEditContent({ id }: { id: string }) {
                 min="0"
                 value={form.maxPosts}
                 onChange={(e) => update('maxPosts', e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-brand border bg-white p-6 shadow-sm space-y-4">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm space-y-4">
           <h2 className="font-heading text-lg font-semibold">Features</h2>
           <div>
-            <label htmlFor="features" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="features" className="block text-sm font-medium text-text-2">
               Features (one per line)
             </label>
             <textarea
@@ -254,7 +254,7 @@ export function PlanEditContent({ id }: { id: string }) {
               rows={5}
               value={form.features}
               onChange={(e) => update('features', e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
             />
           </div>
         </div>

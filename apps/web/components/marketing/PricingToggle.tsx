@@ -79,7 +79,7 @@ export function PricingToggle({ plans }: { plans: Plan[] }) {
           aria-label="Toggle billing period"
         >
           <span
-            className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-300 ${annual ? 'translate-x-5' : 'translate-x-0'}`}
+            className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-bg shadow-md transition-transform duration-300 ${annual ? 'translate-x-5' : 'translate-x-0'}`}
           />
         </button>
         <span className={`text-[13px] font-medium transition-colors ${annual ? 'text-text' : 'text-text-muted'}`}>
@@ -105,7 +105,7 @@ export function PricingToggle({ plans }: { plans: Plan[] }) {
           return (
             <div
               key={plan.id}
-              className={`animate-fade-in-up relative overflow-hidden rounded-card border-2 bg-white p-6 transition-all duration-300 hover:-translate-y-1 ${
+              className={`animate-fade-in-up relative overflow-hidden rounded-card border-2 bg-bg p-6 transition-all duration-300 hover:-translate-y-1 ${
                 highlighted
                   ? 'border-primary shadow-[0_8px_30px_rgba(127,119,221,0.15)] scale-[1.02]'
                   : 'border-border hover:border-primary hover:shadow-[var(--shadow-card-hover)]'

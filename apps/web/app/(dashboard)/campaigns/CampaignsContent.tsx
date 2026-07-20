@@ -9,7 +9,7 @@ import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
-  completed: 'bg-gray-100 text-gray-800',
+  completed: 'bg-bg-2 text-text',
   draft: 'bg-yellow-100 text-yellow-800',
 };
 
@@ -45,7 +45,7 @@ export function CampaignsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Campaigns</h1>
-          <p className="mt-1 text-sm text-gray-500">Organize posts into campaigns for better tracking.</p>
+          <p className="mt-1 text-sm text-text-2">Organize posts into campaigns for better tracking.</p>
         </div>
         <Link
           href="/compose?type=campaign"
@@ -58,20 +58,20 @@ export function CampaignsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : campaigns.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No campaigns yet</h3>
-          <p className="mt-1 text-sm text-gray-500">Create your first campaign to organize your posts.</p>
+          <h3 className="font-heading text-lg font-semibold text-text">No campaigns yet</h3>
+          <p className="mt-1 text-sm text-text-2">Create your first campaign to organize your posts.</p>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Campaign</th>
                 <th className="px-6 py-3 font-medium">Status</th>
                 <th className="px-6 py-3 font-medium">Posts</th>
@@ -83,7 +83,7 @@ export function CampaignsContent() {
               {campaigns.map((campaign: any) => (
                 <tr
                   key={campaign.id}
-                  className="cursor-pointer hover:bg-gray-50"
+                  className="cursor-pointer hover:bg-bg-2"
                   onClick={() => router.push(`/campaigns/${campaign.id}`)}
                 >
                   <td className="px-6 py-4">
@@ -91,13 +91,13 @@ export function CampaignsContent() {
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[campaign.status] || 'bg-gray-100 text-gray-800'}`}
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[campaign.status] || 'bg-bg-2 text-text'}`}
                     >
                       {campaign.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">{campaign.postCount ?? campaign.posts ?? 0}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-text-2">
                     {campaign.startDate || campaign.start_date || '—'} &mdash;{' '}
                     {campaign.endDate || campaign.end_date || '—'}
                   </td>
@@ -122,9 +122,9 @@ export function CampaignsContent() {
       {/* Delete confirmation modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Delete Campaign</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to delete this campaign? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-3">

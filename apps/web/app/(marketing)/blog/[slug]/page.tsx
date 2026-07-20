@@ -166,7 +166,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <Link
                   key={rp.slug || rp.id}
                   href={`/blog/${rp.slug}`}
-                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-white p-5 ${['', 'delay-100', 'delay-200'][i] || ''}`}
+                  className={`animate-fade-in-up card-hover rounded-card border border-border bg-bg p-5 ${['', 'delay-100', 'delay-200'][i] || ''}`}
                 >
                   <h3 className="text-[14px] font-bold text-text">{rp.title}</h3>
                   {rp.excerpt && <p className="mt-1 text-[12px] text-text-2 line-clamp-2">{rp.excerpt}</p>}

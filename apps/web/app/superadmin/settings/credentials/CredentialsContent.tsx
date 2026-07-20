@@ -191,7 +191,7 @@ function CredentialRow({
               type={field.secret ? 'password' : 'text'}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="w-full max-w-md rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+              className="w-full max-w-md rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
               autoFocus
             />
             <button
@@ -203,13 +203,13 @@ function CredentialRow({
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="rounded-brand border px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-50"
+              className="rounded-brand border px-3 py-1.5 text-xs text-text-2 hover:bg-bg-2"
             >
               Cancel
             </button>
           </div>
         ) : (
-          <p className={`mt-0.5 font-mono text-xs ${value ? 'text-gray-500' : 'text-orange-500'}`}>
+          <p className={`mt-0.5 font-mono text-xs ${value ? 'text-text-2' : 'text-orange-500'}`}>
             {maskValue(value, field.secret)}
           </p>
         )}
@@ -217,7 +217,7 @@ function CredentialRow({
       {!editing && (
         <button
           onClick={handleEdit}
-          className="shrink-0 rounded-brand border px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+          className="shrink-0 rounded-brand border px-3 py-1.5 text-xs font-medium text-text-2 hover:bg-bg-2"
         >
           Edit
         </button>
@@ -293,7 +293,7 @@ export function CredentialsContent() {
         <h1 className="font-heading text-2xl font-bold">Credentials</h1>
         <div className="animate-pulse space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-12 rounded-brand bg-gray-200" />
+            <div key={i} className="h-12 rounded-brand bg-border" />
           ))}
         </div>
       </div>
@@ -305,15 +305,15 @@ export function CredentialsContent() {
       <h1 className="font-heading text-2xl font-bold">Credentials</h1>
 
       {/* Tabs */}
-      <div className="flex gap-1 overflow-x-auto rounded-brand border bg-gray-50 p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-brand border bg-bg-2 p-1">
         {sections.map((section) => (
           <button
             key={section.id}
             onClick={() => setActiveTab(section.id)}
             className={`whitespace-nowrap rounded-brand px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === section.id
-                ? 'bg-white text-brand-primary shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-bg text-brand-primary shadow-sm'
+                : 'text-text-2 hover:text-text-2'
             }`}
           >
             {section.label}
@@ -322,7 +322,7 @@ export function CredentialsContent() {
       </div>
 
       {/* Active section */}
-      <div className="rounded-brand border bg-white shadow-sm">
+      <div className="rounded-brand border bg-bg shadow-sm">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">
           {activeSection.label}
         </h2>

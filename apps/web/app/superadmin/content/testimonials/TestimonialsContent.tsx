@@ -117,15 +117,15 @@ export function TestimonialsContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 animate-pulse rounded-brand bg-gray-100" />
+            <div key={i} className="h-48 animate-pulse rounded-brand bg-bg-2" />
           ))}
         </div>
       </div>
@@ -137,7 +137,7 @@ export function TestimonialsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Testimonials</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage customer testimonials</p>
+          <p className="mt-1 text-sm text-text-2">Manage customer testimonials</p>
         </div>
         <button
           onClick={openNewModal}
@@ -151,7 +151,7 @@ export function TestimonialsContent() {
         {sortedItems.map((item) => (
           <div
             key={item.id}
-            className={`rounded-brand border bg-white p-5 shadow-sm ${
+            className={`rounded-brand border bg-bg p-5 shadow-sm ${
               !item.is_visible ? 'opacity-50' : ''
             }`}
           >
@@ -165,17 +165,17 @@ export function TestimonialsContent() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{item.author_name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-text-2">
                     {item.author_role}
                     {item.company ? ` at ${item.company}` : ''}
                   </p>
                 </div>
               </div>
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+              <span className="rounded-full bg-bg-2 px-2 py-0.5 text-xs text-text-2">
                 {item.placement}
               </span>
             </div>
-            <p className="mt-3 line-clamp-3 text-sm text-gray-700">&ldquo;{item.quote}&rdquo;</p>
+            <p className="mt-3 line-clamp-3 text-sm text-text-2">&ldquo;{item.quote}&rdquo;</p>
             <div className="mt-3 flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, i) => (
                 <svg
@@ -206,7 +206,7 @@ export function TestimonialsContent() {
         ))}
 
         {items.length === 0 && (
-          <div className="col-span-full rounded-brand border bg-white py-12 text-center text-gray-400">
+          <div className="col-span-full rounded-brand border bg-bg py-12 text-center text-text-muted">
             No testimonials yet.
           </div>
         )}
@@ -214,14 +214,14 @@ export function TestimonialsContent() {
 
       {editItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-lg rounded-brand bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-brand bg-bg p-6 shadow-xl">
             <h2 className="font-heading text-lg font-semibold">
               {editItem.id ? 'Edit Testimonial' : 'New Testimonial'}
             </h2>
             <div className="mt-4 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Author Name</label>
+                  <label className="block text-sm font-medium text-text-2">Author Name</label>
                   <input
                     type="text"
                     value={editItem.author_name}
@@ -230,7 +230,7 @@ export function TestimonialsContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <label className="block text-sm font-medium text-text-2">Role</label>
                   <input
                     type="text"
                     value={editItem.author_role}
@@ -241,7 +241,7 @@ export function TestimonialsContent() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Initials</label>
+                  <label className="block text-sm font-medium text-text-2">Initials</label>
                   <input
                     type="text"
                     value={editItem.author_initials}
@@ -256,7 +256,7 @@ export function TestimonialsContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Avatar Color</label>
+                  <label className="block text-sm font-medium text-text-2">Avatar Color</label>
                   <input
                     type="color"
                     value={editItem.author_avatar_color}
@@ -267,7 +267,7 @@ export function TestimonialsContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Company</label>
+                  <label className="block text-sm font-medium text-text-2">Company</label>
                   <input
                     type="text"
                     value={editItem.company}
@@ -277,7 +277,7 @@ export function TestimonialsContent() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Quote</label>
+                <label className="block text-sm font-medium text-text-2">Quote</label>
                 <RichTextEditor
                   value={editItem.quote}
                   onChange={(html) => setEditItem({ ...editItem, quote: html })}
@@ -287,7 +287,7 @@ export function TestimonialsContent() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Rating</label>
+                  <label className="block text-sm font-medium text-text-2">Rating</label>
                   <select
                     value={editItem.rating}
                     onChange={(e) => setEditItem({ ...editItem, rating: Number(e.target.value) })}
@@ -301,7 +301,7 @@ export function TestimonialsContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Placement</label>
+                  <label className="block text-sm font-medium text-text-2">Placement</label>
                   <select
                     value={editItem.placement}
                     onChange={(e) => setEditItem({ ...editItem, placement: e.target.value })}
@@ -322,11 +322,11 @@ export function TestimonialsContent() {
                         setEditItem({ ...editItem, is_visible: !editItem.is_visible })
                       }
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                        editItem.is_visible ? 'bg-brand-primary' : 'bg-gray-300'
+                        editItem.is_visible ? 'bg-brand-primary' : 'bg-border'
                       }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 rounded-full bg-white transition ${
+                        className={`inline-block h-4 w-4 rounded-full bg-bg transition ${
                           editItem.is_visible ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
@@ -339,7 +339,7 @@ export function TestimonialsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setEditItem(null)}
-                className="rounded-brand border px-4 py-2 text-sm text-gray-600 transition hover:bg-gray-50"
+                className="rounded-brand border px-4 py-2 text-sm text-text-2 transition hover:bg-bg-2"
               >
                 Cancel
               </button>

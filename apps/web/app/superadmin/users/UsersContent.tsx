@@ -40,17 +40,17 @@ export function UsersContent() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+          className="rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
         />
       </div>
 
       {isLoading ? (
         <TableSkeleton rows={6} cols={5} />
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">User</th>
                 <th className="px-6 py-3 font-medium">Plan</th>
                 <th className="px-6 py-3 font-medium">Status</th>
@@ -61,18 +61,18 @@ export function UsersContent() {
             <tbody className="divide-y">
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-text-2">
                     No users found.
                   </td>
                 </tr>
               ) : (
                 users.map((user: { id: string; name: string; email: string; plan: string; suspended: boolean; createdAt: string }) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} className="hover:bg-bg-2">
                     <td className="px-6 py-4">
                       <Link href={`/admin/users/${user.id}` as Route} className="font-medium text-brand-primary hover:underline">
                         {user.name}
                       </Link>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <p className="text-sm text-text-2">{user.email}</p>
                     </td>
                     <td className="px-6 py-4 text-sm">{user.plan}</td>
                     <td className="px-6 py-4">
@@ -84,7 +84,7 @@ export function UsersContent() {
                         {user.suspended ? 'Suspended' : 'Active'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-text-2">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
@@ -118,7 +118,7 @@ export function UsersContent() {
           >
             Previous
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-text-2">
             Page {page} of {totalPages}
           </span>
           <button

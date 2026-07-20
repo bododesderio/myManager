@@ -21,7 +21,12 @@
   --color-quaternary: #F59E0B;
   --color-text: #111111;
   --color-text-2: #555555;
-  --color-text-muted: #aaaaaa;
+  /* WCAG AA: text-muted was #aaaaaa = 2.32:1 on white, a contrast failure
+     for normal text. After the token sweep ~152 elements resolve through this
+     token, making it a single point of control. Light #727272 = 4.81:1,
+     dark #8191a3 = 5.54:1. Declared in all four blocks so the @theme default,
+     both explicit themes and the prefers-color-scheme fallback agree. */
+  --color-text-muted: #727272;
   --color-bg: #ffffff;
   --color-bg-2: #F8F7FF;
   --color-bg-card: #f7f6f2;
@@ -87,7 +92,7 @@
   /* ── Text ───────────────────────────────────── */
   --color-text:           #111111;
   --color-text-2:         #555555;
-  --color-text-muted:     #aaaaaa;
+  --color-text-muted:     #727272;
 
   /* ── Backgrounds ────────────────────────────── */
   --color-bg:             #ffffff;
@@ -165,7 +170,7 @@
   /* ── Text ───────────────────────────────────── */
   --color-text:           #F1F5F9;
   --color-text-2:         #CBD5E1;
-  --color-text-muted:     #475569;
+  --color-text-muted:     #8191a3;
 
   /* ── Backgrounds ────────────────────────────── */
   --color-bg:             #0F172A;
@@ -226,7 +231,7 @@
     --color-tertiary-light: #0C4A6E;
     --color-text:           #F1F5F9;
     --color-text-2:         #CBD5E1;
-    --color-text-muted:     #64748B;
+    --color-text-muted:     #8191a3;
     --color-bg:             #0F172A;
     --color-bg-2:           #1E293B;
     --color-bg-card:        #1E293B;

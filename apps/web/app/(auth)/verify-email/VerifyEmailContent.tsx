@@ -51,8 +51,8 @@ export function VerifyEmailContent() {
     if (status === 'verifying') {
       return (
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-[var(--brand-primary)]" />
-          <p className="mt-4 text-gray-600">Verifying your email...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border-light border-t-[var(--brand-primary)]" />
+          <p className="mt-4 text-text-2">Verifying your email...</p>
         </div>
       );
     }
@@ -66,7 +66,7 @@ export function VerifyEmailContent() {
             </svg>
           </div>
           <h1 className="mt-6 font-heading text-3xl font-extrabold">Email Verified</h1>
-          <p className="mt-4 text-gray-600">Your email has been verified. You can now log in.</p>
+          <p className="mt-4 text-text-2">Your email has been verified. You can now log in.</p>
           <Link
             href="/login"
             className="mt-6 inline-block rounded-btn bg-primary px-6 py-3 text-[13px] font-bold text-white"
@@ -86,7 +86,7 @@ export function VerifyEmailContent() {
             </svg>
           </div>
           <h1 className="mt-6 font-heading text-3xl font-extrabold">Verification Failed</h1>
-          <p className="mt-4 text-gray-600">
+          <p className="mt-4 text-text-2">
             This link may have expired or already been used.
           </p>
           <Link
@@ -107,12 +107,12 @@ export function VerifyEmailContent() {
         <span className="text-3xl text-brand-primary">&#9993;</span>
       </div>
       <h1 className="mt-6 font-heading text-3xl font-extrabold">Check Your Email</h1>
-      <p className="mt-4 text-gray-600">
+      <p className="mt-4 text-text-2">
         {email
           ? `We've sent a verification link to ${email}. Click the link to verify your account.`
           : 'We have sent a verification link to your email address. Click the link to verify your account and get started.'}
       </p>
-      <p className="mt-6 text-sm text-gray-500">
+      <p className="mt-6 text-sm text-text-2">
         Did not receive the email? Check your spam folder or{' '}
         <button
           onClick={handleResend}

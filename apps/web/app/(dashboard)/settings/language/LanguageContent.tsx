@@ -53,7 +53,7 @@ export default function LanguageContent() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-sm text-gray-500">Loading preferences...</div>;
+    return <div className="flex items-center justify-center py-12 text-sm text-text-2">Loading preferences...</div>;
   }
 
   return (
@@ -65,12 +65,12 @@ export default function LanguageContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Language */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Language</h2>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="mt-4 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.value} value={lang.value}>
@@ -81,12 +81,12 @@ export default function LanguageContent() {
         </div>
 
         {/* Currency */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Currency</h2>
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="mt-4 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
           >
             {CURRENCIES.map((cur) => (
               <option key={cur.value} value={cur.value}>

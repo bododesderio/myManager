@@ -127,8 +127,8 @@ export function SeoContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="h-40 animate-pulse rounded-brand bg-gray-100" />
+        <div className="h-8 w-48 animate-pulse rounded bg-border" />
+        <div className="h-40 animate-pulse rounded-brand bg-bg-2" />
       </div>
     );
   }
@@ -138,35 +138,35 @@ export function SeoContent() {
       <h1 className="font-heading text-2xl font-bold">SEO Management</h1>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Global SEO Settings</h2>
           <div className="mt-4 space-y-4">
             <div>
-              <label htmlFor="seoTitle" className="block text-sm font-medium text-gray-700">Default Title</label>
-              <input id="seoTitle" type="text" value={globalSeo.title} onChange={(e) => updateGlobal('title', e.target.value)} className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none" />
+              <label htmlFor="seoTitle" className="block text-sm font-medium text-text-2">Default Title</label>
+              <input id="seoTitle" type="text" value={globalSeo.title} onChange={(e) => updateGlobal('title', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none" />
             </div>
             <div>
-              <label htmlFor="seoDesc" className="block text-sm font-medium text-gray-700">Default Description</label>
-              <textarea id="seoDesc" rows={3} value={globalSeo.description} onChange={(e) => updateGlobal('description', e.target.value)} className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none" />
+              <label htmlFor="seoDesc" className="block text-sm font-medium text-text-2">Default Description</label>
+              <textarea id="seoDesc" rows={3} value={globalSeo.description} onChange={(e) => updateGlobal('description', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none" />
             </div>
             <div>
-              <label htmlFor="seoKeywords" className="block text-sm font-medium text-gray-700">Keywords</label>
-              <input id="seoKeywords" type="text" value={globalSeo.keywords} onChange={(e) => updateGlobal('keywords', e.target.value)} className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none" />
+              <label htmlFor="seoKeywords" className="block text-sm font-medium text-text-2">Keywords</label>
+              <input id="seoKeywords" type="text" value={globalSeo.keywords} onChange={(e) => updateGlobal('keywords', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">OG Image</label>
+              <label className="block text-sm font-medium text-text-2">OG Image</label>
               <FileUpload
                 value={globalSeo.ogImage}
                 onChange={(url) => updateGlobal('ogImage', url)}
                 accept="image/*"
               />
               {globalSeo.ogImage && (
-                <p className="mt-1 text-xs text-gray-500 truncate">{globalSeo.ogImage}</p>
+                <p className="mt-1 text-xs text-text-2 truncate">{globalSeo.ogImage}</p>
               )}
             </div>
             <div>
-              <label htmlFor="canonicalUrl" className="block text-sm font-medium text-gray-700">Canonical URL</label>
-              <input id="canonicalUrl" type="text" value={globalSeo.canonicalUrl} onChange={(e) => updateGlobal('canonicalUrl', e.target.value)} className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 focus:border-brand-primary focus:outline-none" />
+              <label htmlFor="canonicalUrl" className="block text-sm font-medium text-text-2">Canonical URL</label>
+              <input id="canonicalUrl" type="text" value={globalSeo.canonicalUrl} onChange={(e) => updateGlobal('canonicalUrl', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none" />
             </div>
           </div>
           <button
@@ -178,7 +178,7 @@ export function SeoContent() {
           </button>
         </div>
 
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Page-Specific SEO</h2>
           <div className="mt-4 space-y-3">
             {pages.map((page) => (
@@ -195,36 +195,36 @@ export function SeoContent() {
                 {editingPage === page.slug && (
                   <div className="ml-4 mt-2 space-y-3 border-l-2 border-brand-primary pb-2 pl-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700">Page Title</label>
+                      <label className="block text-xs font-medium text-text-2">Page Title</label>
                       <input
                         type="text"
                         value={page.meta_title ?? ''}
                         onChange={(e) => updatePageSeo(page.slug, 'meta_title', e.target.value)}
                         placeholder="Override default title"
-                        className="mt-1 block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700">Page Description</label>
+                      <label className="block text-xs font-medium text-text-2">Page Description</label>
                       <textarea
                         rows={2}
                         value={page.meta_desc ?? ''}
                         onChange={(e) => updatePageSeo(page.slug, 'meta_desc', e.target.value)}
                         placeholder="Override default description"
-                        className="mt-1 block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700">OG Image</label>
+                      <label className="block text-xs font-medium text-text-2">OG Image</label>
                       <input
                         type="text"
                         value={page.og_image ?? ''}
                         onChange={(e) => updatePageSeo(page.slug, 'og_image', e.target.value)}
                         placeholder="https://..."
-                        className="mt-1 block w-full rounded-brand border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
+                        className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-brand-primary focus:outline-none"
                       />
                     </div>
-                    <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <label className="flex items-center gap-2 text-sm text-text-2">
                       <input
                         type="checkbox"
                         checked={page.is_published}

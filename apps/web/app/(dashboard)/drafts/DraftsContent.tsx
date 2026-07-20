@@ -11,7 +11,7 @@ const PLATFORM_BADGES: Record<string, string> = {
   instagram: 'bg-pink-100 text-pink-700',
   facebook: 'bg-blue-100 text-blue-700',
   linkedin: 'bg-blue-100 text-blue-800',
-  tiktok: 'bg-gray-100 text-gray-800',
+  tiktok: 'bg-bg-2 text-text',
   youtube: 'bg-red-100 text-red-700',
 };
 
@@ -60,7 +60,7 @@ export function DraftsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold">Drafts</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your saved draft posts.</p>
+          <p className="mt-1 text-sm text-text-2">Manage your saved draft posts.</p>
         </div>
         <Link
           href="/compose"
@@ -73,14 +73,14 @@ export function DraftsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={3} />
       ) : drafts.length === 0 ? (
-        <div className="rounded-brand border bg-white py-16 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
+            <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="font-heading text-lg font-semibold text-gray-900">No drafts yet</h3>
-          <p className="mt-1 text-sm text-gray-500">Start creating content and save drafts along the way.</p>
+          <h3 className="font-heading text-lg font-semibold text-text">No drafts yet</h3>
+          <p className="mt-1 text-sm text-text-2">Start creating content and save drafts along the way.</p>
           <Link
             href="/compose"
             className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
@@ -89,7 +89,7 @@ export function DraftsContent() {
           </Link>
         </div>
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <div className="divide-y">
             {drafts.map((draft: any) => {
               const caption = draft.caption || draft.title || 'Untitled draft';
@@ -99,10 +99,10 @@ export function DraftsContent() {
               return (
                 <div
                   key={draft.id}
-                  className="flex items-center justify-between px-6 py-4 hover:bg-gray-50"
+                  className="flex items-center justify-between px-6 py-4 hover:bg-bg-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-gray-900">
+                    <p className="truncate font-medium text-text">
                       {caption.length > 80 ? caption.slice(0, 80) + '...' : caption}
                     </p>
                     <div className="mt-1 flex items-center gap-3">
@@ -111,7 +111,7 @@ export function DraftsContent() {
                           {platforms.map((p: string) => (
                             <span
                               key={p}
-                              className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium capitalize ${PLATFORM_BADGES[p] || 'bg-gray-100 text-gray-600'}`}
+                              className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium capitalize ${PLATFORM_BADGES[p] || 'bg-bg-2 text-text-2'}`}
                             >
                               {p}
                             </span>
@@ -119,7 +119,7 @@ export function DraftsContent() {
                         </div>
                       )}
                       {updatedAt && (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-text-2">
                           Last edited {formatRelativeDate(updatedAt)}
                         </span>
                       )}
@@ -149,9 +149,9 @@ export function DraftsContent() {
       {/* Delete confirmation modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-brand bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-brand bg-bg p-6 shadow-lg">
             <h3 className="font-heading text-lg font-semibold">Delete Draft</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-text-2">
               Are you sure you want to delete this draft? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-3">

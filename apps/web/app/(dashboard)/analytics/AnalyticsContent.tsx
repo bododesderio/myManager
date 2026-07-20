@@ -49,14 +49,14 @@ export function AnalyticsContent() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-bold">Analytics Overview</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-text-2">
           Track performance across all connected platforms.
         </p>
       </div>
 
       {/* Date range picker + nav links */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           From
           <input
             type="date"
@@ -65,7 +65,7 @@ export function AnalyticsContent() {
             className="rounded-brand border px-3 py-1.5 text-sm"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-text-2">
           To
           <input
             type="date"
@@ -111,8 +111,8 @@ export function AnalyticsContent() {
               value: stats?.engagementRate != null ? `${stats.engagementRate}%` : '-',
             },
           ].map((metric) => (
-            <div key={metric.label} className="rounded-brand border bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">{metric.label}</p>
+            <div key={metric.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+              <p className="text-sm text-text-2">{metric.label}</p>
               <p className="mt-1 text-2xl font-bold">
                 {typeof metric.value === 'number'
                   ? metric.value.toLocaleString()
@@ -124,11 +124,11 @@ export function AnalyticsContent() {
       )}
 
       {/* Time-series chart */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Engagement Over Time</h2>
         {daily.isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
-            <div className="h-full w-full animate-pulse rounded bg-gray-100" />
+            <div className="h-full w-full animate-pulse rounded bg-bg-2" />
           </div>
         ) : dailyData.length > 0 ? (
           <div className="mt-4 h-64">
@@ -156,12 +156,12 @@ export function AnalyticsContent() {
             </ResponsiveContainer>
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-400">No daily data available for this range.</p>
+          <p className="mt-4 text-sm text-text-muted">No daily data available for this range.</p>
         )}
       </div>
 
       {/* Top posts table */}
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Top Posts</h2>
         {topPosts.isLoading ? (
           <div className="mt-4">
@@ -176,10 +176,10 @@ export function AnalyticsContent() {
           </div>
         ) : topPostsData.length > 0 ? (
           <div className="mt-4 overflow-x-auto">
-            <p className="mb-2 text-xs text-gray-400 sm:hidden">← Scroll to see all columns →</p>
+            <p className="mb-2 text-xs text-text-muted sm:hidden">← Scroll to see all columns →</p>
             <table className="w-full min-w-[480px] text-left text-sm">
               <thead>
-                <tr className="border-b text-gray-500">
+                <tr className="border-b text-text-2">
                   <th className="pb-2 pr-4 font-medium">Post</th>
                   <th className="pb-2 pr-4 font-medium">Platform</th>
                   <th className="pb-2 pr-4 font-medium">Impressions</th>
@@ -192,7 +192,7 @@ export function AnalyticsContent() {
                     <td className="py-3 pr-4 font-medium">
                       {(post.caption as string)?.slice(0, 60) ?? `Post #${post.id}`}
                     </td>
-                    <td className="py-3 pr-4 text-gray-500">{post.platform as string}</td>
+                    <td className="py-3 pr-4 text-text-2">{post.platform as string}</td>
                     <td className="py-3 pr-4">{(post.impressions as number)?.toLocaleString()}</td>
                     <td className="py-3">{(post.engagements as number)?.toLocaleString()}</td>
                   </tr>
@@ -201,7 +201,7 @@ export function AnalyticsContent() {
             </table>
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-400">No top posts for this range.</p>
+          <p className="mt-4 text-sm text-text-muted">No top posts for this range.</p>
         )}
       </div>
 
@@ -211,10 +211,10 @@ export function AnalyticsContent() {
           <Link
             key={platform}
             href={`/analytics/${platform.toLowerCase()}`}
-            className="rounded-brand border bg-white p-5 shadow-sm transition hover:border-brand-primary"
+            className="rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
           >
             <h3 className="font-heading font-semibold">{platform}</h3>
-            <p className="mt-1 text-sm text-gray-500">View detailed {platform} analytics</p>
+            <p className="mt-1 text-sm text-text-2">View detailed {platform} analytics</p>
           </Link>
         ))}
       </div>

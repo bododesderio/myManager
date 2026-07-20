@@ -46,14 +46,14 @@ export default function BrandContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Logo */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Logo</h2>
           <div className="mt-4 flex items-center gap-4">
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-brand border-2 border-dashed border-gray-300 overflow-hidden">
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-brand border-2 border-dashed border-border overflow-hidden">
               {logoUrl ? (
                 <Image src={logoUrl} alt="Logo" fill className="object-contain" unoptimized />
               ) : (
-                <span className="text-xs text-gray-400">Logo</span>
+                <span className="text-xs text-text-muted">Logo</span>
               )}
             </div>
             <div className="flex-1">
@@ -68,11 +68,11 @@ export default function BrandContent() {
         </div>
 
         {/* Colors */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Colors</h2>
           <div className="mt-4 grid grid-cols-3 gap-4">
             <div>
-              <label htmlFor="colorPrimary" className="block text-sm font-medium text-gray-700">Primary</label>
+              <label htmlFor="colorPrimary" className="block text-sm font-medium text-text-2">Primary</label>
               <div className="mt-1 flex items-center gap-2">
                 <input
                   id="colorPrimary"
@@ -85,12 +85,12 @@ export default function BrandContent() {
                   type="text"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm font-mono focus:border-brand-primary focus:outline-none"
+                  className="block w-full rounded-brand border border-border px-3 py-2 text-sm font-mono focus:border-brand-primary focus:outline-none"
                 />
               </div>
             </div>
             <div>
-              <label htmlFor="colorPrimaryDark" className="block text-sm font-medium text-gray-700">Primary Dark</label>
+              <label htmlFor="colorPrimaryDark" className="block text-sm font-medium text-text-2">Primary Dark</label>
               <div className="mt-1 flex items-center gap-2">
                 <input
                   id="colorPrimaryDark"
@@ -103,12 +103,12 @@ export default function BrandContent() {
                   type="text"
                   value={primaryDarkColor}
                   onChange={(e) => setPrimaryDarkColor(e.target.value)}
-                  className="block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm font-mono focus:border-brand-primary focus:outline-none"
+                  className="block w-full rounded-brand border border-border px-3 py-2 text-sm font-mono focus:border-brand-primary focus:outline-none"
                 />
               </div>
             </div>
             <div>
-              <label htmlFor="colorAccent" className="block text-sm font-medium text-gray-700">Accent</label>
+              <label htmlFor="colorAccent" className="block text-sm font-medium text-text-2">Accent</label>
               <div className="mt-1 flex items-center gap-2">
                 <input
                   id="colorAccent"
@@ -121,7 +121,7 @@ export default function BrandContent() {
                   type="text"
                   value={accentColor}
                   onChange={(e) => setAccentColor(e.target.value)}
-                  className="block w-full rounded-brand border border-gray-300 px-3 py-2 text-sm font-mono focus:border-brand-primary focus:outline-none"
+                  className="block w-full rounded-brand border border-border px-3 py-2 text-sm font-mono focus:border-brand-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -129,16 +129,16 @@ export default function BrandContent() {
         </div>
 
         {/* Typography */}
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Typography</h2>
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="headingFont" className="block text-sm font-medium text-gray-700">Heading Font</label>
+              <label htmlFor="headingFont" className="block text-sm font-medium text-text-2">Heading Font</label>
               <select
                 id="headingFont"
                 value={headingFont}
                 onChange={(e) => setHeadingFont(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
               >
                 <option>Inter</option>
                 <option>Poppins</option>
@@ -148,12 +148,12 @@ export default function BrandContent() {
               </select>
             </div>
             <div>
-              <label htmlFor="bodyFont" className="block text-sm font-medium text-gray-700">Body Font</label>
+              <label htmlFor="bodyFont" className="block text-sm font-medium text-text-2">Body Font</label>
               <select
                 id="bodyFont"
                 value={bodyFont}
                 onChange={(e) => setBodyFont(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-gray-300 px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
               >
                 <option>Inter</option>
                 <option>Open Sans</option>

@@ -22,7 +22,7 @@ export function ApiHealthContent() {
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">API Health Monitor</h1>
         {dataUpdatedAt > 0 && (
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-text-muted">
             Updated {new Date(dataUpdatedAt).toLocaleTimeString()} (auto-refreshes every 30s)
           </span>
         )}
@@ -30,20 +30,20 @@ export function ApiHealthContent() {
 
       {health?.uptime != null && (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Uptime</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Uptime</p>
             <p className="mt-1 text-2xl font-bold">{health.uptime}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Response Time</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Response Time</p>
             <p className="mt-1 text-2xl font-bold">{health.responseTime ?? '--'}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Status</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Status</p>
             <p className="mt-1 text-2xl font-bold">
               <span
                 className={`rounded-full px-3 py-1 text-sm font-medium ${
-                  statusStyles[health.status] ?? 'bg-gray-100 text-gray-800'
+                  statusStyles[health.status] ?? 'bg-bg-2 text-text'
                 }`}
               >
                 {health.status}
@@ -56,10 +56,10 @@ export function ApiHealthContent() {
       {isLoading ? (
         <TableSkeleton rows={8} cols={4} />
       ) : (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Service / Platform API</th>
                 <th className="px-6 py-3 font-medium">Status</th>
                 <th className="px-6 py-3 font-medium">Latency</th>
@@ -69,25 +69,25 @@ export function ApiHealthContent() {
             <tbody className="divide-y">
               {services.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-text-2">
                     No service data available.
                   </td>
                 </tr>
               ) : (
                 services.map((svc) => (
-                  <tr key={svc.name} className="hover:bg-gray-50">
+                  <tr key={svc.name} className="hover:bg-bg-2">
                     <td className="px-6 py-4 font-medium">{svc.name}</td>
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          statusStyles[svc.status] ?? 'bg-gray-100 text-gray-800'
+                          statusStyles[svc.status] ?? 'bg-bg-2 text-text'
                         }`}
                       >
                         {svc.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">{svc.latency}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{svc.lastCheck}</td>
+                    <td className="px-6 py-4 text-sm text-text-2">{svc.lastCheck}</td>
                   </tr>
                 ))
               )}

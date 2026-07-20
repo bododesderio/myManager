@@ -36,8 +36,8 @@ export function ProjectDetailContent({ id }: { id: string }) {
       {/* Header */}
       {projectLoading ? (
         <div className="animate-pulse space-y-3">
-          <div className="h-7 w-64 rounded bg-gray-200" />
-          <div className="h-4 w-40 rounded bg-gray-200" />
+          <div className="h-7 w-64 rounded bg-border" />
+          <div className="h-4 w-40 rounded bg-border" />
         </div>
       ) : (
         <div className="flex items-center justify-between">
@@ -46,7 +46,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
               {project.name || `Project #${id}`}
             </h1>
             {project.description && (
-              <p className="mt-1 text-sm text-gray-500">{project.description}</p>
+              <p className="mt-1 text-sm text-text-2">{project.description}</p>
             )}
           </div>
           <div className="flex gap-2">
@@ -75,16 +75,16 @@ export function ProjectDetailContent({ id }: { id: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Connected Accounts</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Connected Accounts</p>
             <p className="mt-1 text-2xl font-bold">{project.accountCount ?? project.accounts ?? 0}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Team Members</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Team Members</p>
             <p className="mt-1 text-2xl font-bold">{members.length}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Posts</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Posts</p>
             <p className="mt-1 text-2xl font-bold">{posts.length}</p>
           </div>
         </div>
@@ -99,7 +99,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
             className={`px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
                 ? 'border-b-2 border-brand-primary text-brand-primary'
-                : 'text-gray-500 hover:text-gray-800'
+                : 'text-text-2 hover:text-text'
             }`}
           >
             {tab.label}
@@ -109,25 +109,25 @@ export function ProjectDetailContent({ id }: { id: string }) {
 
       {/* Tab content */}
       {activeTab === 'overview' && (
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Recent Activity</h2>
           {postsLoading ? (
             <div className="mt-4">
               <TableSkeleton rows={3} cols={2} />
             </div>
           ) : posts.length === 0 ? (
-            <p className="mt-4 text-sm text-gray-500">No recent activity for this project.</p>
+            <p className="mt-4 text-sm text-text-2">No recent activity for this project.</p>
           ) : (
             <div className="mt-4 divide-y">
               {posts.slice(0, 5).map((post: any) => (
                 <div key={post.id} className="flex items-center justify-between py-3">
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-text">
                       {(post.caption || post.title || 'Untitled').slice(0, 60)}
                     </p>
-                    <p className="text-sm text-gray-500">{post.status || 'draft'}</p>
+                    <p className="text-sm text-text-2">{post.status || 'draft'}</p>
                   </div>
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm text-text-muted">
                     {post.createdAt || post.created_at || ''}
                   </span>
                 </div>
@@ -138,15 +138,15 @@ export function ProjectDetailContent({ id }: { id: string }) {
       )}
 
       {activeTab === 'members' && (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           {membersLoading ? (
             <TableSkeleton rows={4} cols={3} />
           ) : members.length === 0 ? (
-            <div className="p-6 text-center text-sm text-gray-500">No members found.</div>
+            <div className="p-6 text-center text-sm text-text-2">No members found.</div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b text-left text-sm text-gray-500">
+                <tr className="border-b text-left text-sm text-text-2">
                   <th className="px-6 py-3 font-medium">Member</th>
                   <th className="px-6 py-3 font-medium">Role</th>
                   <th className="px-6 py-3 font-medium">Joined</th>
@@ -154,13 +154,13 @@ export function ProjectDetailContent({ id }: { id: string }) {
               </thead>
               <tbody className="divide-y">
                 {members.map((member: any) => (
-                  <tr key={member.id || member.email} className="hover:bg-gray-50">
+                  <tr key={member.id || member.email} className="hover:bg-bg-2">
                     <td className="px-6 py-4">
                       <p className="font-medium">{member.name || member.email}</p>
-                      {member.name && <p className="text-sm text-gray-500">{member.email}</p>}
+                      {member.name && <p className="text-sm text-text-2">{member.email}</p>}
                     </td>
                     <td className="px-6 py-4 text-sm capitalize">{member.role || '—'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-text-2">
                       {member.joinedAt || member.joined_at || member.createdAt || '—'}
                     </td>
                   </tr>
@@ -172,20 +172,20 @@ export function ProjectDetailContent({ id }: { id: string }) {
       )}
 
       {activeTab === 'posts' && (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           {postsLoading ? (
             <TableSkeleton rows={5} cols={3} />
           ) : posts.length === 0 ? (
-            <div className="p-6 text-center text-sm text-gray-500">No posts for this project.</div>
+            <div className="p-6 text-center text-sm text-text-2">No posts for this project.</div>
           ) : (
             <div className="divide-y">
               {posts.map((post: any) => (
-                <div key={post.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
+                <div key={post.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-gray-900">
+                    <p className="truncate font-medium text-text">
                       {(post.caption || post.title || 'Untitled').slice(0, 80)}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">{post.status || 'draft'}</p>
+                    <p className="mt-1 text-sm text-text-2">{post.status || 'draft'}</p>
                   </div>
                   <Link
                     href={`/compose?postId=${post.id}`}

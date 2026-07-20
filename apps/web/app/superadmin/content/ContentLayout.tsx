@@ -42,7 +42,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
         <nav className="sticky top-24 space-y-6">
           {navSections.map((section) => (
             <div key={section.label}>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
                 {section.label}
               </h3>
               <ul className="space-y-0.5">
@@ -56,7 +56,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
                         className={`block rounded-md px-3 py-1.5 text-sm transition ${
                           isActive
                             ? 'bg-brand-primary/10 font-semibold text-brand-primary'
-                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                            : 'text-text-2 hover:bg-bg-2 hover:text-text'
                         }`}
                       >
                         {item.label}

@@ -27,7 +27,7 @@ export function QueueContent() {
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">Queue Monitor</h1>
         {dataUpdatedAt > 0 && (
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-text-muted">
             Updated {new Date(dataUpdatedAt).toLocaleTimeString()} (auto-refreshes every 10s)
           </span>
         )}
@@ -37,20 +37,20 @@ export function QueueContent() {
         <StatCardSkeletonGrid count={4} />
       ) : (
         <div className="grid gap-4 md:grid-cols-4">
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Waiting</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Waiting</p>
             <p className="mt-1 text-2xl font-bold text-yellow-600">{totals.waiting}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Active</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Active</p>
             <p className="mt-1 text-2xl font-bold text-blue-600">{totals.active}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Completed (24h)</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Completed (24h)</p>
             <p className="mt-1 text-2xl font-bold text-green-600">{totals.completed.toLocaleString()}</p>
           </div>
-          <div className="rounded-brand border bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">Failed (24h)</p>
+          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+            <p className="text-sm text-text-2">Failed (24h)</p>
             <p className="mt-1 text-2xl font-bold text-red-600">{totals.failed}</p>
           </div>
         </div>
@@ -59,11 +59,11 @@ export function QueueContent() {
       {isLoading ? (
         <TableSkeleton rows={4} cols={5} />
       ) : queues.length > 0 ? (
-        <div className="rounded-brand border bg-white shadow-sm">
+        <div className="rounded-brand border bg-bg shadow-sm">
           <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Queues</h2>
           <table className="w-full">
             <thead>
-              <tr className="border-b text-left text-sm text-gray-500">
+              <tr className="border-b text-left text-sm text-text-2">
                 <th className="px-6 py-3 font-medium">Queue</th>
                 <th className="px-6 py-3 font-medium">Waiting</th>
                 <th className="px-6 py-3 font-medium">Active</th>
@@ -73,7 +73,7 @@ export function QueueContent() {
             </thead>
             <tbody className="divide-y">
               {queues.map((q) => (
-                <tr key={q.name} className="hover:bg-gray-50">
+                <tr key={q.name} className="hover:bg-bg-2">
                   <td className="px-6 py-4 font-medium">{q.name}</td>
                   <td className="px-6 py-4 text-sm text-yellow-600">{q.waiting}</td>
                   <td className="px-6 py-4 text-sm text-blue-600">{q.active}</td>
@@ -87,23 +87,23 @@ export function QueueContent() {
       ) : null}
 
       {jobs.length > 0 && (
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Active Jobs</h2>
           <div className="mt-4 space-y-3">
             {jobs.map((job) => (
               <div key={job.id} className="flex items-center justify-between rounded-brand border px-4 py-3">
                 <div>
                   <span className="text-sm font-medium">{job.name}</span>
-                  <span className="ml-2 text-xs text-gray-400">{job.queue}</span>
+                  <span className="ml-2 text-xs text-text-muted">{job.queue}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-24 rounded-full bg-gray-200">
+                  <div className="h-2 w-24 rounded-full bg-border">
                     <div
                       className={`h-2 rounded-full bg-brand-primary ${styles.progressFill}`}
                       style={{ ['--progress' as string]: `${job.progress}%` } as React.CSSProperties}
                     />
                   </div>
-                  <span className="text-xs text-gray-500">{job.progress}%</span>
+                  <span className="text-xs text-text-2">{job.progress}%</span>
                 </div>
               </div>
             ))}

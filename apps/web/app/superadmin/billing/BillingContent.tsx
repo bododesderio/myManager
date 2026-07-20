@@ -49,8 +49,8 @@ export function BillingContent() {
       ) : (
         <div className="grid gap-4 md:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="rounded-brand border bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">{stat.label}</p>
+            <div key={stat.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+              <p className="text-sm text-text-2">{stat.label}</p>
               <p className="mt-1 text-2xl font-bold">{stat.value}</p>
             </div>
           ))}
@@ -58,14 +58,14 @@ export function BillingContent() {
       )}
 
       {planBreakdown.length > 0 && (
-        <div className="rounded-brand border bg-white p-6 shadow-sm">
+        <div className="rounded-brand border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Subscriptions by Plan</h2>
           <div className="mt-4 space-y-3">
             {planBreakdown.map((item) => (
               <div key={item.plan} className="flex items-center justify-between text-sm">
                 <span className="font-medium">{item.plan}</span>
                 <div className="flex gap-6">
-                  <span className="text-gray-500">{item.count} subs</span>
+                  <span className="text-text-2">{item.count} subs</span>
                   <span className="font-medium">${item.revenue.toLocaleString()}/mo</span>
                 </div>
               </div>
@@ -74,7 +74,7 @@ export function BillingContent() {
         </div>
       )}
 
-      <div className="rounded-brand border bg-white p-6 shadow-sm">
+      <div className="rounded-brand border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Recent Transactions</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -94,13 +94,13 @@ export function BillingContent() {
                   >
                     {tx.status}
                   </span>
-                  <span className="text-gray-500">{new Date(tx.date).toLocaleDateString()}</span>
+                  <span className="text-text-2">{new Date(tx.date).toLocaleDateString()}</span>
                 </div>
               ),
             )}
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-500">Payment transactions and invoices will appear here.</p>
+          <p className="mt-4 text-sm text-text-2">Payment transactions and invoices will appear here.</p>
         )}
       </div>
     </div>
