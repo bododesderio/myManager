@@ -29,29 +29,36 @@ export class ApiKeysService {
     return { id: apiKey.id, name: apiKey.name, key: rawKey, keyPrefix, scopes: data.scopes, message: 'Store this key securely. It will not be shown again.' };
   }
 
-  async getById(id: string) {
-    const key = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const key = await this.repository.findById(id, workspaceId);
     if (!key) throw new NotFoundException('API key not found');
     const { key_hash: _key_hash, ...rest } = key;
     return rest;
   }
 
-  async update(id: string, data: { name?: string; scopes?: string[] }) { return this.repository.update(id, data); }
+  async update(id: string, workspaceId: string, data: { name?: string; scopes?: string[] }) {
+    const updated = await this.repository.update(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose — a cross-workspace id must
+    // not be confirmed as existing.
+    if (!updated) throw new NotFoundException('API key not found');
+    return updated;
+  }
 
-  async revoke(id: string) {
-    await this.repository.update(id, { is_active: false });
+  async revoke(id: string, workspaceId: string) {
+    const revoked = await this.repository.update(id, workspaceId, { is_active: false });
+    if (!revoked) throw new NotFoundException('API key not found');
     return { message: 'API key revoked' };
   }
 
-  async rotate(id: string) {
-    const existing = await this.repository.findById(id);
+  async rotate(id: string, workspaceId: string) {
+    const existing = await this.repository.findById(id, workspaceId);
     if (!existing) throw new NotFoundException('API key not found');
 
     const rawKey = `mm_${crypto.randomBytes(32).toString('hex')}`;
     const keyPrefix = rawKey.substring(0, 10);
     const keyHash = await bcrypt.hash(rawKey, 12);
 
-    await this.repository.update(id, { key_hash: keyHash, key_prefix: keyPrefix });
+    await this.repository.update(id, workspaceId, { key_hash: keyHash, key_prefix: keyPrefix });
     return { id, key: rawKey, keyPrefix, message: 'Store this key securely. It will not be shown again.' };
   }
 

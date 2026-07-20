@@ -121,8 +121,8 @@ export class MediaService {
     return { uploadUrl, mediaId: mediaAsset.id, r2Key: fileKey };
   }
 
-  async confirmUpload(mediaId: string, r2Key: string) {
-    const asset = await this.repository.findById(mediaId);
+  async confirmUpload(mediaId: string, workspaceId: string, r2Key: string) {
+    const asset = await this.repository.findById(mediaId, workspaceId);
     if (!asset) throw new NotFoundException('Media asset not found');
 
     await this.mediaQueue.add('process', {
@@ -137,14 +137,14 @@ export class MediaService {
     return { message: 'Upload confirmed, processing started', mediaId };
   }
 
-  async getById(id: string) {
-    const asset = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const asset = await this.repository.findById(id, workspaceId);
     if (!asset) throw new NotFoundException('Media asset not found');
     return asset;
   }
 
-  async delete(id: string) {
-    const asset = await this.repository.findById(id);
+  async delete(id: string, workspaceId: string) {
+    const asset = await this.repository.findById(id, workspaceId);
     if (!asset) throw new NotFoundException('Media asset not found');
 
     if (this.useLocalStorage) {
@@ -159,12 +159,14 @@ export class MediaService {
       }));
     }
 
-    await this.repository.delete(id);
+    await this.repository.delete(id, workspaceId);
     return { message: 'Media asset deleted' };
   }
 
-  async bulkDelete(mediaIds: string[]) {
-    const assets = await this.repository.findByIds(mediaIds);
+  async bulkDelete(mediaIds: string[], workspaceId: string) {
+    // Scoped fetch: only assets in this workspace are returned, so the storage
+    // deletes below can never touch another tenant's objects.
+    const assets = await this.repository.findByIds(mediaIds, workspaceId);
     for (const asset of assets) {
       if (this.useLocalStorage) {
         const localFilePath = path.join(this.localStoragePath, asset.r2_key);
@@ -178,12 +180,14 @@ export class MediaService {
         }));
       }
     }
-    await this.repository.bulkDelete(mediaIds);
-    return { deleted: mediaIds.length };
+    const result = await this.repository.bulkDelete(mediaIds, workspaceId);
+    // Report what was actually deleted, not what was requested — ids belonging
+    // to another workspace are silently skipped, not counted.
+    return { deleted: result.count };
   }
 
-  async getVariants(id: string) {
-    const asset = await this.repository.findById(id);
+  async getVariants(id: string, workspaceId: string) {
+    const asset = await this.repository.findById(id, workspaceId);
     if (!asset) throw new NotFoundException('Media asset not found');
     return asset.variants || [];
   }

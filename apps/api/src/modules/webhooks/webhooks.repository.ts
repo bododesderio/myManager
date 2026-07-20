@@ -13,8 +13,12 @@ export class WebhooksRepository {
     });
   }
 
-  async findById(id: string) {
-    return this.prisma.webhookEndpoint.findUnique({ where: { id } });
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.webhookEndpoint.findFirst({
+      where: { id, workspace_id: workspaceId },
+    });
   }
 
   async create(data: {
@@ -27,17 +31,27 @@ export class WebhooksRepository {
     return this.prisma.webhookEndpoint.create({ data });
   }
 
-  async update(id: string, data: {
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: {
     url?: string;
     events?: string[];
     secret?: string;
     is_active?: boolean;
   }) {
-    return this.prisma.webhookEndpoint.update({ where: { id }, data });
+    const result = await this.prisma.webhookEndpoint.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
-  async delete(id: string) {
-    return this.prisma.webhookEndpoint.delete({ where: { id } });
+  /** Returns false when the row does not exist *or* belongs to another workspace. */
+  async delete(id: string, workspaceId: string) {
+    const result = await this.prisma.webhookEndpoint.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
   }
 
   async findActiveByWorkspaceAndEvent(workspaceId: string, event: string) {

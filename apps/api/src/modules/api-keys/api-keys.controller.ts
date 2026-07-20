@@ -25,19 +25,25 @@ export class ApiKeysController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get API key details (key itself not returned)' })
-  async getById(@Param('id') id: string) { return this.apiKeysService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.apiKeysService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update API key name or scopes' })
-  async update(@Param('id') id: string, @Body() body: { name?: string; scopes?: string[] }) {
-    return this.apiKeysService.update(id, body);
+  async update(@Param('id') id: string, @Req() req: Request, @Body() body: { name?: string; scopes?: string[] }) {
+    return this.apiKeysService.update(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Revoke an API key' })
-  async revoke(@Param('id') id: string) { return this.apiKeysService.revoke(id); }
+  async revoke(@Param('id') id: string, @Req() req: Request) {
+    return this.apiKeysService.revoke(id, getRequestWorkspaceId(req));
+  }
 
   @Post(':id/rotate')
   @ApiOperation({ summary: 'Rotate an API key (generates new key, invalidates old)' })
-  async rotate(@Param('id') id: string) { return this.apiKeysService.rotate(id); }
+  async rotate(@Param('id') id: string, @Req() req: Request) {
+    return this.apiKeysService.rotate(id, getRequestWorkspaceId(req));
+  }
 }

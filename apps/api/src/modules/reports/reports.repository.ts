@@ -13,20 +13,34 @@ export class ReportsRepository {
     return [reports, total];
   }
 
-  async findById(id: string) {
-    return this.prisma.report.findUnique({ where: { id } });
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.report.findFirst({
+      where: { id, workspace_id: workspaceId },
+    });
   }
 
   async create(data: Record<string, unknown>) {
     return this.prisma.report.create({ data: data as unknown as Parameters<typeof this.prisma.report.create>[0]['data'] });
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    return this.prisma.report.update({ where: { id }, data });
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.report.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
-  async delete(id: string) {
-    return this.prisma.report.delete({ where: { id } });
+  /** Returns false when the row does not exist *or* belongs to another workspace. */
+  async delete(id: string, workspaceId: string) {
+    const result = await this.prisma.report.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
   }
 
   async findConfigs(workspaceId: string) {

@@ -57,15 +57,15 @@ export class WebhooksService {
     return endpoint;
   }
 
-  async getById(id: string) {
-    const endpoint = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const endpoint = await this.repository.findById(id, workspaceId);
     if (!endpoint) throw new NotFoundException('Webhook endpoint not found');
     return endpoint;
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    const endpoint = await this.getById(id);
-    const updated = await this.repository.update(id, {
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const endpoint = await this.getById(id, workspaceId);
+    const updated = await this.repository.update(id, workspaceId, {
       url: typeof data.url === 'string' ? data.url : undefined,
       events: Array.isArray(data.events)
         ? data.events.filter((event): event is string => typeof event === 'string')
@@ -77,6 +77,8 @@ export class WebhooksService {
           ? data.is_active
           : undefined,
     });
+
+    if (!updated) throw new NotFoundException('Webhook endpoint not found');
 
     await this.auditService.log('webhook_endpoint_updated', {
       workspaceId: endpoint.workspace_id,
@@ -92,9 +94,9 @@ export class WebhooksService {
     return updated;
   }
 
-  async deleteEndpoint(id: string) {
-    const endpoint = await this.getById(id);
-    await this.repository.delete(id);
+  async deleteEndpoint(id: string, workspaceId: string) {
+    const endpoint = await this.getById(id, workspaceId);
+    await this.repository.delete(id, workspaceId);
     await this.auditService.log('webhook_endpoint_deleted', {
       workspaceId: endpoint.workspace_id,
       resourceType: 'webhook_endpoint',
@@ -113,8 +115,8 @@ export class WebhooksService {
     };
   }
 
-  async sendTest(endpointId: string) {
-    const endpoint = await this.repository.findById(endpointId);
+  async sendTest(endpointId: string, workspaceId: string) {
+    const endpoint = await this.repository.findById(endpointId, workspaceId);
     if (!endpoint) throw new NotFoundException('Webhook endpoint not found');
 
     const payload = {

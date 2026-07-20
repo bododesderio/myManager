@@ -30,11 +30,15 @@ export class ReportsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get report details and download URL' })
-  async getReport(@Param('id') id: string) { return this.reportsService.getById(id); }
+  async getReport(@Param('id') id: string, @Req() req: Request) {
+    return this.reportsService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a report' })
-  async deleteReport(@Param('id') id: string) { return this.reportsService.delete(id); }
+  async deleteReport(@Param('id') id: string, @Req() req: Request) {
+    return this.reportsService.delete(id, getRequestWorkspaceId(req));
+  }
 
   @Get('configs')
   @ApiOperation({ summary: 'List saved report configurations' })

@@ -40,14 +40,17 @@ export class ReportsService {
     return { message: 'Report generation queued', reportId: report.id };
   }
 
-  async getById(id: string) {
-    const report = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const report = await this.repository.findById(id, workspaceId);
     if (!report) throw new NotFoundException('Report not found');
     return report;
   }
 
-  async delete(id: string) {
-    await this.repository.delete(id);
+  async delete(id: string, workspaceId: string) {
+    const deleted = await this.repository.delete(id, workspaceId);
+    // Indistinguishable from "not found" on purpose — a cross-workspace id must
+    // not be confirmed as existing.
+    if (!deleted) throw new NotFoundException('Report not found');
     return { message: 'Report deleted' };
   }
 

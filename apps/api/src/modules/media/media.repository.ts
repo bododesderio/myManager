@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 
+/** Upper bound on ids accepted in a single bulk media operation. */
+const MAX_BULK_IDS = 500;
+
 @Injectable()
 export class MediaRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -22,12 +25,21 @@ export class MediaRepository {
     return [assets, total];
   }
 
-  async findById(id: string) {
-    return this.prisma.mediaAsset.findUnique({ where: { id } });
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.mediaAsset.findFirst({
+      where: { id, workspace_id: workspaceId },
+    });
   }
 
-  async findByIds(ids: string[]) {
-    return this.prisma.mediaAsset.findMany({ where: { id: { in: ids } } });
+  async findByIds(ids: string[], workspaceId: string) {
+    return this.prisma.mediaAsset.findMany({
+      where: { id: { in: ids }, workspace_id: workspaceId },
+      // Bounded: an unbounded `in` list let a caller fetch an arbitrary number
+      // of rows in one request.
+      take: MAX_BULK_IDS,
+    });
   }
 
   async create(data: {
@@ -42,19 +54,33 @@ export class MediaRepository {
     return this.prisma.mediaAsset.create({ data });
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    return this.prisma.mediaAsset.update({ where: { id }, data });
-  }
-
-  async delete(id: string) {
-    return this.prisma.mediaAsset.delete({
-      where: { id },
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.mediaAsset.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
     });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
-  async bulkDelete(ids: string[]) {
+  /** Returns false when the row does not exist *or* belongs to another workspace. */
+  async delete(id: string, workspaceId: string) {
+    const result = await this.prisma.mediaAsset.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
+  }
+
+  /**
+   * Deletes only rows belonging to `workspaceId`. Previously this deleted by id
+   * alone, so a caller could pass another workspace's media ids and destroy
+   * their assets. Returns the number actually deleted so callers can detect a
+   * partial match rather than assuming all ids were theirs.
+   */
+  async bulkDelete(ids: string[], workspaceId: string) {
     return this.prisma.mediaAsset.deleteMany({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, workspace_id: workspaceId },
     });
   }
 

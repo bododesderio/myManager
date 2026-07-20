@@ -38,8 +38,12 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async findById(id: string) {
-    return this.prisma.socialAccount.findUnique({ where: { id } });
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.socialAccount.findFirst({
+      where: { id, workspace_id: workspaceId },
+    });
   }
 
   async upsert(data: {
@@ -76,8 +80,14 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    return this.prisma.socialAccount.update({ where: { id }, data });
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.socialAccount.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
   async storeOAuthState(state: string, data: Record<string, unknown>) {
