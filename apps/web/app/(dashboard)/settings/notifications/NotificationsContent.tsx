@@ -59,11 +59,11 @@ export default function NotificationsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Notification Settings</h1>
 
-      <div className="max-w-3xl rounded-brand border bg-bg shadow-sm">
+      <div className="max-w-3xl rounded-brand border border-border bg-bg shadow-sm">
         {/* Header row */}
         <div className="flex items-center border-b px-6 py-3">
           <div className="flex-1">
@@ -90,7 +90,7 @@ export default function NotificationsContent() {
                     type="button"
                     onClick={() => toggle(event.id, ch)}
                     className={`relative h-6 w-11 rounded-full transition-colors ${
-                      localPrefs[event.id]?.[ch] ? 'bg-brand-primary' : 'bg-border'
+                      localPrefs[event.id]?.[ch] ? 'bg-primary' : 'bg-border'
                     }`}
                     aria-label={`${event.label} ${CHANNEL_LABELS[ch]}`}
                   >
@@ -110,7 +110,7 @@ export default function NotificationsContent() {
       <button
         onClick={handleSave}
         disabled={updatePrefs.isPending}
-        className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+        className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
       >
         {updatePrefs.isPending ? 'Saving...' : 'Save Preferences'}
       </button>

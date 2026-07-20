@@ -38,7 +38,7 @@ export function BenchmarksContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/analytics" className="text-sm text-brand-primary hover:underline">
+        <Link href="/analytics" className="text-sm text-primary hover:underline">
           &larr; Analytics
         </Link>
       </div>
@@ -58,7 +58,7 @@ export function BenchmarksContent() {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-text-2">
@@ -67,13 +67,13 @@ export function BenchmarksContent() {
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
       </div>
 
       {/* Engagement rate trend chart */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Engagement Rate Trends</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -122,7 +122,7 @@ export function BenchmarksContent() {
           {benchmarks.map((bench: Record<string, unknown>) => {
             const status = (bench.yours as number) >= (bench.industry as number) ? 'above' : 'below';
             return (
-              <div key={bench.metric as string} className="rounded-brand border bg-bg p-5 shadow-sm">
+              <div key={bench.metric as string} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
                 <h3 className="font-heading font-semibold">{bench.metric as string}</h3>
                 <div className="mt-3 flex justify-between">
                   <div>
@@ -155,7 +155,7 @@ export function BenchmarksContent() {
             const industryNum = typeof bench.industry === 'number' ? bench.industry : 0;
             const status = yoursNum >= industryNum ? 'above' : 'below';
             return (
-              <div key={bench.metric} className="rounded-brand border bg-bg p-5 shadow-sm">
+              <div key={bench.metric} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
                 <h3 className="font-heading font-semibold">{bench.metric}</h3>
                 <div className="mt-3 flex justify-between">
                   <div>

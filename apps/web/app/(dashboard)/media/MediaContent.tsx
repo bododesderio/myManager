@@ -111,7 +111,7 @@ export function MediaContent() {
           <button
             onClick={handleUpload}
             disabled={uploadMedia.isPending}
-            className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {uploadMedia.isPending ? 'Uploading...' : 'Upload'}
           </button>
@@ -135,7 +135,7 @@ export function MediaContent() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+          className="flex-1 rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
         <select
           value={typeFilter}
@@ -143,7 +143,7 @@ export function MediaContent() {
             setTypeFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-brand border border-border px-4 py-2 text-sm"
+          className="rounded-brand border border-border border-border px-4 py-2 text-sm"
         >
           {TYPE_FILTERS.map((f) => (
             <option key={f.value} value={f.value}>
@@ -158,19 +158,19 @@ export function MediaContent() {
           {Array.from({ length: 12 }, (_, i) => (
             <div
               key={i}
-              className="aspect-square animate-pulse rounded-brand border bg-bg-2"
+              className="aspect-square animate-pulse rounded-brand border border-border bg-bg-2"
             />
           ))}
         </div>
       ) : isError ? (
-        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load media library. {(error as Error)?.message ?? ''}{' '}
           <button type="button" onClick={() => refetch()} className="ml-1 underline">
             Retry
           </button>
         </div>
       ) : !Array.isArray(mediaItems) || mediaItems.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -180,7 +180,7 @@ export function MediaContent() {
           <p className="mt-1 text-sm text-text-2">Upload your first file to get started.</p>
           <button
             onClick={handleUpload}
-            className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+            className="mt-4 inline-block rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
             Upload Media
           </button>
@@ -197,7 +197,7 @@ export function MediaContent() {
               return (
                 <div
                   key={item.id}
-                  className="group relative aspect-square overflow-hidden rounded-brand border bg-bg-2 transition hover:border-brand-primary"
+                  className="group relative aspect-square overflow-hidden rounded-brand border border-border bg-bg-2 transition hover:border-primary"
                 >
                   {url && isImage ? (
                     <Image
@@ -255,7 +255,7 @@ export function MediaContent() {
               {page > 1 && (
                 <button
                   onClick={() => setPage(page - 1)}
-                  className="rounded-brand border px-3 py-1.5 text-sm transition hover:border-brand-primary"
+                  className="rounded-brand border border-border px-3 py-1.5 text-sm transition hover:border-primary"
                 >
                   Previous
                 </button>
@@ -263,7 +263,7 @@ export function MediaContent() {
               {hasMore && (
                 <button
                   onClick={() => setPage(page + 1)}
-                  className="rounded-brand border px-3 py-1.5 text-sm transition hover:border-brand-primary"
+                  className="rounded-brand border border-border px-3 py-1.5 text-sm transition hover:border-primary"
                 >
                   Load More
                 </button>
@@ -284,7 +284,7 @@ export function MediaContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

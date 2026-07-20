@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import * as Sentry from '@sentry/nextjs';
+import { Button } from '@mymanager/ui';
 
 export default function MarketingError({
   error,
@@ -26,16 +27,12 @@ export default function MarketingError({
       </p>
       {error.digest && <p className="text-xs text-text-muted">Reference: {error.digest}</p>}
       <div className="mt-2 flex gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="rounded-btn bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-        >
+        <Button size="lg" onClick={reset}>
           Try again
-        </button>
+        </Button>
         <Link
           href="/"
-          className="rounded-btn border border-border px-5 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-card"
+          className="rounded-btn border border-border border-border px-5 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-card"
         >
           Back to home
         </Link>

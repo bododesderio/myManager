@@ -140,7 +140,7 @@ export function AuditLogContent() {
           </label>
           <button
             onClick={handleExport}
-            className="rounded-brand border border-border bg-bg px-4 py-2 text-sm font-medium hover:bg-bg-2"
+            className="rounded-brand border border-border border-border bg-bg px-4 py-2 text-sm font-medium hover:bg-bg-2"
           >
             Export CSV
           </button>
@@ -148,7 +148,7 @@ export function AuditLogContent() {
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-wrap items-end gap-3 rounded-brand border bg-bg p-4 shadow-sm">
+      <div className="flex flex-wrap items-end gap-3 rounded-brand border border-border bg-bg p-4 shadow-sm">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-text-2">Action</label>
           <select
@@ -157,7 +157,7 @@ export function AuditLogContent() {
               setAction(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           >
             <option value="">All actions</option>
             {actions.map((a) => (
@@ -178,7 +178,7 @@ export function AuditLogContent() {
               setUserId(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -192,7 +192,7 @@ export function AuditLogContent() {
               setResourceType(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -205,7 +205,7 @@ export function AuditLogContent() {
               setFromDate(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -218,7 +218,7 @@ export function AuditLogContent() {
               setToDate(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -231,7 +231,7 @@ export function AuditLogContent() {
             setToDate('');
             setPage(1);
           }}
-          className="rounded-brand border border-border px-3 py-2 text-sm text-text-2 hover:bg-bg-2"
+          className="rounded-brand border border-border border-border px-3 py-2 text-sm text-text-2 hover:bg-bg-2"
         >
           Clear
         </button>
@@ -241,7 +241,7 @@ export function AuditLogContent() {
       {loading ? (
         <TableSkeleton rows={8} cols={6} />
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -289,7 +289,7 @@ export function AuditLogContent() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded-brand border px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm disabled:opacity-50"
           >
             Previous
           </button>
@@ -299,7 +299,7 @@ export function AuditLogContent() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="rounded-brand border px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm disabled:opacity-50"
           >
             Next
           </button>

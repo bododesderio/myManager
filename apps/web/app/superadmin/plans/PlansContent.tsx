@@ -15,7 +15,7 @@ export function PlansContent() {
         <h1 className="font-heading text-2xl font-bold">Plans</h1>
         <Link
           href="/superadmin/plans/new"
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           Create Plan
         </Link>
@@ -32,7 +32,7 @@ export function PlansContent() {
               <Link
                 key={plan.id}
                 href={`/admin/plans/${plan.id}` as Route}
-                className="rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
+                className="rounded-brand border border-border bg-bg p-5 shadow-sm transition hover:border-primary"
               >
                 <h3 className="font-heading text-lg font-semibold">{plan.name}</h3>
                 <p className="mt-1 text-2xl font-bold">

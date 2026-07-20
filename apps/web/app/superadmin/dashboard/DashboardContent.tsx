@@ -78,7 +78,7 @@ function Card({
   subtitle: string;
 }) {
   return (
-    <div className="rounded-brand border bg-bg p-5 shadow-sm">
+    <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</p>
       <p className="mt-2 text-2xl font-bold text-text">{value}</p>
       <p className="mt-1 text-sm text-text-2">{subtitle}</p>
@@ -152,10 +152,10 @@ export default function DashboardContent() {
           <p className="mt-1 text-sm text-text-2">Live operational view across revenue, users, queues, and content review.</p>
         </div>
         <div className="flex gap-2 text-sm">
-          <Link href={'/admin/queue' as Route} className="rounded-brand border px-4 py-2 text-text-2 transition hover:bg-bg-2">
+          <Link href={'/admin/queue' as Route} className="rounded-brand border border-border px-4 py-2 text-text-2 transition hover:bg-bg-2">
             Queue Monitor
           </Link>
-          <Link href={'/admin/users' as Route} className="rounded-brand bg-brand-primary px-4 py-2 font-semibold text-white transition hover:bg-brand-primary-dark">
+          <Link href={'/admin/users' as Route} className="rounded-brand bg-primary px-4 py-2 font-semibold text-white transition hover:bg-primary-dark">
             Users
           </Link>
         </div>
@@ -190,7 +190,7 @@ export default function DashboardContent() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-brand border bg-bg p-5 shadow-sm xl:col-span-2">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">MRR Trend</h2>
             <span className="text-xs text-text-muted">Last 6 months</span>
@@ -200,7 +200,7 @@ export default function DashboardContent() {
               <div key={row.month} className="flex flex-1 flex-col items-center gap-2">
                 <div className="text-xs text-text-muted">${Math.round(row.mrr).toLocaleString()}</div>
                 <div
-                  className={`w-full rounded-t-md bg-brand-primary/80 ${styles.barFill}`}
+                  className={`w-full rounded-t-md bg-primary/80 ${styles.barFill}`}
                   style={{ ['--bar-height' as string]: `${Math.max((row.mrr / maxMrr) * 100, 6)}%` } as React.CSSProperties}
                 />
                 <div className="text-xs text-text-2">{row.month.slice(5)}</div>
@@ -209,7 +209,7 @@ export default function DashboardContent() {
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Plan Mix</h2>
           <div className="mt-4 space-y-3">
             {planRows.map((row) => (
@@ -224,7 +224,7 @@ export default function DashboardContent() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Infrastructure Health</h2>
           <div className="mt-4 space-y-3">
             {Object.entries(healthChecks).map(([key, value]) => (
@@ -245,7 +245,7 @@ export default function DashboardContent() {
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-5 shadow-sm xl:col-span-2">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm xl:col-span-2">
           <h2 className="font-heading text-lg font-semibold">Queue Summary</h2>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-left text-sm">
@@ -275,7 +275,7 @@ export default function DashboardContent() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Recent Users</h2>
           <div className="mt-4 space-y-3">
             {users.data?.users.map((user) => (
@@ -293,7 +293,7 @@ export default function DashboardContent() {
           </div>
         </div>
 
-        <div className="rounded-brand border bg-bg p-5 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Lead Queue</h2>
           <div className="mt-4 space-y-3">
             {leads.data?.items.map((lead) => (

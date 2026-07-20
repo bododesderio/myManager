@@ -161,7 +161,7 @@ export function NavLinksContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none';
 
   if (loading) {
     return (
@@ -182,12 +182,12 @@ export function NavLinksContent() {
       </div>
 
       {linksByPlacement.map((group) => (
-        <div key={group.key} className="rounded-brand border bg-bg shadow-sm">
+        <div key={group.key} className="rounded-brand border border-border bg-bg shadow-sm">
           <div className="flex items-center justify-between border-b px-6 py-3">
             <h2 className="font-heading text-base font-semibold">{group.label}</h2>
             <button
               onClick={() => openNew(group.key)}
-              className="rounded-brand bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary transition hover:bg-brand-primary/20"
+              className="rounded-brand bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20"
             >
               + Add
             </button>
@@ -240,7 +240,7 @@ export function NavLinksContent() {
                     </button>
                     <button
                       onClick={() => setEditItem({ ...link })}
-                      className="text-xs text-brand-primary hover:underline"
+                      className="text-xs text-primary hover:underline"
                     >
                       Edit
                     </button>
@@ -312,13 +312,13 @@ export function NavLinksContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setEditItem(null)}
-                className="rounded-brand border px-4 py-2 text-sm text-text-2 transition hover:bg-bg-2"
+                className="rounded-brand border border-border px-4 py-2 text-sm text-text-2 transition hover:bg-bg-2"
               >
                 Cancel
               </button>
               <button
                 onClick={() => void saveItem()}
-                className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+                className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
               >
                 Save
               </button>

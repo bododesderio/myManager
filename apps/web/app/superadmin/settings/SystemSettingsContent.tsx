@@ -122,14 +122,14 @@ export function SystemSettingsContent() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-brand bg-brand-primary px-5 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          className="rounded-brand bg-primary px-5 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
 
       {/* Feature toggles */}
-      <div className="rounded-brand border bg-bg shadow-sm">
+      <div className="rounded-brand border border-border bg-bg shadow-sm">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Feature Flags</h2>
         <div className="divide-y">
           {toggles.map(({ key, label, description }) => (
@@ -141,7 +141,7 @@ export function SystemSettingsContent() {
               <button
                 onClick={() => toggleFeature(key)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                  brand?.features[key] ? 'bg-brand-primary' : 'bg-border'
+                  brand?.features[key] ? 'bg-primary' : 'bg-border'
                 }`}
                 role="switch"
                 aria-checked={brand?.features[key] ?? false}
@@ -158,7 +158,7 @@ export function SystemSettingsContent() {
       </div>
 
       {/* Sub-page links */}
-      <div className="rounded-brand border bg-bg shadow-sm">
+      <div className="rounded-brand border border-border bg-bg shadow-sm">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Configuration</h2>
         <div className="divide-y">
           {subPages.map(({ href, label, description }) => (
@@ -168,7 +168,7 @@ export function SystemSettingsContent() {
               className="flex items-center justify-between px-6 py-4 hover:bg-bg-2"
             >
               <div>
-                <p className="font-medium text-brand-primary">{label}</p>
+                <p className="font-medium text-primary">{label}</p>
                 <p className="text-sm text-text-2">{description}</p>
               </div>
               <svg

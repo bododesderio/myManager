@@ -49,10 +49,10 @@ export default function OAuthCallbackPage() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="max-w-sm rounded-brand border bg-bg p-8 text-center shadow-sm">
+      <div className="max-w-sm rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
         {status === 'loading' && (
           <>
-            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             <p className="text-sm text-text-2">{message}</p>
           </>
         )}
@@ -77,7 +77,7 @@ export default function OAuthCallbackPage() {
             <p className="font-semibold text-text">{message}</p>
             <button
               onClick={() => router.push('/settings/accounts')}
-              className="mt-4 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+              className="mt-4 rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
             >
               Back to Accounts
             </button>

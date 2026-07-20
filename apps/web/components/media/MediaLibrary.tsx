@@ -35,12 +35,12 @@ export function MediaLibrary({ items = [], onSelect, selectable = false }: Media
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search media..."
-          className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+          className="flex-1 rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
         />
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value as typeof filter)}
-          className="rounded-brand border border-border px-4 py-2 text-sm"
+          className="rounded-brand border border-border border-border px-4 py-2 text-sm"
         >
           <option value="all">All Types</option>
           <option value="image">Images</option>
@@ -55,7 +55,7 @@ export function MediaLibrary({ items = [], onSelect, selectable = false }: Media
             key={item.id}
             onClick={() => selectable && onSelect?.(item)}
             className={`group relative aspect-square overflow-hidden rounded-brand border bg-bg-2 transition ${
-              selectable ? 'cursor-pointer hover:border-brand-primary' : ''
+              selectable ? 'cursor-pointer hover:border-primary' : ''
             }`}
           >
             <div className="flex h-full items-center justify-center text-xs text-text-muted">

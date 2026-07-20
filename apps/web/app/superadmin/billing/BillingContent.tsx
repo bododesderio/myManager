@@ -31,13 +31,13 @@ export function BillingContent() {
         <div className="flex gap-2">
           <Link
             href="/superadmin/billing/overrides"
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
           >
             Overrides
           </Link>
           <Link
             href="/superadmin/billing/leads"
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
           >
             Leads
           </Link>
@@ -49,7 +49,7 @@ export function BillingContent() {
       ) : (
         <div className="grid gap-4 md:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+            <div key={stat.label} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
               <p className="text-sm text-text-2">{stat.label}</p>
               <p className="mt-1 text-2xl font-bold">{stat.value}</p>
             </div>
@@ -58,7 +58,7 @@ export function BillingContent() {
       )}
 
       {planBreakdown.length > 0 && (
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Subscriptions by Plan</h2>
           <div className="mt-4 space-y-3">
             {planBreakdown.map((item) => (
@@ -74,7 +74,7 @@ export function BillingContent() {
         </div>
       )}
 
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Recent Transactions</h2>
         {isLoading ? (
           <div className="mt-4">

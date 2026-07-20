@@ -145,7 +145,7 @@ export function LoginForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-border rounded-input bg-bg text-text px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              className="w-full border border-border border-border rounded-input bg-bg text-text px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
             />
           </div>
 
@@ -162,7 +162,7 @@ export function LoginForm() {
               required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-border rounded-input bg-bg text-text px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none pr-10"
+                className="w-full border border-border border-border rounded-input bg-bg text-text px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none pr-10"
               />
               <button
                 type="button"
@@ -221,7 +221,7 @@ export function LoginForm() {
                 value={totpCode}
                 onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="Enter 6-digit code"
-                className="w-full border border-border rounded-input bg-bg text-text px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                className="w-full border border-border border-border rounded-input bg-bg text-text px-3 py-2.5 text-[13px] focus:border-primary focus:ring-1 focus:ring-primary outline-none"
               />
               <p className="mt-1 text-[11px] text-text-muted">
                 Use the code from your authenticator app.
@@ -253,7 +253,7 @@ export function LoginForm() {
           aria-disabled="true"
           tabIndex={-1}
           title="Google sign-in is coming soon"
-          className="pointer-events-none w-full border border-border rounded-btn py-2.5 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+          className="pointer-events-none w-full border border-border border-border rounded-btn py-2.5 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />

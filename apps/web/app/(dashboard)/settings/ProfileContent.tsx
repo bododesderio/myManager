@@ -58,7 +58,7 @@ export default function ProfileContent() {
       </div>
 
       {/* Profile form */}
-      <div className="max-w-2xl rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="max-w-2xl rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Profile</h2>
         <div className="mt-4 space-y-4">
           <div>
@@ -68,7 +68,7 @@ export default function ProfileContent() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
           <div>
@@ -78,7 +78,7 @@ export default function ProfileContent() {
               type="email"
               value={(profile as any)?.email ?? ''}
               readOnly
-              className="mt-1 block w-full rounded-brand border border-border-light bg-bg-2 px-4 py-2 text-text-2 cursor-not-allowed"
+              className="mt-1 block w-full rounded-brand border border-border border-border-light bg-bg-2 px-4 py-2 text-text-2 cursor-not-allowed"
             />
             <p className="mt-1 text-xs text-text-muted">Email cannot be changed.</p>
           </div>
@@ -94,7 +94,7 @@ export default function ProfileContent() {
               id="profileTimezone"
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
             >
               <option value="UTC">UTC</option>
               <option value="America/New_York">America/New_York</option>
@@ -112,7 +112,7 @@ export default function ProfileContent() {
         <button
           onClick={handleSave}
           disabled={updateProfile.isPending}
-          className="mt-6 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+          className="mt-6 rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
         >
           {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
         </button>
@@ -126,7 +126,7 @@ export default function ProfileContent() {
             <Link
               key={link.href}
               href={link.href as Route}
-              className="rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary"
+              className="rounded-brand border border-border bg-bg p-5 shadow-sm transition hover:border-primary"
             >
               <h3 className="font-heading font-semibold">{link.label}</h3>
               <p className="mt-1 text-sm text-text-2">{link.description}</p>

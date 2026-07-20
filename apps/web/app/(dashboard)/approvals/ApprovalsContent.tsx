@@ -95,14 +95,14 @@ export function ApprovalsContent() {
       {isLoading ? (
         <TableSkeleton rows={4} cols={3} />
       ) : isError ? (
-        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load pending approvals. {(error as Error)?.message ?? ''}{' '}
           <button type="button" onClick={() => refetch()} className="ml-1 underline">
             Retry
           </button>
         </div>
       ) : approvals.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
@@ -124,7 +124,7 @@ export function ApprovalsContent() {
               item.submittedAt || item.submitted_at || item.createdAt || item.created_at || '';
 
             return (
-              <div key={postId} className="rounded-brand border bg-bg p-6 shadow-sm">
+              <div key={postId} className="rounded-brand border border-border bg-bg p-6 shadow-sm">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-text">
@@ -161,7 +161,7 @@ export function ApprovalsContent() {
                       type="button"
                       aria-label={`Request revision on post by ${author}`}
                       onClick={() => openCommentModal(postId, 'revision')}
-                      className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                      className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
                     >
                       Request Revision
                     </button>
@@ -169,7 +169,7 @@ export function ApprovalsContent() {
                       type="button"
                       aria-label={`Reject post by ${author}`}
                       onClick={() => openCommentModal(postId, 'reject')}
-                      className="rounded-brand border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                      className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                     >
                       Reject
                     </button>
@@ -218,7 +218,7 @@ export function ApprovalsContent() {
               onChange={(e) => setComment(e.target.value)}
               rows={4}
               placeholder="Add your comment..."
-              className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              className="mt-4 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -227,7 +227,7 @@ export function ApprovalsContent() {
                   setCommentAction(null);
                   setComment('');
                 }}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>
@@ -239,7 +239,7 @@ export function ApprovalsContent() {
                 className={`rounded-brand px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-50 ${
                   commentAction === 'reject'
                     ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-brand-primary hover:bg-brand-primary-dark'
+                    : 'bg-primary hover:bg-primary-dark'
                 }`}
               >
                 {rejectPost.isPending || requestRevision.isPending

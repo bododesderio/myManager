@@ -28,7 +28,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/projects" className="text-sm text-brand-primary hover:underline">
+        <Link href="/projects" className="text-sm text-primary hover:underline">
           &larr; Projects
         </Link>
       </div>
@@ -52,13 +52,13 @@ export function ProjectDetailContent({ id }: { id: string }) {
           <div className="flex gap-2">
             <Link
               href={`/projects/${id}/analytics`}
-              className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+              className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
             >
               Analytics
             </Link>
             <Link
               href={`/projects/${id}/settings`}
-              className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+              className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
             >
               Settings
             </Link>
@@ -75,15 +75,15 @@ export function ProjectDetailContent({ id }: { id: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Connected Accounts</p>
             <p className="mt-1 text-2xl font-bold">{project.accountCount ?? project.accounts ?? 0}</p>
           </div>
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Team Members</p>
             <p className="mt-1 text-2xl font-bold">{members.length}</p>
           </div>
-          <div className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <p className="text-sm text-text-2">Posts</p>
             <p className="mt-1 text-2xl font-bold">{posts.length}</p>
           </div>
@@ -98,7 +98,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
-                ? 'border-b-2 border-brand-primary text-brand-primary'
+                ? 'border-b-2 border-primary text-primary'
                 : 'text-text-2 hover:text-text'
             }`}
           >
@@ -109,7 +109,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
 
       {/* Tab content */}
       {activeTab === 'overview' && (
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Recent Activity</h2>
           {postsLoading ? (
             <div className="mt-4">
@@ -138,7 +138,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
       )}
 
       {activeTab === 'members' && (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           {membersLoading ? (
             <TableSkeleton rows={4} cols={3} />
           ) : members.length === 0 ? (
@@ -172,7 +172,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
       )}
 
       {activeTab === 'posts' && (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           {postsLoading ? (
             <TableSkeleton rows={5} cols={3} />
           ) : posts.length === 0 ? (
@@ -189,7 +189,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
                   </div>
                   <Link
                     href={`/compose?postId=${post.id}`}
-                    className="ml-4 rounded-brand border px-3 py-1 text-sm transition hover:border-brand-primary"
+                    className="ml-4 rounded-brand border border-border px-3 py-1 text-sm transition hover:border-primary"
                   >
                     Edit
                   </Link>

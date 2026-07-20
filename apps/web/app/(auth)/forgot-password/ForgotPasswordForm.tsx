@@ -33,7 +33,7 @@ export function ForgotPasswordForm() {
         </p>
         <Link
           href="/login"
-          className="mt-6 inline-block text-sm font-medium text-brand-primary hover:underline"
+          className="mt-6 inline-block text-sm font-medium text-primary hover:underline"
         >
           Back to Log In
         </Link>
@@ -55,7 +55,7 @@ export function ForgotPasswordForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+            className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 
@@ -70,7 +70,7 @@ export function ForgotPasswordForm() {
 
       <div className="mt-6 text-center text-sm text-text-2">
         Remember your password?{' '}
-        <Link href="/login" className="font-medium text-brand-primary hover:underline">
+        <Link href="/login" className="font-medium text-primary hover:underline">
           Log in
         </Link>
       </div>

@@ -36,13 +36,13 @@ export default function PrivacyContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Privacy</h1>
 
       <div className="max-w-2xl space-y-6">
         {/* Cookie Consent */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Cookie Consent</h2>
           <p className="mt-2 text-sm text-text-2">Manage which cookies you allow on your device.</p>
           <div className="mt-4 space-y-4">
@@ -62,7 +62,7 @@ export default function PrivacyContent() {
                 type="button"
                 onClick={() => setCookieAnalytics(!cookieAnalytics)}
                 className={`relative h-6 w-11 rounded-full transition-colors ${
-                  cookieAnalytics ? 'bg-brand-primary' : 'bg-border'
+                  cookieAnalytics ? 'bg-primary' : 'bg-border'
                 }`}
               >
                 <span
@@ -81,7 +81,7 @@ export default function PrivacyContent() {
                 type="button"
                 onClick={() => setCookieMarketing(!cookieMarketing)}
                 className={`relative h-6 w-11 rounded-full transition-colors ${
-                  cookieMarketing ? 'bg-brand-primary' : 'bg-border'
+                  cookieMarketing ? 'bg-primary' : 'bg-border'
                 }`}
               >
                 <span
@@ -94,27 +94,27 @@ export default function PrivacyContent() {
           </div>
           <button
             onClick={handleSaveCookies}
-            className="mt-4 rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+            className="mt-4 rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
             Save Cookie Preferences
           </button>
         </div>
 
         {/* Data Export */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Data Export</h2>
           <p className="mt-2 text-sm text-text-2">Download a copy of all your data.</p>
           <button
             onClick={handleRequestExport}
             disabled={exportRequested}
-            className="mt-4 rounded-brand border border-brand-primary px-4 py-2 text-sm font-medium text-brand-primary transition hover:bg-brand-primary hover:text-white disabled:opacity-50"
+            className="mt-4 rounded-brand border border-primary px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
           >
             {exportRequested ? 'Export Requested' : 'Request Data Export'}
           </button>
         </div>
 
         {/* Delete Account */}
-        <div className="rounded-brand border border-red-200 bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border border-red-200 bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold text-red-600">Delete Account</h2>
           <p className="mt-2 text-sm text-text-2">
             Permanently delete your account and all data. This action cannot be undone.
@@ -137,7 +137,7 @@ export default function PrivacyContent() {
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="Type DELETE"
-                className="block w-48 rounded-brand border border-red-300 px-4 py-2 focus:border-red-500 focus:outline-none"
+                className="block w-48 rounded-brand border border-border border-red-300 px-4 py-2 focus:border-red-500 focus:outline-none"
               />
               <div className="flex gap-2">
                 <button
@@ -151,7 +151,7 @@ export default function PrivacyContent() {
                     setShowDeleteConfirm(false);
                     setDeleteConfirmText('');
                   }}
-                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>

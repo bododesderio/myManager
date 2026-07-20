@@ -210,7 +210,7 @@ export function ComposeContent() {
       {/* ==================== LEFT: Composer ==================== */}
       <div className="lg:col-span-2 space-y-4">
         {/* --- Account Selection --- */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-text-2">Select Accounts</h2>
 
           {accountsLoading && (
@@ -235,8 +235,8 @@ export function ComposeContent() {
                   onClick={() => toggleAccount(account.id)}
                   className={`flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition ${
                     selected
-                      ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-medium'
-                      : 'border-border hover:border-brand-primary hover:text-brand-primary'
+                      ? 'border-primary bg-primary/10 text-primary font-medium'
+                      : 'border-border hover:border-primary hover:text-primary'
                   }`}
                 >
                   {account.avatar_url ? (
@@ -262,7 +262,7 @@ export function ComposeContent() {
         </div>
 
         {/* --- Content Textarea --- */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <label htmlFor="compose-caption" className="block text-sm font-semibold text-text-2">
             Content
           </label>
@@ -272,7 +272,7 @@ export function ComposeContent() {
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             placeholder="What would you like to share?"
-            className="mt-2 block w-full resize-none rounded-brand border border-border px-4 py-3 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+            className="mt-2 block w-full resize-none rounded-brand border border-border border-border px-4 py-3 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <div className="mt-3 flex items-center justify-between text-sm">
             <span
@@ -286,7 +286,7 @@ export function ComposeContent() {
         </div>
 
         {/* --- Media Upload --- */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-text-2">Media</h2>
 
           <button
@@ -301,8 +301,8 @@ export function ComposeContent() {
             onClick={() => fileInputRef.current?.click()}
             className={`mt-3 flex w-full cursor-pointer flex-col items-center justify-center rounded-brand border-2 border-dashed px-6 py-8 transition ${
               isDragging
-                ? 'border-brand-primary bg-brand-primary/5'
-                : 'border-border hover:border-brand-primary'
+                ? 'border-primary bg-primary/5'
+                : 'border-border hover:border-primary'
             }`}
           >
             <svg
@@ -321,7 +321,7 @@ export function ComposeContent() {
             </svg>
             <p className="text-sm text-text-2">
               Drag &amp; drop files here, or{' '}
-              <span className="font-medium text-brand-primary">browse</span>
+              <span className="font-medium text-primary">browse</span>
             </p>
           </button>
           <input
@@ -338,7 +338,7 @@ export function ComposeContent() {
 
           {uploadMedia.isPending && (
             <div className="mt-2 flex items-center gap-2 text-xs text-text-2" role="status" aria-live="polite">
-              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
+              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               Uploading {uploadedMedia.length > 0 ? `(${uploadedMedia.length} done)` : ''}…
             </div>
           )}
@@ -348,7 +348,7 @@ export function ComposeContent() {
               {uploadedMedia.map((m) => (
                 <div
                   key={m.id}
-                  className="group relative h-20 w-20 overflow-hidden rounded-brand border"
+                  className="group relative h-20 w-20 overflow-hidden rounded-brand border border-border"
                 >
                   {m.url ? (
                     <Image
@@ -377,7 +377,7 @@ export function ComposeContent() {
         </div>
 
         {/* --- Schedule / Submit --- */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-text-2">Schedule</h2>
 
           {caption.length > charLimit && (
@@ -394,7 +394,7 @@ export function ComposeContent() {
                 setSubmitMode('publish');
                 handleSubmit('publish');
               }}
-              className="rounded-brand bg-brand-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+              className="rounded-brand bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
             >
               {isSubmitting && submitMode === 'publish' ? 'Publishing...' : 'Publish Now'}
             </button>
@@ -411,8 +411,8 @@ export function ComposeContent() {
               }}
               className={`rounded-brand border px-6 py-2 text-sm font-semibold transition disabled:opacity-50 ${
                 submitMode === 'schedule'
-                  ? 'border-brand-primary bg-brand-primary text-white hover:bg-brand-primary-dark'
-                  : 'border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white'
+                  ? 'border-primary bg-primary text-white hover:bg-primary-dark'
+                  : 'border-primary text-primary hover:bg-primary hover:text-white'
               }`}
             >
               {isSubmitting && submitMode === 'schedule' ? 'Scheduling...' : 'Schedule'}
@@ -425,7 +425,7 @@ export function ComposeContent() {
                 setSubmitMode('draft');
                 handleSubmit('draft');
               }}
-              className="rounded-brand border px-6 py-2 text-sm font-semibold text-text-2 transition hover:border-border disabled:opacity-50"
+              className="rounded-brand border border-border px-6 py-2 text-sm font-semibold text-text-2 transition hover:border-border disabled:opacity-50"
             >
               {isSubmitting && submitMode === 'draft' ? 'Saving...' : 'Save Draft'}
             </button>
@@ -446,14 +446,14 @@ export function ComposeContent() {
                   value={scheduledAt}
                   onChange={(e) => setScheduledAt(e.target.value)}
                   min={new Date().toISOString().slice(0, 16)}
-                  className="rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <button
                 type="button"
                 disabled={isSubmitting || !scheduledAt}
                 onClick={() => handleSubmit('schedule')}
-                className="rounded-brand bg-brand-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+                className="rounded-brand bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
               >
                 {isSubmitting ? 'Scheduling...' : 'Confirm Schedule'}
               </button>
@@ -464,7 +464,7 @@ export function ComposeContent() {
 
       {/* ==================== RIGHT: Preview ==================== */}
       <div className="hidden space-y-4 lg:block">
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-sm font-semibold text-text-2">Preview</h2>
 
           {selectedAccountIds.size === 0 ? (
@@ -491,7 +491,7 @@ export function ComposeContent() {
                       </div>
 
                       {/* Mock post card */}
-                      <div className="rounded-brand border p-4">
+                      <div className="rounded-brand border border-border p-4">
                         <div className="flex items-center gap-2">
                           {account.avatar_url ? (
                             <Image

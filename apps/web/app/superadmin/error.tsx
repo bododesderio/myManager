@@ -35,7 +35,7 @@ export default function SuperadminError({
         </button>
         <Link
           href="/superadmin/dashboard"
-          className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-2"
+          className="rounded-lg border border-border border-border px-5 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-2"
         >
           Back to admin
         </Link>

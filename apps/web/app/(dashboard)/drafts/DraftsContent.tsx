@@ -64,7 +64,7 @@ export function DraftsContent() {
         </div>
         <Link
           href="/compose"
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           New Draft
         </Link>
@@ -73,7 +73,7 @@ export function DraftsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={3} />
       ) : drafts.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -83,13 +83,13 @@ export function DraftsContent() {
           <p className="mt-1 text-sm text-text-2">Start creating content and save drafts along the way.</p>
           <Link
             href="/compose"
-            className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+            className="mt-4 inline-block rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
             Create Your First Draft
           </Link>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <div className="divide-y">
             {drafts.map((draft: any) => {
               const caption = draft.caption || draft.title || 'Untitled draft';
@@ -128,13 +128,13 @@ export function DraftsContent() {
                   <div className="ml-4 flex flex-shrink-0 gap-2">
                     <Link
                       href={`/compose?postId=${draft.id}`}
-                      className="rounded-brand border px-3 py-1 text-sm transition hover:border-brand-primary"
+                      className="rounded-brand border border-border px-3 py-1 text-sm transition hover:border-primary"
                     >
                       Edit
                     </Link>
                     <button
                       onClick={() => handleDelete(draft.id)}
-                      className="rounded-brand border px-3 py-1 text-sm text-red-500 transition hover:border-red-500"
+                      className="rounded-brand border border-border px-3 py-1 text-sm text-red-500 transition hover:border-red-500"
                     >
                       Delete
                     </button>
@@ -157,7 +157,7 @@ export function DraftsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

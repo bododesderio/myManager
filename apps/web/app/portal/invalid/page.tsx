@@ -6,7 +6,7 @@ export default function PortalInvalidPage() {
       data-theme="light"
       className="min-h-screen flex items-center justify-center p-4 bg-bg-2"
     >
-      <div className="max-w-[400px] rounded-card border border-border bg-bg p-8 text-center">
+      <div className="max-w-[400px] rounded-card border border-border border-border bg-bg p-8 text-center">
         {/* Red error icon */}
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-error-light">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

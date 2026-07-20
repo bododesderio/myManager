@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useReport } from '@/lib/hooks/useReports';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Button } from '@mymanager/ui';
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -34,7 +35,7 @@ export function ReportDetailContent({ id }: { id: string }) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Link href="/reports" className="text-sm text-brand-primary hover:underline">
+          <Link href="/reports" className="text-sm text-primary hover:underline">
             &larr; Reports
           </Link>
         </div>
@@ -48,11 +49,11 @@ export function ReportDetailContent({ id }: { id: string }) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Link href="/reports" className="text-sm text-brand-primary hover:underline">
+          <Link href="/reports" className="text-sm text-primary hover:underline">
             &larr; Reports
           </Link>
         </div>
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <h3 className="font-heading text-lg font-semibold text-text">Report not found</h3>
           <p className="mt-1 text-sm text-text-2">
             This report may have been deleted or does not exist.
@@ -72,7 +73,7 @@ export function ReportDetailContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/reports" className="text-sm text-brand-primary hover:underline">
+        <Link href="/reports" className="text-sm text-primary hover:underline">
           &larr; Reports
         </Link>
       </div>
@@ -85,14 +86,14 @@ export function ReportDetailContent({ id }: { id: string }) {
               href={downloadUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+              className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
             >
               Download {reportType.toUpperCase()}
             </a>
           )}
           <button
             onClick={() => setShowShareModal(true)}
-            className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+            className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
             Share
           </button>
@@ -100,7 +101,7 @@ export function ReportDetailContent({ id }: { id: string }) {
       </div>
 
       {/* Report metadata */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Report Details</h2>
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
@@ -129,21 +130,21 @@ export function ReportDetailContent({ id }: { id: string }) {
       </div>
 
       {/* Report preview */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Preview</h2>
         <div className="mt-4">
           {isPdf && downloadUrl ? (
             <iframe
               src={downloadUrl}
               title="Report PDF Preview"
-              className="h-[600px] w-full rounded-brand border"
+              className="h-[600px] w-full rounded-brand border border-border"
             />
           ) : isPdf ? (
-            <div className="rounded-brand border border-dashed border-border p-12 text-center text-sm text-text-muted">
+            <div className="rounded-brand border border-border border-dashed border-border p-12 text-center text-sm text-text-muted">
               PDF preview is not available. Download the file to view it.
             </div>
           ) : (
-            <div className="rounded-brand border border-dashed border-border p-12 text-center text-sm text-text-muted">
+            <div className="rounded-brand border border-border border-dashed border-border p-12 text-center text-sm text-text-muted">
               CSV reports cannot be previewed. Please download the file to view the data.
             </div>
           )}
@@ -163,22 +164,19 @@ export function ReportDetailContent({ id }: { id: string }) {
                 type="text"
                 readOnly
                 value={`${typeof window !== 'undefined' ? window.location.origin : ''}/reports/${id}`}
-                className="block w-full rounded-brand border border-border px-4 py-2 text-sm text-text-2 focus:outline-none"
+                className="block w-full rounded-brand border border-border border-border px-4 py-2 text-sm text-text-2 focus:outline-none"
               />
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowShareModal(false)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>
-              <button
-                onClick={handleCopyShareLink}
-                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
-              >
+              <Button onClick={handleCopyShareLink}>
                 Copy Link
-              </button>
+              </Button>
             </div>
           </div>
         </div>

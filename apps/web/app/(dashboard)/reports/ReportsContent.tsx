@@ -122,7 +122,7 @@ export function ReportsContent() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           Generate Report
         </button>
@@ -131,7 +131,7 @@ export function ReportsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : reports.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -148,13 +148,13 @@ export function ReportsContent() {
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+            className="mt-4 inline-block rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
             Generate Your First Report
           </button>
         </div>
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           {/* Table header */}
           <div className="flex items-center gap-4 border-b px-6 py-3 text-xs font-semibold uppercase text-text-2">
             <div className="flex-1">Name</div>
@@ -177,7 +177,7 @@ export function ReportsContent() {
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/reports/${report.id}`}
-                      className="font-medium text-text hover:text-brand-primary"
+                      className="font-medium text-text hover:text-primary"
                     >
                       {report.name || 'Untitled Report'}
                     </Link>
@@ -203,14 +203,14 @@ export function ReportsContent() {
                         href={report.downloadUrl || report.download_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-brand border px-3 py-1 text-sm transition hover:border-brand-primary"
+                        className="rounded-brand border border-border px-3 py-1 text-sm transition hover:border-primary"
                       >
                         Download
                       </a>
                     )}
                     <button
                       onClick={() => setDeletingId(report.id)}
-                      className="rounded-brand border px-3 py-1 text-sm text-red-500 transition hover:border-red-500"
+                      className="rounded-brand border border-border px-3 py-1 text-sm text-red-500 transition hover:border-red-500"
                     >
                       Delete
                     </button>
@@ -241,7 +241,7 @@ export function ReportsContent() {
                   onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Monthly Overview"
                   className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
-                    formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
+                    formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-primary'
                   }`}
                 />
                 {formErrors.name && <p className="mt-1 text-xs text-red-600">{formErrors.name}</p>}
@@ -258,7 +258,7 @@ export function ReportsContent() {
                     value={formData.dateFrom}
                     onChange={(e) => setFormData((f) => ({ ...f, dateFrom: e.target.value }))}
                       className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
-                      formErrors.dateFrom ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
+                      formErrors.dateFrom ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-primary'
                     }`}
                   />
                   {formErrors.dateFrom && <p className="mt-1 text-xs text-red-600">{formErrors.dateFrom}</p>}
@@ -275,7 +275,7 @@ export function ReportsContent() {
                     value={formData.dateTo}
                     onChange={(e) => setFormData((f) => ({ ...f, dateTo: e.target.value }))}
                       className={`mt-1 block w-full rounded-brand border px-4 py-2 text-sm focus:outline-none ${
-                      formErrors.dateTo ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-brand-primary'
+                      formErrors.dateTo ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-primary'
                     }`}
                   />
                   {formErrors.dateTo && <p className="mt-1 text-xs text-red-600">{formErrors.dateTo}</p>}
@@ -290,8 +290,8 @@ export function ReportsContent() {
                       onClick={() => setFormData((f) => ({ ...f, type: t }))}
                       className={`rounded-brand border px-4 py-2 text-sm font-medium transition ${
                         formData.type === t
-                          ? 'border-brand-primary bg-brand-primary/5 text-brand-primary'
-                          : 'hover:border-brand-primary'
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'hover:border-primary'
                       }`}
                     >
                       {t.toUpperCase()}
@@ -308,8 +308,8 @@ export function ReportsContent() {
                       onClick={() => togglePlatform(p)}
                       className={`rounded-brand border px-3 py-1 text-xs font-medium capitalize transition ${
                         formData.platforms.includes(p)
-                          ? 'border-brand-primary bg-brand-primary/5 text-brand-primary'
-                          : 'hover:border-brand-primary'
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'hover:border-primary'
                       }`}
                     >
                       {p}
@@ -321,14 +321,14 @@ export function ReportsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowModal(false)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleGenerate}
                 disabled={generateReport.isPending}
-                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+                className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
               >
                 {generateReport.isPending ? 'Generating...' : 'Generate'}
               </button>
@@ -348,7 +348,7 @@ export function ReportsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

@@ -128,7 +128,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Right — Dashboard preview */}
-            <div className="animate-fade-in-up delay-300 animate-float rounded-[16px] border border-border bg-bg p-2 shadow-[var(--shadow-float)] overflow-hidden">
+            <div className="animate-fade-in-up delay-300 animate-float rounded-[16px] border border-border border-border bg-bg p-2 shadow-[var(--shadow-float)] overflow-hidden">
               <Image
                 src="/images/hero-dashboard.svg"
                 alt="myManager Dashboard Preview"

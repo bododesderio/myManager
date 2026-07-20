@@ -135,7 +135,7 @@ export function Topbar() {
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 z-50 mt-2 w-52 rounded-card border border-border bg-bg py-1 shadow-lg">
+            <div className="absolute right-0 z-50 mt-2 w-52 rounded-card border border-border border-border bg-bg py-1 shadow-lg">
               <div className="px-4 py-2.5">
                 <p className="text-sm font-medium text-text">
                   {session?.user?.name || 'User'}

@@ -78,7 +78,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
   if (!post) {
     return (
       <div className="space-y-6">
-        <Link href="/home" className="text-sm text-brand-primary hover:underline">
+        <Link href="/home" className="text-sm text-primary hover:underline">
           &larr; Dashboard
         </Link>
         <p className="text-text-2">Post not found.</p>
@@ -93,7 +93,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/home" className="text-sm text-brand-primary hover:underline">
+        <Link href="/home" className="text-sm text-primary hover:underline">
           &larr; Dashboard
         </Link>
       </div>
@@ -112,21 +112,21 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
         <div className="flex gap-2">
           <button
             onClick={handleEdit}
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
           >
             Edit
           </button>
           <button
             onClick={handleDuplicate}
             disabled={duplicatePost.isPending}
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary disabled:opacity-50"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary disabled:opacity-50"
           >
             {duplicatePost.isPending ? 'Duplicating...' : 'Duplicate'}
           </button>
           <button
             onClick={handleDelete}
             disabled={deletePost.isPending}
-            className="rounded-brand border px-4 py-2 text-sm font-medium text-red-500 transition hover:border-red-500 disabled:opacity-50"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-red-500 transition hover:border-red-500 disabled:opacity-50"
           >
             {deletePost.isPending ? 'Deleting...' : 'Delete'}
           </button>
@@ -136,7 +136,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Post content */}
         <div className="space-y-4">
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Post Content</h2>
             {post.caption ? (
               <p className="mt-4 whitespace-pre-wrap text-text-2">{post.caption}</p>
@@ -150,7 +150,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
                 {post.media.map((item: Record<string, unknown>, i: number) => (
                   <div
                     key={i}
-                    className="flex h-20 w-20 items-center justify-center rounded-brand border bg-bg-2 text-xs text-text-muted"
+                    className="flex h-20 w-20 items-center justify-center rounded-brand border border-border bg-bg-2 text-xs text-text-muted"
                   >
                     {(item.type as string) ?? 'media'}
                   </div>
@@ -164,7 +164,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
                 {platforms.map((p) => (
                   <span
                     key={p}
-                    className="rounded-full bg-brand-primary/10 px-2.5 py-0.5 text-xs font-medium text-brand-primary"
+                    className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
                   >
                     {p}
                   </span>
@@ -175,11 +175,11 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
 
           {/* Per-platform publishing results */}
           {platformResults.length > 0 && (
-            <div className="rounded-brand border bg-bg p-6 shadow-sm">
+            <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
               <h2 className="font-heading text-lg font-semibold">Publishing Results</h2>
               <div className="mt-4 space-y-3">
                 {platformResults.map((result, i) => (
-                  <div key={i} className="flex items-center justify-between rounded-brand border px-4 py-3">
+                  <div key={i} className="flex items-center justify-between rounded-brand border border-border px-4 py-3">
                     <span className="text-sm font-medium">{result.platform as string}</span>
                     <span
                       className={`text-xs font-medium ${
@@ -198,7 +198,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
         {/* Analytics + comments */}
         <div className="space-y-4">
           {isPublished && (
-            <div className="rounded-brand border bg-bg p-6 shadow-sm">
+            <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
               <h2 className="font-heading text-lg font-semibold">Performance</h2>
               {analyticsLoading ? (
                 <div className="mt-4">
@@ -230,12 +230,12 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
             </div>
           )}
 
-          <div className="rounded-brand border bg-bg p-6 shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
             <h2 className="font-heading text-lg font-semibold">Comments</h2>
             {analytics?.comments?.length > 0 ? (
               <div className="mt-4 space-y-3">
                 {analytics.comments.map((comment: Record<string, unknown>, i: number) => (
-                  <div key={i} className="rounded-brand border px-4 py-3">
+                  <div key={i} className="rounded-brand border border-border px-4 py-3">
                     <p className="text-sm font-medium">{comment.author as string}</p>
                     <p className="mt-1 text-sm text-text-2">{comment.text as string}</p>
                   </div>

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import * as Sentry from '@sentry/nextjs';
+import { Button } from '@mymanager/ui';
 
 export default function RouteError({
   error,
@@ -31,16 +32,12 @@ export default function RouteError({
       </p>
       {error.digest && <p className="text-xs text-text-muted">Reference: {error.digest}</p>}
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="rounded-lg bg-[var(--color-primary)] px-6 py-2.5 text-sm font-medium text-white hover:opacity-90"
-        >
+        <Button size="lg" onClick={reset}>
           Try again
-        </button>
+        </Button>
         <Link
           href="/home"
-          className="rounded-lg border border-border px-6 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-2"
+          className="rounded-lg border border-border border-border px-6 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-2"
         >
           Back to dashboard
         </Link>

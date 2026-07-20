@@ -170,7 +170,7 @@ export function TranslationsContent() {
     return (
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Translations</h1>
-        <div className="rounded-brand border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-red-700">{error}</p>
           <button
             onClick={() => void load()}
@@ -198,7 +198,7 @@ export function TranslationsContent() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={handleBack} className="text-sm text-brand-primary hover:underline">
+            <button onClick={handleBack} className="text-sm text-primary hover:underline">
               &larr; Back to languages
             </button>
             <h1 className="font-heading text-2xl font-bold">
@@ -208,7 +208,7 @@ export function TranslationsContent() {
           <button
             onClick={() => void handleSaveAll()}
             disabled={saving}
-            className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+            className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save All'}
           </button>
@@ -219,23 +219,23 @@ export function TranslationsContent() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search keys or English text..."
-          className="w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+          className="w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
 
         {filteredTranslations.length === 0 ? (
-          <div className="rounded-brand border bg-bg p-8 text-center shadow-sm">
+          <div className="rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
             <p className="text-text-muted">No translation keys found.</p>
           </div>
         ) : (
           <div className="space-y-2">
             {filteredTranslations.map((t) => (
-              <div key={t.id} className="rounded-brand border bg-bg p-4 shadow-sm">
+              <div key={t.id} className="rounded-brand border border-border bg-bg p-4 shadow-sm">
                 <div className="mb-2 flex items-center justify-between">
                   <code className="text-xs text-text-2">{t.key}</code>
                   <button
                     onClick={() => void handleSave(t.id)}
                     disabled={saving}
-                    className="text-xs text-brand-primary hover:underline disabled:opacity-50"
+                    className="text-xs text-primary hover:underline disabled:opacity-50"
                   >
                     Save
                   </button>
@@ -247,7 +247,7 @@ export function TranslationsContent() {
                   type="text"
                   value={editedValues[t.id] ?? ''}
                   onChange={(e) => handleValueChange(t.id, e.target.value)}
-                  className="w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  className="w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   placeholder={`Translation for ${langName}...`}
                 />
               </div>
@@ -266,7 +266,7 @@ export function TranslationsContent() {
 
       <div className="grid gap-4 md:grid-cols-3">
         {languages.map((lang) => (
-          <div key={lang.code} className="rounded-brand border bg-bg p-5 shadow-sm">
+          <div key={lang.code} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <h3 className="font-heading font-semibold">{lang.name}</h3>
               <span className="text-sm font-medium text-text-2">{lang.code}</span>
@@ -279,14 +279,14 @@ export function TranslationsContent() {
               </div>
               <div className="mt-1 h-2 rounded-full bg-border">
                 <div
-                  className={`h-2 rounded-full bg-brand-primary ${styles.progressFill}`}
+                  className={`h-2 rounded-full bg-primary ${styles.progressFill}`}
                   style={{ ['--progress' as string]: `${lang.progress}%` } as React.CSSProperties}
                 />
               </div>
             </div>
             <button
               onClick={() => handleEditLanguage(lang.code)}
-              className="mt-3 text-sm text-brand-primary hover:underline"
+              className="mt-3 text-sm text-primary hover:underline"
             >
               Edit Translations
             </button>

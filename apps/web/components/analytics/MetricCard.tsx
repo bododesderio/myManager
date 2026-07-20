@@ -20,7 +20,7 @@ export function MetricCard({ label, value, change, trend = 'neutral', icon }: Me
   };
 
   return (
-    <div className="rounded-brand border bg-bg p-5 shadow-sm">
+    <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <p className="text-sm text-text-2">{label}</p>
         {icon && <span className="text-text-muted">{icon}</span>}

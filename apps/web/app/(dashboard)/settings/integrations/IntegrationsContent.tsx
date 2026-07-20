@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/providers/ToastProvider';
+import { Button } from '@mymanager/ui';
 
 interface ApiKey {
   id: string;
@@ -102,25 +103,25 @@ export default function IntegrationsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <h1 className="font-heading text-2xl font-bold">Integrations</h1>
 
       <div className="max-w-2xl space-y-6">
         {/* API Keys */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">API Keys</h2>
             <button
               onClick={() => setShowNewKey(true)}
-              className="rounded-brand bg-brand-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-primary-dark"
+              className="rounded-brand bg-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-primary-dark"
             >
               Create Key
             </button>
           </div>
 
           {showNewKey && (
-            <div className="mt-4 rounded-brand border border-brand-primary/30 bg-brand-primary/5 p-4">
+            <div className="mt-4 rounded-brand border border-primary/30 bg-primary/5 p-4">
               <label htmlFor="keyName" className="block text-sm font-medium text-text-2">Key Name</label>
               <input
                 id="keyName"
@@ -128,18 +129,15 @@ export default function IntegrationsContent() {
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
                 placeholder="e.g. Production API"
-                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
               <div className="mt-3 flex gap-2">
-                <button
-                  onClick={handleCreateKey}
-                  className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
-                >
+                <Button onClick={handleCreateKey}>
                   Create
-                </button>
+                </Button>
                 <button
                   onClick={() => { setShowNewKey(false); setNewKeyName(''); }}
-                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -162,7 +160,7 @@ export default function IntegrationsContent() {
                   </div>
                   <button
                     onClick={() => handleRevokeKey(key.id)}
-                    className="rounded-brand border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="rounded-brand border border-border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
                   >
                     Revoke
                   </button>
@@ -173,19 +171,19 @@ export default function IntegrationsContent() {
         </div>
 
         {/* Webhook Endpoints */}
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">Webhook Endpoints</h2>
             <button
               onClick={() => setShowNewWebhook(true)}
-              className="rounded-brand bg-brand-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-primary-dark"
+              className="rounded-brand bg-primary px-4 py-1.5 text-sm font-medium text-white transition hover:bg-primary-dark"
             >
               Add Endpoint
             </button>
           </div>
 
           {showNewWebhook && (
-            <div className="mt-4 rounded-brand border border-brand-primary/30 bg-brand-primary/5 p-4">
+            <div className="mt-4 rounded-brand border border-primary/30 bg-primary/5 p-4">
               <div>
                 <label htmlFor="webhookUrl" className="block text-sm font-medium text-text-2">Endpoint URL</label>
                 <input
@@ -194,7 +192,7 @@ export default function IntegrationsContent() {
                   value={newWebhookUrl}
                   onChange={(e) => setNewWebhookUrl(e.target.value)}
                   placeholder="https://example.com/webhook"
-                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-brand-primary focus:outline-none"
+                  className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div className="mt-3">
@@ -207,8 +205,8 @@ export default function IntegrationsContent() {
                       onClick={() => toggleWebhookEvent(event)}
                       className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                         newWebhookEvents.includes(event)
-                          ? 'bg-brand-primary text-white'
-                          : 'border border-border text-text-2 hover:border-brand-primary'
+                          ? 'bg-primary text-white'
+                          : 'border border-border text-text-2 hover:border-primary'
                       }`}
                     >
                       {event}
@@ -217,15 +215,12 @@ export default function IntegrationsContent() {
                 </div>
               </div>
               <div className="mt-3 flex gap-2">
-                <button
-                  onClick={handleCreateWebhook}
-                  className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
-                >
+                <Button onClick={handleCreateWebhook}>
                   Create Endpoint
-                </button>
+                </Button>
                 <button
                   onClick={() => { setShowNewWebhook(false); setNewWebhookUrl(''); setNewWebhookEvents([]); }}
-                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -250,7 +245,7 @@ export default function IntegrationsContent() {
                   </div>
                   <button
                     onClick={() => handleDeleteWebhook(webhook.id)}
-                    className="rounded-brand border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="rounded-brand border border-border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
                   >
                     Delete
                   </button>

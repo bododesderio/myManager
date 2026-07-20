@@ -163,7 +163,7 @@ export function FaqContent() {
   }
 
   const inputCls =
-    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none';
+    'mt-1 block w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none';
 
   if (loading) {
     return (
@@ -185,14 +185,14 @@ export function FaqContent() {
         </div>
         <button
           onClick={() => setNewItem(emptyItem())}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           Add New
         </button>
       </div>
 
       {newItem && (
-        <div className="rounded-brand border-2 border-dashed border-brand-primary/30 bg-brand-primary/5 p-6">
+        <div className="rounded-brand border-2 border-dashed border-primary/30 bg-primary/5 p-6">
           <h3 className="mb-3 text-sm font-semibold">New FAQ Item</h3>
           <div className="space-y-3">
             <div>
@@ -227,13 +227,13 @@ export function FaqContent() {
             <div className="flex gap-2">
               <button
                 onClick={addItem}
-                className="rounded-brand bg-brand-primary px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+                className="rounded-brand bg-primary px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
               >
                 Add
               </button>
               <button
                 onClick={() => setNewItem(null)}
-                className="rounded-brand border px-4 py-1.5 text-sm text-text-2 transition hover:bg-bg-2"
+                className="rounded-brand border border-border px-4 py-1.5 text-sm text-text-2 transition hover:bg-bg-2"
               >
                 Cancel
               </button>
@@ -284,13 +284,13 @@ export function FaqContent() {
                 <div className="flex gap-2">
                   <button
                     onClick={saveEdit}
-                    className="rounded-brand bg-brand-primary px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+                    className="rounded-brand bg-primary px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
-                    className="rounded-brand border px-4 py-1.5 text-sm text-text-2 transition hover:bg-bg-2"
+                    className="rounded-brand border border-border px-4 py-1.5 text-sm text-text-2 transition hover:bg-bg-2"
                   >
                     Cancel
                   </button>
@@ -356,7 +356,7 @@ export function FaqContent() {
         ))}
 
         {items.length === 0 && (
-          <div className="rounded-brand border bg-bg py-12 text-center text-text-muted">
+          <div className="rounded-brand border border-border bg-bg py-12 text-center text-text-muted">
             No FAQ items found yet.
           </div>
         )}

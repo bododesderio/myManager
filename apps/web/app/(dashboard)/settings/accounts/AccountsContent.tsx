@@ -28,24 +28,24 @@ export default function AccountsContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-sm text-brand-primary hover:underline">&larr; Settings</Link>
+        <Link href="/settings" className="text-sm text-primary hover:underline">&larr; Settings</Link>
       </div>
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold">Connected Accounts</h1>
         <Link
           href={"/connect/oauth" as Route}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           Connect Account
         </Link>
       </div>
 
       {accountList.length === 0 ? (
-        <div className="max-w-2xl rounded-brand border bg-bg p-8 text-center shadow-sm">
+        <div className="max-w-2xl rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
           <p className="text-sm text-text-2">No social accounts connected yet.</p>
           <Link
             href={"/connect/oauth" as Route}
-            className="mt-4 inline-block rounded-brand bg-brand-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-primary-dark"
+            className="mt-4 inline-block rounded-brand bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-dark"
           >
             Connect Your First Account
           </Link>
@@ -55,7 +55,7 @@ export default function AccountsContent() {
           {accountList.map((account: any) => (
             <div
               key={account.id}
-              className="flex items-center justify-between rounded-brand border bg-bg px-5 py-4 shadow-sm"
+              className="flex items-center justify-between rounded-brand border border-border bg-bg px-5 py-4 shadow-sm"
             >
               <div>
                 <p className="font-medium">{account.platform}</p>
@@ -93,7 +93,7 @@ export default function AccountsContent() {
               <button
                 onClick={() => handleDisconnect(account.id, account.platform)}
                 disabled={disconnect.isPending}
-                className="rounded-brand border border-red-300 px-4 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                className="rounded-brand border border-border border-red-300 px-4 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
               >
                 Disconnect
               </button>

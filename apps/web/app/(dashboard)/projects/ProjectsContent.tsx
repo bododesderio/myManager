@@ -64,7 +64,7 @@ export function ProjectsContent() {
         </div>
         <button
           onClick={() => setCreating(true)}
-          className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-dark"
+          className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
         >
           New Project
         </button>
@@ -73,7 +73,7 @@ export function ProjectsContent() {
       {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : projects.length === 0 ? (
-        <div className="rounded-brand border bg-bg py-16 text-center shadow-sm">
+        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2 12.5l4.5 4.5L12 12m0 0l5.5 5m-5.5-5V3" />
@@ -85,7 +85,7 @@ export function ProjectsContent() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project: any) => (
-            <div key={project.id} className="group relative rounded-brand border bg-bg p-5 shadow-sm transition hover:border-brand-primary">
+            <div key={project.id} className="group relative rounded-brand border border-border bg-bg p-5 shadow-sm transition hover:border-primary">
               <Link href={`/projects/${project.id}`} className="absolute inset-0 z-10" />
               <h3 className="font-heading text-lg font-semibold">{project.name}</h3>
               {project.description && (
@@ -122,7 +122,7 @@ export function ProjectsContent() {
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="mt-1 w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                  className="mt-1 w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
                   placeholder="Acme Q2 Campaign"
                   autoFocus
                 />
@@ -132,7 +132,7 @@ export function ProjectsContent() {
                 <textarea
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="mt-1 w-full rounded-brand border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
+                  className="mt-1 w-full rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
                   rows={3}
                   placeholder="What is this project about?"
                   aria-label="Project description"
@@ -140,13 +140,13 @@ export function ProjectsContent() {
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setCreating(false)} className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary">
+              <button onClick={() => setCreating(false)} className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary">
                 Cancel
               </button>
               <button
                 onClick={handleCreate}
                 disabled={createProject.isPending}
-                className="rounded-brand bg-brand-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-primary-dark disabled:opacity-50"
+                className="rounded-brand bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-50"
               >
                 {createProject.isPending ? 'Creating...' : 'Create'}
               </button>
@@ -166,7 +166,7 @@ export function ProjectsContent() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary"
+                className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary"
               >
                 Cancel
               </button>

@@ -63,7 +63,7 @@ export function UserDetailContent({ id }: { id: string }) {
   if (!user) {
     return (
       <div className="space-y-4">
-        <Link href="/superadmin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
+        <Link href="/superadmin/users" className="text-sm text-primary hover:underline">&larr; Users</Link>
         <p className="text-text-2">User not found.</p>
       </div>
     );
@@ -72,7 +72,7 @@ export function UserDetailContent({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/superadmin/users" className="text-sm text-brand-primary hover:underline">&larr; Users</Link>
+        <Link href="/superadmin/users" className="text-sm text-primary hover:underline">&larr; Users</Link>
       </div>
 
       <div className="flex items-center justify-between">
@@ -88,14 +88,14 @@ export function UserDetailContent({ id }: { id: string }) {
           <button
             onClick={handleToggleSuperadmin}
             disabled={updateRole.isPending}
-            className="rounded-brand border px-4 py-2 text-sm font-medium transition hover:border-brand-primary disabled:opacity-50"
+            className="rounded-brand border border-border px-4 py-2 text-sm font-medium transition hover:border-primary disabled:opacity-50"
           >
             {user.is_superadmin ? 'Remove Superadmin' : 'Make Superadmin'}
           </button>
           <button
             onClick={handleSuspend}
             disabled={suspendUser.isPending}
-            className="rounded-brand border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+            className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
           >
             {user.suspended ? 'Unsuspend' : 'Suspend'}
           </button>
@@ -103,7 +103,7 @@ export function UserDetailContent({ id }: { id: string }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Profile</h2>
           <dl className="mt-4 space-y-3">
             <div>
@@ -163,7 +163,7 @@ export function UserDetailContent({ id }: { id: string }) {
           </dl>
         </div>
 
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Usage</h2>
           <dl className="mt-4 space-y-3">
             <div>
@@ -191,7 +191,7 @@ export function UserDetailContent({ id }: { id: string }) {
       </div>
 
       {user.workspaces?.length > 0 && (
-        <div className="rounded-brand border bg-bg p-6 shadow-sm">
+        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
           <h2 className="font-heading text-lg font-semibold">Workspaces</h2>
           <div className="mt-4 divide-y">
             {user.workspaces.map((ws: { id: string; name: string; role: string }) => (

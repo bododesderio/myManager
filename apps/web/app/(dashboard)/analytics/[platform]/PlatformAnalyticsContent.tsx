@@ -44,7 +44,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/analytics" className="text-sm text-brand-primary hover:underline">
+        <Link href="/analytics" className="text-sm text-primary hover:underline">
           &larr; Analytics
         </Link>
       </div>
@@ -64,7 +64,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-text-2">
@@ -73,7 +73,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-brand border px-3 py-1.5 text-sm"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm"
           />
         </label>
       </div>
@@ -92,7 +92,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
               value: metrics?.engagementRate != null ? `${metrics.engagementRate}%` : '-',
             },
           ].map((metric) => (
-            <div key={metric.label} className="rounded-brand border bg-bg p-5 shadow-sm">
+            <div key={metric.label} className="rounded-brand border border-border bg-bg p-5 shadow-sm">
               <p className="text-sm text-text-2">{metric.label}</p>
               <p className="mt-1 text-2xl font-bold">
                 {typeof metric.value === 'number'
@@ -105,7 +105,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
       )}
 
       {/* Daily chart */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">{name} Engagement Over Time</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -144,7 +144,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
       </div>
 
       {/* Top posts section */}
-      <div className="rounded-brand border bg-bg p-6 shadow-sm">
+      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold">Top Posts</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -153,7 +153,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
         ) : analytics?.topPosts?.length > 0 ? (
           <div className="mt-4 space-y-3">
             {analytics.topPosts.map((post: Record<string, unknown>, i: number) => (
-              <div key={(post.id as string) ?? i} className="flex items-center justify-between rounded-brand border px-4 py-3">
+              <div key={(post.id as string) ?? i} className="flex items-center justify-between rounded-brand border border-border px-4 py-3">
                 <span className="text-sm font-medium">
                   {(post.caption as string)?.slice(0, 80) ?? `Post #${post.id}`}
                 </span>

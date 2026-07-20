@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
       return (
-        <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-card border border-border bg-bg-card p-8 text-center">
+        <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-card border border-border border-border bg-bg-card p-8 text-center">
           <svg
             className="h-12 w-12 text-text-muted"
             xmlns="http://www.w3.org/2000/svg"

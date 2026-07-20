@@ -40,14 +40,14 @@ export function UsersContent() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="rounded-brand border border-border px-4 py-2 text-sm focus:border-brand-primary focus:outline-none"
+          className="rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
         />
       </div>
 
       {isLoading ? (
         <TableSkeleton rows={6} cols={5} />
       ) : (
-        <div className="rounded-brand border bg-bg shadow-sm">
+        <div className="rounded-brand border border-border bg-bg shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -69,7 +69,7 @@ export function UsersContent() {
                 users.map((user: { id: string; name: string; email: string; plan: string; suspended: boolean; createdAt: string }) => (
                   <tr key={user.id} className="hover:bg-bg-2">
                     <td className="px-6 py-4">
-                      <Link href={`/admin/users/${user.id}` as Route} className="font-medium text-brand-primary hover:underline">
+                      <Link href={`/admin/users/${user.id}` as Route} className="font-medium text-primary hover:underline">
                         {user.name}
                       </Link>
                       <p className="text-sm text-text-2">{user.email}</p>
@@ -89,7 +89,7 @@ export function UsersContent() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <Link href={`/admin/users/${user.id}` as Route} className="text-sm text-brand-primary hover:underline">
+                        <Link href={`/admin/users/${user.id}` as Route} className="text-sm text-primary hover:underline">
                           View
                         </Link>
                         <button
@@ -114,7 +114,7 @@ export function UsersContent() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded-brand border px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm disabled:opacity-50"
           >
             Previous
           </button>
@@ -124,7 +124,7 @@ export function UsersContent() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="rounded-brand border px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm disabled:opacity-50"
           >
             Next
           </button>
