@@ -38,7 +38,25 @@ jobs:
       - name: Generate Prisma client
         run: pnpm prisma generate
 
-      - run: pnpm lint
-      - run: pnpm type-check
-      - run: pnpm test
-      - run: pnpm build
+      # `--continue` (set in the root package.json scripts) makes these report
+      # EVERY failing workspace in one run. Without it turbo aborts on the first
+      # failure, which is how a non-compiling apps/web hid behind apps/mobile:
+      # you fix one, re-run, and only then discover the next.
+      #
+      # Each step is `if: always()` so one red step does not mask the others —
+      # a single CI run should show the complete picture, not the first problem.
+      - name: Lint
+        if: always()
+        run: pnpm lint
+
+      - name: Type check
+        if: always()
+        run: pnpm type-check
+
+      - name: Test
+        if: always()
+        run: pnpm test
+
+      - name: Build
+        if: always()
+        run: pnpm build

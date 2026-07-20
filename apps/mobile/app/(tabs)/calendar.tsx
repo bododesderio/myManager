@@ -165,7 +165,7 @@ export default function CalendarScreen() {
         {!workspaceId && (
           <Text style={styles.emptyText}>No workspace selected.</Text>
         )}
-        {isLoading && <ActivityIndicator color=colors.primary style={{ marginTop: 16 }} />}
+        {isLoading && <ActivityIndicator color={colors.primary} style={{ marginTop: 16 }} />}
         {isError && (
           <View style={styles.errorBox}>
             <Text style={styles.errorText}>Failed to load calendar.</Text>

@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint",
-    "type-check": "turbo type-check",
-    "test": "turbo test",
+    "lint": "turbo lint --continue",
+    "type-check": "turbo type-check --continue",
+    "test": "turbo test --continue",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "devDependencies": {

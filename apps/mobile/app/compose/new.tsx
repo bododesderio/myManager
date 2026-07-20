@@ -228,7 +228,7 @@ export default function NewComposeScreen() {
         <Text style={styles.title}>New Post</Text>
         <TouchableOpacity onPress={handleSaveDraft} disabled={isMutating}>
           {createPost.isPending ? (
-            <ActivityIndicator size="small" color=colors.primary />
+            <ActivityIndicator size="small" color={colors.primary} />
           ) : (
             <Text style={[styles.nextText, isMutating && styles.disabledText]}>Save Draft</Text>
           )}
@@ -288,7 +288,7 @@ export default function NewComposeScreen() {
           </View>
           {uploadMedia.isPending && (
             <View style={styles.uploadingRow}>
-              <ActivityIndicator size="small" color=colors.primary />
+              <ActivityIndicator size="small" color={colors.primary} />
               <Text style={styles.uploadingText}>Uploading…</Text>
             </View>
           )}
@@ -343,7 +343,7 @@ export default function NewComposeScreen() {
             disabled={isMutating}
           >
             {schedulePost.isPending ? (
-              <ActivityIndicator size="small" color=colors.primary />
+              <ActivityIndicator size="small" color={colors.primary} />
             ) : (
               <Text style={[styles.scheduleButtonText, isMutating && styles.disabledText]}>
                 Schedule

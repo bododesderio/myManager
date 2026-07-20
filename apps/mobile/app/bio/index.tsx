@@ -100,7 +100,7 @@ export default function BioScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color=colors.primary />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : (
         <ScrollView style={styles.content}>

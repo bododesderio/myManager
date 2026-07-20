@@ -79,7 +79,7 @@ export default function CampaignsScreen() {
 
       {isLoading ? (
         <View style={styles.emptyState}>
-          <ActivityIndicator size="large" color=colors.primary />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : isError ? (
         <View style={styles.emptyState}>

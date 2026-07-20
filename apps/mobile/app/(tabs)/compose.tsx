@@ -76,7 +76,7 @@ export default function ComposeTabScreen() {
 
       {loading ? (
         <View style={styles.emptyState}>
-          <ActivityIndicator size="large" color=colors.primary />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : error ? (
         <View style={styles.emptyState}>
