@@ -2,10 +2,14 @@
 Last updated: 2026-07-20
 
 ## Current task
-Phase 0 security remediation — **complete and committed** on branch
-`fix/phase0-critical-security` (commit 266a450). Awaiting review/merge.
+Phases 0 and 1 — **complete and committed** on branch
+`fix/phase0-critical-security`. Awaiting review/merge.
 
-Next: Phase 1 (integrity & durability) from `docs/audit-2026-07-20.md` §6.
+- 266a450 — Phase 0: payment bypass, tenancy bypasses, duplicate publishing
+- 094b71e — Phase 1: decimal money, atomic registration, unified crypto,
+  real health checks, env validation, web Sentry, web build fix
+
+Next: Phase 2 (scale & maintainability) from `docs/audit-2026-07-20.md` §6.
 
 ## Stack
 Turborepo + pnpm 9.15.4 workspaces.
@@ -38,23 +42,14 @@ Turborepo + pnpm 9.15.4 workspaces.
 ## Known issues
 Full detail in `docs/audit-2026-07-20.md`. Open items:
 
-**HIGH**
-- Money is `Decimal` in the price catalog but `Float` in the ledger
-  (`schema.prisma:296,320,344,357`). Precision dies at `billing.service.ts:64`
-  the moment a price becomes a charge.
-- `Session.user_id` has no index; every logout full-scans the table. `Session`
-  also doubles as refresh-token storage while a better-designed, apparently
-  unused `RefreshToken` model exists (`schema.prisma:239-253`) — resolve which.
+**HIGH — remaining**
 - Puppeteer launches a full Chromium per PDF (`report-generator.worker.ts:69`).
-- Six independent AES-256-GCM implementations (one with a divergent 16-byte IV),
-  spanning OAuth tokens AND TOTP secrets.
-- Registration does 5 sequential writes with no transaction.
-- Flutterwave webhook `verif-hash` is a static secret, not a payload HMAC.
+- `RefreshToken` model (`schema.prisma:239-253`) is dead — 0 references — while
+  `Session` serves as refresh-token storage. `RefreshToken` has `used_at` /
+  `revoked_at` and is the right target for reuse detection (M1). Decide whether
+  to migrate auth onto it or drop it; do not leave both.
 
-**MEDIUM**
-- No Zod env validation at boot; `ENCRYPTION_KEY` length unchecked.
-- Health check returns 200 without touching DB/Redis.
-- No Sentry on web.
+**MEDIUM — remaining**
 - Analytics aggregated in Node memory, not SQL.
 - 4 unregistered guards (`api-key`, `feature`, `plan`, `quota`) — there is no
   plan-tier or quota enforcement at the HTTP layer.
@@ -69,13 +64,19 @@ Full detail in `docs/audit-2026-07-20.md`. Open items:
   check before any conclusion.
 
 ## Next steps
-1. Review/merge `fix/phase0-critical-security`.
-2. Phase 1: Float→Decimal migration, transactions on register + payment
-   activation, `Session.user_id` index, server-side Flutterwave re-verification,
-   single `CryptoService`, Zod env validation, real readiness probe, web Sentry.
-3. Phase 2: repository-level `workspace_id` scoping, Puppeteer pool, SQL
-   aggregation, Redis caching, `packages/ui`, adopt validators, a11y + loading
-   states, test coverage (currently 13 suites for 43 modules).
+1. Review/merge `fix/phase0-critical-security` (Phases 0 + 1).
+   - **Take a DB backup first**: the Float→Decimal cast in migration
+     `20260720120000` is one-way.
+   - Point orchestrators at `/health/ready` (503) and `/health/live`.
+   - Set `NEXT_PUBLIC_SENTRY_DSN` for browser error capture.
+   - `NEXTAUTH_SECRET` is now mandatory — `docker compose` commands fail without
+     it. That is intentional (M10), but it does change local dev ergonomics.
+2. Investigate why CI's `turbo type-check` did not catch that `apps/web` could
+   not compile. A broken build reached `main` — the gate is not working.
+3. Phase 2: repository-level `workspace_id` scoping (the durable tenancy fix),
+   Puppeteer pool, SQL aggregation, Redis caching, `packages/ui`, adopt
+   validators in web forms, a11y + loading states, test coverage
+   (16 suites for 43 modules).
 
 ## Active branches
 - `main`: stable
