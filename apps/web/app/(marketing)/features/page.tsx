@@ -151,7 +151,7 @@ export default async function FeaturesPage() {
                 {hero.platforms_headline || 'Works with all major platforms'}
               </h2>
             </div>
-            <div className="animate-fade-in-up delay-200 mt-10 overflow-x-auto rounded-card border border-border border-border shadow-[var(--shadow-card)]">
+            <div className="animate-fade-in-up delay-200 mt-10 overflow-x-auto rounded-card border border-border shadow-[var(--shadow-card)]">
               <table className="w-full text-left text-[13px]">
                 <thead className="border-b border-border bg-[var(--color-bg-2)]">
                   <tr>

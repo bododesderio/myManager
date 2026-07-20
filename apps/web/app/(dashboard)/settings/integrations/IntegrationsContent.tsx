@@ -129,7 +129,7 @@ export default function IntegrationsContent() {
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
                 placeholder="e.g. Production API"
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
               <div className="mt-3 flex gap-2">
                 <Button onClick={handleCreateKey}>
@@ -137,7 +137,7 @@ export default function IntegrationsContent() {
                 </Button>
                 <button
                   onClick={() => { setShowNewKey(false); setNewKeyName(''); }}
-                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
@@ -192,7 +192,7 @@ export default function IntegrationsContent() {
                   value={newWebhookUrl}
                   onChange={(e) => setNewWebhookUrl(e.target.value)}
                   placeholder="https://example.com/webhook"
-                  className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div className="mt-3">
@@ -220,7 +220,7 @@ export default function IntegrationsContent() {
                 </Button>
                 <button
                   onClick={() => { setShowNewWebhook(false); setNewWebhookUrl(''); setNewWebhookEvents([]); }}
-                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>

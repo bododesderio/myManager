@@ -41,7 +41,7 @@ export function UsersContent() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+          className="rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
         />
       </div>
 

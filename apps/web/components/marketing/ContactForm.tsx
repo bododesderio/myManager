@@ -80,7 +80,7 @@ export function ContactForm({ supportEmail, salesEmail }: ContactFormProps) {
           name="name"
           type="text"
           required
-          className="mt-1 block w-full rounded-input border border-border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="mt-1 block w-full rounded-input border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -93,7 +93,7 @@ export function ContactForm({ supportEmail, salesEmail }: ContactFormProps) {
           name="email"
           type="email"
           required
-          className="mt-1 block w-full rounded-input border border-border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="mt-1 block w-full rounded-input border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -104,7 +104,7 @@ export function ContactForm({ supportEmail, salesEmail }: ContactFormProps) {
         <select
           id="subject"
           name="subject"
-          className="mt-1 block w-full rounded-input border border-border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="mt-1 block w-full rounded-input border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         >
           <option>General Inquiry</option>
           <option>Sales</option>
@@ -122,7 +122,7 @@ export function ContactForm({ supportEmail, salesEmail }: ContactFormProps) {
           name="message"
           rows={5}
           required
-          className="mt-1 block w-full rounded-input border border-border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="mt-1 block w-full rounded-input border border-border px-4 py-2.5 text-[14px] text-text focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 

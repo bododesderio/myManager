@@ -192,7 +192,7 @@ function CredentialRow({
               type={field.secret ? 'password' : 'text'}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="w-full max-w-md rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+              className="w-full max-w-md rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
               autoFocus
             />
             <button

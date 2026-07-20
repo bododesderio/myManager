@@ -39,7 +39,7 @@ export default function UserError({
         </button>
         <a
           href="/home"
-          className="rounded-btn border border-border border-border px-6 py-2.5 text-sm font-medium text-text transition-colors hover:bg-bg-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="rounded-btn border border-border px-6 py-2.5 text-sm font-medium text-text transition-colors hover:bg-bg-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           Back to dashboard
         </a>

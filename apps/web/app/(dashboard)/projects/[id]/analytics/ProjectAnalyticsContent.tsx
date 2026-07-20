@@ -49,14 +49,14 @@ export function ProjectAnalyticsContent({ id }: { id: string }) {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <span className="text-sm text-text-muted">to</span>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
       </div>

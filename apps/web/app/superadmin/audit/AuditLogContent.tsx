@@ -141,7 +141,7 @@ export function AuditLogContent() {
           </label>
           <button
             onClick={handleExport}
-            className="rounded-brand border border-border border-border bg-bg px-4 py-2 text-sm font-medium hover:bg-bg-2"
+            className="rounded-brand border border-border bg-bg px-4 py-2 text-sm font-medium hover:bg-bg-2"
           >
             Export CSV
           </button>
@@ -158,7 +158,7 @@ export function AuditLogContent() {
               setAction(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           >
             <option value="">All actions</option>
             {actions.map((a) => (
@@ -179,7 +179,7 @@ export function AuditLogContent() {
               setUserId(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -193,7 +193,7 @@ export function AuditLogContent() {
               setResourceType(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -206,7 +206,7 @@ export function AuditLogContent() {
               setFromDate(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -219,7 +219,7 @@ export function AuditLogContent() {
               setToDate(e.target.value);
               setPage(1);
             }}
-            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -232,7 +232,7 @@ export function AuditLogContent() {
             setToDate('');
             setPage(1);
           }}
-          className="rounded-brand border border-border border-border px-3 py-2 text-sm text-text-2 hover:bg-bg-2"
+          className="rounded-brand border border-border px-3 py-2 text-sm text-text-2 hover:bg-bg-2"
         >
           Clear
         </button>

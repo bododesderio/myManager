@@ -37,7 +37,7 @@ export default function RouteError({
         </Button>
         <Link
           href="/home"
-          className="rounded-lg border border-border border-border px-6 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-2"
+          className="rounded-lg border border-border px-6 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-2"
         >
           Back to dashboard
         </Link>

@@ -144,15 +144,15 @@ export function SeoContent() {
           <div className="mt-4 space-y-4">
             <div>
               <label htmlFor="seoTitle" className="block text-sm font-medium text-text-2">Default Title</label>
-              <input id="seoTitle" type="text" value={globalSeo.title} onChange={(e) => updateGlobal('title', e.target.value)} className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none" />
+              <input id="seoTitle" type="text" value={globalSeo.title} onChange={(e) => updateGlobal('title', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none" />
             </div>
             <div>
               <label htmlFor="seoDesc" className="block text-sm font-medium text-text-2">Default Description</label>
-              <textarea id="seoDesc" rows={3} value={globalSeo.description} onChange={(e) => updateGlobal('description', e.target.value)} className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none" />
+              <textarea id="seoDesc" rows={3} value={globalSeo.description} onChange={(e) => updateGlobal('description', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none" />
             </div>
             <div>
               <label htmlFor="seoKeywords" className="block text-sm font-medium text-text-2">Keywords</label>
-              <input id="seoKeywords" type="text" value={globalSeo.keywords} onChange={(e) => updateGlobal('keywords', e.target.value)} className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none" />
+              <input id="seoKeywords" type="text" value={globalSeo.keywords} onChange={(e) => updateGlobal('keywords', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none" />
             </div>
             <div>
               <label className="block text-sm font-medium text-text-2">OG Image</label>
@@ -167,7 +167,7 @@ export function SeoContent() {
             </div>
             <div>
               <label htmlFor="canonicalUrl" className="block text-sm font-medium text-text-2">Canonical URL</label>
-              <input id="canonicalUrl" type="text" value={globalSeo.canonicalUrl} onChange={(e) => updateGlobal('canonicalUrl', e.target.value)} className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none" />
+              <input id="canonicalUrl" type="text" value={globalSeo.canonicalUrl} onChange={(e) => updateGlobal('canonicalUrl', e.target.value)} className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none" />
             </div>
           </div>
           <button
@@ -202,7 +202,7 @@ export function SeoContent() {
                         value={page.meta_title ?? ''}
                         onChange={(e) => updatePageSeo(page.slug, 'meta_title', e.target.value)}
                         placeholder="Override default title"
-                        className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                        className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                     </div>
                     <div>
@@ -212,7 +212,7 @@ export function SeoContent() {
                         value={page.meta_desc ?? ''}
                         onChange={(e) => updatePageSeo(page.slug, 'meta_desc', e.target.value)}
                         placeholder="Override default description"
-                        className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                        className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                     </div>
                     <div>
@@ -222,7 +222,7 @@ export function SeoContent() {
                         value={page.og_image ?? ''}
                         onChange={(e) => updatePageSeo(page.slug, 'og_image', e.target.value)}
                         placeholder="https://..."
-                        className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                        className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                     </div>
                     <label className="flex items-center gap-2 text-sm text-text-2">

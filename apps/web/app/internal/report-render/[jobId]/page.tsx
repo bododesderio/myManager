@@ -41,7 +41,7 @@ export default async function ReportRenderPage({ params }: ReportRenderPageProps
 
         <section className="mt-8">
           <h2 className="font-heading text-xl font-bold">Platform Breakdown</h2>
-          <div className="mt-4 h-64 rounded border border-border border-dashed border-border flex items-center justify-center text-sm text-text-muted">
+          <div className="mt-4 h-64 rounded border border-border border-dashed flex items-center justify-center text-sm text-text-muted">
             Platform performance chart renders here for PDF export.
           </div>
         </section>

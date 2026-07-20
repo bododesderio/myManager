@@ -69,7 +69,7 @@ export default function ProfileContent() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
           <div>
@@ -95,7 +95,7 @@ export default function ProfileContent() {
               id="profileTimezone"
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
-              className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+              className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
             >
               <option value="UTC">UTC</option>
               <option value="America/New_York">America/New_York</option>

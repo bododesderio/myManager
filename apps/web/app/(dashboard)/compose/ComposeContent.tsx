@@ -273,7 +273,7 @@ export function ComposeContent() {
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             placeholder="What would you like to share?"
-            className="mt-2 block w-full resize-none rounded-brand border border-border border-border px-4 py-3 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-2 block w-full resize-none rounded-brand border border-border px-4 py-3 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <div className="mt-3 flex items-center justify-between text-sm">
             <span
@@ -447,7 +447,7 @@ export function ComposeContent() {
                   value={scheduledAt}
                   onChange={(e) => setScheduledAt(e.target.value)}
                   min={new Date().toISOString().slice(0, 16)}
-                  className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <button

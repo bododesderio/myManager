@@ -6,7 +6,7 @@ export function StatCardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="animate-pulse rounded-brand border border-border border-border bg-bg-card p-5 shadow-sm"
+      className="animate-pulse rounded-brand border border-border bg-bg-card p-5 shadow-sm"
     >
       <SkeletonBar className="h-3 w-24" />
       <SkeletonBar className="mt-3 h-7 w-16" />

@@ -61,7 +61,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = 200 }
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={10}
-          className="block w-full rounded-brand border border-border border-border px-3 py-2 font-mono text-xs focus:border-primary focus:outline-none"
+          className="block w-full rounded-brand border border-border px-3 py-2 font-mono text-xs focus:border-primary focus:outline-none"
           style={{ minHeight }}
         />
       )}

@@ -19,7 +19,7 @@ export function CardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="animate-pulse rounded-brand border border-border border-border bg-bg-card p-6 shadow-sm"
+      className="animate-pulse rounded-brand border border-border bg-bg-card p-6 shadow-sm"
     >
       <SkeletonBar className="h-4 w-32" />
       <div className="mt-4 space-y-3">

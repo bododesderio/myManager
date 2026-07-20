@@ -134,7 +134,7 @@ export default function SecurityContent() {
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -144,7 +144,7 @@ export default function SecurityContent() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -154,7 +154,7 @@ export default function SecurityContent() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function SecurityContent() {
                     onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="123456"
                     maxLength={6}
-                    className="mt-1 block w-48 rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                    className="mt-1 block w-48 rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
                   />
                 </div>
                 <button
@@ -264,7 +264,7 @@ export default function SecurityContent() {
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="Enter 6-digit code"
                   maxLength={6}
-                  className="mt-1 block w-48 rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                  className="mt-1 block w-48 rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div className="mt-4 flex gap-2">
@@ -278,7 +278,7 @@ export default function SecurityContent() {
                     setSetupData(null);
                     setVerificationCode('');
                   }}
-                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Cancel
                 </button>
