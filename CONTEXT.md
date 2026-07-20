@@ -92,10 +92,12 @@ all 39 error boundaries wired to Sentry, `/portal` + `/user` boundaries added.
 - Test coverage: 18 suites for 43 modules. Zero coverage on OAuth flows,
   scheduling, 8 of 10 platform workers.
 
-## [BLOCKED] apps/web cannot complete a production build
+## [UNRESOLVED] `next build` fails at the /_error export — cause NOT established
 
-Four blockers found; three fixed (jsdom bundling, and static prerendering of
-auth-gated routes in `(dashboard)`, `superadmin`, `user`). The fourth is open:
+Three real build blockers were found and fixed (jsdom bundling; static
+prerendering of auth-gated routes in `(dashboard)`, `superadmin`, `user`).
+A fourth failure remains and I could **not** determine whether it is a defect in
+this project or an artefact of the dev machine:
 
 ```
 Error: <Html> should not be imported outside of pages/_document
@@ -103,23 +105,47 @@ Export encountered an error on /_error: /404
 ```
 
 Reproduce: `NEXTAUTH_SECRET=<32+ chars> NEXTAUTH_URL=http://localhost:3000 npx next build`
-in `apps/web`. **Not** caused by this branch — reproduced on clean `main` with
-only the two minimal build fixes applied.
+in `apps/web`. Compilation succeeds and 16 static pages generate; only Next's
+internal pages-router `/_error` export fails.
 
-Already ruled out by experiment:
-- `@sentry/nextjs` in `global-error.tsx` (removed it — still failed)
-- any dependency importing `next/document` (only `@next/eslint-plugin-next`
-  references it, and that is not a runtime dependency)
-- the edge runtime on `app/opengraph-image.tsx` (switched to nodejs — still failed)
+### Ruled out by experiment (each tested, each still failed)
+- `@sentry/nextjs` in `global-error.tsx` — removed it
+- `global-error.tsx` entirely — moved it out
+- `app/not-found.tsx` — moved it out
+- the whole `(marketing)` route group — moved it out
+- any dependency importing `next/document` — only `@next/eslint-plugin-next`
+  does, and it is not a runtime dep
+- edge runtime on `app/opengraph-image.tsx` — switched to nodejs
+- `output: 'standalone'` — removed
+- `next.config.ts` — removed entirely
+- the `webpack: ">=5.104.0"` pnpm override — removed
+- Next version — pinned 15.4.7 (fails identically, so not a 15.5 regression)
+- React version — pinned 19.1.1
+- Node version — tested on both 20 (CI's version) and 24
+- `middleware.ts` and `instrumentation.ts` — moved out
 
-Likely a Next 15 App Router / pages-router shim interaction. Note the project
-runs `next-auth ^4.24.13` (pages-router era) against Next 15 App Router, while
-the stack default calls for Auth.js v5 — that mismatch is the most promising
-next lead.
+### The decisive result
+Reducing `apps/web` to a **two-file app** (bare `layout.tsx` + `page.tsx`, no
+config, no middleware) still fails identically. So it is not this project's
+application code.
 
-NOTE: the earlier Phase 1 claim that `next build` exited 0 was measured under
+A pristine Next 15.5.14 scaffold **outside** the workspace also fails to build on
+this machine — with a different error, on both Node 20 and 24. That makes the
+environment a live suspect and means the `<Html>` failure cannot currently be
+attributed to the repository at all.
+
+### Next step for whoever picks this up
+Run `pnpm --filter @mymanager/web build` on CI or another machine. If it passes
+there, this is local-environment noise and nothing in the repo needs fixing. If
+it fails there too, resume from "a two-file app also fails", which points at the
+installed dependency tree rather than app code.
+
+CORRECTION: the earlier claim in this file that "apps/web cannot complete a
+production build" was overstated — it could not be verified, because this
+environment cannot build a pristine Next app either. The Phase 1 claim that
+`next build` exited 0 was also wrong: it was measured under
 `SKIP_ENV_VALIDATION=1` with no `NEXTAUTH_SECRET`, which is not a realistic
-production configuration. It was wrong.
+production configuration.
 
 **Flagged, needs a product decision (not a bug I should fix unilaterally):**
 - `bio-pages.controller.ts` has zero `@Public()` decorators despite two routes
