@@ -4,6 +4,7 @@ import { WorkspaceMemberGuard } from './workspace-member.guard';
 describe('WorkspaceMemberGuard', () => {
   let guard: WorkspaceMemberGuard;
   let prisma: Record<string, any>;
+  let reflector: Record<string, jest.Mock>;
 
   beforeEach(() => {
     prisma = {
@@ -13,7 +14,10 @@ describe('WorkspaceMemberGuard', () => {
       mediaAsset: { findUnique: jest.fn() },
     };
 
-    guard = new WorkspaceMemberGuard(prisma as any);
+    // Reflector returns undefined => route is not @Public(), which is the
+    // default for every route these tests cover.
+    reflector = { getAllAndOverride: jest.fn().mockReturnValue(undefined) };
+    guard = new WorkspaceMemberGuard(prisma as any, reflector as any);
   });
 
   function createContext(overrides: {
@@ -38,6 +42,9 @@ describe('WorkspaceMemberGuard', () => {
       switchToHttp: () => ({
         getRequest: () => request,
       }),
+      // Reflector reads metadata off these; the guard checks @Public() first.
+      getHandler: () => function handler() {},
+      getClass: () => class Controller {},
       request,
     };
   }
