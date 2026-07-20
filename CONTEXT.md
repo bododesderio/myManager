@@ -2,14 +2,16 @@
 Last updated: 2026-07-20
 
 ## Current task
-Phases 0 and 1 — **complete and committed** on branch
+Phases 0 and 1 complete; Phase 2 **partially** complete. All on branch
 `fix/phase0-critical-security`. Awaiting review/merge.
 
 - 266a450 — Phase 0: payment bypass, tenancy bypasses, duplicate publishing
 - 094b71e — Phase 1: decimal money, atomic registration, unified crypto,
   real health checks, env validation, web Sentry, web build fix
+- 891651b — Phase 2 (partial): repository-level workspace scoping (4 modules),
+  Chromium pool, paged CSV export
 
-Next: Phase 2 (scale & maintainability) from `docs/audit-2026-07-20.md` §6.
+**Phase 2 is much larger than 0 and 1 and is NOT finished.** See below.
 
 ## Stack
 Turborepo + pnpm 9.15.4 workspaces.
@@ -63,8 +65,40 @@ Full detail in `docs/audit-2026-07-20.md`. Open items:
   and the API side is correct (`timestamptz` compared in UTC). Needs a frontend
   check before any conclusion.
 
+## Phase 2 — remaining work
+
+**Tenancy scoping — 4 of ~11 modules done.** Scoped: templates, bio-pages, rss,
+competitors. Still using bare-`id` lookups and needing the same treatment:
+`media`, `reports`, `webhooks`, `api-keys`, `comments`, `social-accounts`,
+`approvals`. (`users`, `plans`, `billing.plan`, `sales-leads` are legitimately
+global — do NOT scope those.)
+Method that worked: change the repository signature first, then let `tsc`
+enumerate every call site. Do not grep for them.
+
+**Not started:**
+- Analytics aggregated in Node memory rather than SQL (`analytics.repository.ts:116-156`,
+  `campaigns.repository.ts:41-57`, `projects.repository.ts:79-103`).
+  Also `competitors.repository.ts getCompetitorMetrics` has an N+1 loop.
+- Redis caching for plans / platform config / brand config (read-constantly,
+  write-rarely; Redis is already wired for BullMQ and locks).
+- `packages/ui` — no shared component library exists; 28 components live in
+  `apps/web/components` on raw HTML elements.
+- `packages/validators` still has **zero** imports in web; every form hand-rolls
+  validation in `useState`.
+- 0 `loading.tsx` files; 59% of pages lack `error.tsx`.
+- Accessibility: icon-only buttons without labels, no modal focus management.
+- Test coverage: 17 suites for 43 modules. Zero coverage on OAuth flows,
+  scheduling, 8 of 10 platform workers.
+
+**Flagged, needs a product decision (not a bug I should fix unilaterally):**
+- `bio-pages.controller.ts` has zero `@Public()` decorators despite two routes
+  named/documented public (`GET public/:slug`, `POST :slug/click`). Anonymous
+  visitors get 401, so link-in-bio does not work publicly. Adding `@Public()`
+  expands anonymous access — confirm that is intended before changing.
+
 ## Next steps
-1. Review/merge `fix/phase0-critical-security` (Phases 0 + 1).
+1. Review/merge `fix/phase0-critical-security` (Phases 0 + 1 + partial 2).
+   - Tune `PUPPETEER_POOL_SIZE` (default 2) to the worker's memory budget.
    - **Take a DB backup first**: the Float→Decimal cast in migration
      `20260720120000` is one-way.
    - Point orchestrators at `/health/ready` (503) and `/health/live`.
