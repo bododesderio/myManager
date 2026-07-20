@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Route } from 'next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 interface CmsPage {
   id: string;
@@ -70,7 +71,7 @@ export function ContentPagesContent() {
         <p className="mt-1 text-sm text-text-2">Edit live CMS page sections, fields, and metadata</p>
       </div>
 
-      <div className="rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none">
         <div className="divide-y">
           {sortedPages.map((page) => (
             <Link
@@ -104,7 +105,7 @@ export function ContentPagesContent() {
             <div className="px-6 py-12 text-center text-text-muted">No CMS pages found.</div>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import styles from './page.module.css';
+import { Card } from '@mymanager/ui';
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -570,7 +571,7 @@ function BuilderPanel({
       {/* Controls sidebar */}
       <div className="w-full shrink-0 space-y-5 lg:w-[280px]">
         {/* Colors */}
-        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
+        <Card padding="sm">
           <h2 className="font-heading text-sm font-semibold">Colors</h2>
           <div className="mt-3 space-y-3">
             <ColorPickerField label="Primary" value={colors.primary} onChange={(v) => onUpdateColor('primary', v)} />
@@ -584,10 +585,10 @@ function BuilderPanel({
             <ColorPickerField label="Surface" value={colors.surface} onChange={(v) => onUpdateColor('surface', v)} />
             <ColorPickerField label="Border" value={colors.border} onChange={(v) => onUpdateColor('border', v)} />
           </div>
-        </div>
+        </Card>
 
         {/* Dark mode colors (collapsible) */}
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <button
             type="button"
             onClick={onToggleDarkColors}
@@ -613,10 +614,10 @@ function BuilderPanel({
               <ColorPickerField label="Border" value={darkColors.border} onChange={(v) => onUpdateDarkColor('border', v)} />
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Typography */}
-        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
+        <Card padding="sm">
           <h2 className="font-heading text-sm font-semibold">Typography</h2>
           <div className="mt-3 space-y-3">
             <div>
@@ -644,10 +645,10 @@ function BuilderPanel({
               </select>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Border radius */}
-        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
+        <Card padding="sm">
           <h2 className="font-heading text-sm font-semibold">Border Radius</h2>
           <div className="mt-3 space-y-3">
             <div>
@@ -677,10 +678,10 @@ function BuilderPanel({
               />
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* UI Density */}
-        <div className="rounded-brand border border-border bg-bg p-4 shadow-sm">
+        <Card padding="sm">
           <h2 className="font-heading text-sm font-semibold">UI Density</h2>
           <div className="mt-3">
             <PillToggle
@@ -693,7 +694,7 @@ function BuilderPanel({
               onChange={onDensityChange}
             />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Live preview canvas */}
@@ -852,7 +853,7 @@ function BuilderPanel({
         </div>
 
         {/* Sticky save bar */}
-        <div className="sticky bottom-0 mt-4 flex items-center justify-between gap-3 rounded-brand border border-border bg-bg p-4 shadow-sm">
+        <Card padding="sm" className="sticky bottom-0 mt-4 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onReset}
@@ -877,7 +878,7 @@ function BuilderPanel({
               {saving ? 'Saving...' : 'Save & apply platform-wide \u2192'}
             </button>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
@@ -912,7 +913,7 @@ function ModeScopePanel({
   return (
     <div className="max-w-2xl space-y-6">
       {/* Default mode */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Default Mode</h2>
         <p className="mt-1 text-xs text-text-2">Choose the default color mode for all users.</p>
         <div className="mt-4 space-y-3">
@@ -938,10 +939,10 @@ function ModeScopePanel({
             </label>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Allow user override */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-heading text-lg font-semibold">Allow User Override</h2>
@@ -965,10 +966,10 @@ function ModeScopePanel({
             />
           </button>
         </div>
-      </div>
+      </Card>
 
       {/* Dark mode color overrides */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Dark Mode Color Overrides</h2>
         <p className="mt-1 text-xs text-text-2">
           Customize the colors used when dark mode is active.
@@ -980,10 +981,10 @@ function ModeScopePanel({
           <ColorPickerField label="Text secondary" value={darkColors.textSecondary} onChange={(v) => onDarkColorChange('textSecondary', v)} />
           <ColorPickerField label="Border" value={darkColors.border} onChange={(v) => onDarkColorChange('border', v)} />
         </div>
-      </div>
+      </Card>
 
       {/* Scope rules table */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Scope Rules</h2>
         <p className="mt-1 text-xs text-text-2">
           Read-only overview of how theme modes are applied across different areas.
@@ -1022,7 +1023,7 @@ function ModeScopePanel({
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

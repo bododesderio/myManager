@@ -6,6 +6,7 @@ import { useWorkspace, useUpdateWorkspace } from '@/lib/hooks/useWorkspaces';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { Card } from '@mymanager/ui';
 
 export default function WorkspaceSettingsContent() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -63,7 +64,7 @@ export default function WorkspaceSettingsContent() {
       <h1 className="font-heading text-2xl font-bold">Workspace Settings</h1>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">General</h2>
           <div className="mt-4 space-y-4">
             <div>
@@ -121,7 +122,7 @@ export default function WorkspaceSettingsContent() {
           >
             {updateWorkspace.isPending ? 'Saving...' : 'Save Changes'}
           </button>
-        </div>
+        </Card>
       </div>
     </div>
   );

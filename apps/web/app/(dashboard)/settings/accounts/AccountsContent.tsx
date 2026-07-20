@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSocialAccounts, useDisconnectSocialAccount } from '@/lib/hooks/useSocialAccounts';
 import { useToast } from '@/providers/ToastProvider';
 import { ServiceUnavailableInline } from '@/components/status/ServiceUnavailable';
+import { Card } from '@mymanager/ui';
 
 export default function AccountsContent() {
   const { data: accounts, isLoading } = useSocialAccounts();
@@ -41,7 +42,7 @@ export default function AccountsContent() {
       </div>
 
       {accountList.length === 0 ? (
-        <div className="max-w-2xl rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
+        <Card padding="none" className="max-w-2xl p-8 text-center">
           <p className="text-sm text-text-2">No social accounts connected yet.</p>
           <Link
             href={"/connect/oauth" as Route}
@@ -49,7 +50,7 @@ export default function AccountsContent() {
           >
             Connect Your First Account
           </Link>
-        </div>
+        </Card>
       ) : (
         <div className="max-w-2xl space-y-3">
           {accountList.map((account: any) => (
@@ -93,7 +94,7 @@ export default function AccountsContent() {
               <button
                 onClick={() => handleDisconnect(account.id, account.platform)}
                 disabled={disconnect.isPending}
-                className="rounded-brand border border-border border-red-300 px-4 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                className="rounded-brand border border-red-300 px-4 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
               >
                 Disconnect
               </button>

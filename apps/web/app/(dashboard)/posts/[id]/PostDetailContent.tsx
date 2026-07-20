@@ -7,6 +7,7 @@ import { usePost, usePostAnalytics, useDeletePost, useDuplicatePost } from '@/li
 import { useToast } from '@/providers/ToastProvider';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Card } from '@mymanager/ui';
 
 interface PostDetailContentProps {
   id: string;
@@ -136,7 +137,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Post content */}
         <div className="space-y-4">
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Post Content</h2>
             {post.caption ? (
               <p className="mt-4 whitespace-pre-wrap text-text-2">{post.caption}</p>
@@ -171,11 +172,11 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
                 ))}
               </div>
             )}
-          </div>
+          </Card>
 
           {/* Per-platform publishing results */}
           {platformResults.length > 0 && (
-            <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+            <Card>
               <h2 className="font-heading text-lg font-semibold">Publishing Results</h2>
               <div className="mt-4 space-y-3">
                 {platformResults.map((result, i) => (
@@ -191,14 +192,14 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
         </div>
 
         {/* Analytics + comments */}
         <div className="space-y-4">
           {isPublished && (
-            <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+            <Card>
               <h2 className="font-heading text-lg font-semibold">Performance</h2>
               {analyticsLoading ? (
                 <div className="mt-4">
@@ -227,10 +228,10 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
                   No analytics data available yet.
                 </p>
               )}
-            </div>
+            </Card>
           )}
 
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Comments</h2>
             {analytics?.comments?.length > 0 ? (
               <div className="mt-4 space-y-3">
@@ -246,7 +247,7 @@ export function PostDetailContent({ id }: PostDetailContentProps) {
                 Comments from social platforms will appear here.
               </p>
             )}
-          </div>
+          </Card>
         </div>
       </div>
     </div>

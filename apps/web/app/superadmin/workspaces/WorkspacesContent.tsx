@@ -2,6 +2,7 @@
 
 import { useAdminWorkspaces } from '@/lib/hooks/useAdmin';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function WorkspacesContent() {
   const { data, isLoading } = useAdminWorkspaces();
@@ -14,7 +15,7 @@ export function WorkspacesContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -59,7 +60,7 @@ export function WorkspacesContent() {
               )}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );

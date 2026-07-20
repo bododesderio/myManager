@@ -2,6 +2,7 @@
 
 import { useAdminHealth } from '@/lib/hooks/useAdmin';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const statusStyles: Record<string, string> = {
   operational: 'bg-green-100 text-green-800',
@@ -30,15 +31,15 @@ export function ApiHealthContent() {
 
       {health?.uptime != null && (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          <Card padding="md">
             <p className="text-sm text-text-2">Uptime</p>
             <p className="mt-1 text-2xl font-bold">{health.uptime}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Response Time</p>
             <p className="mt-1 text-2xl font-bold">{health.responseTime ?? '--'}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Status</p>
             <p className="mt-1 text-2xl font-bold">
               <span
@@ -49,14 +50,14 @@ export function ApiHealthContent() {
                 {health.status}
               </span>
             </p>
-          </div>
+          </Card>
         </div>
       )}
 
       {isLoading ? (
         <TableSkeleton rows={8} cols={4} />
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -93,7 +94,7 @@ export function ApiHealthContent() {
               )}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );

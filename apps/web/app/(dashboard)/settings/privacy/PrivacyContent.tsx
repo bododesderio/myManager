@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 export default function PrivacyContent() {
   const { addToast } = useToast();
@@ -42,7 +43,7 @@ export default function PrivacyContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Cookie Consent */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Cookie Consent</h2>
           <p className="mt-2 text-sm text-text-2">Manage which cookies you allow on your device.</p>
           <div className="mt-4 space-y-4">
@@ -98,10 +99,10 @@ export default function PrivacyContent() {
           >
             Save Cookie Preferences
           </button>
-        </div>
+        </Card>
 
         {/* Data Export */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Data Export</h2>
           <p className="mt-2 text-sm text-text-2">Download a copy of all your data.</p>
           <button
@@ -111,10 +112,10 @@ export default function PrivacyContent() {
           >
             {exportRequested ? 'Export Requested' : 'Request Data Export'}
           </button>
-        </div>
+        </Card>
 
         {/* Delete Account */}
-        <div className="rounded-brand border border-border border-red-200 bg-bg p-6 shadow-sm">
+        <Card className="border-red-200">
           <h2 className="font-heading text-lg font-semibold text-red-600">Delete Account</h2>
           <p className="mt-2 text-sm text-text-2">
             Permanently delete your account and all data. This action cannot be undone.
@@ -137,7 +138,7 @@ export default function PrivacyContent() {
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="Type DELETE"
-                className="block w-48 rounded-brand border border-border border-red-300 px-4 py-2 focus:border-red-500 focus:outline-none"
+                className="block w-48 rounded-brand border border-red-300 px-4 py-2 focus:border-red-500 focus:outline-none"
               />
               <div className="flex gap-2">
                 <button
@@ -158,7 +159,7 @@ export default function PrivacyContent() {
               </div>
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

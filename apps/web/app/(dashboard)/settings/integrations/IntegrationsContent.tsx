@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/providers/ToastProvider';
-import { Button } from '@mymanager/ui';
+import { Button, Card } from '@mymanager/ui';
 
 interface ApiKey {
   id: string;
@@ -109,7 +109,7 @@ export default function IntegrationsContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* API Keys */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">API Keys</h2>
             <button
@@ -160,7 +160,7 @@ export default function IntegrationsContent() {
                   </div>
                   <button
                     onClick={() => handleRevokeKey(key.id)}
-                    className="rounded-brand border border-border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="rounded-brand border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
                   >
                     Revoke
                   </button>
@@ -168,10 +168,10 @@ export default function IntegrationsContent() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Webhook Endpoints */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold">Webhook Endpoints</h2>
             <button
@@ -245,7 +245,7 @@ export default function IntegrationsContent() {
                   </div>
                   <button
                     onClick={() => handleDeleteWebhook(webhook.id)}
-                    className="rounded-brand border border-border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="rounded-brand border border-red-300 px-3 py-1 text-sm font-medium text-red-600 transition hover:bg-red-50"
                   >
                     Delete
                   </button>
@@ -253,7 +253,7 @@ export default function IntegrationsContent() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

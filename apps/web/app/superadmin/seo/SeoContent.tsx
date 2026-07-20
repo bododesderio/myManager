@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
+import { Card } from '@mymanager/ui';
 
 interface BrandResponse {
   id: string;
@@ -138,7 +139,7 @@ export function SeoContent() {
       <h1 className="font-heading text-2xl font-bold">SEO Management</h1>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Global SEO Settings</h2>
           <div className="mt-4 space-y-4">
             <div>
@@ -176,9 +177,9 @@ export function SeoContent() {
           >
             {saving ? 'Saving...' : 'Save Global SEO'}
           </button>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Page-Specific SEO</h2>
           <div className="mt-4 space-y-3">
             {pages.map((page) => (
@@ -243,7 +244,7 @@ export function SeoContent() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

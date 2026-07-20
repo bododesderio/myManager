@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import styles from './TranslationsContent.module.css';
+import { Card } from '@mymanager/ui';
 
 interface TranslationKey {
   id: string;
@@ -170,7 +171,7 @@ export function TranslationsContent() {
     return (
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Translations</h1>
-        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-brand border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-red-700">{error}</p>
           <button
             onClick={() => void load()}
@@ -223,9 +224,9 @@ export function TranslationsContent() {
         />
 
         {filteredTranslations.length === 0 ? (
-          <div className="rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
+          <Card padding="none" className="p-8 text-center">
             <p className="text-text-muted">No translation keys found.</p>
-          </div>
+          </Card>
         ) : (
           <div className="space-y-2">
             {filteredTranslations.map((t) => (

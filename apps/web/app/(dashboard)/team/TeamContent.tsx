@@ -10,6 +10,7 @@ import {
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const ROLES = ['owner', 'admin', 'editor', 'viewer'] as const;
 
@@ -92,7 +93,7 @@ export function TeamContent() {
 
       {/* Invite form */}
       {showInviteForm && (
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Invite a Team Member</h2>
           <form onSubmit={handleInvite} className="mt-4 flex flex-wrap items-end gap-4">
             <div className="flex-1">
@@ -143,19 +144,19 @@ export function TeamContent() {
               </button>
             </div>
           </form>
-        </div>
+        </Card>
       )}
 
       {/* Members table */}
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : members.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <h3 className="font-heading text-lg font-semibold text-text">No team members</h3>
           <p className="mt-1 text-sm text-text-2">Invite someone to get started.</p>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -213,7 +214,7 @@ export function TeamContent() {
               })}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
 
       {/* Remove confirmation modal */}

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 interface BrandFeatures {
   maintenance_mode: boolean;
@@ -129,7 +130,7 @@ export function SystemSettingsContent() {
       </div>
 
       {/* Feature toggles */}
-      <div className="rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Feature Flags</h2>
         <div className="divide-y">
           {toggles.map(({ key, label, description }) => (
@@ -155,10 +156,10 @@ export function SystemSettingsContent() {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Sub-page links */}
-      <div className="rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Configuration</h2>
         <div className="divide-y">
           {subPages.map(({ href, label, description }) => (
@@ -186,7 +187,7 @@ export function SystemSettingsContent() {
             </Link>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAdminBilling } from '@/lib/hooks/useAdmin';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function BillingContent() {
   const { data: billing, isLoading } = useAdminBilling();
@@ -58,7 +59,7 @@ export function BillingContent() {
       )}
 
       {planBreakdown.length > 0 && (
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Subscriptions by Plan</h2>
           <div className="mt-4 space-y-3">
             {planBreakdown.map((item) => (
@@ -71,10 +72,10 @@ export function BillingContent() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Recent Transactions</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -102,7 +103,7 @@ export function BillingContent() {
         ) : (
           <p className="mt-4 text-sm text-text-2">Payment transactions and invoices will appear here.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

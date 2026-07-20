@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAnalyticsOverview } from '@/lib/hooks/useAnalytics';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
+import { Card } from '@mymanager/ui';
 
 function getDefaultDates() {
   const end = new Date();
@@ -73,7 +74,7 @@ export function ProjectAnalyticsContent({ id }: { id: string }) {
         </div>
       )}
 
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Performance Over Time</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -84,7 +85,7 @@ export function ProjectAnalyticsContent({ id }: { id: string }) {
             Project-specific analytics charts will render here.
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

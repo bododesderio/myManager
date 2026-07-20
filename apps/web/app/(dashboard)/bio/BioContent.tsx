@@ -14,6 +14,7 @@ import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
 import styles from './BioContent.module.css';
+import { Card } from '@mymanager/ui';
 
 interface BioLink {
   id: string;
@@ -167,7 +168,7 @@ export function BioContent() {
             Create a branded link-in-bio page for your profiles.
           </p>
         </div>
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -191,7 +192,7 @@ export function BioContent() {
           >
             {createBioPage.isPending ? 'Creating...' : 'Create Bio Page'}
           </button>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -219,7 +220,7 @@ export function BioContent() {
         {/* Editor */}
         <div className="space-y-4">
           {/* Profile section */}
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Profile</h2>
             <div className="mt-4 space-y-4">
               <div>
@@ -253,10 +254,10 @@ export function BioContent() {
                 accept="image/*"
               />
             </div>
-          </div>
+          </Card>
 
           {/* Links section */}
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Links</h2>
             <div className="mt-4 space-y-3">
               {links.map((link, index) => (
@@ -369,10 +370,10 @@ export function BioContent() {
                 </button>
               )}
             </div>
-          </div>
+          </Card>
 
           {/* Theme / Color picker */}
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Theme</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {THEME_COLORS.map((color) => (
@@ -398,10 +399,10 @@ export function BioContent() {
                 </button>
               ))}
             </div>
-          </div>
+          </Card>
 
           {/* Analytics */}
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Analytics</h2>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div className="rounded-brand border border-border p-4 text-center">
@@ -431,12 +432,12 @@ export function BioContent() {
                 )}
               </div>
             )}
-          </div>
+          </Card>
         </div>
 
         {/* Preview */}
         <div className="flex justify-center lg:sticky lg:top-6 lg:self-start">
-          <div className="w-80 rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card className="w-80">
             <div className="text-center">
               {avatarUrl ? (
                 <Image
@@ -472,7 +473,7 @@ export function BioContent() {
                 ))
               )}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

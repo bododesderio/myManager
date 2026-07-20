@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Route } from 'next';
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 interface BlogPost {
   id: string;
@@ -86,7 +87,7 @@ export function BlogListContent() {
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none" className="overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>
@@ -140,7 +141,7 @@ export function BlogListContent() {
             )}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

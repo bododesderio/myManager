@@ -8,6 +8,7 @@ import { useCreatePost, usePublishPost } from '@/lib/hooks/usePosts';
 import { useUploadMedia } from '@/lib/hooks/useMedia';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 /* ------------------------------------------------------------------ */
 /*  Platform icon helper (simple coloured dot + label fallback)        */
@@ -210,7 +211,7 @@ export function ComposeContent() {
       {/* ==================== LEFT: Composer ==================== */}
       <div className="lg:col-span-2 space-y-4">
         {/* --- Account Selection --- */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-sm font-semibold text-text-2">Select Accounts</h2>
 
           {accountsLoading && (
@@ -259,10 +260,10 @@ export function ComposeContent() {
               );
             })}
           </div>
-        </div>
+        </Card>
 
         {/* --- Content Textarea --- */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <label htmlFor="compose-caption" className="block text-sm font-semibold text-text-2">
             Content
           </label>
@@ -283,10 +284,10 @@ export function ComposeContent() {
               {caption.length.toLocaleString()} / {charLimit.toLocaleString()} characters
             </span>
           </div>
-        </div>
+        </Card>
 
         {/* --- Media Upload --- */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-sm font-semibold text-text-2">Media</h2>
 
           <button
@@ -374,10 +375,10 @@ export function ComposeContent() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* --- Schedule / Submit --- */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-sm font-semibold text-text-2">Schedule</h2>
 
           {caption.length > charLimit && (
@@ -459,12 +460,12 @@ export function ComposeContent() {
               </button>
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* ==================== RIGHT: Preview ==================== */}
       <div className="hidden space-y-4 lg:block">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-sm font-semibold text-text-2">Preview</h2>
 
           {selectedAccountIds.size === 0 ? (
@@ -557,7 +558,7 @@ export function ComposeContent() {
                 })}
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

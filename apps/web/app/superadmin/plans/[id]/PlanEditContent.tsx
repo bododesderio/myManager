@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAdminPlan, useUpdatePlan } from '@/lib/hooks/useAdmin';
 import { useToast } from '@/providers/ToastProvider';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function PlanEditContent({ id }: { id: string }) {
   const { data: plan, isLoading } = useAdminPlan(id);
@@ -109,24 +110,24 @@ export function PlanEditContent({ id }: { id: string }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+        <Card padding="md">
           <p className="text-sm text-text-2">Active Subscribers</p>
           <p className="mt-1 text-2xl font-bold">{plan.subscriberCount ?? 0}</p>
-        </div>
-        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+        </Card>
+        <Card padding="md">
           <p className="text-sm text-text-2">Monthly Revenue</p>
           <p className="mt-1 text-2xl font-bold">
             ${((plan.subscriberCount ?? 0) * (plan.monthlyPrice ?? 0)).toLocaleString()}
           </p>
-        </div>
-        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+        </Card>
+        <Card padding="md">
           <p className="text-sm text-text-2">Churn Rate</p>
           <p className="mt-1 text-2xl font-bold">{plan.churnRate ?? '0'}%</p>
-        </div>
+        </Card>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
+        <Card className="space-y-4">
           <h2 className="font-heading text-lg font-semibold">Plan Configuration</h2>
           <div>
             <label htmlFor="planName" className="block text-sm font-medium text-text-2">
@@ -183,9 +184,9 @@ export function PlanEditContent({ id }: { id: string }) {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
+        <Card className="space-y-4">
           <h2 className="font-heading text-lg font-semibold">Limits</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -241,9 +242,9 @@ export function PlanEditContent({ id }: { id: string }) {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
+        <Card className="space-y-4">
           <h2 className="font-heading text-lg font-semibold">Features</h2>
           <div>
             <label htmlFor="features" className="block text-sm font-medium text-text-2">
@@ -257,7 +258,7 @@ export function PlanEditContent({ id }: { id: string }) {
               className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
-        </div>
+        </Card>
 
         <button
           type="submit"

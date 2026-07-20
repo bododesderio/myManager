@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
-import { Button } from '@mymanager/ui';
+import { Button, Card } from '@mymanager/ui';
 
 interface EmailTemplate {
   id: string;
@@ -137,7 +137,7 @@ export function EmailTemplatesContent() {
     return (
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Email Templates</h1>
-        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-brand border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-red-700">{error}</p>
           <button
             onClick={() => void load()}
@@ -160,13 +160,13 @@ export function EmailTemplatesContent() {
           </button>
           <h1 className="font-heading text-2xl font-bold">Preview: {editingTemplate.name}</h1>
         </div>
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <p className="mb-2 text-sm text-text-2">Subject: {editingTemplate.subject}</p>
           <div
             className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(editingTemplate.body ?? '') }}
           />
-        </div>
+        </Card>
       </div>
     );
   }
@@ -184,7 +184,7 @@ export function EmailTemplatesContent() {
           </h1>
         </div>
 
-        <div className="space-y-4 rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-text-2">Template Name</label>
             <input
@@ -238,7 +238,7 @@ export function EmailTemplatesContent() {
               Cancel
             </button>
           </div>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -254,7 +254,7 @@ export function EmailTemplatesContent() {
       </div>
 
       {templates.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
+        <Card padding="none" className="p-8 text-center">
           <p className="text-text-muted">No email templates yet.</p>
           <button
             onClick={handleCreate}
@@ -262,9 +262,9 @@ export function EmailTemplatesContent() {
           >
             Create your first template
           </button>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <div className="divide-y">
             {templates.map((template) => (
               <div key={template.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
@@ -298,7 +298,7 @@ export function EmailTemplatesContent() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

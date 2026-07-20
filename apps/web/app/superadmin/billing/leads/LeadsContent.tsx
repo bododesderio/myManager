@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAdminLeads } from '@/lib/hooks/useAdmin';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const statusStyles: Record<string, string> = {
   new: 'bg-blue-100 text-blue-800',
@@ -28,7 +29,7 @@ export function LeadsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -78,7 +79,7 @@ export function LeadsContent() {
               )}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );

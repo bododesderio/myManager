@@ -14,6 +14,7 @@ import {
 import { usePlatformAnalytics } from '@/lib/hooks/useAnalytics';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Card } from '@mymanager/ui';
 
 function defaultDateRange() {
   const end = new Date();
@@ -105,7 +106,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
       )}
 
       {/* Daily chart */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">{name} Engagement Over Time</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -141,10 +142,10 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
             No daily data available for this range.
           </p>
         )}
-      </div>
+      </Card>
 
       {/* Top posts section */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Top Posts</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -168,7 +169,7 @@ export function PlatformAnalyticsContent({ platform }: PlatformAnalyticsContentP
             Your best-performing {name} posts will appear here.
           </p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

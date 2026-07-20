@@ -4,6 +4,7 @@ import { useAdminQueue } from '@/lib/hooks/useAdmin';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import styles from './QueueContent.module.css';
+import { Card } from '@mymanager/ui';
 
 export function QueueContent() {
   const { data, isLoading, dataUpdatedAt } = useAdminQueue();
@@ -37,29 +38,29 @@ export function QueueContent() {
         <StatCardSkeletonGrid count={4} />
       ) : (
         <div className="grid gap-4 md:grid-cols-4">
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          <Card padding="md">
             <p className="text-sm text-text-2">Waiting</p>
             <p className="mt-1 text-2xl font-bold text-yellow-600">{totals.waiting}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Active</p>
             <p className="mt-1 text-2xl font-bold text-blue-600">{totals.active}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Completed (24h)</p>
             <p className="mt-1 text-2xl font-bold text-green-600">{totals.completed.toLocaleString()}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Failed (24h)</p>
             <p className="mt-1 text-2xl font-bold text-red-600">{totals.failed}</p>
-          </div>
+          </Card>
         </div>
       )}
 
       {isLoading ? (
         <TableSkeleton rows={4} cols={5} />
       ) : queues.length > 0 ? (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">Queues</h2>
           <table className="w-full">
             <thead>
@@ -83,11 +84,11 @@ export function QueueContent() {
               ))}
             </tbody>
           </table>
-        </div>
+        </Card>
       ) : null}
 
       {jobs.length > 0 && (
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Active Jobs</h2>
           <div className="mt-4 space-y-3">
             {jobs.map((job) => (
@@ -108,7 +109,7 @@ export function QueueContent() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

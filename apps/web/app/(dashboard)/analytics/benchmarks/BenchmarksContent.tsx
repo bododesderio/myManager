@@ -14,6 +14,7 @@ import {
 import { useEngagementRate } from '@/lib/hooks/useAnalytics';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Card } from '@mymanager/ui';
 
 function defaultDateRange() {
   const end = new Date();
@@ -73,7 +74,7 @@ export function BenchmarksContent() {
       </div>
 
       {/* Engagement rate trend chart */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Engagement Rate Trends</h2>
         {isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -112,7 +113,7 @@ export function BenchmarksContent() {
             No engagement trend data available for this range.
           </p>
         )}
-      </div>
+      </Card>
 
       {/* Comparison metrics */}
       {isLoading ? (

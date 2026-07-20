@@ -19,6 +19,7 @@ import {
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Card } from '@mymanager/ui';
 
 function defaultDateRange() {
   const end = new Date();
@@ -94,7 +95,7 @@ export function AnalyticsContent() {
       {overview.isLoading ? (
         <StatCardSkeletonGrid count={4} />
       ) : overview.isError ? (
-        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load analytics overview. {(overview.error as Error)?.message ?? ''}{' '}
           <button type="button" onClick={() => overview.refetch()} className="ml-1 underline">
             Retry
@@ -124,7 +125,7 @@ export function AnalyticsContent() {
       )}
 
       {/* Time-series chart */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Engagement Over Time</h2>
         {daily.isLoading ? (
           <div className="mt-4 flex h-64 items-center justify-center">
@@ -158,17 +159,17 @@ export function AnalyticsContent() {
         ) : (
           <p className="mt-4 text-sm text-text-muted">No daily data available for this range.</p>
         )}
-      </div>
+      </Card>
 
       {/* Top posts table */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Top Posts</h2>
         {topPosts.isLoading ? (
           <div className="mt-4">
             <TableSkeleton rows={5} cols={4} />
           </div>
         ) : topPosts.isError ? (
-          <div className="mt-4 rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             Failed to load top posts. {(topPosts.error as Error)?.message ?? ''}{' '}
             <button type="button" onClick={() => topPosts.refetch()} className="ml-1 underline">
               Retry
@@ -203,7 +204,7 @@ export function AnalyticsContent() {
         ) : (
           <p className="mt-4 text-sm text-text-muted">No top posts for this range.</p>
         )}
-      </div>
+      </Card>
 
       {/* Platform breakdown */}
       <div className="grid gap-4 md:grid-cols-2">

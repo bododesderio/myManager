@@ -5,6 +5,7 @@ import { useCampaign } from '@/lib/hooks/useCampaigns';
 import { usePosts } from '@/lib/hooks/usePosts';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { StatCardSkeleton } from '@/components/skeletons/StatCardSkeleton';
+import { Card } from '@mymanager/ui';
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
@@ -86,23 +87,23 @@ export function CampaignDetailContent({ id }: { id: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          <Card padding="md">
             <p className="text-sm text-text-2">Total Posts</p>
             <p className="mt-1 text-2xl font-bold">{posts.length}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Total Engagement</p>
             <p className="mt-1 text-2xl font-bold">{campaign.totalEngagement ?? '—'}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Avg. Engagement Rate</p>
             <p className="mt-1 text-2xl font-bold">{campaign.avgEngagementRate ?? '—'}</p>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Posts table */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Campaign Posts</h2>
 
         {postsLoading ? (
@@ -145,7 +146,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
             })}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

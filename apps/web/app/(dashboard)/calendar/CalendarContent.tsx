@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePostCalendar } from '@/lib/hooks/usePosts';
+import { Card } from '@mymanager/ui';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -101,7 +102,7 @@ export function CalendarContent() {
         </Link>
       </div>
 
-      <div className="rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <button
             type="button"
@@ -213,7 +214,7 @@ export function CalendarContent() {
                 );
               })}
         </div>
-      </div>
+      </Card>
 
       {openDate && (
         <div

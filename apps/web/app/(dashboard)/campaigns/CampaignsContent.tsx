@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCampaigns, useDeleteCampaign } from '@/lib/hooks/useCampaigns';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
@@ -58,7 +59,7 @@ export function CampaignsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : campaigns.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -66,9 +67,9 @@ export function CampaignsContent() {
           </div>
           <h3 className="font-heading text-lg font-semibold text-text">No campaigns yet</h3>
           <p className="mt-1 text-sm text-text-2">Create your first campaign to organize your posts.</p>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -116,7 +117,7 @@ export function CampaignsContent() {
               ))}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
 
       {/* Delete confirmation modal */}

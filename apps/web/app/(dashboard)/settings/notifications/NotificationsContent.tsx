@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useNotificationPreferences, useUpdateNotificationPreferences } from '@/lib/hooks/useNotificationPrefs';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 const EVENT_TYPES = [
   { id: 'post-published', label: 'Post Published', description: 'When a scheduled post is published.' },
@@ -63,7 +64,7 @@ export default function NotificationsContent() {
       </div>
       <h1 className="font-heading text-2xl font-bold">Notification Settings</h1>
 
-      <div className="max-w-3xl rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none" className="max-w-3xl">
         {/* Header row */}
         <div className="flex items-center border-b px-6 py-3">
           <div className="flex-1">
@@ -105,7 +106,7 @@ export default function NotificationsContent() {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       <button
         onClick={handleSave}

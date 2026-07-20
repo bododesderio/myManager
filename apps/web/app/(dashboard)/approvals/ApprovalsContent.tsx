@@ -9,6 +9,7 @@ import {
 } from '@/lib/hooks/useApprovals';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const PLATFORM_BADGES: Record<string, string> = {
   twitter: 'bg-sky-100 text-sky-700',
@@ -95,14 +96,14 @@ export function ApprovalsContent() {
       {isLoading ? (
         <TableSkeleton rows={4} cols={3} />
       ) : isError ? (
-        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-brand border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load pending approvals. {(error as Error)?.message ?? ''}{' '}
           <button type="button" onClick={() => refetch()} className="ml-1 underline">
             Retry
           </button>
         </div>
       ) : approvals.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
@@ -110,7 +111,7 @@ export function ApprovalsContent() {
           </div>
           <h3 className="font-heading text-lg font-semibold text-text">All caught up!</h3>
           <p className="mt-1 text-sm text-text-2">No posts pending approval right now.</p>
-        </div>
+        </Card>
       ) : (
         <div className="space-y-4">
           {approvals.map((item: any) => {
@@ -169,7 +170,7 @@ export function ApprovalsContent() {
                       type="button"
                       aria-label={`Reject post by ${author}`}
                       onClick={() => openCommentModal(postId, 'reject')}
-                      className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                      className="rounded-brand border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                     >
                       Reject
                     </button>

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import styles from './PortalContent.module.css';
+import { Card } from '@mymanager/ui';
 
 type Tab = 'overview' | 'approvals' | 'calendar' | 'reports';
 
@@ -140,10 +141,10 @@ function PlatformChips({ platforms }: { platforms: string[] }) {
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-brand border border-border border-dashed bg-bg px-6 py-10 text-center shadow-sm">
+    <Card padding="none" className="border-dashed px-6 py-10 text-center">
       <p className="text-sm font-semibold text-text">{title}</p>
       <p className="mt-2 text-sm text-text-2">{description}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -157,11 +158,11 @@ function MetricCard({
   caption: string;
 }) {
   return (
-    <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+    <Card padding="md">
       <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</p>
       <p className="mt-2 text-2xl font-bold text-text">{value}</p>
       <p className="mt-1 text-sm text-text-2">{caption}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -195,7 +196,7 @@ function OverviewTab({ data }: { data: PortalData }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm xl:col-span-2">
+        <Card padding="md" className="xl:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold text-text">Weekly Reach</h2>
             <span className="text-xs text-text-muted">Last 4 weeks</span>
@@ -212,9 +213,9 @@ function OverviewTab({ data }: { data: PortalData }) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+        <Card padding="md">
           <h2 className="font-heading text-lg font-semibold text-text">Platform Mix</h2>
           <div className="mt-4 space-y-4">
             {data.platformBreakdown.map((item) => {
@@ -240,10 +241,10 @@ function OverviewTab({ data }: { data: PortalData }) {
               <p className="text-sm text-text-muted">No analytics breakdown available yet.</p>
             )}
           </div>
-        </div>
+        </Card>
       </div>
 
-      <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+      <Card padding="md">
         <h2 className="font-heading text-lg font-semibold text-text">Top Performing Posts</h2>
         <div className="mt-4 space-y-3">
           {data.topPosts.map((post) => (
@@ -271,7 +272,7 @@ function OverviewTab({ data }: { data: PortalData }) {
             />
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -382,7 +383,7 @@ function ApprovalsTab({
                       comment: (comments[item.id] ?? '').trim(),
                     })
                   }
-                  className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-brand border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Request Revision
                 </button>
@@ -512,12 +513,12 @@ export default function PortalContent({ token }: { token: string }) {
   if (portalQuery.isError || !portalQuery.data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg-2 px-6 py-10">
-        <div className="max-w-lg rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
+        <Card padding="none" className="max-w-lg p-8 text-center">
           <h1 className="font-heading text-2xl font-bold text-text">Portal unavailable</h1>
           <p className="mt-3 text-sm text-text-2">
             This portal link is invalid, expired, or no longer active.
           </p>
-        </div>
+        </Card>
       </div>
     );
   }
