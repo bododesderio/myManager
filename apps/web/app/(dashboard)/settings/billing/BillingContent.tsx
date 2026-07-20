@@ -112,7 +112,7 @@ function BillingContentInner() {
                 </button>
                 <button
                   onClick={() => setShowCancelConfirm(false)}
-                  className="rounded-brand border border-border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
+                  className="rounded-brand border border-border px-4 py-2 text-sm font-medium text-text-2 transition hover:bg-bg-2"
                 >
                   Keep Subscription
                 </button>

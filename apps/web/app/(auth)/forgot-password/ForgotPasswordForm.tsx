@@ -55,7 +55,7 @@ export function ForgotPasswordForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 

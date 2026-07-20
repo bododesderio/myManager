@@ -86,7 +86,7 @@ export default function BrandContent() {
                   type="text"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="block w-full rounded-brand border border-border border-border px-3 py-2 text-sm font-mono focus:border-primary focus:outline-none"
+                  className="block w-full rounded-brand border border-border px-3 py-2 text-sm font-mono focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function BrandContent() {
                   type="text"
                   value={primaryDarkColor}
                   onChange={(e) => setPrimaryDarkColor(e.target.value)}
-                  className="block w-full rounded-brand border border-border border-border px-3 py-2 text-sm font-mono focus:border-primary focus:outline-none"
+                  className="block w-full rounded-brand border border-border px-3 py-2 text-sm font-mono focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function BrandContent() {
                   type="text"
                   value={accentColor}
                   onChange={(e) => setAccentColor(e.target.value)}
-                  className="block w-full rounded-brand border border-border border-border px-3 py-2 text-sm font-mono focus:border-primary focus:outline-none"
+                  className="block w-full rounded-brand border border-border px-3 py-2 text-sm font-mono focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function BrandContent() {
                 id="headingFont"
                 value={headingFont}
                 onChange={(e) => setHeadingFont(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
               >
                 <option>Inter</option>
                 <option>Poppins</option>
@@ -154,7 +154,7 @@ export default function BrandContent() {
                 id="bodyFont"
                 value={bodyFont}
                 onChange={(e) => setBodyFont(e.target.value)}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
               >
                 <option>Inter</option>
                 <option>Open Sans</option>

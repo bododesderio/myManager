@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PASSWORD_RULES, registerSchema } from '@mymanager/validators';
 
 type AccountType = 'individual' | 'company';
 type Step = 1 | 2 | 3 | 4;
@@ -40,18 +41,40 @@ export default function SignupForm() {
 
   const totalSteps = accountType === 'company' ? 4 : 3;
 
-  const passwordStrength = () => {
-    let score = 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    return score;
-  };
+  // Scores against the SHARED policy, so the meter cannot drift from what the
+  // API enforces. The previous version checked for a symbol and did NOT check
+  // for a lowercase letter, so "PASSWORD1" scored 3/4 and was then rejected by
+  // the server with a generic error.
+  const passwordStrength = () => PASSWORD_RULES.filter((r) => r.test(password)).length;
 
   const handleSubmit = async () => {
-    setLoading(true);
     setError('');
+
+    // Validate against the same shape the API's RegisterDto enforces, so the
+    // user gets a specific message instead of a round-trip and a generic 400.
+    const parsed = registerSchema.safeParse({
+      accountType,
+      firstName,
+      lastName,
+      email,
+      password,
+      country: country || undefined,
+      companyName: accountType === 'company' ? companyName || undefined : undefined,
+      workspaceName: accountType === 'company' ? workspaceName || undefined : undefined,
+      workspaceSlug: accountType === 'company' ? workspaceSlug || undefined : undefined,
+      industry: accountType === 'company' ? industry || undefined : undefined,
+      teamSize: accountType === 'company' ? teamSize || undefined : undefined,
+      referralSource: referralSource || undefined,
+      planSlug: selectedPlan || undefined,
+      billingCycle,
+    });
+
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? 'Please check the form and try again.');
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await fetch('/api/v1/auth/register', {
         method: 'POST',
@@ -173,20 +196,20 @@ export default function SignupForm() {
                     if (!workspaceName) setWorkspaceName(`${e.target.value} Workspace`);
                     if (!workspaceSlug) setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                   }}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                 />
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <input type="text" required minLength={2} aria-label="First name" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
-                  className="px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 <input type="text" required minLength={2} aria-label="Last name" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)}
-                  className="px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
               </div>
 
               <div>
                 <input type="email" required aria-label="Email address" autoComplete="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {email && !emailValid && (
                   <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
                 )}
@@ -194,29 +217,47 @@ export default function SignupForm() {
 
               <div>
                 <input type="password" required minLength={8} aria-label="Password" autoComplete="new-password" placeholder="Password (min 8 characters)" value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
                 {password && (
-                  <div className="flex gap-1 mt-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className={`h-1 flex-1 rounded-full ${
-                        passwordStrength() >= i
-                          ? i <= 1 ? 'bg-red-400' : i <= 2 ? 'bg-amber-400' : 'bg-green-400'
-                          : 'bg-border'
-                      }`} />
-                    ))}
-                  </div>
+                  <>
+                    <div className="flex gap-1 mt-2">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className={`h-1 flex-1 rounded-full ${
+                          passwordStrength() >= i
+                            ? i <= 1 ? 'bg-error' : i <= 2 ? 'bg-warning' : 'bg-accent'
+                            : 'bg-border'
+                        }`} />
+                      ))}
+                    </div>
+                    {/* Spell the rules out. A bar chart tells you that something
+                        is wrong, not what — and these are the exact rules the
+                        API enforces, so nothing here can be satisfied and then
+                        rejected on submit. */}
+                    <ul className="mt-2 space-y-0.5" aria-live="polite">
+                      {PASSWORD_RULES.map((rule) => {
+                        const ok = rule.test(password);
+                        return (
+                          <li key={rule.label} className={`flex items-center gap-1.5 text-[11px] ${ok ? 'text-accent' : 'text-text-muted'}`}>
+                            <span aria-hidden="true">{ok ? '\u2713' : '\u25CB'}</span>
+                            <span>{rule.label}</span>
+                            <span className="sr-only">{ok ? '(met)' : '(not met)'}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
                 )}
               </div>
 
               <select value={country} onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Select country</option>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
 
               {accountType === 'company' && (
                 <select value={teamSize} onChange={(e) => setTeamSize(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                   <option value="">Team size</option>
                   {TEAM_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -246,11 +287,11 @@ export default function SignupForm() {
               </div>
 
               <input type="text" placeholder="Workspace name" value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)}
-                className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
 
               <div>
                 <label className="text-xs text-text-2 mb-1 block">Workspace URL</label>
-                <div className="flex items-center border border-border border-border rounded-lg overflow-hidden">
+                <div className="flex items-center border border-border rounded-lg overflow-hidden">
                   <span className="px-3 bg-bg-2 text-sm text-text-muted border-r border-border py-2.5">mymanager.com/</span>
                   <input type="text" value={workspaceSlug} onChange={(e) => setWorkspaceSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                     className="flex-1 px-3 py-2.5 bg-bg text-text text-sm focus:outline-none" />
@@ -258,7 +299,7 @@ export default function SignupForm() {
               </div>
 
               <select value={industry} onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-4 py-2.5 bg-bg text-text border border-border border-border bg-bg text-text rounded-lg bg-bg text-text text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Industry</option>
                 {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
               </select>
@@ -268,7 +309,7 @@ export default function SignupForm() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={prevStep} className="px-6 py-2.5 border border-border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
+                <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
                 <button onClick={nextStep} className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)]">Continue</button>
               </div>
             </div>
@@ -325,7 +366,7 @@ export default function SignupForm() {
               </p>
 
               <div className="flex gap-3">
-                <button onClick={prevStep} className="px-6 py-2.5 border border-border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
+                <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
                 <button
                   onClick={nextStep}
                   disabled={loading}

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useResetPassword } from '@/lib/hooks/useAuth';
 import { getErrorMessage } from '@/lib/utils/error-messages';
+import { passwordSchema, PASSWORD_RULES } from '@mymanager/validators';
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -25,8 +26,12 @@ export function ResetPasswordForm() {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+    // Shared policy — the same rules ResetPasswordDto enforces. Checking only
+    // length here meant a weak-but-long password produced a generic server
+    // error with no indication of what was wrong.
+    const check = passwordSchema.safeParse(password);
+    if (!check.success) {
+      setError(check.error.issues[0]?.message ?? 'Password does not meet the requirements.');
       return;
     }
 
@@ -69,8 +74,22 @@ export function ResetPasswordForm() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
+          {password && (
+            <ul className="mt-2 space-y-0.5" aria-live="polite">
+              {PASSWORD_RULES.map((rule) => {
+                const ok = rule.test(password);
+                return (
+                  <li key={rule.label} className={`flex items-center gap-1.5 text-[11px] ${ok ? 'text-accent' : 'text-text-muted'}`}>
+                    <span aria-hidden="true">{ok ? '\u2713' : '\u25CB'}</span>
+                    <span>{rule.label}</span>
+                    <span className="sr-only">{ok ? '(met)' : '(not met)'}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
         <div>
@@ -85,7 +104,7 @@ export function ResetPasswordForm() {
             minLength={8}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 

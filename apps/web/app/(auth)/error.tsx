@@ -32,7 +32,7 @@ export default function AuthError({
         </Button>
         <Link
           href="/"
-          className="rounded-btn border border-border border-border px-5 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-card"
+          className="rounded-btn border border-border px-5 py-2.5 text-sm font-medium text-text-2 hover:bg-bg-card"
         >
           Back to home
         </Link>

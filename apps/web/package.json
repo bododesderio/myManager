@@ -45,6 +45,7 @@
     "resend": "^4.1.1",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
+    "zod": "^3.23.8",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

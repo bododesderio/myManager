@@ -96,7 +96,7 @@ export function ConversationsContent() {
           <select
             value={platformFilter}
             onChange={(e) => setPlatformFilter(e.target.value)}
-            className="rounded-brand border border-border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="rounded-brand border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
           >
             {PLATFORMS.map((p) => (
               <option key={p} value={p}>
@@ -216,7 +216,7 @@ export function ConversationsContent() {
                           if (e.key === 'Enter') handleReply(comment.id);
                         }}
                         placeholder="Type a reply..."
-                        className="flex-1 rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+                        className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
                       />
                       <button
                         onClick={() => handleReply(comment.id)}

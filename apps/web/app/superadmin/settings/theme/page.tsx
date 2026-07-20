@@ -175,13 +175,13 @@ function ColorPickerField({
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-9 cursor-pointer rounded border border-border border-border p-0.5"
+          className="h-9 w-9 cursor-pointer rounded border border-border p-0.5"
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm font-mono focus:border-primary focus:outline-none"
+          className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm font-mono focus:border-primary focus:outline-none"
         />
       </div>
     </div>
@@ -198,7 +198,7 @@ function PillToggle<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex rounded-brand border border-border border-border overflow-hidden">
+    <div className="inline-flex rounded-brand border border-border overflow-hidden">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -625,7 +625,7 @@ function BuilderPanel({
               <select
                 value={typography.headingFont}
                 onChange={(e) => onTypographyChange({ ...typography, headingFont: e.target.value })}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -637,7 +637,7 @@ function BuilderPanel({
               <select
                 value={typography.bodyFont}
                 onChange={(e) => onTypographyChange({ ...typography, bodyFont: e.target.value })}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
               >
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -857,7 +857,7 @@ function BuilderPanel({
           <button
             type="button"
             onClick={onReset}
-            className="rounded-brand border border-border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
+            className="rounded-brand border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
           >
             Reset to default
           </button>
@@ -865,7 +865,7 @@ function BuilderPanel({
             <button
               type="button"
               onClick={onSaveAsPreset}
-              className="rounded-brand border border-border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
+              className="rounded-brand border border-border px-4 py-2 text-xs font-semibold text-text-2 transition hover:bg-bg-2"
             >
               Save as preset
             </button>

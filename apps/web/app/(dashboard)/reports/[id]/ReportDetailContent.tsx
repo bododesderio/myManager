@@ -140,11 +140,11 @@ export function ReportDetailContent({ id }: { id: string }) {
               className="h-[600px] w-full rounded-brand border border-border"
             />
           ) : isPdf ? (
-            <div className="rounded-brand border border-border border-dashed border-border p-12 text-center text-sm text-text-muted">
+            <div className="rounded-brand border border-border border-dashed p-12 text-center text-sm text-text-muted">
               PDF preview is not available. Download the file to view it.
             </div>
           ) : (
-            <div className="rounded-brand border border-border border-dashed border-border p-12 text-center text-sm text-text-muted">
+            <div className="rounded-brand border border-border border-dashed p-12 text-center text-sm text-text-muted">
               CSV reports cannot be previewed. Please download the file to view the data.
             </div>
           )}
@@ -164,7 +164,7 @@ export function ReportDetailContent({ id }: { id: string }) {
                 type="text"
                 readOnly
                 value={`${typeof window !== 'undefined' ? window.location.origin : ''}/reports/${id}`}
-                className="block w-full rounded-brand border border-border border-border px-4 py-2 text-sm text-text-2 focus:outline-none"
+                className="block w-full rounded-brand border border-border px-4 py-2 text-sm text-text-2 focus:outline-none"
               />
             </div>
             <div className="mt-6 flex justify-end gap-3">

@@ -121,7 +121,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, app_name: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -138,7 +138,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, app_tagline: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <FileUpload
@@ -220,7 +220,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, font_heading: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -237,7 +237,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setTheme({ ...theme, font_body: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
@@ -258,7 +258,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, support_email: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -271,7 +271,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, sales_email: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -284,7 +284,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, footer_made_in: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -297,7 +297,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, footer_copyright: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -313,7 +313,7 @@ export function BrandContent() {
                     footer_attribution_text: e.target.value,
                   })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -326,7 +326,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, footer_attribution_url: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -339,7 +339,7 @@ export function BrandContent() {
                 onChange={(e) =>
                   setBrand({ ...brand, meta_title_suffix: e.target.value })
                 }
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>

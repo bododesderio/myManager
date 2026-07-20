@@ -233,7 +233,7 @@ export function BioContent() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="@myaccount"
-                  className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                  className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
                 />
               </div>
               <div>
@@ -269,14 +269,14 @@ export function BioContent() {
                         value={link.label}
                         onChange={(e) => updateLink(link.id, 'label', e.target.value)}
                         placeholder="Label"
-                        className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                        className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                       <input
                         type="text"
                         value={link.url}
                         onChange={(e) => updateLink(link.id, 'url', e.target.value)}
                         placeholder="URL"
-                        className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                        className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                       />
                       <button
                         onClick={() => setEditingLinkId(null)}
@@ -332,14 +332,14 @@ export function BioContent() {
                       value={newLinkLabel}
                       onChange={(e) => setNewLinkLabel(e.target.value)}
                       placeholder="Link label"
-                      className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                      className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                     />
                     <input
                       type="text"
                       value={newLinkUrl}
                       onChange={(e) => setNewLinkUrl(e.target.value)}
                       placeholder="https://..."
-                      className="block w-full rounded-brand border border-border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
+                      className="block w-full rounded-brand border border-border px-3 py-1.5 text-sm focus:border-primary focus:outline-none"
                     />
                     <div className="flex gap-2">
                       <button
@@ -364,7 +364,7 @@ export function BioContent() {
               ) : (
                 <button
                   onClick={() => setShowAddLink(true)}
-                  className="w-full rounded-brand border border-border border-dashed border-border px-4 py-3 text-sm text-text-2 transition hover:border-primary hover:text-primary"
+                  className="w-full rounded-brand border border-border border-dashed px-4 py-3 text-sm text-text-2 transition hover:border-primary hover:text-primary"
                 >
                   + Add Link
                 </button>

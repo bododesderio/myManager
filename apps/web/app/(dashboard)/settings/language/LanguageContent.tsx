@@ -71,7 +71,7 @@ export default function LanguageContent() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="mt-4 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+            className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.value} value={lang.value}>
@@ -87,7 +87,7 @@ export default function LanguageContent() {
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="mt-4 block w-full rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
+            className="mt-4 block w-full rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none"
           >
             {CURRENCIES.map((cur) => (
               <option key={cur.value} value={cur.value}>

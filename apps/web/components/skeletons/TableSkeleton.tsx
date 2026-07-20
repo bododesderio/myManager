@@ -26,7 +26,7 @@ export function TableSkeleton({
       <span className="sr-only">{label}</span>
       <div
         aria-hidden="true"
-        className="animate-pulse overflow-x-auto rounded-brand border border-border border-border bg-bg-card shadow-sm"
+        className="animate-pulse overflow-x-auto rounded-brand border border-border bg-bg-card shadow-sm"
       >
         {/* Header row sits slightly stronger than the body rows. */}
         <div className="flex items-center gap-4 border-b border-border px-4 py-3">

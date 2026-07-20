@@ -74,7 +74,7 @@ export function OverridesContent() {
                 required
                 value={form.workspaceId}
                 onChange={(e) => setForm((p) => ({ ...p, workspaceId: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -85,7 +85,7 @@ export function OverridesContent() {
                 id="overrideType"
                 value={form.type}
                 onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               >
                 <option value="discount">Discount</option>
                 <option value="free_trial">Free Trial Extension</option>
@@ -103,7 +103,7 @@ export function OverridesContent() {
                 required
                 value={form.details}
                 onChange={(e) => setForm((p) => ({ ...p, details: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -115,7 +115,7 @@ export function OverridesContent() {
                 type="date"
                 value={form.expiresAt}
                 onChange={(e) => setForm((p) => ({ ...p, expiresAt: e.target.value }))}
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none"
               />
             </div>
           </div>

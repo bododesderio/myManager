@@ -136,7 +136,7 @@ export function MediaContent() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="flex-1 rounded-brand border border-border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="flex-1 rounded-brand border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
         <select
           value={typeFilter}
@@ -144,7 +144,7 @@ export function MediaContent() {
             setTypeFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-brand border border-border border-border px-4 py-2 text-sm"
+          className="rounded-brand border border-border px-4 py-2 text-sm"
         >
           {TYPE_FILTERS.map((f) => (
             <option key={f.value} value={f.value}>

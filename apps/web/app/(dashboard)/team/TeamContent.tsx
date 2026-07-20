@@ -107,7 +107,7 @@ export function TeamContent() {
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="colleague@example.com"
                 required
-                className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="mt-1 block w-full rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
             <div>
@@ -118,7 +118,7 @@ export function TeamContent() {
                 id="inviteRole"
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value)}
-                className="mt-1 block rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="mt-1 block rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -186,7 +186,7 @@ export function TeamContent() {
                         <select
                           value={member.role}
                           onChange={(e) => handleRoleChange(memberId, e.target.value)}
-                          className="rounded-brand border border-border border-border px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          className="rounded-brand border border-border px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         >
                           {ROLES.filter((r) => r !== 'owner').map((r) => (
                             <option key={r} value={r}>

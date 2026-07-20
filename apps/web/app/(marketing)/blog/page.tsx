@@ -88,7 +88,7 @@ export default async function BlogPage() {
             {categories.map((cat: any) => (
               <span
                 key={cat.id || cat.slug || cat.name}
-                className="card-hover cursor-pointer rounded-full border border-border border-border bg-bg px-4 py-1.5 text-[12px] font-medium text-text-2 hover:border-primary hover:text-primary"
+                className="card-hover cursor-pointer rounded-full border border-border bg-bg px-4 py-1.5 text-[12px] font-medium text-text-2 hover:border-primary hover:text-primary"
               >
                 {cat.category || cat.name || String(cat)}
               </span>
@@ -172,7 +172,7 @@ export default async function BlogPage() {
           {/* ── SIDEBAR ── */}
           <aside className="animate-fade-in-up delay-300 space-y-8">
             {popularPosts.length > 0 && (
-              <div className="rounded-card border border-border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
+              <div className="rounded-card border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Popular Posts</h3>
                 <div className="mt-4 space-y-4">
                   {popularPosts.map((post: any) => (
@@ -195,7 +195,7 @@ export default async function BlogPage() {
             )}
 
             {categories.length > 0 && (
-              <div className="rounded-card border border-border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
+              <div className="rounded-card border border-border bg-bg p-5 shadow-[var(--shadow-card)]">
                 <h3 className="text-[13px] font-bold uppercase tracking-wide text-text">Categories</h3>
                 <div className="mt-4 space-y-2">
                   {categories.map((cat: any) => (
