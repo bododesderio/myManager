@@ -1,7 +1,21 @@
 import { Job } from 'bullmq';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazily constructed. Building the client at module scope made a missing
+// RESEND_API_KEY throw on *import*, which crashed the worker at boot and made
+// every module transitively importing this one untestable without the key set.
+let resendClient: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not configured — cannot send email');
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 interface EmailJobData {
   userId: string;
@@ -43,7 +57,7 @@ export class EmailWorker {
 
     const html = this.renderTemplate(template, data);
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: `${process.env.BRAND_NAME || 'MyManager'} <noreply@${process.env.EMAIL_DOMAIN || 'mymanager.com'}>`,
       to: valid,
       subject,

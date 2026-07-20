@@ -136,8 +136,10 @@ export class BillingRepository {
     return [records, total];
   }
 
-  async findInvoice(id: string) {
-    return this.prisma.billingHistory.findUnique({ where: { id } });
+  async findInvoice(id: string, userId: string) {
+    // Scoped by user at the query level: an unscoped findUnique let any
+    // authenticated caller read any invoice by guessing/enumerating its UUID.
+    return this.prisma.billingHistory.findFirst({ where: { id, user_id: userId } });
   }
 
   async getSeatCount(subscriptionId: string): Promise<number> {

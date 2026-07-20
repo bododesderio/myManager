@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guards/jwt.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { WorkspaceMemberGuard } from './common/guards/workspace-member.guard';
+import { WorkspaceRoleGuard } from './common/guards/workspace-role.guard';
 import { CsrfGuard } from './common/guards/csrf.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -139,6 +140,9 @@ import { MetricsController } from './metrics.controller';
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: CsrfGuard },
     { provide: APP_GUARD, useClass: WorkspaceMemberGuard },
+    // MUST run after WorkspaceMemberGuard, which populates request.workspaceMember.
+    // Opt-in: no-ops unless a route carries @WorkspaceRoles().
+    { provide: APP_GUARD, useClass: WorkspaceRoleGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

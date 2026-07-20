@@ -19,7 +19,10 @@
   "pnpm": {
     "overrides": {
       "webpack": ">=5.104.0",
-      "next": ">=15.2.3"
+      "next": ">=15.2.3",
+      "handlebars": ">=4.7.9",
+      "protobufjs": ">=7.5.5",
+      "shell-quote": ">=1.8.4"
     }
   }
 }

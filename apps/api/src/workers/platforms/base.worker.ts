@@ -35,6 +35,24 @@ export abstract class BasePublishingWorker {
   async process(job: Job<PublishJobData>): Promise<void> {
     const { postId, platform, socialAccountId, userId } = job.data;
 
+    // IDEMPOTENCY GUARD — must run before any platform call.
+    //
+    // Jobs are enqueued with attempts: 5. If publish() succeeds against the real
+    // platform API but this process dies before the PUBLISHED write below, BullMQ
+    // retries and posts to the customer's account a second time. Without this
+    // check a single transient failure could produce up to 5 duplicate posts.
+    //
+    // The @@unique([post_id, platform]) constraint makes this row the single
+    // authoritative record of whether this platform has already been published to.
+    const existingResult = await this.prisma.postPlatformResult.findUnique({
+      where: { post_id_platform: { post_id: postId, platform } },
+      select: { status: true, platform_post_id: true },
+    });
+
+    if (existingResult?.status === 'PUBLISHED') {
+      return;
+    }
+
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
       include: {

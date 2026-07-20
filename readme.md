@@ -15,7 +15,7 @@
 | **Docker** | 5 services running | PostgreSQL, Redis, API, Web, Worker — all with health checks |
 | **CI/CD** | Configured | 5 GitHub Actions workflows (CI, deploy-api, deploy-web, eas-build, preview) |
 | **Tests** | 8 spec files | Auth, billing, publishing, users, guards, webhooks |
-| **Security** | Hardened | RLS, AES-256, bcrypt, CSRF, HMAC, CSP, Helmet, rate limiting |
+| **Security** | Under remediation | AES-256, bcrypt, CSRF, HMAC, CSP, Helmet, rate limiting. See `docs/audit-2026-07-20.md` |
 
 ---
 
@@ -76,7 +76,11 @@ MyManager lets individuals, brands, and agencies create, schedule, publish, and 
 - JWT + refresh token rotation
 - TOTP 2FA with backup codes
 - AES-256 encrypted OAuth tokens
-- PostgreSQL Row-Level Security on 31 tables
+- Application-level workspace scoping via `WorkspaceMemberGuard` + `WorkspaceRoleGuard`
+  (NOTE: PostgreSQL Row-Level Security is **not** implemented. It was previously
+  documented here in error — no policies exist and `setWorkspaceContext()` is
+  unwired. Tenancy is enforced in the application layer only. Tracked in
+  `docs/audit-2026-07-20.md` §C4.)
 - HMAC-SHA256 webhook signatures
 - CSRF double-submit cookies
 - Prometheus metrics endpoint (`/metrics`)
@@ -228,7 +232,9 @@ For custom plans, reseller inquiries, or API access:
 - Added MetricsInterceptor for HTTP request counting by method/status
 
 **Security**
-- Implemented PostgreSQL Row-Level Security on 31 workspace-scoped tables
+- ~~Implemented PostgreSQL Row-Level Security on 31 workspace-scoped tables~~
+  **RETRACTED 2026-07-20:** this was never implemented. No `CREATE POLICY`
+  statements exist and `setWorkspaceContext()` has no call sites.
 - Created `setWorkspaceContext()` utility with UUID validation (SQL injection safe)
 - Owner bypass policies for migration compatibility
 - Nullable workspace_id handling for notifications, audit_logs, ai_credit_usage

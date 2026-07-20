@@ -69,8 +69,9 @@ export class WorkspacesController {
   @Get(':id/members')
   @WorkspaceRoles('OWNER', 'ADMIN')
   @ApiOperation({ summary: 'List workspace members' })
-  async listMembers(@Param('id', ParseUUIDPipe) id: string) {
-    return this.workspacesService.listMembers(id);
+  async listMembers(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.workspacesService.listMembers(id, userId);
   }
 
   @Post(':id/members/invite')
@@ -92,8 +93,10 @@ export class WorkspacesController {
     @Param('id', ParseUUIDPipe) id: string,
     @Param('memberId') memberId: string,
     @Body() body: { role: string },
+    @Req() req: Request,
   ) {
-    return this.workspacesService.updateMemberRole(id, memberId, body.role);
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.workspacesService.updateMemberRole(id, memberId, body.role, userId);
   }
 
   @Delete(':id/members/:memberId')
@@ -102,8 +105,10 @@ export class WorkspacesController {
   async removeMember(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('memberId') memberId: string,
+    @Req() req: Request,
   ) {
-    return this.workspacesService.removeMember(id, memberId);
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.workspacesService.removeMember(id, memberId, userId);
   }
 
   @Get(':id/approval-config')
@@ -113,12 +118,15 @@ export class WorkspacesController {
   }
 
   @Put(':id/approval-config')
+  @WorkspaceRoles('OWNER', 'ADMIN')
   @ApiOperation({ summary: 'Update workspace approval configuration' })
   async updateApprovalConfig(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { require_approval: boolean; auto_approve_admins: boolean; require_client_review: boolean },
+    @Req() req: Request,
   ) {
-    return this.workspacesService.updateApprovalConfig(id, body);
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.workspacesService.updateApprovalConfig(id, body, userId);
   }
 
   @Get(':id/usage')

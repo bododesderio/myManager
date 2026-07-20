@@ -67,7 +67,10 @@ services:
       - .env
     environment:
       NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-change-me-in-production-min-32-chars!!}
+      # No default: a missing session secret must fail loudly at startup, never
+      # silently fall back to a public placeholder that would let anyone forge
+      # sessions. `?err` makes compose abort with this message.
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?NEXTAUTH_SECRET must be set (min 32 chars)}
       AUTH_TRUST_HOST: "true"
       AUTH_URL: http://localhost:3000
       API_URL: http://api:3001

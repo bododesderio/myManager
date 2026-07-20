@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { UserStatus } from '@prisma/client';
@@ -160,10 +161,50 @@ export class BillingService {
     };
   }
 
-  async getInvoice(id: string) {
-    const invoice = await this.repository.findInvoice(id);
+  async getInvoice(id: string, userId: string) {
+    const invoice = await this.repository.findInvoice(id, userId);
     if (!invoice) throw new NotFoundException('Invoice not found');
     return invoice;
+  }
+
+  /**
+   * Assert the amount actually captured matches the plan's list price.
+   *
+   * Non-USD checkouts are converted at initialize time, and the FX rate can move
+   * between initialize and verify, so local-currency payments are compared with a
+   * small tolerance. USD is compared exactly (to the cent).
+   */
+  private async assertPaidAmountMatchesPlan(
+    verified: { amount?: unknown; currency?: unknown },
+    plan: { price_monthly_usd: unknown; price_annual_usd: unknown },
+    isAnnual: boolean,
+  ): Promise<void> {
+    const paid = Number(verified.amount ?? 0);
+    const currency = String(verified.currency ?? 'USD').toUpperCase();
+    const listUsd = Number(isAnnual ? plan.price_annual_usd : plan.price_monthly_usd);
+
+    if (!Number.isFinite(paid) || paid <= 0) {
+      throw new BadRequestException('Verified transaction has no usable amount');
+    }
+
+    let expected = listUsd;
+    let tolerance = 0.005; // half a cent — USD must match exactly
+
+    if (currency !== 'USD') {
+      const rate = await this.repository.getExchangeRate(currency);
+      if (!Number.isFinite(rate) || rate <= 0) {
+        throw new BadRequestException(`No exchange rate available for ${currency}`);
+      }
+      expected = listUsd * rate;
+      tolerance = expected * 0.02; // 2% headroom for FX drift between checkout and verify
+    }
+
+    if (Math.abs(paid - expected) > tolerance) {
+      this.logger.warn(
+        `Payment amount mismatch: paid ${paid} ${currency}, expected ~${expected.toFixed(2)} ${currency}`,
+      );
+      throw new BadRequestException('Payment amount does not match the plan price');
+    }
   }
 
   async verifyPayment(userId: string, data: {
@@ -193,16 +234,41 @@ export class BillingService {
       return { message: 'Payment already verified', billingRecordId: existing.id };
     }
 
-    const planSlug = data.plan || verified.meta?.plan;
-    const plan = planSlug
-      ? await this.repository.findPlanBySlug(planSlug)
-      : null;
+    // SECURITY: plan and cycle are derived exclusively from the server-set `meta`
+    // written in initializeSubscription(). Client-supplied `data.plan` /
+    // `data.billing_cycle` are IGNORED — trusting them let any user pay for the
+    // cheapest plan and claim any other. `data` retains those fields only for
+    // backwards-compatible request shapes.
+    const meta = verified.meta ?? {};
+
+    // The transaction must belong to the caller, or one user could redeem
+    // another user's successful payment against their own subscription.
+    if (meta.userId && String(meta.userId) !== String(userId)) {
+      throw new ForbiddenException('This transaction belongs to a different user');
+    }
+
+    const planId = meta.planId ? String(meta.planId) : null;
+    if (!planId) {
+      throw new BadRequestException(
+        'Payment is missing server-side plan metadata and cannot be verified',
+      );
+    }
+
+    const plan = await this.repository.findPlanById(planId);
     if (!plan) {
       throw new NotFoundException('Plan not found for verified payment');
     }
 
+    // initializeSubscription writes `interval` as 'monthly' | 'yearly'.
+    const isAnnual = String(meta.interval ?? 'monthly') === 'yearly';
+    const billingCycle: 'monthly' | 'annual' = isAnnual ? 'annual' : 'monthly';
+
+    // The amount actually paid must match the plan's price. Without this, a
+    // verified-but-cheaper transaction could unlock an expensive plan.
+    await this.assertPaidAmountMatchesPlan(verified, plan, isAnnual);
+
     const workspaceId =
-      verified.meta?.workspaceId ||
+      meta.workspaceId ||
       await this.repository.findPrimaryWorkspaceForUser(userId);
     if (!workspaceId) {
       throw new NotFoundException('Workspace not found for payment verification');
@@ -213,7 +279,7 @@ export class BillingService {
       workspaceId,
       planId: plan.id,
       flutterwaveId: String(verified.id ?? data.transaction_id),
-      billingCycle: data.billing_cycle || verified.meta?.billing_cycle || 'monthly',
+      billingCycle,
     });
 
     const billingRecord = await this.repository.createBillingRecord({
@@ -236,7 +302,7 @@ export class BillingService {
       planSlug: plan.slug,
       amount: Number(verified.amount ?? 0),
       currency: String(verified.currency ?? 'USD'),
-      billingCycle: data.billing_cycle || verified.meta?.billing_cycle || 'monthly',
+      billingCycle,
     });
 
     return {
