@@ -41,13 +41,25 @@ export class CompetitorsRepository {
     });
   }
 
+  /**
+   * Competitors with their most recent snapshot.
+   *
+   * Was an N+1: one query for the list, then one findFirst per competitor. Now a
+   * single nested read — Prisma emits one query per relation, not one per row,
+   * so this is 2 queries regardless of how many competitors are tracked.
+   */
   async getCompetitorMetrics(workspaceId: string, platform: string) {
-    const competitors = await this.prisma.competitorProfile.findMany({ where: { workspace_id: workspaceId, platform } });
-    const results = [];
-    for (const c of competitors) {
-      const latest = await this.prisma.competitorSnapshot.findFirst({ where: { competitor_profile_id: c.id }, orderBy: { date: 'desc' } });
-      results.push({ ...c, latestSnapshot: latest });
-    }
-    return results;
+    const competitors = await this.prisma.competitorProfile.findMany({
+      where: { workspace_id: workspaceId, platform },
+      include: {
+        snapshots: { orderBy: { date: 'desc' }, take: 1 },
+      },
+    });
+
+    // Preserve the original shape: `latestSnapshot`, not a `snapshots` array.
+    return competitors.map(({ snapshots, ...competitor }) => ({
+      ...competitor,
+      latestSnapshot: snapshots[0] ?? null,
+    }));
   }
 }

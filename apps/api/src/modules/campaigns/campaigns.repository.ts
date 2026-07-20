@@ -38,21 +38,39 @@ export class CampaignsRepository {
     return this.prisma.campaignPost.delete({ where: { campaign_id_post_id: { campaign_id: campaignId, post_id: postId } } });
   }
 
+  /**
+   * Campaign totals, aggregated in the database.
+   *
+   * Previously loaded every campaign post with its full analytics graph and
+   * summed in Node (docs/audit-2026-07-20.md §M7). Identical output; the
+   * arithmetic now happens where the rows already are, so memory is constant
+   * rather than proportional to campaign size.
+   */
   async getAnalytics(campaignId: string) {
-    const posts = await this.prisma.campaignPost.findMany({
-      where: { campaign_id: campaignId },
-      include: { post: { include: { analytics: true } } },
-    });
+    const [posts, sums] = await Promise.all([
+      this.prisma.campaignPost.count({ where: { campaign_id: campaignId } }),
+      this.prisma.postAnalytics.aggregate({
+        where: { post: { campaign_posts: { some: { campaign_id: campaignId } } } },
+        _sum: {
+          reach: true,
+          impressions: true,
+          clicks: true,
+          likes: true,
+          comments: true,
+          shares: true,
+        },
+      }),
+    ]);
 
-    const totals = { posts: posts.length, reach: 0, impressions: 0, engagements: 0, clicks: 0 };
-    for (const cp of posts) {
-      for (const a of cp.post.analytics) {
-        totals.reach += a.reach || 0;
-        totals.impressions += a.impressions || 0;
-        totals.engagements += (a.likes + a.comments + a.shares) || 0;
-        totals.clicks += a.clicks || 0;
-      }
-    }
-    return totals;
+    const s = sums._sum;
+    return {
+      posts,
+      reach: s.reach ?? 0,
+      impressions: s.impressions ?? 0,
+      // Engagement is a derived metric; summing the components separately and
+      // adding three numbers is O(1), unlike summing per row in Node.
+      engagements: (s.likes ?? 0) + (s.comments ?? 0) + (s.shares ?? 0),
+      clicks: s.clicks ?? 0,
+    };
   }
 }
