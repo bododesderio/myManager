@@ -44,8 +44,12 @@ export class CommentsController {
 
   @Put(':id/status')
   @ApiOperation({ summary: 'Update comment status (open, resolved, archived)' })
-  async updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
-    return this.commentsService.updateStatus(id, body.status);
+  async updateStatus(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body() body: { status: string },
+  ) {
+    return this.commentsService.updateStatus(id, getRequestWorkspaceId(req), body.status);
   }
 
   @Delete(':id/hide')

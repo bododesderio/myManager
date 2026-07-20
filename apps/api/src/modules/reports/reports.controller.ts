@@ -60,11 +60,17 @@ export class ReportsController {
 
   @Put('configs/:id')
   @ApiOperation({ summary: 'Update a report configuration' })
-  async updateConfig(@Param('id') id: string, @Body() body: Record<string, unknown>) {
-    return this.reportsService.updateConfig(id, body);
+  async updateConfig(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.reportsService.updateConfig(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete('configs/:id')
   @ApiOperation({ summary: 'Delete a report configuration' })
-  async deleteConfig(@Param('id') id: string) { return this.reportsService.deleteConfig(id); }
+  async deleteConfig(@Param('id') id: string, @Req() req: Request) {
+    return this.reportsService.deleteConfig(id, getRequestWorkspaceId(req));
+  }
 }

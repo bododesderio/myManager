@@ -52,8 +52,16 @@ export class CommentsRepository {
     });
   }
 
-  async updateAssignmentStatus(assignmentId: string, status: string) {
-    return this.prisma.commentAssignment.update({ where: { id: assignmentId }, data: { status } });
+  /**
+   * Scoped through the parent comment — commentAssignment has no workspace_id.
+   * Returns false when the assignment does not exist *or* belongs elsewhere.
+   */
+  async updateAssignmentStatus(assignmentId: string, workspaceId: string, status: string) {
+    const result = await this.prisma.commentAssignment.updateMany({
+      where: { id: assignmentId, comment: { workspace_id: workspaceId } },
+      data: { status },
+    });
+    return result.count > 0;
   }
 
   async getInboxStats(workspaceId: string) {

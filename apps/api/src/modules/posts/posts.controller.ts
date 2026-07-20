@@ -81,46 +81,48 @@ export class PostsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get post details' })
-  async getPost(@Param('id', ParseUUIDPipe) id: string) {
-    return this.postsService.getById(id);
+  async getPost(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.postsService.getById(id, getRequestWorkspaceId(req));
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a post' })
   async updatePost(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
     @Body() body: UpdatePostDto,
   ) {
-    return this.postsService.update(id, body as Record<string, any>);
+    return this.postsService.update(id, getRequestWorkspaceId(req), body as Record<string, any>);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a post' })
-  async deletePost(@Param('id', ParseUUIDPipe) id: string) {
-    return this.postsService.delete(id);
+  async deletePost(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.postsService.delete(id, getRequestWorkspaceId(req));
   }
 
   @Post(':id/publish')
   @ApiOperation({ summary: 'Publish a post immediately' })
   async publishNow(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.postsService.publishNow(id, userId);
+    return this.postsService.publishNow(id, userId, getRequestWorkspaceId(req));
   }
 
   @Post(':id/schedule')
   @ApiOperation({ summary: 'Schedule a post for later' })
   async schedule(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
     @Body() body: SchedulePostDto,
   ) {
-    return this.postsService.schedule(id, body.scheduledAt);
+    return this.postsService.schedule(id, getRequestWorkspaceId(req), body.scheduledAt);
   }
 
   @Post(':id/duplicate')
   @ApiOperation({ summary: 'Duplicate a post' })
   async duplicate(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.postsService.duplicate(id, userId);
+    return this.postsService.duplicate(id, userId, getRequestWorkspaceId(req));
   }
 
   @Get(':id/versions')
@@ -150,7 +152,7 @@ export class PostsController {
 
   @Post('bulk/delete')
   @ApiOperation({ summary: 'Bulk delete posts' })
-  async bulkDelete(@Body() body: BulkDeletePostsDto) {
-    return this.postsService.bulkDelete(body.postIds);
+  async bulkDelete(@Body() body: BulkDeletePostsDto, @Req() req: Request) {
+    return this.postsService.bulkDelete(body.postIds, getRequestWorkspaceId(req));
   }
 }

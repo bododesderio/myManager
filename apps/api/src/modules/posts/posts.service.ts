@@ -99,21 +99,21 @@ export class PostsService {
     return post;
   }
 
-  async getById(id: string) {
-    const post = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const post = await this.repository.findById(id, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
     return post;
   }
 
-  async update(id: string, data: Record<string, any>) {
-    const post = await this.repository.findById(id);
+  async update(id: string, workspaceId: string, data: Record<string, any>) {
+    const post = await this.repository.findById(id, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
 
     if (['PUBLISHED', 'PUBLISHING'].includes(post.status)) {
       throw new BadRequestException('Cannot edit a published or publishing post');
     }
 
-    const updated = await this.repository.update(id, data);
+    const updated = await this.repository.update(id, workspaceId, data);
 
     await this.repository.createVersion(id, {
       caption: data.caption || post.caption,
@@ -124,16 +124,18 @@ export class PostsService {
     return updated;
   }
 
-  async delete(id: string) {
-    await this.repository.softDelete(id);
+  async delete(id: string, workspaceId: string) {
+    const deleted = await this.repository.softDelete(id, workspaceId);
+    // Indistinguishable from "not found" on purpose.
+    if (!deleted) throw new NotFoundException('Post not found');
     return { message: 'Post deleted' };
   }
 
-  async publishNow(id: string, userId: string) {
-    const post = await this.repository.findById(id);
+  async publishNow(id: string, userId: string, workspaceId: string) {
+    const post = await this.repository.findById(id, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
 
-    await this.repository.update(id, { status: 'QUEUED' });
+    await this.repository.update(id, workspaceId, { status: 'QUEUED' });
 
     for (const platform of post.platforms) {
       const socialAccount = await this.repository.findSocialAccountForPlatform(
@@ -163,20 +165,20 @@ export class PostsService {
     return { message: 'Post queued for publishing', postId: id };
   }
 
-  async schedule(id: string, scheduledAt: string) {
+  async schedule(id: string, workspaceId: string, scheduledAt: string) {
     const date = new Date(scheduledAt);
     if (date <= new Date()) {
       throw new BadRequestException('Scheduled time must be in the future');
     }
 
-    return this.repository.update(id, {
+    return this.repository.update(id, workspaceId, {
       status: 'SCHEDULED',
       scheduled_at: date,
     });
   }
 
-  async duplicate(id: string, userId: string) {
-    const original = await this.repository.findById(id);
+  async duplicate(id: string, userId: string, workspaceId: string) {
+    const original = await this.repository.findById(id, workspaceId);
     if (!original) throw new NotFoundException('Post not found');
 
     return this.repository.create({
@@ -231,8 +233,9 @@ export class PostsService {
     return { created: created.length, posts: created };
   }
 
-  async bulkDelete(postIds: string[]) {
-    await this.repository.bulkSoftDelete(postIds);
-    return { deleted: postIds.length };
+  async bulkDelete(postIds: string[], workspaceId: string) {
+    const result = await this.repository.bulkSoftDelete(postIds, workspaceId);
+    // Report what was actually deleted — ids from another workspace are skipped.
+    return { deleted: result.count };
   }
 }

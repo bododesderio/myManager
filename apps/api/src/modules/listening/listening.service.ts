@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ListeningRepository } from './listening.repository';
 
 @Injectable()
@@ -11,7 +11,12 @@ export class ListeningService {
     return this.repository.createTerm(data);
   }
 
-  async removeTerm(id: string) { await this.repository.deleteTerm(id); return { message: 'Monitoring term removed' }; }
+  async removeTerm(id: string, workspaceId: string) {
+    const deleted = await this.repository.deleteTerm(id, workspaceId);
+    // Indistinguishable from "not found" on purpose.
+    if (!deleted) throw new NotFoundException('Monitoring term not found');
+    return { message: 'Monitoring term removed' };
+  }
 
   async listMentions(workspaceId: string, platform: string | undefined, page: number, limit: number) {
     const offset = (page - 1) * limit;

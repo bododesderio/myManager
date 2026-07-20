@@ -35,44 +35,68 @@ export class ProjectsService {
     return project;
   }
 
-  async getById(id: string) {
-    const project = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const project = await this.repository.findById(id, workspaceId);
     if (!project) throw new NotFoundException('Project not found');
     return project;
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    return this.repository.update(id, data);
+  /**
+   * projectMember and portalAccessToken have no workspace_id of their own, so
+   * they cannot self-scope. Every method that writes to them must first prove
+   * the parent project belongs to the caller's workspace — that is what this
+   * does, and why it is called before each of them.
+   */
+  private async ensureProjectInWorkspace(projectId: string, workspaceId: string) {
+    const project = await this.repository.findById(projectId, workspaceId);
+    if (!project) throw new NotFoundException('Project not found');
+    return project;
   }
 
-  async delete(id: string) {
-    await this.repository.softDelete(id);
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const updated = await this.repository.update(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose.
+    if (!updated) throw new NotFoundException('Project not found');
+    return updated;
+  }
+
+  async delete(id: string, workspaceId: string) {
+    const deleted = await this.repository.softDelete(id, workspaceId);
+    if (!deleted) throw new NotFoundException('Project not found');
     return { message: 'Project deleted' };
   }
 
-  async listMembers(projectId: string) {
-    return this.repository.findMembers(projectId);
+  async listMembers(projectId: string, workspaceId: string) {
+    return this.repository.findMembers(projectId, workspaceId);
   }
 
-  async addMember(projectId: string, userId: string, role: string) {
+  async addMember(projectId: string, workspaceId: string, userId: string, role: string) {
+    await this.ensureProjectInWorkspace(projectId, workspaceId);
     return this.repository.addMember(projectId, userId, role);
   }
 
-  async removeMember(projectId: string, userId: string) {
+  async removeMember(projectId: string, workspaceId: string, userId: string) {
+    await this.ensureProjectInWorkspace(projectId, workspaceId);
     await this.repository.removeMember(projectId, userId);
     return { message: 'Member removed from project' };
   }
 
-  async generatePortalToken(projectId: string, label: string = 'default') {
+  async generatePortalToken(projectId: string, workspaceId: string, label: string = 'default') {
+    // Highest-risk of the three: a portal token grants an OUTSIDE party read
+    // access to the project's content. Issuing one against another tenant's
+    // project would hand over their client portal.
+    await this.ensureProjectInWorkspace(projectId, workspaceId);
+
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     await this.repository.createPortalToken(projectId, token, expiresAt, label);
     return { token, expiresAt };
   }
 
-  async getAnalytics(projectId: string, startDate: string, endDate: string) {
+  async getAnalytics(projectId: string, workspaceId: string, startDate: string, endDate: string) {
     return this.repository.getProjectAnalytics(
       projectId,
+      workspaceId,
       new Date(startDate),
       new Date(endDate),
     );

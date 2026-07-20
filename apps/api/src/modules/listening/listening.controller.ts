@@ -25,7 +25,9 @@ export class ListeningController {
 
   @Delete('terms/:id')
   @ApiOperation({ summary: 'Remove a monitoring term' })
-  async removeTerm(@Param('id') id: string) { return this.listeningService.removeTerm(id); }
+  async removeTerm(@Param('id') id: string, @Req() req: Request) {
+    return this.listeningService.removeTerm(id, getRequestWorkspaceId(req));
+  }
 
   @Get('mentions')
   @ApiOperation({ summary: 'List brand mentions' })

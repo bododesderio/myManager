@@ -28,8 +28,11 @@ export class CommentsService {
     return this.repository.assign(commentId, assigneeId, assignerId);
   }
 
-  async updateStatus(assignmentId: string, status: string) {
-    return this.repository.updateAssignmentStatus(assignmentId, status);
+  async updateStatus(assignmentId: string, workspaceId: string, status: string) {
+    const updated = await this.repository.updateAssignmentStatus(assignmentId, workspaceId, status);
+    // Indistinguishable from "not found" on purpose.
+    if (!updated) throw new NotFoundException('Comment assignment not found');
+    return { message: 'Assignment status updated' };
   }
 
   async hide(commentId: string, workspaceId: string) {

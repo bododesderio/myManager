@@ -34,8 +34,8 @@ export class PublishingService {
     ]);
   }
 
-  async dispatchPost(postId: string, userId: string) {
-    const post = await this.repository.findPostById(postId);
+  async dispatchPost(postId: string, userId: string, workspaceId: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
 
     if (post.status === 'PUBLISHED') {
@@ -78,8 +78,8 @@ export class PublishingService {
     return { postId, dispatched, errors };
   }
 
-  async retryPlatform(postId: string, platform: string) {
-    const post = await this.repository.findPostById(postId);
+  async retryPlatform(postId: string, platform: string, workspaceId: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
 
     const account = await this.repository.findActiveSocialAccount(post.workspace_id, platform);
@@ -117,8 +117,8 @@ export class PublishingService {
     return this.repository.findPlatformResults(postId);
   }
 
-  async cancelPost(postId: string) {
-    const post = await this.repository.findPostById(postId);
+  async cancelPost(postId: string, workspaceId: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
 
     if (!['queued', 'scheduled'].includes(post.status)) {
