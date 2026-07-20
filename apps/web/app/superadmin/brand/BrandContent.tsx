@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/providers/ToastProvider";
 import { FileUpload } from "@/components/FileUpload";
+import { Card } from '@mymanager/ui';
 
 interface BrandConfig {
   app_name: string;
@@ -101,7 +102,7 @@ export function BrandContent() {
       </p>
 
       <div className="max-w-2xl space-y-6">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">
             Platform Identity
           </h2>
@@ -155,9 +156,9 @@ export function BrandContent() {
               accept="image/*"
             />
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Theme</h2>
           <div className="mt-4 grid grid-cols-3 gap-4">
             <div>
@@ -200,9 +201,9 @@ export function BrandContent() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Typography</h2>
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
@@ -240,9 +241,9 @@ export function BrandContent() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">
             Support & Footer
           </h2>
@@ -342,7 +343,7 @@ export function BrandContent() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
         <button
           onClick={() => void handleSave()}

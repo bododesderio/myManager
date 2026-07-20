@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 export default function OAuthCallbackPage() {
   const searchParams = useSearchParams();
@@ -49,7 +50,7 @@ export default function OAuthCallbackPage() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="max-w-sm rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
+      <Card padding="none" className="max-w-sm p-8 text-center">
         {status === 'loading' && (
           <>
             <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -83,7 +84,7 @@ export default function OAuthCallbackPage() {
             </button>
           </>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

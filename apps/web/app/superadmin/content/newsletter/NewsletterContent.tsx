@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 interface Subscriber {
   id: string;
@@ -89,7 +90,7 @@ export function NewsletterContent() {
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none" className="overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>
@@ -131,7 +132,7 @@ export function NewsletterContent() {
             )}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

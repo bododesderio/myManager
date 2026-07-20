@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePreferences, useUpdatePreferences } from '@/lib/hooks/useUser';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 const LANGUAGES = [
   { value: 'en', label: 'English' },
@@ -65,7 +66,7 @@ export default function LanguageContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Language */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Language</h2>
           <select
             value={language}
@@ -78,10 +79,10 @@ export default function LanguageContent() {
               </option>
             ))}
           </select>
-        </div>
+        </Card>
 
         {/* Currency */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Currency</h2>
           <select
             value={currency}
@@ -94,7 +95,7 @@ export default function LanguageContent() {
               </option>
             ))}
           </select>
-        </div>
+        </Card>
 
         <button
           onClick={handleSave}

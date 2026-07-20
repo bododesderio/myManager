@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAdminUser, useDisableUserTwoFactor, useSuspendUser, useUpdateUserRole } from '@/lib/hooks/useAdmin';
 import { useToast } from '@/providers/ToastProvider';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function UserDetailContent({ id }: { id: string }) {
   const { data: user, isLoading } = useAdminUser(id);
@@ -95,7 +96,7 @@ export function UserDetailContent({ id }: { id: string }) {
           <button
             onClick={handleSuspend}
             disabled={suspendUser.isPending}
-            className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+            className="rounded-brand border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
           >
             {user.suspended ? 'Unsuspend' : 'Suspend'}
           </button>
@@ -103,7 +104,7 @@ export function UserDetailContent({ id }: { id: string }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Profile</h2>
           <dl className="mt-4 space-y-3">
             <div>
@@ -161,9 +162,9 @@ export function UserDetailContent({ id }: { id: string }) {
               </dd>
             </div>
           </dl>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Usage</h2>
           <dl className="mt-4 space-y-3">
             <div>
@@ -187,11 +188,11 @@ export function UserDetailContent({ id }: { id: string }) {
               <dd className="font-medium">{user.usage?.teamMembers ?? 0}</dd>
             </div>
           </dl>
-        </div>
+        </Card>
       </div>
 
       {user.workspaces?.length > 0 && (
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Workspaces</h2>
           <div className="mt-4 divide-y">
             {user.workspaces.map((ws: { id: string; name: string; role: string }) => (
@@ -201,7 +202,7 @@ export function UserDetailContent({ id }: { id: string }) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

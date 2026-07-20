@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { Card } from '@mymanager/ui';
 
 interface BlogForm {
   title: string;
@@ -180,7 +181,7 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-text-2">Title</label>
@@ -202,9 +203,9 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-text-2">Excerpt</label>
@@ -222,9 +223,9 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 accept="image/*"
               />
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <label className="mb-2 block text-sm font-medium text-text-2">Body</label>
             <RichTextEditor
               value={form.body}
@@ -232,11 +233,11 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
               placeholder="Write your blog post..."
               minHeight={300}
             />
-          </div>
+          </Card>
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h3 className="font-heading text-sm font-semibold">Publish Settings</h3>
             <div className="mt-4 space-y-4">
               <label className="flex items-center justify-between text-sm text-text-2">
@@ -252,9 +253,9 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 <input type="checkbox" checked={form.is_featured} onChange={(e) => update('is_featured', e.target.checked)} />
               </label>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h3 className="font-heading text-sm font-semibold">Organization</h3>
             <div className="mt-4 space-y-4">
               <div>
@@ -272,9 +273,9 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 <input type="text" value={form.tags} onChange={(e) => update('tags', e.target.value)} className={inputCls} placeholder="tag1, tag2, tag3" />
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h3 className="font-heading text-sm font-semibold">SEO</h3>
             <div className="mt-4 space-y-4">
               <div>
@@ -292,7 +293,7 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
                 accept="image/*"
               />
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

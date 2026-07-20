@@ -6,6 +6,7 @@ import { useReports, useGenerateReport, useDeleteReport } from '@/lib/hooks/useR
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const REPORT_PLATFORMS = ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'youtube'];
 
@@ -131,7 +132,7 @@ export function ReportsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
       ) : reports.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -152,9 +153,9 @@ export function ReportsContent() {
           >
             Generate Your First Report
           </button>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           {/* Table header */}
           <div className="flex items-center gap-4 border-b px-6 py-3 text-xs font-semibold uppercase text-text-2">
             <div className="flex-1">Name</div>
@@ -219,7 +220,7 @@ export function ReportsContent() {
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Generate Report Modal */}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -322,7 +323,7 @@ export function CredentialsContent() {
       </div>
 
       {/* Active section */}
-      <div className="rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none">
         <h2 className="border-b px-6 py-4 font-heading text-lg font-semibold">
           {activeSection.label}
         </h2>
@@ -336,7 +337,7 @@ export function CredentialsContent() {
             />
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

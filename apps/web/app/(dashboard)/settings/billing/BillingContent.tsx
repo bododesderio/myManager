@@ -6,6 +6,7 @@ import { useSubscription, usePlans, useBillingHistory, useChangePlan, useCancelS
 import { useToast } from '@/providers/ToastProvider';
 import { useCapabilities } from '@/providers/CapabilitiesProvider';
 import { ServiceUnavailable } from '@/components/status/ServiceUnavailable';
+import { Card } from '@mymanager/ui';
 
 export default function BillingContent() {
   const caps = useCapabilities();
@@ -73,7 +74,7 @@ function BillingContentInner() {
 
       <div className="max-w-3xl space-y-6">
         {/* Current Plan */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Current Plan</h2>
           <div className="mt-4 flex items-center justify-between">
             <div>
@@ -89,7 +90,7 @@ function BillingContentInner() {
               {sub?.status === 'active' && (
                 <button
                   onClick={() => setShowCancelConfirm(true)}
-                  className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  className="rounded-brand border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
                 >
                   Cancel
                 </button>
@@ -97,7 +98,7 @@ function BillingContentInner() {
             </div>
           </div>
           {showCancelConfirm && (
-            <div className="mt-4 rounded-brand border border-border border-red-200 bg-red-50 p-4">
+            <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4">
               <p className="text-sm text-red-700">
                 Are you sure? Your subscription will remain active until the end of the current billing period.
               </p>
@@ -118,11 +119,11 @@ function BillingContentInner() {
               </div>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Plan comparison grid */}
         {planList.length > 0 && (
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Available Plans</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-3">
               {planList.map((plan: any) => {
@@ -164,11 +165,11 @@ function BillingContentInner() {
                 );
               })}
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Billing History */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Billing History</h2>
           {invoices.length === 0 ? (
             <p className="mt-4 text-sm text-text-2">No billing history yet.</p>
@@ -211,7 +212,7 @@ function BillingContentInner() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

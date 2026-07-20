@@ -7,6 +7,7 @@ import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useUpdateWorkspace } from '@/lib/hooks/useWorkspaces';
 import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
+import { Card } from '@mymanager/ui';
 
 export default function BrandContent() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -46,7 +47,7 @@ export default function BrandContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Logo */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Logo</h2>
           <div className="mt-4 flex items-center gap-4">
             <div className="relative flex h-20 w-20 items-center justify-center rounded-brand border-2 border-dashed border-border overflow-hidden">
@@ -65,10 +66,10 @@ export default function BrandContent() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Colors */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Colors</h2>
           <div className="mt-4 grid grid-cols-3 gap-4">
             <div>
@@ -126,10 +127,10 @@ export default function BrandContent() {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Typography */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Typography</h2>
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
@@ -163,7 +164,7 @@ export default function BrandContent() {
               </select>
             </div>
           </div>
-        </div>
+        </Card>
 
         <button
           onClick={handleSave}

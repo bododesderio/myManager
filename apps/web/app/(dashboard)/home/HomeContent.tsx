@@ -155,7 +155,7 @@ export function HomeContent() {
   return (
     <div className="space-y-5">
       {queryError && (
-        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-brand border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           Some dashboard data failed to load: {(queryError as Error)?.message ?? 'unknown error'}.
           <button
             type="button"

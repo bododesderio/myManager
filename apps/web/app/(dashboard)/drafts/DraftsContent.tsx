@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePosts, useDeletePost } from '@/lib/hooks/usePosts';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const PLATFORM_BADGES: Record<string, string> = {
   twitter: 'bg-sky-100 text-sky-700',
@@ -73,7 +74,7 @@ export function DraftsContent() {
       {isLoading ? (
         <TableSkeleton rows={5} cols={3} />
       ) : drafts.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -87,9 +88,9 @@ export function DraftsContent() {
           >
             Create Your First Draft
           </Link>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <div className="divide-y">
             {drafts.map((draft: any) => {
               const caption = draft.caption || draft.title || 'Untitled draft';
@@ -143,7 +144,7 @@ export function DraftsContent() {
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Delete confirmation modal */}

@@ -6,6 +6,7 @@ import { useProject, useProjectMembers } from '@/lib/hooks/useProjects';
 import { usePosts } from '@/lib/hooks/usePosts';
 import { StatCardSkeleton } from '@/components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 type Tab = 'overview' | 'members' | 'posts';
 
@@ -75,18 +76,18 @@ export function ProjectDetailContent({ id }: { id: string }) {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          <Card padding="md">
             <p className="text-sm text-text-2">Connected Accounts</p>
             <p className="mt-1 text-2xl font-bold">{project.accountCount ?? project.accounts ?? 0}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Team Members</p>
             <p className="mt-1 text-2xl font-bold">{members.length}</p>
-          </div>
-          <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+          </Card>
+          <Card padding="md">
             <p className="text-sm text-text-2">Posts</p>
             <p className="mt-1 text-2xl font-bold">{posts.length}</p>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -109,7 +110,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
 
       {/* Tab content */}
       {activeTab === 'overview' && (
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Recent Activity</h2>
           {postsLoading ? (
             <div className="mt-4">
@@ -134,11 +135,11 @@ export function ProjectDetailContent({ id }: { id: string }) {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {activeTab === 'members' && (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           {membersLoading ? (
             <TableSkeleton rows={4} cols={3} />
           ) : members.length === 0 ? (
@@ -168,11 +169,11 @@ export function ProjectDetailContent({ id }: { id: string }) {
               </tbody>
             </table>
           )}
-        </div>
+        </Card>
       )}
 
       {activeTab === 'posts' && (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           {postsLoading ? (
             <TableSkeleton rows={5} cols={3} />
           ) : posts.length === 0 ? (
@@ -197,7 +198,7 @@ export function ProjectDetailContent({ id }: { id: string }) {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       )}
     </div>
   );

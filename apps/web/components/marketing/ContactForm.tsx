@@ -127,7 +127,7 @@ export function ContactForm({ supportEmail, salesEmail }: ContactFormProps) {
       </div>
 
       {status === 'error' && (
-        <div className="rounded-input border border-border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
+        <div className="rounded-input border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
           {errorMsg}
         </div>
       )}

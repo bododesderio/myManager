@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTemplates, useDeleteTemplate } from '@/lib/hooks/useTemplates';
 import { useToast } from '@/providers/ToastProvider';
 import { CardGridSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Card } from '@mymanager/ui';
 
 const PLATFORM_BADGES: Record<string, string> = {
   twitter: 'bg-sky-100 text-sky-700',
@@ -59,7 +60,7 @@ export function TemplatesContent() {
       {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : !Array.isArray(templates) || templates.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
@@ -73,7 +74,7 @@ export function TemplatesContent() {
           >
             Create Your First Template
           </Link>
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {templates.map((template: any) => {

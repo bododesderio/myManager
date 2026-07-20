@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 interface AuditEntry {
   id: string;
@@ -148,7 +149,7 @@ export function AuditLogContent() {
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-wrap items-end gap-3 rounded-brand border border-border bg-bg p-4 shadow-sm">
+      <Card padding="sm" className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-text-2">Action</label>
           <select
@@ -235,13 +236,13 @@ export function AuditLogContent() {
         >
           Clear
         </button>
-      </div>
+      </Card>
 
       {/* Table */}
       {loading ? (
         <TableSkeleton rows={8} cols={6} />
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -280,7 +281,7 @@ export function AuditLogContent() {
               )}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
 
       {/* Pagination */}

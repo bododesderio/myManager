@@ -10,7 +10,7 @@ import {
   useVerifyTwoFactor,
 } from '@/lib/hooks/useUser';
 import { useToast } from '@/providers/ToastProvider';
-import { Button } from '@mymanager/ui';
+import { Button, Card } from '@mymanager/ui';
 
 export default function SecurityContent() {
   const { data: preferences, isLoading: isLoadingPreferences } = usePreferences();
@@ -124,7 +124,7 @@ export default function SecurityContent() {
 
       <div className="max-w-2xl space-y-6">
         {/* Change Password */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Change Password</h2>
           <div className="mt-4 space-y-4">
             <div>
@@ -165,10 +165,10 @@ export default function SecurityContent() {
           >
             {changePassword.isPending ? 'Updating...' : 'Update Password'}
           </button>
-        </div>
+        </Card>
 
         {/* Two-Factor Authentication */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Two-Factor Authentication</h2>
           <p className="mt-2 text-sm text-text-2">Add an extra layer of security to your account.</p>
           <div className="mt-4 flex items-center gap-3">
@@ -193,7 +193,7 @@ export default function SecurityContent() {
           </div>
 
           {twoFAEnabled && (
-            <div className="mt-4 rounded-brand border border-border border-red-200 bg-red-50 p-4">
+            <div className="mt-4 rounded-brand border border-red-200 bg-red-50 p-4">
               <h3 className="text-sm font-semibold text-red-800">Disable Two-Factor Authentication</h3>
               <p className="mt-2 text-sm text-red-700">
                 Enter a current authenticator code to turn 2FA off for this account.
@@ -215,7 +215,7 @@ export default function SecurityContent() {
                 <button
                   onClick={handleDisable2FA}
                   disabled={disableTwoFactor.isPending}
-                  className="rounded-brand border border-border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                  className="rounded-brand border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
                 >
                   {disableTwoFactor.isPending ? 'Disabling...' : 'Disable 2FA'}
                 </button>
@@ -285,10 +285,10 @@ export default function SecurityContent() {
               </div>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Active Sessions */}
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card>
           <h2 className="font-heading text-lg font-semibold">Active Sessions</h2>
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between rounded-brand border border-border px-4 py-3">
@@ -299,7 +299,7 @@ export default function SecurityContent() {
               <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">Active</span>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

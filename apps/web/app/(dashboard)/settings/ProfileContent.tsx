@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useProfile, useUpdateProfile } from '@/lib/hooks/useUser';
 import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
+import { Card } from '@mymanager/ui';
 
 const settingsLinks = [
   { href: '/settings/accounts', label: 'Connected Accounts', description: 'Manage your social media connections.' },
@@ -58,7 +59,7 @@ export default function ProfileContent() {
       </div>
 
       {/* Profile form */}
-      <div className="max-w-2xl rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card className="max-w-2xl">
         <h2 className="font-heading text-lg font-semibold">Profile</h2>
         <div className="mt-4 space-y-4">
           <div>
@@ -116,7 +117,7 @@ export default function ProfileContent() {
         >
           {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
         </button>
-      </div>
+      </Card>
 
       {/* Settings navigation grid */}
       <div>

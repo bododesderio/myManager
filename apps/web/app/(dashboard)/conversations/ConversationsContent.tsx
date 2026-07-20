@@ -6,6 +6,7 @@ import { useWorkspaceMembers } from '@/lib/hooks/useWorkspaces';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 const PLATFORMS = ['all', 'facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'youtube'] as const;
 
@@ -109,7 +110,7 @@ export function ConversationsContent() {
       {isLoading ? (
         <TableSkeleton rows={6} cols={4} />
       ) : comments.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -124,9 +125,9 @@ export function ConversationsContent() {
           <p className="mt-1 text-sm text-text-2">
             Incoming comments from your connected platforms will appear here.
           </p>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <div className="divide-y">
             {comments.map((comment: any) => {
               const platform = comment.platform || 'unknown';
@@ -230,7 +231,7 @@ export function ConversationsContent() {
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

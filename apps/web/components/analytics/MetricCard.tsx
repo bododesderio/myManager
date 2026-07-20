@@ -1,3 +1,4 @@
+import { Card } from '@mymanager/ui';
 interface MetricCardProps {
   label: string;
   value: string | number;
@@ -20,7 +21,7 @@ export function MetricCard({ label, value, change, trend = 'neutral', icon }: Me
   };
 
   return (
-    <div className="rounded-brand border border-border bg-bg p-5 shadow-sm">
+    <Card padding="md">
       <div className="flex items-center justify-between">
         <p className="text-sm text-text-2">{label}</p>
         {icon && <span className="text-text-muted">{icon}</span>}
@@ -31,6 +32,6 @@ export function MetricCard({ label, value, change, trend = 'neutral', icon }: Me
           {trendArrows[trend]} {change}
         </p>
       )}
-    </div>
+    </Card>
   );
 }

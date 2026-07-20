@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useProjects, useDeleteProject, useCreateProject } from '@/lib/hooks/useProjects';
 import { useToast } from '@/providers/ToastProvider';
 import { CardGridSkeleton } from '@/components/skeletons/CardSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function ProjectsContent() {
   const { data, isLoading } = useProjects();
@@ -73,7 +74,7 @@ export function ProjectsContent() {
       {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : projects.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-bg-2">
             <svg className="h-6 w-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2 12.5l4.5 4.5L12 12m0 0l5.5 5m-5.5-5V3" />
@@ -81,7 +82,7 @@ export function ProjectsContent() {
           </div>
           <h3 className="font-heading text-lg font-semibold text-text">No projects yet</h3>
           <p className="mt-1 text-sm text-text-2">Create a project to start organizing your work.</p>
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project: any) => (

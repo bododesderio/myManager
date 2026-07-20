@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCreatePlan } from '@/lib/hooks/useAdmin';
 import { useToast } from '@/providers/ToastProvider';
+import { Card } from '@mymanager/ui';
 
 export function PlanCreateContent() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export function PlanCreateContent() {
       <h1 className="font-heading text-2xl font-bold">Create New Plan</h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
+        <Card className="space-y-4">
           <div>
             <label htmlFor="planName" className="block text-sm font-medium text-text-2">
               Plan Name
@@ -124,9 +125,9 @@ export function PlanCreateContent() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
+        <Card className="space-y-4">
           <h2 className="font-heading text-lg font-semibold">Limits</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -182,9 +183,9 @@ export function PlanCreateContent() {
               />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="rounded-brand border border-border bg-bg p-6 shadow-sm space-y-4">
+        <Card className="space-y-4">
           <h2 className="font-heading text-lg font-semibold">Features</h2>
           <div>
             <label htmlFor="features" className="block text-sm font-medium text-text-2">
@@ -199,7 +200,7 @@ export function PlanCreateContent() {
               className="mt-1 block w-full rounded-brand border border-border border-border px-4 py-2 focus:border-primary focus:outline-none"
             />
           </div>
-        </div>
+        </Card>
 
         <button
           type="submit"

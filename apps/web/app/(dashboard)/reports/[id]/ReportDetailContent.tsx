@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useReport } from '@/lib/hooks/useReports';
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
-import { Button } from '@mymanager/ui';
+import { Button, Card } from '@mymanager/ui';
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -53,12 +53,12 @@ export function ReportDetailContent({ id }: { id: string }) {
             &larr; Reports
           </Link>
         </div>
-        <div className="rounded-brand border border-border bg-bg py-16 text-center shadow-sm">
+        <Card padding="none" className="py-16 text-center">
           <h3 className="font-heading text-lg font-semibold text-text">Report not found</h3>
           <p className="mt-1 text-sm text-text-2">
             This report may have been deleted or does not exist.
           </p>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export function ReportDetailContent({ id }: { id: string }) {
       </div>
 
       {/* Report metadata */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Report Details</h2>
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
@@ -127,10 +127,10 @@ export function ReportDetailContent({ id }: { id: string }) {
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
       {/* Report preview */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Preview</h2>
         <div className="mt-4">
           {isPdf && downloadUrl ? (
@@ -149,7 +149,7 @@ export function ReportDetailContent({ id }: { id: string }) {
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
       {/* Share modal */}
       {showShareModal && (

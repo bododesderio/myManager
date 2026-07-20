@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAdminUsers, useSuspendUser } from '@/lib/hooks/useAdmin';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function UsersContent() {
   const [search, setSearch] = useState('');
@@ -47,7 +48,7 @@ export function UsersContent() {
       {isLoading ? (
         <TableSkeleton rows={6} cols={5} />
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -106,7 +107,7 @@ export function UsersContent() {
               )}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
 
       {totalPages > 1 && (

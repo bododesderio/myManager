@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { Card } from '@mymanager/ui';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CLOSED_WON' | 'CLOSED_LOST';
 
@@ -134,7 +135,7 @@ export function LeadsContent() {
         })}
       </div>
 
-      <div className="overflow-hidden rounded-brand border border-border bg-bg shadow-sm">
+      <Card padding="none" className="overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-bg-2 text-xs uppercase text-text-2">
             <tr>
@@ -263,7 +264,7 @@ export function LeadsContent() {
             )}
           </tbody>
         </table>
-      </div>
+      </Card>
     </div>
   );
 }

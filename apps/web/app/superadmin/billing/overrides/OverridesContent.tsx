@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAdminOverrides, useCreateOverride } from '@/lib/hooks/useAdmin';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 export function OverridesContent() {
   const { data, isLoading } = useAdminOverrides();
@@ -131,7 +132,7 @@ export function OverridesContent() {
       {isLoading ? (
         <TableSkeleton rows={3} cols={4} />
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-text-2">
@@ -164,7 +165,7 @@ export function OverridesContent() {
               )}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );

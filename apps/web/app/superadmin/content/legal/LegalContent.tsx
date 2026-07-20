@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { Card } from '@mymanager/ui';
 
 interface LegalDoc {
   id: string;
@@ -118,7 +119,7 @@ export function LegalContent() {
     return (
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Legal Content</h1>
-        <div className="rounded-brand border border-border border-red-200 bg-red-50 p-6 text-center">
+        <div className="rounded-brand border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-red-700">{error}</p>
           <button
             onClick={() => void load()}
@@ -142,7 +143,7 @@ export function LegalContent() {
           <h1 className="font-heading text-2xl font-bold">Edit: {editingDoc.name}</h1>
         </div>
 
-        <div className="space-y-4 rounded-brand border border-border bg-bg p-6 shadow-sm">
+        <Card className="space-y-4">
           <RichTextEditor
             value={editedBody}
             onChange={setEditedBody}
@@ -164,7 +165,7 @@ export function LegalContent() {
               Cancel
             </button>
           </div>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -176,11 +177,11 @@ export function LegalContent() {
       <p className="text-sm text-text-2">Manage legal documents and policies.</p>
 
       {docs.length === 0 ? (
-        <div className="rounded-brand border border-border bg-bg p-8 text-center shadow-sm">
+        <Card padding="none" className="p-8 text-center">
           <p className="text-text-muted">No legal documents found.</p>
-        </div>
+        </Card>
       ) : (
-        <div className="rounded-brand border border-border bg-bg shadow-sm">
+        <Card padding="none">
           <div className="divide-y">
             {docs.map((doc) => (
               <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-bg-2">
@@ -224,7 +225,7 @@ export function LegalContent() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

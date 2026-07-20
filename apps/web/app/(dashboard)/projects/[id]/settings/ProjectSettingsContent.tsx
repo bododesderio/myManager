@@ -7,6 +7,7 @@ import { useProject, useUpdateProject, useDeleteProject } from '@/lib/hooks/useP
 import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { Card } from '@mymanager/ui';
 
 export function ProjectSettingsContent({ id }: { id: string }) {
   const router = useRouter();
@@ -71,7 +72,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
       ) : (
         <div className="max-w-2xl space-y-6">
           {/* General settings */}
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">General</h2>
             <div className="mt-4 space-y-4">
               <div>
@@ -106,10 +107,10 @@ export function ProjectSettingsContent({ id }: { id: string }) {
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Member management */}
-          <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+          <Card>
             <h2 className="font-heading text-lg font-semibold">Members</h2>
             <p className="mt-2 text-sm text-text-2">Manage team members assigned to this project.</p>
             <Link
@@ -118,10 +119,10 @@ export function ProjectSettingsContent({ id }: { id: string }) {
             >
               Manage Members
             </Link>
-          </div>
+          </Card>
 
           {/* Danger zone */}
-          <div className="rounded-brand border border-border border-red-200 bg-bg p-6 shadow-sm">
+          <Card className="border-red-200">
             <h2 className="font-heading text-lg font-semibold text-red-600">Danger Zone</h2>
             <p className="mt-2 text-sm text-text-2">
               Permanently delete this project and all associated data.
@@ -132,7 +133,7 @@ export function ProjectSettingsContent({ id }: { id: string }) {
             >
               Delete Project
             </button>
-          </div>
+          </Card>
         </div>
       )}
 

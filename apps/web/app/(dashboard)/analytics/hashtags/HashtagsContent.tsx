@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useHashtagAnalytics } from '@/lib/hooks/useAnalytics';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
+import { Card } from '@mymanager/ui';
 
 function defaultDateRange() {
   const end = new Date();
@@ -61,7 +62,7 @@ export function HashtagsContent() {
       </div>
 
       {/* Hashtags table */}
-      <div className="rounded-brand border border-border bg-bg p-6 shadow-sm">
+      <Card>
         <h2 className="font-heading text-lg font-semibold">Top Performing Hashtags</h2>
         {isLoading ? (
           <div className="mt-4">
@@ -98,7 +99,7 @@ export function HashtagsContent() {
             No hashtag data available for this range.
           </p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
