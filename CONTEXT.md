@@ -77,20 +77,49 @@ enumerate every call site. Do not grep for them.
 **CI gate — DONE.** `pnpm type-check` now passes 4/4 workspaces (was exit 2).
 Root scripts use `--continue` so every failing workspace is reported in one run.
 
+**DONE:** SQL aggregation (hashtags/campaigns/projects), competitors N+1,
+platform-catalogue caching, route-level `loading.tsx`, theme-aware skeletons,
+all 39 error boundaries wired to Sentry, `/portal` + `/user` boundaries added.
+
 **Not started:**
-- Analytics aggregated in Node memory rather than SQL (`analytics.repository.ts:116-156`,
-  `campaigns.repository.ts:41-57`, `projects.repository.ts:79-103`).
-  Also `competitors.repository.ts getCompetitorMetrics` has an N+1 loop.
-- Redis caching for plans / platform config / brand config (read-constantly,
-  write-rarely; Redis is already wired for BullMQ and locks).
 - `packages/ui` — no shared component library exists; 28 components live in
   `apps/web/components` on raw HTML elements.
 - `packages/validators` still has **zero** imports in web; every form hand-rolls
   validation in `useState`.
-- 0 `loading.tsx` files; 59% of pages lack `error.tsx`.
 - Accessibility: icon-only buttons without labels, no modal focus management.
-- Test coverage: 17 suites for 43 modules. Zero coverage on OAuth flows,
+  (Skeletons were done; the rest of the surface was not audited component by
+  component.)
+- Test coverage: 18 suites for 43 modules. Zero coverage on OAuth flows,
   scheduling, 8 of 10 platform workers.
+
+## [BLOCKED] apps/web cannot complete a production build
+
+Four blockers found; three fixed (jsdom bundling, and static prerendering of
+auth-gated routes in `(dashboard)`, `superadmin`, `user`). The fourth is open:
+
+```
+Error: <Html> should not be imported outside of pages/_document
+Export encountered an error on /_error: /404
+```
+
+Reproduce: `NEXTAUTH_SECRET=<32+ chars> NEXTAUTH_URL=http://localhost:3000 npx next build`
+in `apps/web`. **Not** caused by this branch — reproduced on clean `main` with
+only the two minimal build fixes applied.
+
+Already ruled out by experiment:
+- `@sentry/nextjs` in `global-error.tsx` (removed it — still failed)
+- any dependency importing `next/document` (only `@next/eslint-plugin-next`
+  references it, and that is not a runtime dependency)
+- the edge runtime on `app/opengraph-image.tsx` (switched to nodejs — still failed)
+
+Likely a Next 15 App Router / pages-router shim interaction. Note the project
+runs `next-auth ^4.24.13` (pages-router era) against Next 15 App Router, while
+the stack default calls for Auth.js v5 — that mismatch is the most promising
+next lead.
+
+NOTE: the earlier Phase 1 claim that `next build` exited 0 was measured under
+`SKIP_ENV_VALIDATION=1` with no `NEXTAUTH_SECRET`, which is not a realistic
+production configuration. It was wrong.
 
 **Flagged, needs a product decision (not a bug I should fix unilaterally):**
 - `bio-pages.controller.ts` has zero `@Public()` decorators despite two routes
