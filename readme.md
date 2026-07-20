@@ -107,9 +107,9 @@ Services start at:
 
 | Email | Password | Role |
 |-------|----------|------|
-| admin@mymanager.app | superadmin123 | Superadmin |
-| demo@mymanager.app | demo1234 | Demo user |
-| agency@mymanager.app | agency1234 | Agency owner |
+| admin@mymanager.app | Superadmin123 | Superadmin |
+| demo@mymanager.app | Demo1234 | Demo user |
+| agency@mymanager.app | Agency1234 | Agency owner |
 
 ### Local Development
 

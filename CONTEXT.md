@@ -1,6 +1,25 @@
 # Project Context
 Last updated: 2026-07-20
 
+## PR open — https://github.com/bododesderio/myManager/pull/1
+`fix/phase0-critical-security` → `main`, 14 commits, 154 files.
+
+**[BLOCKED] CI cannot validate it:** GitHub Actions reports *"The job was not
+started because your account is locked due to a billing issue."* Both workflows
+fail in <10s without ever starting. The red X on the PR says nothing about the
+code. Local verification: `pnpm build` 3/3, `pnpm type-check` 4/4, API tests
+139/139.
+
+Knock-on: branch protection requiring CI **cannot be enabled until billing is
+resolved** — you cannot require a check that can never run. Until then the gate
+stays advisory, which is the same hole that let a non-compiling `apps/web` reach
+`main`.
+
+Push note: the repo remote is HTTPS but `gh` is configured for SSH git
+operations. The OAuth token lacks `workflow` scope, so pushing `.github/**` over
+HTTPS is rejected. Push over SSH (`git push git@github.com:bododesderio/myManager.git <branch>`)
+bypasses this cleanly.
+
 ## Current task
 Phases 0 and 1 complete; Phase 2 **partially** complete. All on branch
 `fix/phase0-critical-security`. Awaiting review/merge.
