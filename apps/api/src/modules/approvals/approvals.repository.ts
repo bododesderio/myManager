@@ -17,8 +17,11 @@ export class ApprovalsRepository {
     return [posts, total];
   }
 
-  async findPostById(id: string) {
-    return this.prisma.post.findUnique({ where: { id } });
+  // Tenancy enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // Every approval transition reads through this first, so scoping it here
+  // closes approve/reject/submit against another tenant's post in one place.
+  async findPostById(id: string, workspaceId: string) {
+    return this.prisma.post.findFirst({ where: { id, workspace_id: workspaceId } });
   }
 
   async updatePostStatus(id: string, status: string) {
@@ -31,9 +34,11 @@ export class ApprovalsRepository {
     });
   }
 
-  async findApprovalEvents(postId: string) {
+  /** Scoped through the parent post. */
+  async findApprovalEvents(postId: string, workspaceId: string) {
     return this.prisma.approvalEvent.findMany({
-      where: { post_id: postId },
+      // Scoped through the parent post — approval history is review data.
+      where: { post_id: postId, post: { workspace_id: workspaceId } },
       include: { post: { include: { user: { select: { id: true, name: true, avatar_url: true } } } } },
       orderBy: { created_at: 'asc' },
     });
@@ -49,9 +54,11 @@ export class ApprovalsRepository {
     });
   }
 
-  async findPostComments(postId: string) {
+  /** Scoped through the parent post. */
+  async findPostComments(postId: string, workspaceId: string) {
     return this.prisma.postComment.findMany({
-      where: { post_id: postId },
+      // Scoped through the parent post — comments carry reviewer feedback.
+      where: { post_id: postId, post: { workspace_id: workspaceId } },
       include: { post: { include: { user: { select: { id: true, name: true, avatar_url: true } } } } },
       orderBy: { created_at: 'asc' },
     });

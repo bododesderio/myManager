@@ -45,8 +45,11 @@ export class RssRepository {
     return this.prisma.rssImportedItem.create({ data: { rss_feed_id: feedId, ...data } });
   }
 
-  async findItems(feedId: string, offset: number, limit: number): Promise<[unknown[], number]> {
-    const where = { rss_feed_id: feedId };
+  /** Scoped through the parent feed. */
+  async findItems(feedId: string, workspaceId: string, offset: number, limit: number): Promise<[unknown[], number]> {
+    // Scoped through the parent feed so another tenant's imported items are
+    // not readable by feed UUID.
+    const where = { rss_feed_id: feedId, rss_feed: { workspace_id: workspaceId } };
     const [items, total] = await Promise.all([
       this.prisma.rssImportedItem.findMany({ where, skip: offset, take: limit, orderBy: { imported_at: 'desc' } }),
       this.prisma.rssImportedItem.count({ where }),

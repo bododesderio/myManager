@@ -47,8 +47,13 @@ export class WebhooksController {
 
   @Get(':id/deliveries')
   @ApiOperation({ summary: 'List recent webhook deliveries' })
-  async listDeliveries(@Param('id') id: string, @Query('page') page: number = 1, @Query('limit') limit: number = 20) {
-    return this.webhooksService.listDeliveries(id, page, limit);
+  async listDeliveries(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 20,
+  ) {
+    return this.webhooksService.listDeliveries(id, getRequestWorkspaceId(req), page, limit);
   }
 
   @Post(':id/test')

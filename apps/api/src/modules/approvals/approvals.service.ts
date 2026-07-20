@@ -24,8 +24,8 @@ export class ApprovalsService {
     };
   }
 
-  async submitForApproval(postId: string, userId: string) {
-    const post = await this.repository.findPostById(postId);
+  async submitForApproval(postId: string, userId: string, workspaceId: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
     this.validateTransition(post.status, 'pending_approval');
 
@@ -35,8 +35,8 @@ export class ApprovalsService {
     return { message: 'Post submitted for approval', postId };
   }
 
-  async approve(postId: string, approverId: string, comment?: string) {
-    const post = await this.repository.findPostById(postId);
+  async approve(postId: string, approverId: string, workspaceId: string, comment?: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
     this.validateTransition(post.status, 'approved');
 
@@ -46,8 +46,8 @@ export class ApprovalsService {
     return { message: 'Post approved', postId };
   }
 
-  async requestRevision(postId: string, reviewerId: string, comment: string) {
-    const post = await this.repository.findPostById(postId);
+  async requestRevision(postId: string, reviewerId: string, comment: string, workspaceId: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
     this.validateTransition(post.status, 'revision_requested');
 
@@ -57,8 +57,8 @@ export class ApprovalsService {
     return { message: 'Revision requested', postId };
   }
 
-  async reject(postId: string, reviewerId: string, comment: string) {
-    const post = await this.repository.findPostById(postId);
+  async reject(postId: string, reviewerId: string, comment: string, workspaceId: string) {
+    const post = await this.repository.findPostById(postId, workspaceId);
     if (!post) throw new NotFoundException('Post not found');
     this.validateTransition(post.status, 'rejected');
 
@@ -76,12 +76,12 @@ export class ApprovalsService {
     return this.repository.createPostComment(postId, userId, data);
   }
 
-  async getComments(postId: string) {
-    return this.repository.findPostComments(postId);
+  async getComments(postId: string, workspaceId: string) {
+    return this.repository.findPostComments(postId, workspaceId);
   }
 
-  async getHistory(postId: string) {
-    return this.repository.findApprovalEvents(postId);
+  async getHistory(postId: string, workspaceId: string) {
+    return this.repository.findApprovalEvents(postId, workspaceId);
   }
 
   private validateTransition(currentStatus: string, targetStatus: ApprovalStatus) {

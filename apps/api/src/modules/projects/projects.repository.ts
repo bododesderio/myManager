@@ -18,9 +18,11 @@ export class ProjectsRepository {
     return [projects, total];
   }
 
-  async findById(id: string) {
-    return this.prisma.project.findUnique({
-      where: { id },
+  // Tenancy enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.project.findFirst({
+      where: { id, workspace_id: workspaceId },
       include: {
         members: { include: { user: { select: { id: true, name: true, email: true, avatar_url: true } } } },
         brand_config: true,
@@ -39,25 +41,39 @@ export class ProjectsRepository {
     return this.prisma.project.create({ data });
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    return this.prisma.project.update({ where: { id }, data });
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.project.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
-  async softDelete(id: string) {
+  /** Returns false when the row does not exist *or* belongs to another workspace. */
+  async softDelete(id: string, workspaceId: string) {
     // Project model has no deletedAt field; update status instead
-    return this.prisma.project.update({
-      where: { id },
+    const result = await this.prisma.project.updateMany({
+      where: { id, workspace_id: workspaceId },
       data: { status: 'DELETED' },
     });
+    return result.count > 0;
   }
 
-  async findMembers(projectId: string) {
+  /** Scoped through the parent project — member rows carry names and emails. */
+  async findMembers(projectId: string, workspaceId: string) {
     return this.prisma.projectMember.findMany({
-      where: { project_id: projectId },
+      where: { project_id: projectId, project: { workspace_id: workspaceId } },
       include: { user: { select: { id: true, name: true, email: true, avatar_url: true } } },
     });
   }
 
+  /**
+   * Caller must have verified the project belongs to their workspace first —
+   * projectMember has no workspace_id of its own, so this cannot self-scope.
+   * ProjectsService.addMember enforces it via findById.
+   */
   async addMember(projectId: string, userId: string, role: string) {
     return this.prisma.projectMember.create({
       data: { project_id: projectId, user_id: userId, role },
@@ -83,9 +99,15 @@ export class ProjectsRepository {
    * summed in Node (docs/audit-2026-07-20.md §M7) — a six-month project pulled
    * thousands of rows into memory to produce five numbers. Identical output.
    */
-  async getProjectAnalytics(projectId: string, startDate: Date, endDate: Date) {
+  async getProjectAnalytics(
+    projectId: string,
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+  ) {
     const postWhere = {
       project_id: projectId,
+      workspace_id: workspaceId,
       created_at: { gte: startDate, lte: endDate },
     };
 

@@ -106,9 +106,9 @@ export class WebhooksService {
     return { message: 'Webhook endpoint deleted' };
   }
 
-  async listDeliveries(endpointId: string, page: number, limit: number) {
+  async listDeliveries(endpointId: string, workspaceId: string, page: number, limit: number) {
     const offset = (page - 1) * limit;
-    const [deliveries, total] = await this.repository.findDeliveries(endpointId, offset, limit);
+    const [deliveries, total] = await this.repository.findDeliveries(endpointId, workspaceId, offset, limit);
     return {
       data: deliveries,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },

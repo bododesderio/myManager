@@ -71,7 +71,7 @@ describe('PublishingService', () => {
       { id: 'acct_1', platform_id: 'facebook' },
     ]);
 
-    const result = await service.dispatchPost('post_1', 'user_1');
+    const result = await service.dispatchPost('post_1', 'user_1', 'ws_1');
 
     expect(repository.updatePostStatus).toHaveBeenCalledWith('post_1', 'queued');
     expect(queues.facebookQueue.add).toHaveBeenCalledWith(
@@ -107,13 +107,13 @@ describe('PublishingService', () => {
       platforms: ['facebook'],
     });
 
-    await expect(service.dispatchPost('post_1', 'user_1')).rejects.toBeInstanceOf(BadRequestException);
+    await expect(service.dispatchPost('post_1', 'user_1', 'ws_1')).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('rejects publishing a missing post', async () => {
     const { service, repository } = createService();
     repository.findPostById.mockResolvedValue(null);
 
-    await expect(service.dispatchPost('missing', 'user_1')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.dispatchPost('missing', 'user_1', 'ws_1')).rejects.toBeInstanceOf(NotFoundException);
   });
 });

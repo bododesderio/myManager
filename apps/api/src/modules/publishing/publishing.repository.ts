@@ -5,9 +5,11 @@ import { PrismaService } from '../../prisma.service';
 @Injectable()
 export class PublishingRepository {
   constructor(private readonly prisma: PrismaService) {}
-  async findPostById(id: string) {
-    return this.prisma.post.findUnique({
-      where: { id },
+  // Tenancy enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findPostById(id: string, workspaceId: string) {
+    return this.prisma.post.findFirst({
+      where: { id, workspace_id: workspaceId },
       include: {
         media: { include: { media_asset: true }, orderBy: { sort_order: 'asc' } },
       },

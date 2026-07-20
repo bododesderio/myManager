@@ -55,59 +55,66 @@ export class ProjectsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get project details' })
-  async getProject(@Param('id', ParseUUIDPipe) id: string) {
-    return this.projectsService.getById(id);
+  async getProject(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.projectsService.getById(id, getRequestWorkspaceId(req));
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update project details' })
   async updateProject(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
     @Body() body: { name?: string; clientName?: string; clientEmail?: string; description?: string; status?: string },
   ) {
-    return this.projectsService.update(id, body);
+    return this.projectsService.update(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a project' })
-  async deleteProject(@Param('id', ParseUUIDPipe) id: string) {
-    return this.projectsService.delete(id);
+  async deleteProject(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.projectsService.delete(id, getRequestWorkspaceId(req));
   }
 
   @Get(':id/members')
   @ApiOperation({ summary: 'List project members' })
-  async listMembers(@Param('id', ParseUUIDPipe) id: string) {
-    return this.projectsService.listMembers(id);
+  async listMembers(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.projectsService.listMembers(id, getRequestWorkspaceId(req));
   }
 
   @Post(':id/members')
   @ApiOperation({ summary: 'Add member to project' })
   async addMember(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
     @Body() body: { userId: string; role: string },
   ) {
-    return this.projectsService.addMember(id, body.userId, body.role);
+    return this.projectsService.addMember(id, getRequestWorkspaceId(req), body.userId, body.role);
   }
 
   @Delete(':id/members/:userId')
   @ApiOperation({ summary: 'Remove member from project' })
-  async removeMember(@Param('id', ParseUUIDPipe) id: string, @Param('userId') userId: string) {
-    return this.projectsService.removeMember(id, userId);
+  async removeMember(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('userId') userId: string,
+    @Req() req: Request,
+  ) {
+    return this.projectsService.removeMember(id, getRequestWorkspaceId(req), userId);
   }
 
   @Post(':id/portal-token')
   @ApiOperation({ summary: 'Generate client portal access token' })
-  async generatePortalToken(@Param('id', ParseUUIDPipe) id: string) {
-    return this.projectsService.generatePortalToken(id);
+  async generatePortalToken(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.projectsService.generatePortalToken(id, getRequestWorkspaceId(req));
   }
 
   @Get(':id/analytics')
   @ApiOperation({ summary: 'Get project-level analytics' })
   async getAnalytics(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
-    return this.projectsService.getAnalytics(id, startDate, endDate);
+    return this.projectsService.getAnalytics(id, getRequestWorkspaceId(req), startDate, endDate);
   }
 }

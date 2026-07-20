@@ -6,7 +6,13 @@ export class ListeningRepository {
   constructor(private readonly prisma: PrismaService) {}
   async findTerms(workspaceId: string) { return this.prisma.listeningTerm.findMany({ where: { workspace_id: workspaceId } }); }
   async createTerm(data: Record<string, unknown>) { return this.prisma.listeningTerm.create({ data } as unknown as Parameters<typeof this.prisma.listeningTerm.create>[0]); }
-  async deleteTerm(id: string) { return this.prisma.listeningTerm.delete({ where: { id } }); }
+  /** Returns false when the term does not exist *or* belongs to another workspace. */
+  async deleteTerm(id: string, workspaceId: string) {
+    const result = await this.prisma.listeningTerm.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
+  }
 
   async findMentions(workspaceId: string, platform: string | undefined, offset: number, limit: number): Promise<[unknown[], number]> {
     const terms = await this.prisma.listeningTerm.findMany({ where: { workspace_id: workspaceId }, select: { id: true } });

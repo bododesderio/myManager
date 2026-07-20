@@ -60,8 +60,11 @@ export class WebhooksRepository {
     });
   }
 
-  async findDeliveries(endpointId: string, offset: number, limit: number): Promise<[unknown[], number]> {
-    const where = { webhook_endpoint_id: endpointId };
+  /** Scoped through the parent endpoint — delivery rows contain request/response payloads. */
+  async findDeliveries(endpointId: string, workspaceId: string, offset: number, limit: number): Promise<[unknown[], number]> {
+    // Scoped through the parent endpoint — delivery rows contain request and
+    // response payloads, so a bare endpoint UUID must not be enough to read them.
+    const where = { webhook_endpoint_id: endpointId, endpoint: { workspace_id: workspaceId } };
     const [deliveries, total] = await Promise.all([
       this.prisma.webhookDelivery.findMany({
         where,

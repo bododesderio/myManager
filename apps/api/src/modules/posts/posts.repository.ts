@@ -35,9 +35,11 @@ export class PostsRepository {
     return [posts, total];
   }
 
-  async findById(id: string) {
-    return this.prisma.post.findUnique({
-      where: { id },
+  // Tenancy enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.post.findFirst({
+      where: { id, workspace_id: workspaceId },
       include: {
         media: { include: { media_asset: true }, orderBy: { sort_order: 'asc' } },
         platform_results: true,
@@ -80,20 +82,33 @@ export class PostsRepository {
     });
   }
 
-  async update(id: string, data: Record<string, any>) {
-    return this.prisma.post.update({ where: { id }, data });
+  /** Returns null when the post does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, any>) {
+    const result = await this.prisma.post.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
-  async softDelete(id: string) {
-    return this.prisma.post.update({
-      where: { id },
+  /** Returns false when the post does not exist *or* belongs to another workspace. */
+  async softDelete(id: string, workspaceId: string) {
+    const result = await this.prisma.post.updateMany({
+      where: { id, workspace_id: workspaceId },
       data: { status: 'DELETED' },
     });
+    return result.count > 0;
   }
 
-  async bulkSoftDelete(ids: string[]) {
+  /**
+   * Scoped bulk delete. An unscoped `id: { in: ids }` let a caller soft-delete
+   * another workspace's posts by passing their UUIDs. Returns the count actually
+   * affected so callers report what happened, not what was requested.
+   */
+  async bulkSoftDelete(ids: string[], workspaceId: string) {
     return this.prisma.post.updateMany({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, workspace_id: workspaceId },
       data: { status: 'DELETED' },
     });
   }

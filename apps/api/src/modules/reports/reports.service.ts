@@ -62,12 +62,16 @@ export class ReportsService {
     return this.repository.createConfig(data);
   }
 
-  async updateConfig(id: string, data: Record<string, unknown>) {
-    return this.repository.updateConfig(id, data);
+  async updateConfig(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const updated = await this.repository.updateConfig(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose.
+    if (!updated) throw new NotFoundException('Report configuration not found');
+    return updated;
   }
 
-  async deleteConfig(id: string) {
-    await this.repository.deleteConfig(id);
+  async deleteConfig(id: string, workspaceId: string) {
+    const deleted = await this.repository.deleteConfig(id, workspaceId);
+    if (!deleted) throw new NotFoundException('Report configuration not found');
     return { message: 'Report configuration deleted' };
   }
 }

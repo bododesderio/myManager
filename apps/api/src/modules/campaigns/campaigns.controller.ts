@@ -30,17 +30,21 @@ export class CampaignsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get campaign details with posts' })
-  async getById(@Param('id') id: string) { return this.campaignsService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.campaignsService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update campaign' })
-  async update(@Param('id') id: string, @Body() body: Record<string, unknown>) {
-    return this.campaignsService.update(id, body);
+  async update(@Param('id') id: string, @Req() req: Request, @Body() body: Record<string, unknown>) {
+    return this.campaignsService.update(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete campaign' })
-  async delete(@Param('id') id: string) { return this.campaignsService.delete(id); }
+  async delete(@Param('id') id: string, @Req() req: Request) {
+    return this.campaignsService.delete(id, getRequestWorkspaceId(req));
+  }
 
   @Post(':id/posts')
   @ApiOperation({ summary: 'Add posts to campaign' })

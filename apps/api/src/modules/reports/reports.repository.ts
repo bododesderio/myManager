@@ -51,11 +51,21 @@ export class ReportsRepository {
     return this.prisma.reportConfig.create({ data: data as unknown as Parameters<typeof this.prisma.reportConfig.create>[0]['data'] });
   }
 
-  async updateConfig(id: string, data: Record<string, unknown>) {
-    return this.prisma.reportConfig.update({ where: { id }, data });
+  /** Returns null when the config does not exist *or* belongs to another workspace. */
+  async updateConfig(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.reportConfig.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.prisma.reportConfig.findFirst({ where: { id, workspace_id: workspaceId } });
   }
 
-  async deleteConfig(id: string) {
-    return this.prisma.reportConfig.delete({ where: { id } });
+  /** Returns false when the config does not exist *or* belongs to another workspace. */
+  async deleteConfig(id: string, workspaceId: string) {
+    const result = await this.prisma.reportConfig.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
   }
 }

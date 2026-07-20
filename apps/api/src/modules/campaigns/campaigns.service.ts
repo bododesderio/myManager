@@ -15,15 +15,24 @@ export class CampaignsService {
     return this.repository.create({ ...data, createdBy: userId, startDate: new Date(data.startDate as string), endDate: new Date(data.endDate as string) });
   }
 
-  async getById(id: string) {
-    const campaign = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const campaign = await this.repository.findById(id, workspaceId);
     if (!campaign) throw new NotFoundException('Campaign not found');
     return campaign;
   }
 
-  async update(id: string, data: Record<string, unknown>) { return this.repository.update(id, data); }
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const updated = await this.repository.update(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose.
+    if (!updated) throw new NotFoundException('Campaign not found');
+    return updated;
+  }
 
-  async delete(id: string) { await this.repository.delete(id); return { message: 'Campaign deleted' }; }
+  async delete(id: string, workspaceId: string) {
+    const deleted = await this.repository.delete(id, workspaceId);
+    if (!deleted) throw new NotFoundException('Campaign not found');
+    return { message: 'Campaign deleted' };
+  }
 
   async addPosts(campaignId: string, postIds: string[]) {
     await this.repository.addPosts(campaignId, postIds);

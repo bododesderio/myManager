@@ -56,9 +56,9 @@ export class RssService {
     return { imported, total: items.length };
   }
 
-  async listItems(feedId: string, page: number, limit: number) {
+  async listItems(feedId: string, workspaceId: string, page: number, limit: number) {
     const offset = (page - 1) * limit;
-    const [items, total] = await this.repository.findItems(feedId, offset, limit);
+    const [items, total] = await this.repository.findItems(feedId, workspaceId, offset, limit);
     return { data: items, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 

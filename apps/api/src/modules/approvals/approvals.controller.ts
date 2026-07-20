@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ApprovalsService } from './approvals.service';
+import { getRequestWorkspaceId } from '../../common/http/request-context';
 
 @ApiTags('Approvals')
 @ApiBearerAuth()
@@ -23,7 +24,7 @@ export class ApprovalsController {
   @ApiOperation({ summary: 'Submit a post for approval' })
   async submitForApproval(@Param('postId') postId: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.approvalsService.submitForApproval(postId, userId);
+    return this.approvalsService.submitForApproval(postId, userId, getRequestWorkspaceId(req));
   }
 
   @Post(':postId/approve')
@@ -34,7 +35,7 @@ export class ApprovalsController {
     @Body() body: { comment?: string },
   ) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.approvalsService.approve(postId, userId, body.comment);
+    return this.approvalsService.approve(postId, userId, getRequestWorkspaceId(req), body.comment);
   }
 
   @Post(':postId/reject')
@@ -45,7 +46,7 @@ export class ApprovalsController {
     @Body() body: { comment: string },
   ) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.approvalsService.reject(postId, userId, body.comment);
+    return this.approvalsService.reject(postId, userId, body.comment, getRequestWorkspaceId(req));
   }
 
   @Post(':postId/request-revision')
@@ -56,7 +57,7 @@ export class ApprovalsController {
     @Body() body: { comment: string },
   ) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.approvalsService.requestRevision(postId, userId, body.comment);
+    return this.approvalsService.requestRevision(postId, userId, body.comment, getRequestWorkspaceId(req));
   }
 
   @Post(':postId/comments')
@@ -72,13 +73,13 @@ export class ApprovalsController {
 
   @Get(':postId/comments')
   @ApiOperation({ summary: 'Get inline comments for a post' })
-  async getComments(@Param('postId') postId: string) {
-    return this.approvalsService.getComments(postId);
+  async getComments(@Param('postId') postId: string, @Req() req: Request) {
+    return this.approvalsService.getComments(postId, getRequestWorkspaceId(req));
   }
 
   @Get(':postId/history')
   @ApiOperation({ summary: 'Get approval event history for a post' })
-  async getHistory(@Param('postId') postId: string) {
-    return this.approvalsService.getHistory(postId);
+  async getHistory(@Param('postId') postId: string, @Req() req: Request) {
+    return this.approvalsService.getHistory(postId, getRequestWorkspaceId(req));
   }
 }

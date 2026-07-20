@@ -9,6 +9,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { PublishingService } from './publishing.service';
+import { getRequestWorkspaceId } from '../../common/http/request-context';
 
 @ApiTags('Publishing')
 @ApiBearerAuth()
@@ -20,7 +21,7 @@ export class PublishingController {
   @ApiOperation({ summary: 'Dispatch a post for publishing to all selected platforms' })
   async dispatch(@Param('postId') postId: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.publishingService.dispatchPost(postId, userId);
+    return this.publishingService.dispatchPost(postId, userId, getRequestWorkspaceId(req));
   }
 
   @Post('retry/:postId/:platform')
@@ -28,8 +29,9 @@ export class PublishingController {
   async retry(
     @Param('postId') postId: string,
     @Param('platform') platform: string,
+    @Req() req: Request,
   ) {
-    return this.publishingService.retryPlatform(postId, platform);
+    return this.publishingService.retryPlatform(postId, platform, getRequestWorkspaceId(req));
   }
 
   @Get('queue/status')
@@ -46,8 +48,8 @@ export class PublishingController {
 
   @Post('cancel/:postId')
   @ApiOperation({ summary: 'Cancel a queued or scheduled post' })
-  async cancel(@Param('postId') postId: string) {
-    return this.publishingService.cancelPost(postId);
+  async cancel(@Param('postId') postId: string, @Req() req: Request) {
+    return this.publishingService.cancelPost(postId, getRequestWorkspaceId(req));
   }
 
   @Get('history')
