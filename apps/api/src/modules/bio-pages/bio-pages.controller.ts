@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
+import { Public } from '../../common/decorators/public.decorator';
 import { BioPagesService } from './bio-pages.service';
 
 @ApiTags('Bio Pages')
@@ -29,8 +31,18 @@ export class BioPagesController {
     });
   }
 
+  /**
+   * Genuinely anonymous: a link-in-bio page is shared with the public, so
+   * requiring a JWT here made the feature non-functional (every visitor got 401).
+   *
+   * Safe to expose because the service reads through the published-only,
+   * field-restricted lookup — drafts are invisible and no tenant identifiers are
+   * returned. Throttled because it is an unauthenticated database read.
+   */
+  @Public()
+  @Throttle({ long: { ttl: 60000, limit: 120 } })
   @Get('public/:slug')
-  @ApiOperation({ summary: 'Get published bio page by slug (public)' })
+  @ApiOperation({ summary: 'Get published bio page by slug (public, no auth)' })
   async getPublic(@Param('slug') slug: string) {
     return this.bioPagesService.getBySlug(slug);
   }
@@ -56,8 +68,15 @@ export class BioPagesController {
     return this.bioPagesService.delete(id, getRequestWorkspaceId(req));
   }
 
+  /**
+   * Anonymous WRITE, so throttled harder than the read: every request inserts a
+   * bio_link_events row. Without a limit this is a free write amplifier and lets
+   * anyone inflate another workspace's click analytics.
+   */
+  @Public()
+  @Throttle({ long: { ttl: 60000, limit: 30 } })
   @Post(':slug/click')
-  @ApiOperation({ summary: 'Track link click event (public)' })
+  @ApiOperation({ summary: 'Track link click event (public, no auth)' })
   async trackClick(@Param('slug') slug: string, @Body() body: { linkIndex: number; referrer?: string }) {
     return this.bioPagesService.trackClick(slug, body.linkIndex, body.referrer);
   }
@@ -65,7 +84,11 @@ export class BioPagesController {
   @Get(':id/analytics')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get bio page click analytics' })
-  async getAnalytics(@Param('id') id: string, @Query('days') days: number = 30) {
-    return this.bioPagesService.getAnalytics(id, days);
+  async getAnalytics(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Query('days') days: number = 30,
+  ) {
+    return this.bioPagesService.getAnalytics(id, getRequestWorkspaceId(req), days);
   }
 }

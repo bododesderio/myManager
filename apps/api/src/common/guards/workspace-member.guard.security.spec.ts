@@ -11,6 +11,7 @@ import { WorkspaceMemberGuard } from './workspace-member.guard';
 describe('WorkspaceMemberGuard — tenancy bypass regressions', () => {
   let guard: WorkspaceMemberGuard;
   let prisma: Record<string, any>;
+  let reflector: Record<string, jest.Mock>;
 
   const ATTACKER_WS = 'ws_attacker';
   const VICTIM_WS = 'ws_victim';
@@ -37,7 +38,10 @@ describe('WorkspaceMemberGuard — tenancy bypass regressions', () => {
       commentAssignment: { findUnique: jest.fn() },
     };
 
-    guard = new WorkspaceMemberGuard(prisma as any);
+    // Reflector returns undefined => route is not @Public(), which is the
+    // default for every route these tests cover.
+    reflector = { getAllAndOverride: jest.fn().mockReturnValue(undefined) };
+    guard = new WorkspaceMemberGuard(prisma as any, reflector as any);
   });
 
   function createContext(overrides: {
@@ -62,6 +66,9 @@ describe('WorkspaceMemberGuard — tenancy bypass regressions', () => {
     };
     return {
       switchToHttp: () => ({ getRequest: () => request }),
+      // Reflector reads metadata off these; the guard checks @Public() first.
+      getHandler: () => function handler() {},
+      getClass: () => class Controller {},
       request,
     };
   }
@@ -167,6 +174,40 @@ describe('WorkspaceMemberGuard — tenancy bypass regressions', () => {
         user: { id: 'attacker', is_superadmin: false },
         params: { id: 'nonexistent' },
         routePath: '/campaigns/:id',
+        baseUrl: '/api/v1',
+      });
+
+      await expect(guard.canActivate(ctx as any)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('allows an authenticated user through a @Public() route under a scoped prefix', async () => {
+      // The link-in-bio page lives at /bio-pages/public/:slug — a workspace-scoped
+      // prefix with no resolvable workspace. Before the guard honoured @Public(),
+      // a LOGGED-IN visitor hit deny-by-default and got 403 on a page that worked
+      // for everyone else.
+      attackerIsMemberOfOwnWorkspaceOnly();
+      reflector.getAllAndOverride.mockReturnValue(true); // route is @Public()
+
+      const ctx = createContext({
+        user: { id: 'some_logged_in_user', is_superadmin: false },
+        params: { slug: 'someones-bio' },
+        routePath: '/bio-pages/public/:slug',
+        baseUrl: '/api/v1',
+      });
+
+      await expect(guard.canActivate(ctx as any)).resolves.toBe(true);
+      expect(prisma.workspaceMember.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('still denies a NON-public route under the same prefix', async () => {
+      // Guards against the @Public() escape hatch being over-broad.
+      attackerIsMemberOfOwnWorkspaceOnly();
+      prisma.bioPage.findUnique.mockResolvedValue({ workspace_id: VICTIM_WS });
+
+      const ctx = createContext({
+        user: { id: 'attacker', is_superadmin: false },
+        params: { id: 'victim_bio_page' },
+        routePath: '/bio-pages/:id',
         baseUrl: '/api/v1',
       });
 

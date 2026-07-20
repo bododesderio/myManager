@@ -5,7 +5,9 @@ import {
   ForbiddenException,
   Logger,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../../prisma.service';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 /**
  * Route prefixes that operate on workspace-scoped data. If a request matches one
@@ -37,9 +39,26 @@ const WORKSPACE_SCOPED_PREFIXES = [
 export class WorkspaceMemberGuard implements CanActivate {
   private readonly logger = new Logger(WorkspaceMemberGuard.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // @Public() routes are workspace-agnostic by definition. Without this, a
+    // route under a workspace-scoped prefix (e.g. the anonymous link-in-bio page
+    // at /bio-pages/public/:slug) would hit the deny-by-default branch below
+    // whenever the caller happened to be authenticated — a logged-in visitor
+    // would get 403 on a page that works fine for everyone else.
+    //
+    // CsrfGuard and the JWT guard already honour this decorator; this guard not
+    // doing so was an inconsistency waiting to bite.
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) return true;
+
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 

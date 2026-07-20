@@ -35,12 +35,54 @@ export class BioPagesRepository {
     return result.count > 0;
   }
 
+  /** Authenticated lookup — returns the full record regardless of publish state. */
   async findBySlug(slug: string) { return this.prisma.bioPage.findUnique({ where: { slug } }); }
+
+  /**
+   * Anonymous lookup for the public link-in-bio page.
+   *
+   * Two constraints the authenticated path does not have:
+   *  - `is_published: true` — an unpublished page is a draft and must not be
+   *    readable by slug. Without this, adding @Public() would have exposed every
+   *    draft in every workspace to anyone who guessed a slug.
+   *  - an explicit `select` — a public visitor has no business seeing
+   *    workspace_id, project_id, custom_domain or timestamps. Returning the whole
+   *    row would leak the tenant identifier of every page owner.
+   */
+  async findPublishedBySlug(slug: string) {
+    return this.prisma.bioPage.findFirst({
+      where: { slug, is_published: true },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        bio: true,
+        avatar_url: true,
+        theme: true,
+        links: true,
+      },
+    });
+  }
 
   async create(data: Record<string, unknown>) { return this.prisma.bioPage.create({ data } as unknown as Parameters<typeof this.prisma.bioPage.create>[0]); }
 
-  async incrementViews(id: string) {
-    return this.prisma.bioPage.update({ where: { id }, data: { } });
+  /**
+   * NOTE: view counting was never implemented. This previously issued
+   * `update({ where: { id }, data: {} })` — an empty UPDATE that incremented
+   * nothing, because BioPage has no view-count column. On a public endpoint that
+   * is a write on every anonymous request for no benefit: pure amplification.
+   *
+   * Removed rather than "fixed", because adding a counter is a product decision
+   * (needs a schema column, and a naive per-request UPDATE would serialise on the
+   * row under load — a counter wants batching or a separate events table, which
+   * bio_link_events already provides for clicks).
+   */
+  async findPublishedIdBySlug(slug: string) {
+    const page = await this.prisma.bioPage.findFirst({
+      where: { slug, is_published: true },
+      select: { id: true },
+    });
+    return page?.id ?? null;
   }
 
   async recordClick(bioPageId: string, linkIndex: number, referrer?: string) {
@@ -51,12 +93,22 @@ export class BioPagesRepository {
     });
   }
 
-  async getClickAnalytics(bioPageId: string, days: number) {
+  /**
+   * Scoped by workspace via the parent bio page — this was reachable with a bare
+   * id, so click analytics for another tenant's page were readable by anyone who
+   * knew the UUID. Missed in the Phase 2 tenancy sweep because it queries
+   * bio_link_events rather than bio_pages.
+   */
+  async getClickAnalytics(bioPageId: string, workspaceId: string, days: number) {
     const since = new Date();
     since.setDate(since.getDate() - days);
     return this.prisma.bioLinkEvent.groupBy({
       by: ['link_index', 'date'],
-      where: { bio_page_id: bioPageId, date: { gte: since } },
+      where: {
+        bio_page_id: bioPageId,
+        bio_page: { workspace_id: workspaceId },
+        date: { gte: since },
+      },
       _count: { id: true },
       orderBy: { date: 'asc' },
     });
