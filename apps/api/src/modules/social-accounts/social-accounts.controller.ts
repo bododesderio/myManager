@@ -53,35 +53,36 @@ export class SocialAccountsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get social account details' })
-  async getAccount(@Param('id', ParseUUIDPipe) id: string) {
-    return this.socialAccountsService.getById(id);
+  async getAccount(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.socialAccountsService.getById(id, getRequestWorkspaceId(req));
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update social account settings' })
   async updateAccount(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
     @Body() body: { metadata?: Record<string, unknown> },
   ) {
-    return this.socialAccountsService.update(id, body);
+    return this.socialAccountsService.update(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Disconnect a social account' })
-  async disconnectAccount(@Param('id', ParseUUIDPipe) id: string) {
-    return this.socialAccountsService.disconnect(id);
+  async disconnectAccount(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.socialAccountsService.disconnect(id, getRequestWorkspaceId(req));
   }
 
   @Post(':id/refresh-token')
   @ApiOperation({ summary: 'Manually refresh OAuth token for an account' })
-  async refreshToken(@Param('id', ParseUUIDPipe) id: string) {
-    return this.socialAccountsService.refreshToken(id);
+  async refreshToken(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.socialAccountsService.refreshToken(id, getRequestWorkspaceId(req));
   }
 
   @Get(':id/validate')
   @ApiOperation({ summary: 'Validate that the account token is still working' })
-  async validateAccount(@Param('id', ParseUUIDPipe) id: string) {
-    return this.socialAccountsService.validate(id);
+  async validateAccount(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    return this.socialAccountsService.validate(id, getRequestWorkspaceId(req));
   }
 
   @Get('platforms/supported')

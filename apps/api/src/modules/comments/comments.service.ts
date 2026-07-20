@@ -11,14 +11,14 @@ export class CommentsService {
     return { data: comments, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getById(id: string) {
-    const comment = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const comment = await this.repository.findById(id, workspaceId);
     if (!comment) throw new NotFoundException('Comment not found');
     return comment;
   }
 
-  async reply(commentId: string, userId: string, text: string) {
-    const comment = await this.repository.findById(commentId);
+  async reply(commentId: string, userId: string, workspaceId: string, text: string) {
+    const comment = await this.repository.findById(commentId, workspaceId);
     if (!comment) throw new NotFoundException('Comment not found');
     const reply = await this.repository.createReply(commentId, userId, text);
     return reply;
@@ -32,8 +32,8 @@ export class CommentsService {
     return this.repository.updateAssignmentStatus(assignmentId, status);
   }
 
-  async hide(commentId: string) {
-    const comment = await this.repository.findById(commentId);
+  async hide(commentId: string, workspaceId: string) {
+    const comment = await this.repository.findById(commentId, workspaceId);
     if (!comment) throw new NotFoundException('Comment not found');
     await this.repository.hide(commentId);
     return { message: 'Comment hidden' };

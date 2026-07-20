@@ -45,7 +45,11 @@ export class WorkspacesService {
     return { message: 'Workspace deleted' };
   }
 
-  async listMembers(workspaceId: string) {
+  // Defense in depth: these methods are also covered by @WorkspaceRoles at the
+  // controller, but a member roster and role mutations are too sensitive to rely
+  // on a single guard registration. This service must be safe to call directly.
+  async listMembers(workspaceId: string, userId: string) {
+    await this.ensureAdminAccess(workspaceId, userId);
     return this.repository.findMembers(workspaceId);
   }
 
@@ -55,11 +59,13 @@ export class WorkspacesService {
     return invite;
   }
 
-  async updateMemberRole(workspaceId: string, memberId: string, role: string) {
+  async updateMemberRole(workspaceId: string, memberId: string, role: string, actorId: string) {
+    await this.ensureOwnerAccess(workspaceId, actorId);
     return this.repository.updateMemberRole(workspaceId, memberId, role);
   }
 
-  async removeMember(workspaceId: string, memberId: string) {
+  async removeMember(workspaceId: string, memberId: string, actorId: string) {
+    await this.ensureAdminAccess(workspaceId, actorId);
     await this.repository.removeMember(workspaceId, memberId);
     return { message: 'Member removed' };
   }
@@ -72,7 +78,10 @@ export class WorkspacesService {
     require_approval: boolean;
     auto_approve_admins: boolean;
     require_client_review: boolean;
-  }) {
+  }, userId: string) {
+    // Disabling approval requirements bypasses the entire content review
+    // pipeline — restricted to admins.
+    await this.ensureAdminAccess(workspaceId, userId);
     return this.repository.upsertApprovalConfig(workspaceId, data);
   }
 

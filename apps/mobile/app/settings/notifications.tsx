@@ -80,7 +80,7 @@ export default function NotificationsSettingsScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color=colors.primary />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : (
         <ScrollView style={styles.content}>

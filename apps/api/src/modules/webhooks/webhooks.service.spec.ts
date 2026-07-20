@@ -146,7 +146,7 @@ describe('WebhooksService', () => {
       repository.updateDelivery.mockResolvedValue({});
       mockFetch.mockResolvedValue({ ok: true, status: 200, text: () => Promise.resolve('OK') });
 
-      const result = await service.sendTest('ep_1');
+      const result = await service.sendTest('ep_1', 'ws_1');
 
       expect(result.deliveryId).toBe('del_t1');
       expect(repository.createDelivery).toHaveBeenCalledWith(
@@ -159,7 +159,7 @@ describe('WebhooksService', () => {
 
     it('should throw when endpoint not found', async () => {
       repository.findById.mockResolvedValue(null);
-      await expect(service.sendTest('ep_missing')).rejects.toThrow(NotFoundException);
+      await expect(service.sendTest('ep_missing', 'ws_1')).rejects.toThrow(NotFoundException);
     });
   });
 

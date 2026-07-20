@@ -25,19 +25,27 @@ export class RssController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get RSS feed details with recent items' })
-  async getById(@Param('id') id: string) { return this.rssService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.rssService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update RSS feed settings' })
-  async update(@Param('id') id: string, @Body() body: Record<string, unknown>) { return this.rssService.update(id, body); }
+  async update(@Param('id') id: string, @Req() req: Request, @Body() body: Record<string, unknown>) {
+    return this.rssService.update(id, getRequestWorkspaceId(req), body);
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove RSS feed' })
-  async remove(@Param('id') id: string) { return this.rssService.remove(id); }
+  async remove(@Param('id') id: string, @Req() req: Request) {
+    return this.rssService.remove(id, getRequestWorkspaceId(req));
+  }
 
   @Post(':id/sync')
   @ApiOperation({ summary: 'Manually trigger RSS feed sync' })
-  async sync(@Param('id') id: string) { return this.rssService.syncNow(id); }
+  async sync(@Param('id') id: string, @Req() req: Request) {
+    return this.rssService.syncNow(id, getRequestWorkspaceId(req));
+  }
 
   @Get(':id/items')
   @ApiOperation({ summary: 'List imported items from RSS feed' })

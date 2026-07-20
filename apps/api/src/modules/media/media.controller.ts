@@ -17,6 +17,7 @@ import {
   BulkDeleteMediaDto,
   ListMediaQueryDto,
 } from './dto/media.dto';
+import { getRequestWorkspaceId } from '../../common/http/request-context';
 
 @ApiTags('Media')
 @ApiBearerAuth()
@@ -47,32 +48,32 @@ export class MediaController {
 
   @Post('confirm')
   @ApiOperation({ summary: 'Confirm upload and trigger processing' })
-  async confirmUpload(@Body() body: ConfirmUploadDto) {
-    return this.mediaService.confirmUpload(body.mediaId, body.r2Key);
+  async confirmUpload(@Body() body: ConfirmUploadDto, @Req() req: Request) {
+    return this.mediaService.confirmUpload(body.mediaId, getRequestWorkspaceId(req), body.r2Key);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get media asset details' })
-  async getMedia(@Param('id') id: string) {
-    return this.mediaService.getById(id);
+  async getMedia(@Param('id') id: string, @Req() req: Request) {
+    return this.mediaService.getById(id, getRequestWorkspaceId(req));
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a media asset' })
-  async deleteMedia(@Param('id') id: string) {
-    return this.mediaService.delete(id);
+  async deleteMedia(@Param('id') id: string, @Req() req: Request) {
+    return this.mediaService.delete(id, getRequestWorkspaceId(req));
   }
 
   @Post('bulk-delete')
   @ApiOperation({ summary: 'Bulk delete media assets' })
-  async bulkDelete(@Body() body: BulkDeleteMediaDto) {
-    return this.mediaService.bulkDelete(body.mediaIds);
+  async bulkDelete(@Body() body: BulkDeleteMediaDto, @Req() req: Request) {
+    return this.mediaService.bulkDelete(body.mediaIds, getRequestWorkspaceId(req));
   }
 
   @Get(':id/variants')
   @ApiOperation({ summary: 'Get all processed variants of a media asset' })
-  async getVariants(@Param('id') id: string) {
-    return this.mediaService.getVariants(id);
+  async getVariants(@Param('id') id: string, @Req() req: Request) {
+    return this.mediaService.getVariants(id, getRequestWorkspaceId(req));
   }
 
   @Get('storage/usage')

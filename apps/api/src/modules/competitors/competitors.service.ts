@@ -11,13 +11,17 @@ export class CompetitorsService {
     return this.repository.create(data);
   }
 
-  async getById(id: string) {
-    const profile = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const profile = await this.repository.findById(id, workspaceId);
     if (!profile) throw new NotFoundException('Competitor profile not found');
     return profile;
   }
 
-  async remove(id: string) { await this.repository.delete(id); return { message: 'Competitor profile removed' }; }
+  async remove(id: string, workspaceId: string) {
+    const deleted = await this.repository.delete(id, workspaceId);
+    if (!deleted) throw new NotFoundException('Competitor profile not found');
+    return { message: 'Competitor profile removed' };
+  }
 
   async getSnapshots(id: string, days: number) { return this.repository.findSnapshots(id, days); }
 

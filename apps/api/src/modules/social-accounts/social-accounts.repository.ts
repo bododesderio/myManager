@@ -3,6 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma.service';
 import { getSharedRedis } from '../../common/redis/shared-redis';
 
+const PLATFORMS_CACHE_KEY = 'platforms:all';
+/** 1 hour. Platform rows are seed data — nothing in the app mutates them. */
+const PLATFORMS_CACHE_TTL = 3600;
+
 @Injectable()
 export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SocialAccountsRepository.name);
@@ -38,8 +42,12 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async findById(id: string) {
-    return this.prisma.socialAccount.findUnique({ where: { id } });
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.socialAccount.findFirst({
+      where: { id, workspace_id: workspaceId },
+    });
   }
 
   async upsert(data: {
@@ -76,8 +84,14 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async update(id: string, data: Record<string, unknown>) {
-    return this.prisma.socialAccount.update({ where: { id }, data });
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.socialAccount.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
   }
 
   async storeOAuthState(state: string, data: Record<string, unknown>) {
@@ -93,11 +107,30 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
     await getSharedRedis().del(`oauth:state:${state}`);
   }
 
+  /**
+   * Platform catalogue with content types (docs/audit-2026-07-20.md §M7).
+   *
+   * A three-table nested read that is hit on every "which platforms can I post
+   * to?" request, but whose rows are seed data — nothing in the codebase
+   * creates, updates or upserts a Platform. A long TTL is safe; the only way
+   * this changes is a deploy or a manual seed, both of which restart the process
+   * or can be flushed by hand.
+   */
   async findAllPlatforms() {
-    return this.prisma.platform.findMany({
+    const cached = await getSharedRedis().get(PLATFORMS_CACHE_KEY);
+    if (cached) return JSON.parse(cached);
+
+    const platforms = await this.prisma.platform.findMany({
       orderBy: { id: 'asc' },
       include: { platform_content_types: { include: { content_type: true } } },
     });
+
+    await getSharedRedis().setex(
+      PLATFORMS_CACHE_KEY,
+      PLATFORMS_CACHE_TTL,
+      JSON.stringify(platforms),
+    );
+    return platforms;
   }
 
   async findExpiringTokens(withinHours: number) {

@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PlansRepository } from './plans.repository';
 
 @Injectable()
@@ -9,11 +10,17 @@ export class PlansService {
     const plans = await this.repository.findAllPublic();
     if (currency !== 'USD') {
       const rate = await this.repository.getExchangeRate(currency);
+      // Decimal math, rounded once per value. These are display prices sent as
+      // JSON numbers, so toNumber() at the boundary is correct — but the
+      // multiplication itself must not happen in float space.
+      const toLocal = (value: number) =>
+        new Prisma.Decimal(value).mul(rate).toDecimalPlaces(2).toNumber();
+
       return plans.map((plan: Record<string, unknown> & { priceMonthly: number; priceYearly: number; seatPrice: number }) => ({
         ...plan,
-        priceMonthlyLocal: Number((plan.priceMonthly * rate).toFixed(2)),
-        priceYearlyLocal: Number((plan.priceYearly * rate).toFixed(2)),
-        seatPriceLocal: Number((plan.seatPrice * rate).toFixed(2)),
+        priceMonthlyLocal: toLocal(plan.priceMonthly),
+        priceYearlyLocal: toLocal(plan.priceYearly),
+        seatPriceLocal: toLocal(plan.seatPrice),
         displayCurrency: currency,
       }));
     }

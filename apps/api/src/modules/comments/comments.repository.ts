@@ -23,8 +23,13 @@ export class CommentsRepository {
     return [comments, total];
   }
 
-  async findById(id: string) {
-    return this.prisma.socialComment.findUnique({ where: { id }, include: { assignments: true } });
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.socialComment.findFirst({
+      where: { id, workspace_id: workspaceId },
+      include: { assignments: true },
+    });
   }
 
   async createReply(commentId: string, userId: string, text: string) {

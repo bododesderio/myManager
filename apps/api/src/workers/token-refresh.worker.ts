@@ -2,6 +2,7 @@ import { Job } from 'bullmq';
 import { PrismaService } from '../prisma.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
+import { encryptSecret, decryptSecret } from '../common/crypto/crypto.util';
 
 interface TokenRefreshJobData {
   socialAccountId: string;
@@ -91,26 +92,10 @@ export class TokenRefreshWorker {
   }
 
   private encryptToken(token: string): string {
-    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
-    const iv = crypto.randomBytes(12); // GCM uses 12-byte IV
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-    let encrypted = cipher.update(token, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag().toString('hex');
-    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
+    return encryptSecret(token);
   }
 
   private decryptToken(encrypted: string): string {
-    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
-    const parts = encrypted.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    return decipher.update(cipherHex, 'hex', 'utf8') + decipher.final('utf8');
+    return decryptSecret(encrypted);
   }
 }

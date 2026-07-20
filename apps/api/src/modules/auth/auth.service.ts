@@ -14,6 +14,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { AuthRepository } from './auth.repository';
 import { getSharedRedis } from '../../common/redis/shared-redis';
+import { encryptSecret, decryptSecret } from '../../common/crypto/crypto.util';
 
 interface AuthTokens {
   accessToken: string;
@@ -69,13 +70,6 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const hashedPassword = await bcrypt.hash(data.password, this.SALT_ROUNDS);
     const fullName = `${data.firstName} ${data.lastName}`;
 
-    const user = await this.repository.createUser({
-      email: data.email,
-      passwordHash: hashedPassword,
-      name: fullName,
-    });
-
-    // Create workspace
     const workspaceName = data.accountType === 'company'
       ? (data.workspaceName || `${data.companyName} Workspace`)
       : `${fullName}'s Workspace`;
@@ -83,20 +77,23 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const workspaceSlug = data.workspaceSlug
       || workspaceName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    const workspace = await this.repository.createDefaultWorkspace(user.id, workspaceName, workspaceSlug);
-    await this.repository.createWorkspaceMember(workspace.id, user.id, 'OWNER');
-    await this.repository.createUserPreferences(user.id);
-
-    // Assign plan
-    if (data.planSlug && data.planSlug !== 'free') {
-      await this.repository.assignPlanToWorkspace(workspace.id, user.id, data.planSlug, data.billingCycle || 'monthly');
-    }
-
-    // Send verification email
     const verifyToken = crypto.randomBytes(32).toString('hex');
     const hashedVerifyToken = crypto.createHash('sha256').update(verifyToken).digest('hex');
     const verifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    await this.repository.storeEmailVerificationToken(user.id, hashedVerifyToken, verifyExpiresAt);
+
+    // Single transaction: user, workspace, membership, preferences, optional
+    // plan, and the verification token either all land or none do.
+    const { user, workspace } = await this.repository.createUserWithWorkspace({
+      email: data.email,
+      passwordHash: hashedPassword,
+      name: fullName,
+      workspaceName,
+      workspaceSlug,
+      planSlug: data.planSlug,
+      billingCycle: data.billingCycle || 'monthly',
+      emailVerificationTokenHash: hashedVerifyToken,
+      emailVerificationExpiresAt: verifyExpiresAt,
+    });
 
     const webUrl = this.configService.get<string>('WEB_URL', 'http://localhost:3000');
     await this.repository.enqueueEmail('verify-email', {
@@ -496,29 +493,11 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   private encryptTotpSecret(secret: string): string {
-    const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const iv = crypto.randomBytes(12); // GCM uses 12-byte IV
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-    let encrypted = cipher.update(secret, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag().toString('hex');
-    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
+    return encryptSecret(secret);
   }
 
   private decryptTotpSecret(encryptedSecret: string): string {
-    const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const parts = encryptedSecret.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted secret format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    return decryptSecret(encryptedSecret);
   }
 
   private verifyTotpCode(secret: string, code: string): boolean {

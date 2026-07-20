@@ -76,29 +76,41 @@ export class ProjectsRepository {
     });
   }
 
+  /**
+   * Project totals, aggregated in the database.
+   *
+   * Previously loaded every post in range with its full analytics graph and
+   * summed in Node (docs/audit-2026-07-20.md §M7) — a six-month project pulled
+   * thousands of rows into memory to produce five numbers. Identical output.
+   */
   async getProjectAnalytics(projectId: string, startDate: Date, endDate: Date) {
-    const posts = await this.prisma.post.findMany({
-      where: { project_id: projectId, created_at: { gte: startDate, lte: endDate } },
-      include: { analytics: true },
-    });
-
-    const totals = {
-      totalPosts: posts.length,
-      totalReach: 0,
-      totalImpressions: 0,
-      totalEngagements: 0,
-      totalClicks: 0,
+    const postWhere = {
+      project_id: projectId,
+      created_at: { gte: startDate, lte: endDate },
     };
 
-    for (const post of posts) {
-      for (const analytic of post.analytics) {
-        totals.totalReach += analytic.reach || 0;
-        totals.totalImpressions += analytic.impressions || 0;
-        totals.totalEngagements += (analytic.likes + analytic.comments + analytic.shares) || 0;
-        totals.totalClicks += analytic.clicks || 0;
-      }
-    }
+    const [totalPosts, sums] = await Promise.all([
+      this.prisma.post.count({ where: postWhere }),
+      this.prisma.postAnalytics.aggregate({
+        where: { post: postWhere },
+        _sum: {
+          reach: true,
+          impressions: true,
+          clicks: true,
+          likes: true,
+          comments: true,
+          shares: true,
+        },
+      }),
+    ]);
 
-    return totals;
+    const s = sums._sum;
+    return {
+      totalPosts,
+      totalReach: s.reach ?? 0,
+      totalImpressions: s.impressions ?? 0,
+      totalEngagements: (s.likes ?? 0) + (s.comments ?? 0) + (s.shares ?? 0),
+      totalClicks: s.clicks ?? 0,
+    };
   }
 }

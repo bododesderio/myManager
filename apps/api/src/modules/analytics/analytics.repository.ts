@@ -113,45 +113,57 @@ export class AnalyticsRepository {
     });
   }
 
+  /**
+   * Hashtag performance, aggregated in the database.
+   *
+   * This previously loaded every hashtag with every linked post and every
+   * analytics row, then summed in Node (docs/audit-2026-07-20.md §M7). A
+   * workspace with a few thousand tagged posts pulled the entire object graph
+   * into memory to produce a handful of totals.
+   *
+   * Same output shape and ordering as before; the arithmetic just happens where
+   * the data already is. COUNT(DISTINCT ph.post_id) preserves the old
+   * "one count per linked post" semantics despite the analytics join
+   * multiplying rows (a post has one analytics row per platform).
+   */
   async getHashtagPerformance(workspaceId: string, startDate: Date, endDate: Date) {
-    const hashtags = await this.prisma.hashtag.findMany({
-      where: { workspace_id: workspaceId },
-      include: {
-        post_hashtags: {
-          include: {
-            post: {
-              include: {
-                analytics: {
-                  where: { synced_at: { gte: startDate, lte: endDate } },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
+    const rows = await this.prisma.$queryRaw<
+      Array<{
+        id: string;
+        text: string;
+        post_count: bigint;
+        total_engagements: bigint;
+        total_reach: bigint;
+      }>
+    >`
+      SELECT
+        h.id,
+        h.text,
+        COUNT(DISTINCT ph.post_id) AS post_count,
+        COALESCE(SUM(a.likes + a.comments + a.shares), 0) AS total_engagements,
+        COALESCE(SUM(a.reach), 0) AS total_reach
+      FROM hashtags h
+      LEFT JOIN post_hashtags ph ON ph.hashtag_id = h.id
+      LEFT JOIN post_analytics a
+        ON a.post_id = ph.post_id
+       AND a.synced_at >= ${startDate}
+       AND a.synced_at <= ${endDate}
+      WHERE h.workspace_id = ${workspaceId}
+      GROUP BY h.id, h.text
+      ORDER BY total_engagements DESC
+    `;
 
-    return hashtags.map((h) => {
-      let totalEngagements = 0;
-      let totalReach = 0;
-      let postCount = 0;
-
-      for (const ph of h.post_hashtags) {
-        postCount++;
-        for (const a of ph.post.analytics) {
-          totalEngagements += (a.likes + a.comments + a.shares) || 0;
-          totalReach += a.reach || 0;
-        }
-      }
-
+    return rows.map((r) => {
+      const postCount = Number(r.post_count);
+      const totalEngagements = Number(r.total_engagements);
       return {
-        id: h.id,
-        text: h.text,
+        id: r.id,
+        text: r.text,
         postCount,
         totalEngagements,
-        totalReach,
+        totalReach: Number(r.total_reach),
         avgEngagements: postCount > 0 ? Math.round(totalEngagements / postCount) : 0,
       };
-    }).sort((a, b) => b.totalEngagements - a.totalEngagements);
+    });
   }
 }

@@ -22,15 +22,25 @@ export class BioPagesService {
     return page;
   }
 
-  async getById(id: string) {
-    const page = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const page = await this.repository.findById(id, workspaceId);
     if (!page) throw new NotFoundException('Bio page not found');
     return page;
   }
 
-  async update(id: string, data: Record<string, unknown>) { return this.repository.update(id, data); }
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const updated = await this.repository.update(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose — a cross-workspace id must
+    // not be confirmed as existing.
+    if (!updated) throw new NotFoundException('Bio page not found');
+    return updated;
+  }
 
-  async delete(id: string) { await this.repository.delete(id); return { message: 'Bio page deleted' }; }
+  async delete(id: string, workspaceId: string) {
+    const deleted = await this.repository.delete(id, workspaceId);
+    if (!deleted) throw new NotFoundException('Bio page not found');
+    return { message: 'Bio page deleted' };
+  }
 
   async trackClick(slug: string, linkIndex: number, referrer?: string) {
     const page = await this.repository.findBySlug(slug);

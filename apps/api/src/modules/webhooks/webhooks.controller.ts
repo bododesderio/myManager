@@ -29,15 +29,21 @@ export class WebhooksController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get webhook endpoint details' })
-  async getById(@Param('id') id: string) { return this.webhooksService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.webhooksService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update webhook endpoint' })
-  async update(@Param('id') id: string, @Body() body: Record<string, unknown>) { return this.webhooksService.update(id, body); }
+  async update(@Param('id') id: string, @Req() req: Request, @Body() body: Record<string, unknown>) {
+    return this.webhooksService.update(id, getRequestWorkspaceId(req), body);
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete webhook endpoint' })
-  async deleteEndpoint(@Param('id') id: string) { return this.webhooksService.deleteEndpoint(id); }
+  async deleteEndpoint(@Param('id') id: string, @Req() req: Request) {
+    return this.webhooksService.deleteEndpoint(id, getRequestWorkspaceId(req));
+  }
 
   @Get(':id/deliveries')
   @ApiOperation({ summary: 'List recent webhook deliveries' })
@@ -47,7 +53,9 @@ export class WebhooksController {
 
   @Post(':id/test')
   @ApiOperation({ summary: 'Send a test webhook delivery' })
-  async test(@Param('id') id: string) { return this.webhooksService.sendTest(id); }
+  async test(@Param('id') id: string, @Req() req: Request) {
+    return this.webhooksService.sendTest(id, getRequestWorkspaceId(req));
+  }
 
   @Post('deliveries/:deliveryId/retry')
   @ApiOperation({ summary: 'Retry a failed webhook delivery' })

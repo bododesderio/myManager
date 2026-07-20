@@ -68,7 +68,7 @@ export default function LanguageSettingsScreen() {
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Language</Text>
-        {saving ? <ActivityIndicator size="small" color=colors.primary /> : <View style={{ width: 40 }} />}
+        {saving ? <ActivityIndicator size="small" color={colors.primary} /> : <View style={{ width: 40 }} />}
       </View>
 
       <FlatList

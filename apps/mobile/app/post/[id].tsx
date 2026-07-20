@@ -53,7 +53,7 @@ export default function PostDetailScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color=colors.primary />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : isError || !post ? (
         <View style={styles.center}>

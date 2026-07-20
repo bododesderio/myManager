@@ -262,7 +262,7 @@ async function seedPlatforms() {
 // ─── Users + Workspaces ───────────────────────────────────
 async function seedUsers() {
   // Superadmin
-  const adminPassword = await bcrypt.hash('superadmin123', 12);
+  const adminPassword = await bcrypt.hash('Superadmin123', 12);
   await prisma.user.upsert({
     where: { email: 'admin@mymanager.app' },
     update: { first_name: 'Super', last_name: 'Admin', status: 'ACTIVE' },
@@ -273,7 +273,7 @@ async function seedUsers() {
   });
 
   // Demo individual user
-  const demoPassword = await bcrypt.hash('demo1234', 12);
+  const demoPassword = await bcrypt.hash('Demo1234', 12);
   const demoUser = await prisma.user.upsert({
     where: { email: 'demo@mymanager.app' },
     update: { first_name: 'Keza', last_name: 'Uwimana', status: 'ACTIVE' },
@@ -316,7 +316,7 @@ async function seedUsers() {
   await prisma.user.update({ where: { id: demoUser.id }, data: { last_workspace_id: demoWs.id } });
 
   // Agency user
-  const agencyPassword = await bcrypt.hash('agency1234', 12);
+  const agencyPassword = await bcrypt.hash('Agency1234', 12);
   const agencyUser = await prisma.user.upsert({
     where: { email: 'agency@mymanager.app' },
     update: { first_name: 'Kwame', last_name: 'Osei', status: 'ACTIVE' },

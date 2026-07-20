@@ -38,7 +38,7 @@ export default function ProjectDetailScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color=colors.primary />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : isError || !project ? (
         <View style={styles.center}>

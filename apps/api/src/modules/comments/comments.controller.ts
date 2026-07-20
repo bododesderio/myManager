@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@ne
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CommentsService } from './comments.service';
+import { getRequestWorkspaceId } from '../../common/http/request-context';
 
 @ApiTags('Comments')
 @ApiBearerAuth()
@@ -23,13 +24,15 @@ export class CommentsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get comment details with thread' })
-  async getById(@Param('id') id: string) { return this.commentsService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.commentsService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Post(':id/reply')
   @ApiOperation({ summary: 'Reply to a social comment' })
   async reply(@Param('id') id: string, @Req() req: Request, @Body() body: { text: string }) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.commentsService.reply(id, userId, body.text);
+    return this.commentsService.reply(id, userId, getRequestWorkspaceId(req), body.text);
   }
 
   @Put(':id/assign')
@@ -47,7 +50,9 @@ export class CommentsController {
 
   @Delete(':id/hide')
   @ApiOperation({ summary: 'Hide a comment on the platform' })
-  async hide(@Param('id') id: string) { return this.commentsService.hide(id); }
+  async hide(@Param('id') id: string, @Req() req: Request) {
+    return this.commentsService.hide(id, getRequestWorkspaceId(req));
+  }
 
   @Get('stats')
   @ApiOperation({ summary: 'Get comment inbox statistics' })

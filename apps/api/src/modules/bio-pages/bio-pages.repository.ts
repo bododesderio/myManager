@@ -8,15 +8,36 @@ export class BioPagesRepository {
     return this.prisma.bioPage.findMany({ where: { workspace_id: workspaceId }, orderBy: { created_at: 'desc' } });
   }
 
-  async findById(id: string) { return this.prisma.bioPage.findUnique({ where: { id } }); }
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.bioPage.findFirst({
+      where: { id, workspace_id: workspaceId },
+    });
+  }
+
+  /** Returns null when the row does not exist *or* belongs to another workspace. */
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const result = await this.prisma.bioPage.updateMany({
+      where: { id, workspace_id: workspaceId },
+      data,
+    });
+    if (result.count === 0) return null;
+    return this.findById(id, workspaceId);
+  }
+
+  /** Returns false when the row does not exist *or* belongs to another workspace. */
+  async delete(id: string, workspaceId: string) {
+    const result = await this.prisma.bioPage.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
+  }
 
   async findBySlug(slug: string) { return this.prisma.bioPage.findUnique({ where: { slug } }); }
 
   async create(data: Record<string, unknown>) { return this.prisma.bioPage.create({ data } as unknown as Parameters<typeof this.prisma.bioPage.create>[0]); }
-
-  async update(id: string, data: Record<string, unknown>) { return this.prisma.bioPage.update({ where: { id }, data }); }
-
-  async delete(id: string) { return this.prisma.bioPage.delete({ where: { id } }); }
 
   async incrementViews(id: string) {
     return this.prisma.bioPage.update({ where: { id }, data: { } });

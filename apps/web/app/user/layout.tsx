@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
 
+
 export default function UserLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">

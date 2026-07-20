@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { ErrorPage, Illustrations } from '@/components/errors/ErrorPage';
+import * as Sentry from '@sentry/nextjs';
 
 interface RootErrorProps {
   error: Error & { digest?: string; status?: number };
@@ -10,6 +11,9 @@ interface RootErrorProps {
 
 export default function RootError({ error, reset }: RootErrorProps) {
   useEffect(() => {
+    // Report to Sentry as well as the console — Phase 1 wired Sentry up,
+    // but these boundaries were still only logging locally.
+    Sentry.captureException(error);
     console.error('Application error:', error);
   }, [error]);
 

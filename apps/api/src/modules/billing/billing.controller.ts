@@ -104,8 +104,9 @@ export class BillingController {
   @Get('invoice/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get invoice details' })
-  async getInvoice(@Param('id', ParseUUIDPipe) id: string) {
-    return this.billingService.getInvoice(id);
+  async getInvoice(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.billingService.getInvoice(id, userId);
   }
 
   @Public()

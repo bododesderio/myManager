@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as crypto from 'crypto';
 import { PrismaService } from '../../prisma.service';
+import { encryptSecret, decryptSecret } from '../../common/crypto/crypto.util';
 
 @Injectable()
 export class SystemConfigService {
@@ -61,28 +61,10 @@ export class SystemConfigService {
   }
 
   private encrypt(value: string): string {
-    const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const iv = crypto.randomBytes(12); // GCM uses 12-byte IV
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-    let encrypted = cipher.update(value, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag().toString('hex');
-    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
+    return encryptSecret(value);
   }
 
   private decrypt(encrypted: string): string {
-    const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const parts = encrypted.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted value format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    return decryptSecret(encrypted);
   }
 }

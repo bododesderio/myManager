@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 import { PostStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import * as crypto from 'crypto';
+import { decryptSecret } from '../../common/crypto/crypto.util';
 
 export interface PublishJobData {
   postId: string;
@@ -34,6 +34,24 @@ export abstract class BasePublishingWorker {
 
   async process(job: Job<PublishJobData>): Promise<void> {
     const { postId, platform, socialAccountId, userId } = job.data;
+
+    // IDEMPOTENCY GUARD — must run before any platform call.
+    //
+    // Jobs are enqueued with attempts: 5. If publish() succeeds against the real
+    // platform API but this process dies before the PUBLISHED write below, BullMQ
+    // retries and posts to the customer's account a second time. Without this
+    // check a single transient failure could produce up to 5 duplicate posts.
+    //
+    // The @@unique([post_id, platform]) constraint makes this row the single
+    // authoritative record of whether this platform has already been published to.
+    const existingResult = await this.prisma.postPlatformResult.findUnique({
+      where: { post_id_platform: { post_id: postId, platform } },
+      select: { status: true, platform_post_id: true },
+    });
+
+    if (existingResult?.status === 'PUBLISHED') {
+      return;
+    }
 
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
@@ -110,19 +128,7 @@ export abstract class BasePublishingWorker {
   }
 
   protected decryptToken(encryptedToken: string): string {
-    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
-    const parts = encryptedToken.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    return decryptSecret(encryptedToken);
   }
 
   private async checkAllPlatformsPublished(postId: string): Promise<void> {

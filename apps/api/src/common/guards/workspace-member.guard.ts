@@ -3,11 +3,40 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 
+/**
+ * Route prefixes that operate on workspace-scoped data. If a request matches one
+ * of these but no workspace can be resolved, the request is denied rather than
+ * allowed — a resolver gap must fail closed, not silently grant access.
+ *
+ * Routes NOT listed here (e.g. /auth, /users/me, /plans) are workspace-agnostic
+ * and are allowed through untouched.
+ */
+const WORKSPACE_SCOPED_PREFIXES = [
+  '/posts',
+  '/media',
+  '/projects',
+  '/reports',
+  '/social-accounts',
+  '/api-keys',
+  '/webhooks',
+  '/comments',
+  '/campaigns',
+  '/templates',
+  '/bio-pages',
+  '/rss',
+  '/competitors',
+  '/listening',
+  '/workspaces',
+];
+
 @Injectable()
 export class WorkspaceMemberGuard implements CanActivate {
+  private readonly logger = new Logger(WorkspaceMemberGuard.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -18,7 +47,18 @@ export class WorkspaceMemberGuard implements CanActivate {
     if (user.is_superadmin) return true;
 
     const workspaceId = await this.resolveWorkspaceId(request);
-    if (!workspaceId) return true;
+
+    if (!workspaceId) {
+      // Fail closed: a workspace-scoped route with no resolvable workspace is a
+      // resolver gap, not a public endpoint.
+      if (this.isWorkspaceScopedRoute(request)) {
+        this.logger.warn(
+          `Denied ${request.method} ${this.routePath(request)} — workspace-scoped route with unresolvable workspace`,
+        );
+        throw new ForbiddenException('Workspace could not be determined for this request');
+      }
+      return true;
+    }
 
     const member = await this.prisma.workspaceMember.findFirst({
       where: { user_id: user.id, workspace_id: workspaceId, status: { not: 'REMOVED' } },
@@ -33,6 +73,23 @@ export class WorkspaceMemberGuard implements CanActivate {
     return true;
   }
 
+  private routePath(request: {
+    baseUrl?: string;
+    path?: string;
+    route?: { path?: string };
+  }): string {
+    return `${request.baseUrl ?? ''}${request.route?.path ?? request.path ?? ''}`.toLowerCase();
+  }
+
+  private isWorkspaceScopedRoute(request: {
+    baseUrl?: string;
+    path?: string;
+    route?: { path?: string };
+  }): boolean {
+    const routePath = this.routePath(request);
+    return WORKSPACE_SCOPED_PREFIXES.some((prefix) => routePath.includes(prefix));
+  }
+
   private async resolveWorkspaceId(request: {
     params?: Record<string, unknown>;
     query?: Record<string, unknown>;
@@ -41,17 +98,22 @@ export class WorkspaceMemberGuard implements CanActivate {
     path?: string;
     route?: { path?: string };
   }): Promise<string | null> {
-    const explicitWorkspaceId = this.getString(
+    // Resource ownership is authoritative and MUST be checked first. Trusting a
+    // caller-supplied workspaceId ahead of the resource's real owner allowed
+    // `GET /posts/<victim-id>?workspaceId=<attacker-workspace>` to pass the
+    // membership check against the attacker's own workspace.
+    const inferredWorkspaceId = await this.inferWorkspaceIdFromResource(request);
+    if (inferredWorkspaceId) {
+      return inferredWorkspaceId;
+    }
+
+    // Only fall back to an explicit id when there is no resource to infer from
+    // (list and create routes, and /workspaces/:workspaceId/* itself).
+    return this.getString(
       request.params?.workspaceId ??
       request.query?.workspaceId ??
       request.body?.workspaceId,
     );
-
-    if (explicitWorkspaceId) {
-      return explicitWorkspaceId;
-    }
-
-    return this.inferWorkspaceIdFromResource(request);
   }
 
   private async inferWorkspaceIdFromResource(request: {
@@ -62,6 +124,14 @@ export class WorkspaceMemberGuard implements CanActivate {
     route?: { path?: string };
   }): Promise<string | null> {
     const routePath = `${request.baseUrl ?? ''}${request.route?.path ?? request.path ?? ''}`.toLowerCase();
+
+    // On /workspaces/:id/* the :id param IS the workspace id. Must be handled
+    // before the generic branches, and before the explicit-param fallback —
+    // these routes never carry a :workspaceId param.
+    if (routePath.includes('/workspaces')) {
+      const id = this.getString(request.params?.id);
+      if (id) return id;
+    }
 
     if (routePath.includes('/posts')) {
       const id = this.getString(request.params?.id);
@@ -127,6 +197,38 @@ export class WorkspaceMemberGuard implements CanActivate {
       }
 
       return this.findCommentWorkspaceId(id);
+    }
+
+    if (routePath.includes('/campaigns')) {
+      const id = this.getString(request.params?.id);
+      if (id) return this.findCampaignWorkspaceId(id);
+    }
+
+    if (routePath.includes('/templates')) {
+      // Covers POST /templates/:id/create-post, which previously copied the
+      // source template's workspace_id — turning a cross-tenant read into a write.
+      const id = this.getString(request.params?.id) ?? this.getString(request.body?.templateId);
+      if (id) return this.findTemplateWorkspaceId(id);
+    }
+
+    if (routePath.includes('/bio-pages')) {
+      const id = this.getString(request.params?.id);
+      if (id) return this.findBioPageWorkspaceId(id);
+    }
+
+    if (routePath.includes('/rss')) {
+      const id = this.getString(request.params?.id);
+      if (id) return this.findRssFeedWorkspaceId(id);
+    }
+
+    if (routePath.includes('/competitors')) {
+      const id = this.getString(request.params?.id);
+      if (id) return this.findCompetitorWorkspaceId(id);
+    }
+
+    if (routePath.includes('/listening')) {
+      const id = this.getString(request.params?.id);
+      if (id) return this.findListeningTermWorkspaceId(id);
     }
 
     return null;
@@ -251,6 +353,54 @@ export class WorkspaceMemberGuard implements CanActivate {
       },
     });
     return assignment?.comment.workspace_id ?? null;
+  }
+
+  private async findCampaignWorkspaceId(id: string) {
+    const campaign = await this.prisma.campaign.findUnique({
+      where: { id },
+      select: { workspace_id: true },
+    });
+    return campaign?.workspace_id ?? null;
+  }
+
+  private async findTemplateWorkspaceId(id: string) {
+    const template = await this.prisma.postTemplate.findUnique({
+      where: { id },
+      select: { workspace_id: true },
+    });
+    return template?.workspace_id ?? null;
+  }
+
+  private async findBioPageWorkspaceId(id: string) {
+    const page = await this.prisma.bioPage.findUnique({
+      where: { id },
+      select: { workspace_id: true },
+    });
+    return page?.workspace_id ?? null;
+  }
+
+  private async findRssFeedWorkspaceId(id: string) {
+    const feed = await this.prisma.rssFeed.findUnique({
+      where: { id },
+      select: { workspace_id: true },
+    });
+    return feed?.workspace_id ?? null;
+  }
+
+  private async findCompetitorWorkspaceId(id: string) {
+    const competitor = await this.prisma.competitorProfile.findUnique({
+      where: { id },
+      select: { workspace_id: true },
+    });
+    return competitor?.workspace_id ?? null;
+  }
+
+  private async findListeningTermWorkspaceId(id: string) {
+    const term = await this.prisma.listeningTerm.findUnique({
+      where: { id },
+      select: { workspace_id: true },
+    });
+    return term?.workspace_id ?? null;
   }
 
   private getString(value: unknown): string | null {

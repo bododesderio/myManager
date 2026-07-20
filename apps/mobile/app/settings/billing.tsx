@@ -68,7 +68,7 @@ export default function BillingSettingsScreen() {
 
       {subscription.isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color=colors.primary />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : (
         <ScrollView style={styles.content}>
@@ -97,7 +97,7 @@ export default function BillingSettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Billing History</Text>
             {history.isLoading ? (
-              <ActivityIndicator color=colors.primary />
+              <ActivityIndicator color={colors.primary} />
             ) : historyList.length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>No billing history</Text>

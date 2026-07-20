@@ -38,7 +38,7 @@ export default function CampaignDetailScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color=colors.primary />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : isError || !campaign ? (
         <View style={styles.center}>

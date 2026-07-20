@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { SocialAccountsRepository } from './social-accounts.repository';
+import { encryptSecret, decryptSecret } from '../../common/crypto/crypto.util';
 
 interface OAuthConfig {
   authUrl: string;
@@ -163,24 +164,29 @@ export class SocialAccountsService {
     return account;
   }
 
-  async getById(id: string) {
-    const account = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const account = await this.repository.findById(id, workspaceId);
     if (!account) throw new NotFoundException('Social account not found');
     const { access_token_encrypted: _access_token_encrypted, refresh_token_encrypted: _refresh_token_encrypted, ...safe } = account;
     return safe;
   }
 
-  async update(id: string, data: { metadata?: Record<string, unknown> }) {
-    return this.repository.update(id, data);
+  async update(id: string, workspaceId: string, data: { metadata?: Record<string, unknown> }) {
+    const updated = await this.repository.update(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose — a cross-workspace id must
+    // not be confirmed as existing.
+    if (!updated) throw new NotFoundException('Social account not found');
+    return updated;
   }
 
-  async disconnect(id: string) {
-    await this.repository.update(id, { is_active: false, access_token_encrypted: null, refresh_token_encrypted: null });
+  async disconnect(id: string, workspaceId: string) {
+    const updated = await this.repository.update(id, workspaceId, { is_active: false, access_token_encrypted: null, refresh_token_encrypted: null });
+    if (!updated) throw new NotFoundException('Social account not found');
     return { message: 'Account disconnected' };
   }
 
-  async refreshToken(id: string) {
-    const account = await this.repository.findById(id);
+  async refreshToken(id: string, workspaceId: string) {
+    const account = await this.repository.findById(id, workspaceId);
     if (!account) throw new NotFoundException('Social account not found');
     if (!account.refresh_token_encrypted) throw new BadRequestException('No refresh token available');
 
@@ -204,7 +210,7 @@ export class SocialAccountsService {
       ? this.encryptToken(tokens.refresh_token)
       : account.refresh_token_encrypted;
 
-    await this.repository.update(id, {
+    await this.repository.update(id, workspaceId, {
       access_token_encrypted: encryptedAccessToken,
       refresh_token_encrypted: encryptedRefreshToken,
       token_expires_at: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : null,
@@ -214,8 +220,8 @@ export class SocialAccountsService {
     return { message: 'Token refreshed successfully' };
   }
 
-  async validate(id: string) {
-    const account = await this.repository.findById(id);
+  async validate(id: string, workspaceId: string) {
+    const account = await this.repository.findById(id, workspaceId);
     if (!account) throw new NotFoundException('Social account not found');
 
     try {
@@ -223,7 +229,7 @@ export class SocialAccountsService {
       await this.fetchPlatformProfile(account.platform_id, decryptedToken);
       return { valid: true, platform: account.platform_id };
     } catch {
-      await this.repository.update(id, { is_active: false });
+      await this.repository.update(id, workspaceId, { is_active: false });
       return { valid: false, platform: account.platform_id, reason: 'Token is no longer valid' };
     }
   }
@@ -273,28 +279,10 @@ export class SocialAccountsService {
   }
 
   private encryptToken(token: string): string {
-    const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const iv = crypto.randomBytes(12); // GCM uses 12-byte IV
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-    let encrypted = cipher.update(token, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag().toString('hex');
-    return `${iv.toString('hex')}:${authTag}:${encrypted}`;
+    return encryptSecret(token);
   }
 
   private decryptToken(encryptedToken: string): string {
-    const key = Buffer.from(this.configService.get<string>('ENCRYPTION_KEY')!, 'hex');
-    const parts = encryptedToken.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    return decryptSecret(encryptedToken);
   }
 }

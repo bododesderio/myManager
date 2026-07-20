@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { BillingService } from './billing.service';
 
 jest.mock('axios');
@@ -73,6 +73,8 @@ describe('BillingService', () => {
       name: 'Pro',
       limits: {},
       features: {},
+      price_monthly_usd: 49,
+      price_annual_usd: 490,
     });
     repository.findUserById.mockResolvedValue({
       id: 'user_1',
@@ -94,15 +96,20 @@ describe('BillingService', () => {
           flw_ref: 'FLW-123',
           amount: 49,
           currency: 'USD',
-          meta: { plan: 'pro', workspaceId: 'workspace_1', billing_cycle: 'monthly' },
+          // Server-set metadata, written by initializeSubscription(). These are
+          // the ONLY keys verifyPayment trusts.
+          meta: {
+            userId: 'user_1',
+            planId: 'plan_1',
+            interval: 'monthly',
+            workspaceId: 'workspace_1',
+          },
         },
       },
     });
 
     const result = await service.verifyPayment('user_1', {
       transaction_id: 12345,
-      plan: 'pro',
-      billing_cycle: 'monthly',
     });
 
     expect(result).toEqual({
@@ -141,5 +148,163 @@ describe('BillingService', () => {
     await expect(
       service.verifyPayment('user_1', { transaction_id: 999 }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  /**
+   * Regression tests for the payment bypass in the 2026-07-20 audit
+   * (docs/audit-2026-07-20.md §C1).
+   */
+  describe('payment verification cannot be driven by client input', () => {
+    function setupSuccessfulCheapPayment(
+      repository: Record<string, jest.Mock>,
+      meta: Record<string, unknown>,
+      amount = 9,
+    ) {
+      repository.findPlanById.mockResolvedValue({
+        id: 'plan_starter',
+        slug: 'starter',
+        name: 'Starter',
+        limits: {},
+        features: {},
+        price_monthly_usd: 9,
+        price_annual_usd: 90,
+      });
+      repository.findPrimaryWorkspaceForUser.mockResolvedValue('workspace_1');
+      repository.findBillingRecordByFlutterwaveRef.mockResolvedValue(null);
+
+      (axios as jest.Mocked<typeof axios>).get.mockResolvedValue({
+        data: {
+          data: {
+            id: 12345,
+            status: 'successful',
+            flw_ref: 'FLW-CHEAP',
+            amount,
+            currency: 'USD',
+            meta,
+          },
+        },
+      });
+    }
+
+    it('ignores a client-supplied plan and uses the server-set metadata', async () => {
+      const { service, repository } = createService();
+      setupSuccessfulCheapPayment(repository, {
+        userId: 'user_1',
+        planId: 'plan_starter',
+        interval: 'monthly',
+        workspaceId: 'workspace_1',
+      });
+      repository.createSubscription.mockResolvedValue({ id: 'sub_1' });
+      repository.createBillingRecord.mockResolvedValue({ id: 'bill_1' });
+
+      // The attack: a real $9 Starter transaction, claimed as Enterprise.
+      await service.verifyPayment('user_1', {
+        transaction_id: 12345,
+        plan: 'enterprise',
+        billing_cycle: 'annual',
+      } as any);
+
+      // Must have resolved the plan from meta.planId, never the client's slug.
+      expect(repository.findPlanById).toHaveBeenCalledWith('plan_starter');
+      expect(repository.findPlanBySlug).not.toHaveBeenCalledWith('enterprise');
+    });
+
+    it('rejects a payment whose amount does not match the plan price', async () => {
+      const { service, repository } = createService();
+      // Paid $9, but meta claims a plan that costs $49.
+      setupSuccessfulCheapPayment(repository, {
+        userId: 'user_1',
+        planId: 'plan_pro',
+        interval: 'monthly',
+        workspaceId: 'workspace_1',
+      });
+      repository.findPlanById.mockResolvedValue({
+        id: 'plan_pro',
+        slug: 'pro',
+        name: 'Pro',
+        limits: {},
+        features: {},
+        price_monthly_usd: 49,
+        price_annual_usd: 490,
+      });
+
+      await expect(
+        service.verifyPayment('user_1', { transaction_id: 12345 }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+    });
+
+    it('rejects redeeming a transaction that belongs to a different user', async () => {
+      const { service, repository } = createService();
+      setupSuccessfulCheapPayment(repository, {
+        userId: 'someone_else',
+        planId: 'plan_starter',
+        interval: 'monthly',
+        workspaceId: 'workspace_1',
+      });
+
+      await expect(
+        service.verifyPayment('user_1', { transaction_id: 12345 }),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+    });
+
+    it('ignores a forged webhook body and acts only on the re-verified transaction', async () => {
+      const { service, repository } = createService();
+      repository.findBillingRecordByFlutterwaveRef.mockResolvedValue(null);
+      repository.findPlanBySlug.mockResolvedValue(null);
+      repository.findPlanById.mockResolvedValue(null);
+
+      // Flutterwave says the transaction failed...
+      (axios as jest.Mocked<typeof axios>).get.mockResolvedValue({
+        data: { data: { id: 999, status: 'failed', amount: 0, currency: 'USD', meta: {} } },
+      });
+
+      // ...but the attacker's forged body claims a successful enterprise payment.
+      await service.handleWebhook({
+        event: 'charge.completed',
+        data: {
+          id: 999,
+          status: 'successful',
+          amount: 948,
+          currency: 'USD',
+          flw_ref: 'FLW-FORGED',
+          meta: { planId: 'plan_enterprise', interval: 'yearly', userId: 'user_1' },
+        },
+      } as any);
+
+      // The re-verified status wins: nothing is granted or recorded.
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+      expect(repository.createBillingRecord).not.toHaveBeenCalled();
+    });
+
+    it('ignores a charge.completed webhook that cannot be re-verified', async () => {
+      const { service, repository } = createService();
+      (axios as jest.Mocked<typeof axios>).get.mockRejectedValue(new Error('network'));
+
+      await service.handleWebhook({
+        event: 'charge.completed',
+        data: {
+          id: 555,
+          status: 'successful',
+          amount: 948,
+          flw_ref: 'FLW-UNVERIFIABLE',
+          meta: { planId: 'plan_enterprise' },
+        },
+      } as any);
+
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+      expect(repository.createBillingRecord).not.toHaveBeenCalled();
+    });
+
+    it('rejects a transaction with no server-side plan metadata', async () => {
+      const { service, repository } = createService();
+      setupSuccessfulCheapPayment(repository, { userId: 'user_1' });
+
+      await expect(
+        service.verifyPayment('user_1', { transaction_id: 12345, plan: 'pro' } as any),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+    });
   });
 });

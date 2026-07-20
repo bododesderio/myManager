@@ -90,7 +90,7 @@ export default function HomeScreen() {
 
       <ScrollView
         style={styles.scrollView}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor=colors.primary />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
         <View style={styles.quickActions}>
           {quickActions.map((action) => (
@@ -107,7 +107,7 @@ export default function HomeScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color=colors.primary />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : error ? (
           <View style={styles.section}>
