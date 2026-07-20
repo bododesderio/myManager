@@ -249,6 +249,54 @@ describe('BillingService', () => {
       expect(repository.createSubscription).not.toHaveBeenCalled();
     });
 
+    it('ignores a forged webhook body and acts only on the re-verified transaction', async () => {
+      const { service, repository } = createService();
+      repository.findBillingRecordByFlutterwaveRef.mockResolvedValue(null);
+      repository.findPlanBySlug.mockResolvedValue(null);
+      repository.findPlanById.mockResolvedValue(null);
+
+      // Flutterwave says the transaction failed...
+      (axios as jest.Mocked<typeof axios>).get.mockResolvedValue({
+        data: { data: { id: 999, status: 'failed', amount: 0, currency: 'USD', meta: {} } },
+      });
+
+      // ...but the attacker's forged body claims a successful enterprise payment.
+      await service.handleWebhook({
+        event: 'charge.completed',
+        data: {
+          id: 999,
+          status: 'successful',
+          amount: 948,
+          currency: 'USD',
+          flw_ref: 'FLW-FORGED',
+          meta: { planId: 'plan_enterprise', interval: 'yearly', userId: 'user_1' },
+        },
+      } as any);
+
+      // The re-verified status wins: nothing is granted or recorded.
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+      expect(repository.createBillingRecord).not.toHaveBeenCalled();
+    });
+
+    it('ignores a charge.completed webhook that cannot be re-verified', async () => {
+      const { service, repository } = createService();
+      (axios as jest.Mocked<typeof axios>).get.mockRejectedValue(new Error('network'));
+
+      await service.handleWebhook({
+        event: 'charge.completed',
+        data: {
+          id: 555,
+          status: 'successful',
+          amount: 948,
+          flw_ref: 'FLW-UNVERIFIABLE',
+          meta: { planId: 'plan_enterprise' },
+        },
+      } as any);
+
+      expect(repository.createSubscription).not.toHaveBeenCalled();
+      expect(repository.createBillingRecord).not.toHaveBeenCalled();
+    });
+
     it('rejects a transaction with no server-side plan metadata', async () => {
       const { service, repository } = createService();
       setupSuccessfulCheapPayment(repository, { userId: 'user_1' });

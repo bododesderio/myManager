@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 import { PostStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import * as crypto from 'crypto';
+import { decryptSecret } from '../../common/crypto/crypto.util';
 
 export interface PublishJobData {
   postId: string;
@@ -128,19 +128,7 @@ export abstract class BasePublishingWorker {
   }
 
   protected decryptToken(encryptedToken: string): string {
-    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
-    const parts = encryptedToken.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(cipherHex, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    return decryptSecret(encryptedToken);
   }
 
   private async checkAllPlatformsPublished(postId: string): Promise<void> {

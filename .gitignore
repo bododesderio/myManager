@@ -73,7 +73,11 @@ coverage/
 .nyc_output/
 
 # Prisma
-apps/api/prisma/migrations/**/migration_lock.toml
+# NOTE: migration_lock.toml is intentionally NOT ignored. Prisma requires it to
+# be committed — it records the datasource provider, guards against an
+# accidental provider switch, and without it `prisma migrate diff
+# --from-migrations` fails outright ("Could not determine the connector from the
+# migrations directory"). It was previously ignored here in error.
 
 # Sentry
 .sentryclirc

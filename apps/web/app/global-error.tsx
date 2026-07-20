@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { ErrorPage, Illustrations } from '@/components/errors/ErrorPage';
 
 /**
@@ -13,6 +15,12 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // A root-layout crash is the highest-severity frontend failure there is, and
+  // it renders outside every other boundary — so report it explicitly.
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <html lang="en">
       <body>

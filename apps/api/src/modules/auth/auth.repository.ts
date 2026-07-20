@@ -35,6 +35,87 @@ export class AuthRepository {
     });
   }
 
+  /**
+   * Create a user and everything that must exist for that user to be usable, in
+   * a single transaction.
+   *
+   * Previously these were five sequential writes. A failure partway through left
+   * a user who owned no workspace and belonged to none — unable to use the app,
+   * and unable to re-register because the unique-email check would then reject
+   * them. Registration is all-or-nothing.
+   */
+  async createUserWithWorkspace(data: {
+    email: string;
+    passwordHash: string;
+    name: string;
+    workspaceName: string;
+    workspaceSlug: string;
+    planSlug?: string;
+    billingCycle?: string;
+    emailVerificationTokenHash: string;
+    emailVerificationExpiresAt: Date;
+  }) {
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: data.email,
+          password_hash: data.passwordHash,
+          name: data.name,
+          email_verified: false,
+        },
+      });
+
+      const workspace = await tx.workspace.create({
+        data: { name: data.workspaceName, slug: data.workspaceSlug },
+      });
+
+      await tx.workspaceMember.create({
+        data: {
+          workspace_id: workspace.id,
+          user_id: user.id,
+          role: 'OWNER' as WorkspaceRole,
+        },
+      });
+
+      await tx.userPreferences.create({
+        data: {
+          user_id: user.id,
+          language: 'en',
+          currency: 'USD',
+          timezone: 'UTC',
+          theme: 'system',
+        },
+      });
+
+      if (data.planSlug && data.planSlug !== 'free') {
+        const plan = await tx.plan.findUnique({ where: { slug: data.planSlug } });
+        if (plan) {
+          const isAnnual = data.billingCycle === 'annual';
+          await tx.subscription.create({
+            data: {
+              workspace_id: workspace.id,
+              user_id: user.id,
+              plan_id: plan.id,
+              status: 'ACTIVE',
+              billing_cycle: isAnnual ? 'ANNUAL' : 'MONTHLY',
+              current_period_start: new Date(),
+              current_period_end: new Date(
+                Date.now() + (isAnnual ? 365 : 30) * 24 * 60 * 60 * 1000,
+              ),
+              locked_limits: (plan.limits as Record<string, any>) ?? {},
+              locked_features: (plan.features as Record<string, any>) ?? {},
+            },
+          });
+        }
+      }
+
+      await tx.$executeRaw`DELETE FROM email_verification_tokens WHERE user_id = ${user.id}`;
+      await tx.$executeRaw`INSERT INTO email_verification_tokens (id, user_id, token_hash, expires_at, created_at) VALUES (gen_random_uuid(), ${user.id}, ${data.emailVerificationTokenHash}, ${data.emailVerificationExpiresAt}, NOW())`;
+
+      return { user, workspace };
+    });
+  }
+
   async createDefaultWorkspace(userId: string, name: string, slug?: string) {
     const finalSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     return this.prisma.workspace.create({

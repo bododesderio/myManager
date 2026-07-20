@@ -5,7 +5,7 @@ import {
   ForbiddenException,
   Logger,
 } from '@nestjs/common';
-import { UserStatus } from '@prisma/client';
+import { UserStatus, Prisma } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { BillingRepository } from './billing.repository';
@@ -62,15 +62,20 @@ export class BillingService {
     if (!plan) throw new NotFoundException('Plan not found');
 
     const user = await this.repository.findUserById(userId);
-    const amount = data.interval === 'yearly' ? Number(plan.price_annual_usd) : Number(plan.price_monthly_usd);
+    // Kept as Decimal: converting to a JS number here was where an exact
+    // Decimal(10,2) price silently became a float approximation.
+    const amount = data.interval === 'yearly' ? plan.price_annual_usd : plan.price_monthly_usd;
 
     if (data.currency !== 'USD') {
       const rate = await this.repository.getExchangeRate(data.currency);
-      const localAmount = Number((amount * rate).toFixed(2));
+      // Decimal multiplication, rounded once at the end to the currency's
+      // minor unit. toNumber() only at the wire boundary, where the value is
+      // already exact at 2dp.
+      const localAmount = new Prisma.Decimal(amount).mul(rate).toDecimalPlaces(2);
 
       const response = await axios.post(`${this.baseUrl}/payments`, {
         tx_ref: `sub_${userId}_${Date.now()}`,
-        amount: localAmount,
+        amount: localAmount.toNumber(),
         currency: data.currency,
         payment_plan: null,
         redirect_url: `${this.configService.get('NEXTAUTH_URL')}/settings/billing?status=complete`,
@@ -86,7 +91,7 @@ export class BillingService {
 
     const response = await axios.post(`${this.baseUrl}/payments`, {
       tx_ref: `sub_${userId}_${Date.now()}`,
-      amount,
+      amount: new Prisma.Decimal(amount).toNumber(),
       currency: 'USD',
       redirect_url: `${this.configService.get('NEXTAUTH_URL')}/settings/billing?status=complete`,
       customer: { email: user!.email, name: user!.name },
@@ -168,6 +173,33 @@ export class BillingService {
   }
 
   /**
+   * Re-fetch a transaction from Flutterwave and return the authoritative record.
+   *
+   * This is the compensating control for Flutterwave's static `verif-hash`
+   * webhook signature, which cannot bind a signature to a payload. Anything that
+   * grants entitlements must be driven by this response, never by a request body.
+   *
+   * Returns null on any failure — callers must treat that as "do not act".
+   */
+  private async fetchVerifiedTransaction(
+    transactionId: string | number,
+  ): Promise<Record<string, any> | null> {
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}/transactions/${transactionId}/verify`,
+        { headers: { Authorization: `Bearer ${this.flutterwaveSecret}` } },
+      );
+      return response.data?.data ?? null;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to re-verify Flutterwave transaction ${String(transactionId)}: ${message}`,
+      );
+      return null;
+    }
+  }
+
+  /**
    * Assert the amount actually captured matches the plan's list price.
    *
    * Non-USD checkouts are converted at initialize time, and the FX rate can move
@@ -176,32 +208,41 @@ export class BillingService {
    */
   private async assertPaidAmountMatchesPlan(
     verified: { amount?: unknown; currency?: unknown },
-    plan: { price_monthly_usd: unknown; price_annual_usd: unknown },
+    plan: { price_monthly_usd: Prisma.Decimal; price_annual_usd: Prisma.Decimal },
     isAnnual: boolean,
   ): Promise<void> {
-    const paid = Number(verified.amount ?? 0);
     const currency = String(verified.currency ?? 'USD').toUpperCase();
-    const listUsd = Number(isAnnual ? plan.price_annual_usd : plan.price_monthly_usd);
 
-    if (!Number.isFinite(paid) || paid <= 0) {
+    let paid: Prisma.Decimal;
+    try {
+      paid = new Prisma.Decimal(String(verified.amount ?? 0));
+    } catch {
       throw new BadRequestException('Verified transaction has no usable amount');
     }
 
-    let expected = listUsd;
-    let tolerance = 0.005; // half a cent — USD must match exactly
+    if (!paid.isFinite() || paid.lte(0)) {
+      throw new BadRequestException('Verified transaction has no usable amount');
+    }
+
+    const listUsd = isAnnual ? plan.price_annual_usd : plan.price_monthly_usd;
+
+    let expected = new Prisma.Decimal(listUsd);
+    // Half a cent — USD must match exactly.
+    let tolerance = new Prisma.Decimal('0.005');
 
     if (currency !== 'USD') {
       const rate = await this.repository.getExchangeRate(currency);
-      if (!Number.isFinite(rate) || rate <= 0) {
+      if (!rate.isFinite() || rate.lte(0)) {
         throw new BadRequestException(`No exchange rate available for ${currency}`);
       }
-      expected = listUsd * rate;
-      tolerance = expected * 0.02; // 2% headroom for FX drift between checkout and verify
+      expected = expected.mul(rate);
+      // 2% headroom for FX drift between checkout and verification.
+      tolerance = expected.mul('0.02');
     }
 
-    if (Math.abs(paid - expected) > tolerance) {
+    if (paid.minus(expected).abs().gt(tolerance)) {
       this.logger.warn(
-        `Payment amount mismatch: paid ${paid} ${currency}, expected ~${expected.toFixed(2)} ${currency}`,
+        `Payment amount mismatch: paid ${paid.toString()} ${currency}, expected ~${expected.toFixed(2)} ${currency}`,
       );
       throw new BadRequestException('Payment amount does not match the plan price');
     }
@@ -286,7 +327,9 @@ export class BillingService {
       workspace_id: workspaceId,
       user_id: userId,
       plan_name: plan.name,
-      amount: Number(verified.amount ?? 0),
+      // Constructed from the string form so the ledger stores the exact captured
+      // amount rather than a float approximation of it.
+      amount: new Prisma.Decimal(String(verified.amount ?? 0)),
       currency: String(verified.currency ?? 'USD'),
       status: 'PAID',
       flutterwave_ref: String(verified.flw_ref ?? data.tx_ref ?? ''),
@@ -421,12 +464,38 @@ export class BillingService {
   }
 
   private async handleChargeCompleted(data: Record<string, any>) {
-    if (data.status !== 'successful') {
-      this.logger.warn(`Ignoring Flutterwave charge.completed event with status ${String(data.status)}`);
+    // SECURITY (docs/audit-2026-07-20.md §H7)
+    //
+    // Flutterwave's `verif-hash` is a STATIC shared secret, not an HMAC over the
+    // request body. It is byte-identical on every call, so it authenticates the
+    // sender but proves nothing about *this* payload — a forged body carrying a
+    // valid hash was indistinguishable from a genuine event.
+    //
+    // We therefore treat the webhook purely as a notification and re-fetch the
+    // transaction from Flutterwave, then act only on that response. Every field
+    // below reads from `verified`, never from `data`.
+    const transactionId = data.id;
+    if (!transactionId) {
+      this.logger.warn('Flutterwave charge.completed webhook had no transaction id — ignoring');
       return;
     }
 
-    const flutterwaveRef = String(data.flw_ref ?? '');
+    const verified = await this.fetchVerifiedTransaction(transactionId);
+    if (!verified) {
+      this.logger.warn(
+        `Could not re-verify Flutterwave transaction ${String(transactionId)} — ignoring webhook`,
+      );
+      return;
+    }
+
+    if (verified.status !== 'successful') {
+      this.logger.warn(
+        `Flutterwave transaction ${String(transactionId)} is ${String(verified.status)} on re-verification — ignoring`,
+      );
+      return;
+    }
+
+    const flutterwaveRef = String(verified.flw_ref ?? '');
     const existingBillingRecord = flutterwaveRef
       ? await this.repository.findBillingRecordByFlutterwaveRef(flutterwaveRef)
       : null;
@@ -435,7 +504,7 @@ export class BillingService {
       return;
     }
 
-    const meta = (data.meta ?? {}) as Record<string, any>;
+    const meta = (verified.meta ?? {}) as Record<string, any>;
     const billingCycle = meta.billing_cycle || meta.interval || 'monthly';
     const plan = await this.resolvePlan(meta);
     if (!plan) {
@@ -443,7 +512,11 @@ export class BillingService {
       return;
     }
 
-    const userId = await this.resolveUserId(data, meta);
+    // Same amount binding as verifyPayment: a verified-but-cheaper transaction
+    // must not unlock an expensive plan.
+    await this.assertPaidAmountMatchesPlan(verified, plan, billingCycle === 'annual');
+
+    const userId = await this.resolveUserId(verified, meta);
     if (!userId) {
       this.logger.warn('Unable to resolve user for Flutterwave charge.completed webhook');
       return;
@@ -459,7 +532,7 @@ export class BillingService {
       userId,
       workspaceId,
       planId: plan.id,
-      flutterwaveId: String(data.id ?? ''),
+      flutterwaveId: String(verified.id ?? transactionId),
       billingCycle,
     });
 
@@ -467,8 +540,8 @@ export class BillingService {
     if (existingBillingRecord) {
       await this.repository.updateBillingRecord(existingBillingRecord.id, {
         plan_name: plan.name,
-        amount: Number(data.amount ?? existingBillingRecord.amount),
-        currency: String(data.currency ?? existingBillingRecord.currency),
+        amount: new Prisma.Decimal(String(verified.amount ?? existingBillingRecord.amount)),
+        currency: String(verified.currency ?? existingBillingRecord.currency),
         status: 'PAID',
       });
       billingRecordId = existingBillingRecord.id;
@@ -477,8 +550,8 @@ export class BillingService {
         workspace_id: workspaceId,
         user_id: userId,
         plan_name: plan.name,
-        amount: Number(data.amount ?? 0),
-        currency: String(data.currency ?? 'USD'),
+        amount: new Prisma.Decimal(String(verified.amount ?? 0)),
+        currency: String(verified.currency ?? 'USD'),
         status: 'PAID',
         flutterwave_ref: flutterwaveRef,
       });
@@ -488,13 +561,15 @@ export class BillingService {
     await this.syncUserStatusAfterPayment(userId);
     await this.dispatchBillingEvent(workspaceId, 'billing.payment_succeeded', {
       billingRecordId,
-      transactionId: String(data.id ?? ''),
+      transactionId: String(verified.id ?? transactionId),
       flutterwaveRef,
       userId,
       planId: plan.id,
       planSlug: plan.slug,
-      amount: Number(data.amount ?? 0),
-      currency: String(data.currency ?? 'USD'),
+      // Outbound webhook payload: stays a JSON number to preserve the existing
+      // contract for consumers. Internal storage uses Decimal.
+      amount: Number(verified.amount ?? 0),
+      currency: String(verified.currency ?? 'USD'),
       billingCycle,
     });
   }
@@ -541,7 +616,7 @@ export class BillingService {
     if (existing) {
       await this.repository.updateBillingRecord(existing.id, {
         plan_name: planName,
-        amount: Number(data.amount ?? existing.amount),
+        amount: new Prisma.Decimal(String(data.amount ?? existing.amount)),
         currency: String(data.currency ?? existing.currency),
         status: 'FAILED',
       });
@@ -549,7 +624,7 @@ export class BillingService {
         billingRecordId: existing.id,
         flutterwaveRef,
         userId,
-        amount: Number(data.amount ?? existing.amount),
+        amount: new Prisma.Decimal(String(data.amount ?? existing.amount)),
         currency: String(data.currency ?? existing.currency),
         planName,
       });
@@ -560,7 +635,7 @@ export class BillingService {
       workspace_id: workspaceId,
       user_id: userId,
       plan_name: planName,
-      amount: Number(data.amount ?? 0),
+      amount: new Prisma.Decimal(String(data.amount ?? 0)),
       currency: String(data.currency ?? 'USD'),
       status: 'FAILED',
       flutterwave_ref: flutterwaveRef,
@@ -570,7 +645,7 @@ export class BillingService {
       billingRecordId: billingRecord.id,
       flutterwaveRef,
       userId,
-      amount: Number(data.amount ?? 0),
+      amount: new Prisma.Decimal(String(data.amount ?? 0)),
       currency: String(data.currency ?? 'USD'),
       planName,
     });

@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma.service';
 import axios from 'axios';
-import * as crypto from 'crypto';
+import { decryptSecret } from '../common/crypto/crypto.util';
 
 interface AnalyticsSyncJobData {
   postId: string;
@@ -220,16 +220,6 @@ export class AnalyticsSyncWorker {
   }
 
   private decryptToken(encrypted: string): string {
-    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
-    const parts = encrypted.split(':');
-    if (parts.length !== 3) {
-      throw new Error('Invalid encrypted token format — expected GCM format (iv:authTag:ciphertext)');
-    }
-    const [ivHex, authTagHex, cipherHex] = parts;
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    return decipher.update(cipherHex, 'hex', 'utf8') + decipher.final('utf8');
+    return decryptSecret(encrypted);
   }
 }

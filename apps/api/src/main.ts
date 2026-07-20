@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { GlobalHttpExceptionFilter } from './common/filters/http-exception.filter';
 import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
 import { requestTracingMiddleware } from './common/http/request-tracing.middleware';
+import { validateEnv } from './common/config/env.validation';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
@@ -20,14 +21,11 @@ async function bootstrap() {
     });
   }
 
-  // Validate required env vars (hard = crash, soft = warn)
-  const REQUIRED_ENV = ['DATABASE_URL', 'REDIS_URL', 'JWT_SECRET', 'ENCRYPTION_KEY'];
+  // Validate the environment's shape, not just presence. Reports every problem
+  // at once and crashes before the app can accept traffic with bad config.
+  validateEnv();
+
   const RECOMMENDED_ENV = ['FLUTTERWAVE_WEBHOOK_SECRET', 'RESEND_API_KEY'];
-  for (const key of REQUIRED_ENV) {
-    if (!process.env[key]) {
-      throw new Error(`Missing required env var: ${key}`);
-    }
-  }
   for (const key of RECOMMENDED_ENV) {
     if (!process.env[key]) {
       logger.warn(`Missing recommended env var: ${key} — related features will be disabled`);
@@ -41,7 +39,14 @@ async function bootstrap() {
   app.use(requestTracingMiddleware);
 
   app.setGlobalPrefix('api/v1', {
-    exclude: ['health', 'api/v1/health', 'api/brand', 'metrics'],
+    exclude: [
+      'health',
+      'health/live',
+      'health/ready',
+      'api/v1/health',
+      'api/brand',
+      'metrics',
+    ],
   });
 
   const corsOrigins = process.env.CORS_ORIGINS

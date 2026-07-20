@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SubStatus, BillingCycle } from '@prisma/client';
+import { SubStatus, BillingCycle, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { getSharedRedis } from '../../common/redis/shared-redis';
 
@@ -104,7 +104,7 @@ export class BillingRepository {
     workspace_id: string;
     user_id: string;
     plan_name: string;
-    amount: number;
+    amount: Prisma.Decimal;
     currency: string;
     status: string;
     flutterwave_ref: string;
@@ -251,14 +251,19 @@ export class BillingRepository {
     return [records, total];
   }
 
-  async getExchangeRate(currency: string): Promise<number> {
+  /**
+   * Returns the FX rate as a Decimal. Rates multiply into charge amounts, so
+   * keeping this out of JS float space prevents drift propagating into money.
+   * The Redis cache stores the exact decimal string, not a float.
+   */
+  async getExchangeRate(currency: string): Promise<Prisma.Decimal> {
     const cached = await redis.get(`exchange_rate:${currency}`);
-    if (cached) return Number(cached);
+    if (cached) return new Prisma.Decimal(cached);
 
     const rate = await this.prisma.exchangeRate.findFirst({
       where: { to_currency: currency },
       orderBy: { fetched_at: 'desc' },
     });
-    return rate?.rate ?? 1;
+    return rate?.rate ?? new Prisma.Decimal(1);
   }
 }

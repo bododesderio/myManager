@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { getSharedRedis } from '../../common/redis/shared-redis';
 
@@ -58,16 +59,17 @@ export class PlansRepository {
     return plan;
   }
 
-  async getExchangeRate(currency: string): Promise<number> {
+  async getExchangeRate(currency: string): Promise<Prisma.Decimal> {
     const cached = await redis.get(`exchange_rate:${currency}`);
-    if (cached) return Number(cached);
+    if (cached) return new Prisma.Decimal(cached);
 
     const rate = await this.prisma.exchangeRate.findFirst({
       where: { to_currency: currency },
       orderBy: { fetched_at: 'desc' },
     });
 
-    const value = rate?.rate ?? 1;
+    const value = rate?.rate ?? new Prisma.Decimal(1);
+    // toString() on a Decimal is exact — no float round-trip through the cache.
     await redis.setex(`exchange_rate:${currency}`, 3600, value.toString());
     return value;
   }
