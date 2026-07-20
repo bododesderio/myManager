@@ -2,6 +2,14 @@ import type { ReactNode } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
 
+/**
+ * Auth-gated and per-user: never statically prerender. Without this Next tries
+ * to prerender at build time, where SessionProvider has no React runtime:
+ *   TypeError: Cannot read properties of null (reading 'useState')
+ */
+export const dynamic = 'force-dynamic';
+
+
 export default function UserLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">

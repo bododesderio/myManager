@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import * as Sentry from '@sentry/nextjs';
 
 export default function MarketingError({
   error,
@@ -11,6 +12,9 @@ export default function MarketingError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Report to Sentry as well as the console — Phase 1 wired Sentry up,
+    // but these boundaries were still only logging locally.
+    Sentry.captureException(error);
     console.error('Marketing route error:', error);
   }, [error]);
 

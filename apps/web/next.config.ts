@@ -2,6 +2,15 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // isomorphic-dompurify loads jsdom on the server, and jsdom resolves internal
+  // assets (default-stylesheet.css) relative to its own package directory.
+  // Bundling it breaks that lookup and fails the build while collecting page
+  // data for /blog/[slug]:
+  //   ENOENT .next/server/app/browser/default-stylesheet.css
+  // Keeping it external makes it a runtime require from node_modules, which is
+  // how jsdom expects to be loaded. `output: 'standalone'` still traces it into
+  // the deployed bundle.
+  serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
   transpilePackages: [
     '@mymanager/config',
     '@mymanager/types',

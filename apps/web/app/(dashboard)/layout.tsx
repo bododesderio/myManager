@@ -1,17 +1,29 @@
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
-const Sidebar = dynamic(
+/**
+ * Every dashboard route is per-user and auth-gated, so none of them may be
+ * statically prerendered. Without this, Next tried to prerender pages like
+ * /analytics/benchmarks at build time, where SessionProvider has no React
+ * runtime and the build died with:
+ *   TypeError: Cannot read properties of null (reading 'useState')
+ *
+ * Declaring it on the layout covers all 34 pages in the segment rather than
+ * relying on each one to remember.
+ */
+export const dynamic = 'force-dynamic';
+
+const Sidebar = nextDynamic(
   () => import('@/components/layout/Sidebar').then((m) => ({ default: m.Sidebar })),
   {
     loading: () => <div className="w-16 shrink-0 border-r border-border bg-bg" />,
   },
 );
 
-const Topbar = dynamic(
+const Topbar = nextDynamic(
   () => import('@/components/layout/Topbar').then((m) => ({ default: m.Topbar })),
   {
     loading: () => <div className="h-14 border-b border-border bg-bg" />,
