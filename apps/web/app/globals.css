@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Tailwind v4 auto-detects sources from this file's directory, which does NOT
+   reach into the monorepo's packages/. Without this @source, every class used
+   only inside @mymanager/ui is never generated and those components render
+   partially unstyled. Verified by checking a package-only class (min-h-24) in
+   the built CSS. */
+@source "../../../packages/ui";
+
 @theme {
   --color-primary: #6D5AE8;
   --color-primary-dark: #4A36D4;
@@ -26,6 +33,21 @@
   --color-warning-light: #FAEEDA;
   --color-stats-bg: #4A36D4;
   --color-stats-text: #ffffff;
+
+  /* ── Border Radii ─────────────────────────────
+     These MUST live inside @theme. Tailwind v4 generates utilities only from
+     @theme tokens; the same values declared in [data-theme="light"] below are
+     plain CSS custom properties and produce no `rounded-*` classes.
+     Before this, 682 usages of rounded-brand/card/btn/input/badge across the app
+     resolved to nothing and every one of those elements rendered square.
+     --radius-brand is the alias the codebase uses most (576 uses) and had never
+     been declared anywhere; it maps to the card radius. */
+  --radius-brand:         12px;
+  --radius-card:          12px;
+  --radius-btn:           8px;
+  --radius-input:         7px;
+  --radius-badge:         5px;
+  --radius-icon:          7px;
 }
 
 /* ═══════════════════════════════════════════════════════════

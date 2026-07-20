@@ -19,6 +19,7 @@
     "@mymanager/seo": "workspace:*",
     "@mymanager/translations": "workspace:*",
     "@mymanager/types": "workspace:*",
+    "@mymanager/ui": "workspace:*",
     "@mymanager/utils": "workspace:*",
     "@mymanager/validators": "workspace:*",
     "@radix-ui/react-slot": "^1.1.1",

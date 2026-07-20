@@ -1,9 +1,26 @@
 import type { Config } from 'tailwindcss';
 
+/**
+ * ⚠️ THIS FILE IS NOT LOADED BY THE BUILD.
+ *
+ * The project runs Tailwind v4 (`@import "tailwindcss"` in app/globals.css),
+ * which is CSS-first: a JS config only applies if a `@config` directive points
+ * at it, and there is none. Every token that actually works comes from the
+ * `@theme` block in app/globals.css — that is the source of truth.
+ *
+ * This file survives because editor Tailwind IntelliSense still reads it. Keep
+ * it roughly in sync for autocomplete, but changing it has NO effect on output.
+ * Adding a colour or radius here and expecting a utility to appear will not
+ * work — that is exactly how 682 `rounded-*` usages ended up resolving to
+ * nothing while the values sat declared in the wrong CSS block.
+ */
 const config: Config = {
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
+    // Shared UI package. Tailwind only generates classes it can see, so without
+    // this path every @mymanager/ui component renders unstyled.
+    '../../packages/ui/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {
