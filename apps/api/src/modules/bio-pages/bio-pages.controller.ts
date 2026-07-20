@@ -38,19 +38,23 @@ export class BioPagesController {
   @Get(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get bio page details' })
-  async getById(@Param('id') id: string) { return this.bioPagesService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.bioPagesService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Put(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update bio page' })
-  async update(@Param('id') id: string, @Body() body: Record<string, unknown>) {
-    return this.bioPagesService.update(id, body);
+  async update(@Param('id') id: string, @Req() req: Request, @Body() body: Record<string, unknown>) {
+    return this.bioPagesService.update(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete bio page' })
-  async delete(@Param('id') id: string) { return this.bioPagesService.delete(id); }
+  async delete(@Param('id') id: string, @Req() req: Request) {
+    return this.bioPagesService.delete(id, getRequestWorkspaceId(req));
+  }
 
   @Post(':slug/click')
   @ApiOperation({ summary: 'Track link click event (public)' })

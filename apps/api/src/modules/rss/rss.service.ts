@@ -20,18 +20,28 @@ export class RssService {
     });
   }
 
-  async getById(id: string) {
-    const feed = await this.repository.findById(id);
+  async getById(id: string, workspaceId: string) {
+    const feed = await this.repository.findById(id, workspaceId);
     if (!feed) throw new NotFoundException('RSS feed not found');
     return feed;
   }
 
-  async update(id: string, data: Record<string, unknown>) { return this.repository.update(id, data); }
+  async update(id: string, workspaceId: string, data: Record<string, unknown>) {
+    const updated = await this.repository.update(id, workspaceId, data);
+    // Indistinguishable from "not found" on purpose — a cross-workspace id must
+    // not be confirmed as existing.
+    if (!updated) throw new NotFoundException('RSS feed not found');
+    return updated;
+  }
 
-  async remove(id: string) { await this.repository.delete(id); return { message: 'RSS feed removed' }; }
+  async remove(id: string, workspaceId: string) {
+    const deleted = await this.repository.delete(id, workspaceId);
+    if (!deleted) throw new NotFoundException('RSS feed not found');
+    return { message: 'RSS feed removed' };
+  }
 
-  async syncNow(id: string) {
-    const feed = await this.repository.findById(id);
+  async syncNow(id: string, workspaceId: string) {
+    const feed = await this.repository.findById(id, workspaceId);
     if (!feed) throw new NotFoundException('RSS feed not found');
     const items = await this.fetchFeedItems(feed.url);
     let imported = 0;
@@ -42,7 +52,7 @@ export class RssService {
         imported++;
       }
     }
-    await this.repository.update(id, { lastSyncedAt: new Date() });
+    await this.repository.update(id, workspaceId, { lastSyncedAt: new Date() });
     return { imported, total: items.length };
   }
 

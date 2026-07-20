@@ -2,7 +2,12 @@ import { Job } from 'bullmq';
 import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import puppeteer from 'puppeteer';
+import { browserPool } from './browser-pool';
+
+/** Rows fetched per page when streaming a CSV export. */
+const CSV_PAGE_SIZE = 1000;
+/** Hard ceiling on exported rows; exceeding it appends an explicit truncation row. */
+const CSV_MAX_ROWS = 100_000;
 
 interface ReportGenerateJobData {
   reportId: string;
@@ -66,25 +71,20 @@ export class ReportGeneratorWorker {
   private async generatePdf(report: { id: string; workspace_id: string }): Promise<void> {
     const renderUrl = `${process.env.NEXTAUTH_URL}/internal/report-render/${report.id}`;
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    });
-    let pdfBuffer: Buffer;
-    try {
-      const page = await browser.newPage();
+    // Pooled browser: launching one Chromium per PDF cost ~150-200MB and 3-5s
+    // each, so concurrent reports OOM'd the worker. The pool caps that; excess
+    // jobs queue instead of spawning.
+    const pdfBuffer = await browserPool.withPage(async (page) => {
       await page.setViewport({ width: 1200, height: 800 });
       await page.goto(renderUrl, { waitUntil: 'networkidle0', timeout: 60000 });
-      pdfBuffer = Buffer.from(
+      return Buffer.from(
         await page.pdf({
           format: 'A4',
           printBackground: true,
           margin: { top: '20mm', right: '15mm', bottom: '20mm', left: '15mm' },
         }),
       );
-    } finally {
-      await browser.close().catch(() => undefined);
-    }
+    });
 
     const r2Key = `reports/${report.workspace_id}/${report.id}.pdf`;
     await this.s3Client.send(new PutObjectCommand({
@@ -103,24 +103,60 @@ export class ReportGeneratorWorker {
   }
 
   private async generateCsv(report: { id: string; workspace_id: string; date_from: Date | null; date_to: Date | null; platforms: string[] | null }): Promise<void> {
-    const analytics = await this.prisma.postAnalytics.findMany({
-      where: {
-        post: {
-          workspace_id: report.workspace_id,
-          published_at: { gte: report.date_from ?? undefined, lte: report.date_to ?? undefined },
-        },
-        ...(report.platforms?.length ? { platform: { in: report.platforms } } : {}),
+    const where = {
+      post: {
+        workspace_id: report.workspace_id,
+        published_at: { gte: report.date_from ?? undefined, lte: report.date_to ?? undefined },
       },
-      include: { post: { select: { caption: true, platforms: true, published_at: true } } },
-      orderBy: { synced_at: 'desc' },
-    });
+      ...(report.platforms?.length ? { platform: { in: report.platforms } } : {}),
+    };
 
-    const header = 'Post Caption,Platform,Published At,Impressions,Reach,Engagements,Clicks,Likes,Comments,Shares\n';
-    const rows = analytics.map((a) =>
-      `"${(a.post.caption || '').replace(/"/g, '""').substring(0, 100)}",${a.platform},${a.post.published_at?.toISOString() || ''},${a.impressions || 0},${a.reach || 0},${(a.likes + a.comments + a.shares) || 0},${a.clicks || 0},${a.likes || 0},${a.comments || 0},${a.shares || 0}`
-    ).join('\n');
+    // Paged with a cursor rather than one unbounded findMany. A six-month export
+    // for an active workspace could otherwise pull 50k+ rows — each with a joined
+    // post — into memory at once, on the same process that runs Chromium.
+    const header =
+      'Post Caption,Platform,Published At,Impressions,Reach,Engagements,Clicks,Likes,Comments,Shares\n';
+    const chunks: string[] = [header];
 
-    const csvBuffer = Buffer.from(header + rows, 'utf-8');
+    let cursor: string | undefined;
+    let exported = 0;
+
+    for (;;) {
+      const batch = await this.prisma.postAnalytics.findMany({
+        where,
+        include: { post: { select: { caption: true, platforms: true, published_at: true } } },
+        // Cursor paging requires a stable, unique ordering — synced_at alone is
+        // neither, so rows could be skipped or repeated across pages.
+        orderBy: { id: 'asc' },
+        take: CSV_PAGE_SIZE,
+        ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      });
+
+      if (batch.length === 0) break;
+
+      for (const a of batch) {
+        chunks.push(
+          `"${(a.post.caption || '').replace(/"/g, '""').substring(0, 100)}",${a.platform},${a.post.published_at?.toISOString() || ''},${a.impressions || 0},${a.reach || 0},${(a.likes + a.comments + a.shares) || 0},${a.clicks || 0},${a.likes || 0},${a.comments || 0},${a.shares || 0}\n`,
+        );
+      }
+
+      exported += batch.length;
+      cursor = batch[batch.length - 1].id;
+
+      if (batch.length < CSV_PAGE_SIZE) break;
+
+      if (exported >= CSV_MAX_ROWS) {
+        // Never truncate silently — a short CSV that looks complete is worse
+        // than an explicit note that it is not.
+        this.logger.warn(
+          `Report ${report.id} hit the ${CSV_MAX_ROWS}-row export cap; output is truncated`,
+        );
+        chunks.push(`"Export truncated at ${CSV_MAX_ROWS} rows",,,,,,,,,\n`);
+        break;
+      }
+    }
+
+    const csvBuffer = Buffer.from(chunks.join(''), 'utf-8');
     const r2Key = `reports/${report.workspace_id}/${report.id}.csv`;
 
     await this.s3Client.send(new PutObjectCommand({

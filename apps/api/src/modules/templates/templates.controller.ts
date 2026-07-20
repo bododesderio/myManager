@@ -30,21 +30,30 @@ export class TemplatesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get template details' })
-  async getById(@Param('id') id: string) { return this.templatesService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.templatesService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a template' })
-  async update(@Param('id') id: string, @Body() body: Record<string, unknown>) {
-    return this.templatesService.update(id, body);
+  async update(@Param('id') id: string, @Req() req: Request, @Body() body: Record<string, unknown>) {
+    return this.templatesService.update(id, getRequestWorkspaceId(req), body);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a template' })
-  async delete(@Param('id') id: string) { return this.templatesService.delete(id); }
+  async delete(@Param('id') id: string, @Req() req: Request) {
+    return this.templatesService.delete(id, getRequestWorkspaceId(req));
+  }
 
   @Post(':id/create-post')
   @ApiOperation({ summary: 'Create a post from a template' })
   async createFromTemplate(@Param('id') id: string, @Req() req: Request, @Body() body: { scheduledAt?: string }) {
-    return this.templatesService.createPostFromTemplate(id, getRequestUserId(req), body.scheduledAt);
+    return this.templatesService.createPostFromTemplate(
+      id,
+      getRequestUserId(req),
+      getRequestWorkspaceId(req),
+      body.scheduledAt,
+    );
   }
 }

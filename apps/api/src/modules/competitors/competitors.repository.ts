@@ -5,9 +5,24 @@ import { PrismaService } from '../../prisma.service';
 export class CompetitorsRepository {
   constructor(private readonly prisma: PrismaService) {}
   async findByWorkspace(workspaceId: string) { return this.prisma.competitorProfile.findMany({ where: { workspace_id: workspaceId } }); }
-  async findById(id: string) { return this.prisma.competitorProfile.findUnique({ where: { id }, include: { snapshots: { take: 7, orderBy: { date: 'desc' } } } }); }
+  // Tenancy is enforced in the WHERE clause (docs/audit-2026-07-20.md §C2).
+  // The guard is defence in depth; the database is the authority.
+  async findById(id: string, workspaceId: string) {
+    return this.prisma.competitorProfile.findFirst({
+      where: { id, workspace_id: workspaceId },
+      include: { snapshots: { take: 7, orderBy: { date: 'desc' } } },
+    });
+  }
+
   async create(data: Record<string, unknown>) { return this.prisma.competitorProfile.create({ data } as unknown as Parameters<typeof this.prisma.competitorProfile.create>[0]); }
-  async delete(id: string) { return this.prisma.competitorProfile.delete({ where: { id } }); }
+
+  /** Returns false when the row does not exist *or* belongs to another workspace. */
+  async delete(id: string, workspaceId: string) {
+    const result = await this.prisma.competitorProfile.deleteMany({
+      where: { id, workspace_id: workspaceId },
+    });
+    return result.count > 0;
+  }
 
   async findSnapshots(competitorId: string, days: number) {
     const since = new Date(); since.setDate(since.getDate() - days);

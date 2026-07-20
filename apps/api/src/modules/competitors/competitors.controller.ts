@@ -25,11 +25,15 @@ export class CompetitorsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get competitor profile with recent snapshots' })
-  async getById(@Param('id') id: string) { return this.competitorsService.getById(id); }
+  async getById(@Param('id') id: string, @Req() req: Request) {
+    return this.competitorsService.getById(id, getRequestWorkspaceId(req));
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Stop tracking a competitor' })
-  async remove(@Param('id') id: string) { return this.competitorsService.remove(id); }
+  async remove(@Param('id') id: string, @Req() req: Request) {
+    return this.competitorsService.remove(id, getRequestWorkspaceId(req));
+  }
 
   @Get(':id/snapshots')
   @ApiOperation({ summary: 'Get historical metric snapshots for competitor' })
