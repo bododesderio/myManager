@@ -2,13 +2,6 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
-/**
- * Auth-gated and per-user: never statically prerender. Without this Next tries
- * to prerender at build time, where SessionProvider has no React runtime:
- *   TypeError: Cannot read properties of null (reading 'useState')
- */
-export const dynamic = 'force-dynamic';
-
 
 export default async function SuperadminLayout({
   children,

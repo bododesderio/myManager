@@ -92,7 +92,40 @@ all 39 error boundaries wired to Sentry, `/portal` + `/user` boundaries added.
 - Test coverage: 18 suites for 43 modules. Zero coverage on OAuth flows,
   scheduling, 8 of 10 platform workers.
 
-## [UNRESOLVED] `next build` fails at the /_error export — cause NOT established
+## [RESOLVED] The `<Html>` build failure — root cause found
+
+**`NODE_ENV=development` was exported in the developer's shell.** `next build`
+inherited it, Next built in a hybrid mode, and the static export of Next's
+internal `/404` and `/_error` pages died with
+`<Html> should not be imported outside of pages/_document`.
+
+It was never a defect in this repository. Proof: a pristine three-file Next
+15.5.14 app — npm not pnpm, outside the workspace, no config — reproduces the
+error exactly, and building this repo with `NODE_ENV=production` succeeds.
+It is a known Next.js App Router issue (vercel/next.js#56481).
+
+Guarded so it cannot recur: `apps/web` build script now pins
+`NODE_ENV=production next build`, which is correct for a build regardless of the
+shell. Verified: `pnpm build` succeeds even with `NODE_ENV=development` exported.
+
+### Also fixed while chasing this
+`turbo build` was not passing `NEXTAUTH_SECRET` to the web build — Turbo 2
+filters env vars unless declared. CI runs `pnpm build`, so CI would have hit the
+same wall. `turbo.json` now declares `env` for build/test and `globalEnv`.
+
+**`pnpm build` now succeeds for the whole monorepo (3/3 tasks) for the first time.**
+
+### Retracted: two of the three "build blockers" were not real
+Only the jsdom/`serverExternalPackages` fix was genuine — verified by building
+the pre-fix commit with correct `NODE_ENV`, which still failed at `/blog/[slug]`.
+
+The `force-dynamic` additions to the `(dashboard)`, `superadmin` and `user`
+layouts were REVERTED. They were a response to the `NODE_ENV` artifact, they are
+redundant (the layouts already `await auth()`, which opts them out of static
+rendering), and the code comments justifying them were factually wrong. Those
+three files are now byte-identical to their pre-Phase-2 state.
+
+## [SUPERSEDED — kept for the record] earlier investigation notes
 
 Three real build blockers were found and fixed (jsdom bundling; static
 prerendering of auth-gated routes in `(dashboard)`, `superadmin`, `user`).
