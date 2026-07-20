@@ -7,11 +7,11 @@ export class FacebookWorker extends BasePublishingWorker {
   async buildPayload(post: Record<string, any>, _account: Record<string, any>): Promise<PlatformPayload> {
     return {
       caption: post.caption as string,
-      mediaUrls: post.media?.map((m: any) => m.mediaAsset.url) || [],
-      contentType: post.contentType as string,
-      platformOptions: post.platformOptions?.facebook || {},
-      linkUrl: post.linkUrl as string,
-      firstCommentText: post.firstCommentText as string,
+      mediaUrls: post.media?.map((m: any) => m.media_asset.url) || [],
+      contentType: post.content_type as string,
+      platformOptions: post.platform_options?.facebook || {},
+      linkUrl: post.link_url as string,
+      firstCommentText: post.first_comment_text as string,
     };
   }
 

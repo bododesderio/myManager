@@ -7,10 +7,10 @@ export class InstagramWorker extends BasePublishingWorker {
   async buildPayload(post: Record<string, any>, _account: Record<string, any>): Promise<PlatformPayload> {
     return {
       caption: post.caption as string,
-      mediaUrls: post.media?.map((m: any) => m.mediaAsset.url) || [],
-      contentType: post.contentType as string,
-      platformOptions: post.platformOptions?.instagram || {},
-      firstCommentText: post.firstCommentText as string,
+      mediaUrls: post.media?.map((m: any) => m.media_asset.url) || [],
+      contentType: post.content_type as string,
+      platformOptions: post.platform_options?.instagram || {},
+      firstCommentText: post.first_comment_text as string,
     };
   }
 
