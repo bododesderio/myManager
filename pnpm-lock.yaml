@@ -362,6 +362,9 @@ importers:
       '@mymanager/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@mymanager/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@mymanager/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -508,6 +511,25 @@ importers:
   packages/translations: {}
 
   packages/types: {}
+
+  packages/ui:
+    dependencies:
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+      tailwind-merge:
+        specifier: ^2.5.5
+        version: 2.6.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
 
   packages/utils:
     dependencies:
@@ -12404,6 +12426,8 @@ snapshots:
       '@ckeditor/ckeditor5-icons': 47.6.1
       '@ckeditor/ckeditor5-ui': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-paste-from-office@47.6.1':
     dependencies:

@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
   transpilePackages: [
     '@mymanager/config',
+    '@mymanager/ui',
     '@mymanager/types',
     '@mymanager/utils',
     '@mymanager/constants',
