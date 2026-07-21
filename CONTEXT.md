@@ -64,12 +64,24 @@ Turborepo + pnpm 9.15.4 workspaces.
   (migration `20260721000000`). NOTE: deploy logs out active API refresh
   sessions once.
 
-**MEDIUM**
-- Analytics aggregated in Node memory, not SQL.
-- 4 unregistered guards (`api-key`, `feature`, `plan`, `quota`) — no plan-tier or
-  quota enforcement at the HTTP layer.
-- Web: many pages lack `error.tsx`, raw `fetch()` calls bypass the API client,
-  `any` types, and `packages/ui` still doesn't exist (web components unshared).
+**MEDIUM — mostly RESOLVED 2026-07-21 (commit 9f084f7)**
+- ~~Auth: reset-token throttle backwards (M3), login timing enumeration (M4),
+  TOTP replay + non-constant-time (M5)~~ → all fixed + tested.
+- ~~Analytics in-memory aggregation (M7)~~ done earlier; ~~silent analytics
+  catch blocks (M6)~~ now logged; ~~unbounded bulk-media query (M8)~~ capped.
+- ~~4 unregistered guards (M14)~~ → Plan/Feature/Quota registered globally as
+  opt-in (no-op without @RequirePlan/@RequireFeature/@RequireQuota); ApiKeyGuard
+  stays per-route by design. **Enforcement is wired but inert** until routes get
+  the decorators + plan tiers define limits (product config).
+- ~~Brand-color XSS (M2)~~ → strict `validateHexColor` gate.
+- ~~error.tsx/loading.tsx gaps~~ → filled where missing.
+
+**MEDIUM — still open**
+- **73 raw `fetch()` calls** still bypass `lib/api/client.ts` (its auth-refresh +
+  CSRF interceptors) — incl. LoginForm/SignupForm. NOT yet migrated: it's a
+  large, auth-flow-touching change that needs its own careful, tested pass.
+- `any` types in `app/`/`lib/`; broaden `@mymanager/ui` adoption (the package
+  exists as of Jul 20 but most components are still local).
 
 **Unverified**
 - Whether the web composer converts local→UTC correctly before sending
