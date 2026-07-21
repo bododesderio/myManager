@@ -118,7 +118,6 @@ model User {
   preferences              UserPreferences?
   push_tokens              UserPushToken[]
   totp_backup_codes        TotpBackupCode[]
-  sessions                 Session[]
   accounts                 Account[]
   workspace_members        WorkspaceMember[]
   project_members          ProjectMember[]
@@ -199,21 +198,11 @@ model TotpBackupCode {
   @@map("totp_backup_codes")
 }
 
-model Session {
-  id            String   @id @default(uuid())
-  session_token String   @unique
-  user_id       String
-  expires       DateTime
-  created_at    DateTime @default(now())
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  // Sessions double as refresh-token storage, so every logout, password change
-  // and "sign out all devices" filters by user_id. Without this index those are
-  // sequential scans on the hottest security path in the app.
-  @@index([user_id])
-  @@map("sessions")
-}
+// NOTE: the former `Session` model is gone. Web auth is NextAuth with a JWT
+// session strategy (no DB sessions), and the API's refresh tokens now live in
+// the purpose-built `RefreshToken` model below (with used_at/revoked_at for
+// rotation and reuse detection). The `sessions` table is dropped by migration
+// 20260721_drop_sessions_refresh_token_rotation.
 
 model Account {
   id                  String   @id @default(uuid())
@@ -240,6 +229,12 @@ model Account {
 // AUTH TOKENS
 // ═══════════════════════════════════════════════════════════
 
+// Refresh tokens for the API's SimpleJWT-style auth. Rotated on every use:
+// a valid token is marked `used_at` and a new one issued. A token presented
+// after it was already used or revoked is treated as theft — the whole user's
+// token family is revoked (see AuthService.refreshTokens). Rows are retained
+// (not deleted on use) so that reuse can be detected, and pruned after expiry
+// by RefreshTokenCleanupCron.
 model RefreshToken {
   id         String    @id @default(uuid())
   user_id    String
@@ -253,6 +248,8 @@ model RefreshToken {
 
   @@index([token_hash])
   @@index([user_id])
+  // Supports the cleanup cron's `expires_at < now` prune without a full scan.
+  @@index([expires_at])
   @@map("refresh_tokens")
 }
 

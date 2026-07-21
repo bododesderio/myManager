@@ -26,21 +26,44 @@ interface PooledBrowser {
   busy: boolean;
 }
 
-class BrowserPool {
+interface Waiter {
+  resolve: (entry: PooledBrowser) => void;
+  reject: (err: Error) => void;
+}
+
+export class BrowserPool {
   private readonly logger = new Logger(BrowserPool.name);
   private readonly browsers: PooledBrowser[] = [];
-  private readonly waiters: Array<(entry: PooledBrowser) => void> = [];
+  private readonly waiters: Waiter[] = [];
   private shuttingDown = false;
+  /**
+   * Slots claimed by in-flight `launch()` calls that have not yet pushed onto
+   * `browsers`. Counted toward the pool size so two concurrent `acquire()`s
+   * cannot both slip past the cap during the `await puppeteer.launch()` gap and
+   * overshoot MAX_BROWSERS — which would defeat the memory bound entirely.
+   */
+  private pendingLaunches = 0;
+
+  private get poolSize(): number {
+    return this.browsers.length + this.pendingLaunches;
+  }
 
   private async launch(): Promise<PooledBrowser> {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    });
-    const entry: PooledBrowser = { browser, uses: 0, busy: true };
-    this.browsers.push(entry);
-    this.logger.log(`Launched pooled browser (${this.browsers.length}/${MAX_BROWSERS})`);
-    return entry;
+    // Reserve the slot synchronously, before the first await, so poolSize
+    // reflects this launch for any acquire() that interleaves during startup.
+    this.pendingLaunches += 1;
+    try {
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      });
+      const entry: PooledBrowser = { browser, uses: 0, busy: true };
+      this.browsers.push(entry);
+      this.logger.log(`Launched pooled browser (${this.browsers.length}/${MAX_BROWSERS})`);
+      return entry;
+    } finally {
+      this.pendingLaunches -= 1;
+    }
   }
 
   private async acquire(): Promise<PooledBrowser> {
@@ -54,12 +77,42 @@ class BrowserPool {
       return idle;
     }
 
-    if (this.browsers.length < MAX_BROWSERS) {
+    if (this.poolSize < MAX_BROWSERS) {
       return this.launch();
     }
 
     // Pool exhausted — wait for a release rather than launching more.
-    return new Promise<PooledBrowser>((resolve) => this.waiters.push(resolve));
+    return new Promise<PooledBrowser>((resolve, reject) =>
+      this.waiters.push({ resolve, reject }),
+    );
+  }
+
+  /** Hand a live browser to the next waiter, launching a replacement if needed.
+   *  A failed replacement launch must reject the waiter, never strand it. */
+  private handOff(entry: PooledBrowser): void {
+    const waiter = this.waiters.shift();
+    if (waiter) waiter.resolve(entry); // stays busy — handed straight on
+    else entry.busy = false;
+  }
+
+  private launchForNextWaiter(): void {
+    const waiter = this.waiters.shift();
+    if (!waiter) return;
+    if (this.shuttingDown) {
+      waiter.reject(new Error('Browser pool is shutting down'));
+      return;
+    }
+    // Replace the retired browser for whoever is waiting. If the launch fails
+    // we reject the waiter (and pendingLaunches self-corrects in launch()'s
+    // finally), so the caller sees an error instead of hanging forever.
+    this.launch().then(
+      (fresh) => waiter.resolve(fresh),
+      (err: unknown) => {
+        const error = err instanceof Error ? err : new Error(String(err));
+        this.logger.error(`Replacement browser launch failed: ${error.message}`);
+        waiter.reject(error);
+      },
+    );
   }
 
   private async release(entry: PooledBrowser): Promise<void> {
@@ -76,22 +129,11 @@ class BrowserPool {
           ? 'Discarded disconnected pooled browser'
           : `Recycled pooled browser after ${entry.uses} uses`,
       );
-
-      const waiter = this.waiters.shift();
-      if (waiter) {
-        // Replace the retired browser for whoever is waiting.
-        void this.launch().then(waiter);
-      }
+      this.launchForNextWaiter();
       return;
     }
 
-    const waiter = this.waiters.shift();
-    if (waiter) {
-      waiter(entry); // stays busy — handed straight to the next caller
-      return;
-    }
-
-    entry.busy = false;
+    this.handOff(entry);
   }
 
   /**
@@ -115,6 +157,11 @@ class BrowserPool {
   /** Close every browser. Call on process shutdown so Chromium is not orphaned. */
   async shutdown(): Promise<void> {
     this.shuttingDown = true;
+    // Reject anyone still queued so their withPage() rejects instead of hanging
+    // until the process is killed.
+    while (this.waiters.length) {
+      this.waiters.shift()!.reject(new Error('Browser pool is shutting down'));
+    }
     const all = this.browsers.splice(0, this.browsers.length);
     await Promise.all(all.map((e) => e.browser.close().catch(() => undefined)));
     this.logger.log('Browser pool shut down');

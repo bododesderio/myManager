@@ -24,7 +24,7 @@ export class DataDeletionCron {
       await this.prisma.$transaction(async (tx) => {
         await tx.post.deleteMany({ where: { user_id: request.user_id } });
         await tx.notification.deleteMany({ where: { user_id: request.user_id } });
-        await tx.session.deleteMany({ where: { user_id: request.user_id } });
+        await tx.refreshToken.deleteMany({ where: { user_id: request.user_id } });
         await tx.userPushToken.deleteMany({ where: { user_id: request.user_id } });
         await tx.userPreferences.deleteMany({ where: { user_id: request.user_id } });
         await tx.workspaceMember.deleteMany({ where: { user_id: request.user_id } });

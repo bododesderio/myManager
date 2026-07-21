@@ -160,45 +160,90 @@ export class AuthRepository {
     });
   }
 
-  async storeRefreshToken(userId: string, token: string, expires: Date) {
-    return this.prisma.session.create({
-      data: { user_id: userId, session_token: token, expires },
+  async storeRefreshToken(userId: string, tokenHash: string, expires: Date) {
+    return this.prisma.refreshToken.create({
+      data: { user_id: userId, token_hash: tokenHash, expires_at: expires },
     });
   }
 
-  async findRefreshToken(token: string) {
-    return this.prisma.session.findFirst({
-      where: { session_token: token },
-    });
-  }
-
-  async deleteRefreshToken(token: string) {
-    return this.prisma.session.deleteMany({
-      where: { session_token: token },
+  async findRefreshToken(tokenHash: string) {
+    return this.prisma.refreshToken.findUnique({
+      where: { token_hash: tokenHash },
     });
   }
 
   /**
-   * Atomically delete a refresh token if it exists and is unexpired.
-   * Returns the deleted row, or null if nothing was deleted (race or invalid).
+   * Attempt to consume a refresh token as part of rotation, with reuse
+   * detection. Returns a discriminated result the service acts on:
+   *
+   * - `rotated`  — token was valid and unused; it is now marked used and the
+   *                caller may mint a replacement.
+   * - `reuse`    — the token exists but was already used or revoked. This is
+   *                the classic stolen-token replay: the family must be revoked.
+   * - `invalid`  — no such token, or it is expired.
+   *
+   * The consume is atomic: `updateMany` with a `used_at: null, revoked_at: null`
+   * guard means only one of two concurrent refreshes flips the row (count === 1);
+   * the loser reads back a now-used row and is reported as reuse, so a genuine
+   * double-submit is indistinguishable from theft and fails safe.
    */
-  async deleteRefreshTokenIfValid(token: string) {
-    // Atomic: deleteMany returns count; only one concurrent caller sees count===1.
+  async consumeRefreshToken(
+    tokenHash: string,
+    now: Date = new Date(),
+  ): Promise<
+    | { status: 'rotated'; userId: string }
+    | { status: 'reuse'; userId: string }
+    | { status: 'invalid' }
+  > {
     return this.prisma.$transaction(async (tx) => {
-      const existing = await tx.session.findFirst({
-        where: { session_token: token, expires: { gt: new Date() } },
+      const existing = await tx.refreshToken.findUnique({
+        where: { token_hash: tokenHash },
       });
-      if (!existing) return null;
-      const result = await tx.session.deleteMany({
-        where: { session_token: token },
+      if (!existing) return { status: 'invalid' as const };
+
+      if (existing.used_at || existing.revoked_at) {
+        return { status: 'reuse' as const, userId: existing.user_id };
+      }
+      if (existing.expires_at <= now) {
+        return { status: 'invalid' as const };
+      }
+
+      const consumed = await tx.refreshToken.updateMany({
+        where: { token_hash: tokenHash, used_at: null, revoked_at: null },
+        data: { used_at: now },
       });
-      return result.count === 1 ? existing : null;
+      if (consumed.count !== 1) {
+        // Lost the race to a concurrent refresh — treat as reuse, fail safe.
+        return { status: 'reuse' as const, userId: existing.user_id };
+      }
+      return { status: 'rotated' as const, userId: existing.user_id };
     });
   }
 
-  async deleteAllRefreshTokensForUser(userId: string) {
-    return this.prisma.session.deleteMany({
-      where: { user_id: userId },
+  /** Revoke a single refresh token (logout). Idempotent; retains the row so a
+   *  later replay of the same token is still detectable as reuse. */
+  async revokeRefreshToken(tokenHash: string, now: Date = new Date()) {
+    return this.prisma.refreshToken.updateMany({
+      where: { token_hash: tokenHash, revoked_at: null },
+      data: { revoked_at: now },
+    });
+  }
+
+  /** Revoke every live refresh token for a user — used on reuse detection,
+   *  password reset and "sign out all devices". */
+  async revokeAllRefreshTokensForUser(userId: string, now: Date = new Date()) {
+    return this.prisma.refreshToken.updateMany({
+      where: { user_id: userId, revoked_at: null },
+      data: { revoked_at: now },
+    });
+  }
+
+  /** Delete expired refresh tokens. Called by the cleanup cron. Once a token is
+   *  past expiry it can no longer be presented, so retaining it buys no further
+   *  reuse detection. */
+  async deleteExpiredRefreshTokens(now: Date = new Date()) {
+    return this.prisma.refreshToken.deleteMany({
+      where: { expires_at: { lt: now } },
     });
   }
 

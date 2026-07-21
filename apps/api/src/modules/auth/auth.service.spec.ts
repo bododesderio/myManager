@@ -72,3 +72,77 @@ describe('AuthService.login', () => {
     );
   });
 });
+
+describe('AuthService.refreshTokens — rotation & reuse detection', () => {
+  function makeService(repoOverrides: Record<string, any> = {}) {
+    const repository = {
+      consumeRefreshToken: jest.fn(),
+      revokeRefreshToken: jest.fn().mockResolvedValue({ count: 1 }),
+      revokeAllRefreshTokensForUser: jest.fn().mockResolvedValue({ count: 1 }),
+      findUserById: jest.fn().mockResolvedValue({ id: 'u1', email: 'a@b.com', is_superadmin: false }),
+      storeRefreshToken: jest.fn().mockResolvedValue(undefined),
+      ...repoOverrides,
+    };
+    const jwtService = { sign: jest.fn().mockReturnValue('signed.jwt') };
+    const configService = { get: jest.fn() };
+    const service = new AuthService(
+      repository as unknown as ConstructorParameters<typeof AuthService>[0],
+      jwtService as unknown as ConstructorParameters<typeof AuthService>[1],
+      configService as unknown as ConstructorParameters<typeof AuthService>[2],
+    );
+    return { service, repository, jwtService };
+  }
+
+  it('rotates a valid token into a fresh access + refresh pair', async () => {
+    const { service, repository } = makeService({
+      consumeRefreshToken: jest.fn().mockResolvedValue({ status: 'rotated', userId: 'u1' }),
+    });
+
+    const result = await service.refreshTokens('valid-token');
+
+    expect(result.accessToken).toBe('signed.jwt');
+    expect(result.refreshToken).toHaveLength(80);
+    expect(repository.storeRefreshToken).toHaveBeenCalledTimes(1);
+    expect(repository.revokeAllRefreshTokensForUser).not.toHaveBeenCalled();
+  });
+
+  it('revokes the whole family and 401s when a used/revoked token is replayed', async () => {
+    const { service, repository } = makeService({
+      consumeRefreshToken: jest.fn().mockResolvedValue({ status: 'reuse', userId: 'u1' }),
+    });
+
+    await expect(service.refreshTokens('stolen-token')).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(repository.revokeAllRefreshTokensForUser).toHaveBeenCalledWith('u1');
+    expect(repository.storeRefreshToken).not.toHaveBeenCalled();
+  });
+
+  it('401s an invalid/expired token without revoking the family', async () => {
+    const { service, repository } = makeService({
+      consumeRefreshToken: jest.fn().mockResolvedValue({ status: 'invalid' }),
+    });
+
+    await expect(service.refreshTokens('nope')).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(repository.revokeAllRefreshTokensForUser).not.toHaveBeenCalled();
+    expect(repository.storeRefreshToken).not.toHaveBeenCalled();
+  });
+
+  it('looks the token up by SHA-256 hash, never by its raw value', async () => {
+    const consumeRefreshToken = jest.fn().mockResolvedValue({ status: 'invalid' });
+    const { service } = makeService({ consumeRefreshToken });
+
+    await expect(service.refreshTokens('raw-secret')).rejects.toBeInstanceOf(UnauthorizedException);
+
+    const passedHash = consumeRefreshToken.mock.calls[0][0];
+    expect(passedHash).not.toContain('raw-secret');
+    expect(passedHash).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it('revokeRefreshToken (logout) revokes by hash rather than deleting', async () => {
+    const { service, repository } = makeService();
+
+    await service.revokeRefreshToken('some-token');
+
+    expect(repository.revokeRefreshToken).toHaveBeenCalledTimes(1);
+    expect(repository.revokeRefreshToken.mock.calls[0][0]).toMatch(/^[a-f0-9]{64}$/);
+  });
+});

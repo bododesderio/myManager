@@ -26,6 +26,8 @@ import { MonthlyReportsCron } from './crons/monthly-reports.cron';
 import { ScheduledPostsCron } from './crons/scheduled-posts.cron';
 import { TokenRefreshCron } from './crons/token-refresh.cron';
 import { ListeningSyncCron } from './crons/listening-sync.cron';
+import { RefreshTokenCleanupCron } from './crons/refresh-token-cleanup.cron';
+import { AuthRepository } from './modules/auth/auth.repository';
 import {
   FacebookProcessor,
   InstagramProcessor,
@@ -120,6 +122,8 @@ import {
     ScheduledPostsCron,
     TokenRefreshCron,
     ListeningSyncCron,
+    RefreshTokenCleanupCron,
+    AuthRepository,
     FacebookProcessor,
     InstagramProcessor,
     XProcessor,

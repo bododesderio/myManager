@@ -154,13 +154,27 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
   async refreshTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    // Atomic rotation: only one concurrent refresh wins; the other sees 0 rows deleted.
-    const deleted = await this.repository.deleteRefreshTokenIfValid(hashedToken);
-    if (!deleted) {
+
+    // Rotate with reuse detection. Atomicity lives in the repository: only one
+    // concurrent caller flips the row to used; anyone else is reported as reuse.
+    const result = await this.repository.consumeRefreshToken(hashedToken);
+
+    if (result.status === 'reuse') {
+      // A token that was already rotated or revoked is being presented again.
+      // The safe assumption is theft: revoke the whole family so neither the
+      // attacker's nor the victim's stolen lineage survives. Both must re-auth.
+      await this.repository.revokeAllRefreshTokensForUser(result.userId);
+      this.logger.warn(
+        `[SECURITY] Refresh token reuse detected for user ${result.userId}; revoked all sessions.`,
+      );
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    const user = await this.repository.findUserById(deleted.user_id);
+    if (result.status === 'invalid') {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const user = await this.repository.findUserById(result.userId);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -170,7 +184,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
   async revokeRefreshToken(refreshToken: string): Promise<void> {
     const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    await this.repository.deleteRefreshToken(hashedToken);
+    await this.repository.revokeRefreshToken(hashedToken);
   }
 
   async sendPasswordResetEmail(email: string): Promise<void> {
@@ -225,7 +239,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
     await this.repository.updateUserPassword(resetRecord.user_id, hashedPassword);
     await this.repository.markPasswordResetTokenUsed(resetRecord.id);
-    await this.repository.deleteAllRefreshTokensForUser(resetRecord.user_id);
+    await this.repository.revokeAllRefreshTokensForUser(resetRecord.user_id);
 
     // Invalidate all existing JWTs by recording password change time
     await getSharedRedis().set(
