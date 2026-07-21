@@ -11,7 +11,13 @@ export class WorkspacesService {
   constructor(private readonly repository: WorkspacesRepository) {}
 
   async listForUser(userId: string) {
-    return this.repository.findByUserId(userId);
+    // Return the WORKSPACES the user belongs to (with their role), not the raw
+    // membership rows. The client keys its active workspace off each item's `id`
+    // and passes that as `workspaceId` on every scoped request — returning
+    // membership rows (whose `id` is the membership id, not the workspace id)
+    // made every downstream call 403 with the wrong workspace.
+    const memberships = await this.repository.findByUserId(userId);
+    return memberships.map((m) => ({ ...m.workspace, role: m.role }));
   }
 
   async create(userId: string, data: { name: string; slug?: string }) {

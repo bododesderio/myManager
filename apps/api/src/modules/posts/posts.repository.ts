@@ -12,7 +12,16 @@ export class PostsRepository {
     limit: number,
   ): Promise<[unknown[], number]> {
     const where: Record<string, unknown> = { workspace_id: workspaceId };
-    if (filters.status) where.status = filters.status;
+    if (filters.status) {
+      // Clients send the status lowercase (e.g. ?status=draft); PostStatus is an
+      // uppercase Prisma enum. Normalize case-insensitively and ignore an
+      // unrecognized value rather than passing it straight to Prisma (which threw
+      // PrismaClientValidationError → 500 on every status-filtered list).
+      const normalized = filters.status.toUpperCase();
+      if ((Object.values(PostStatus) as string[]).includes(normalized)) {
+        where.status = normalized as PostStatus;
+      }
+    }
     if (filters.platform) where.platforms = { has: filters.platform };
     if (filters.projectId) where.project_id = filters.projectId;
     if (filters.campaignId) where.campaign_id = filters.campaignId;

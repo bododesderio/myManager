@@ -106,7 +106,18 @@ export class WorkspaceMemberGuard implements CanActivate {
     route?: { path?: string };
   }): boolean {
     const routePath = this.routePath(request);
-    return WORKSPACE_SCOPED_PREFIXES.some((prefix) => routePath.includes(prefix));
+    return WORKSPACE_SCOPED_PREFIXES.some((prefix) => {
+      if (!routePath.includes(prefix)) return false;
+      // The bare `/workspaces` collection (list-my-workspaces, create-workspace)
+      // is user-scoped, not workspace-scoped — the service filters by the caller's
+      // own memberships. Only `/workspaces/:id/*` sub-routes need a workspace id
+      // (and resolve it from :id). Without this carve-out the collection endpoints
+      // fail closed with 403 for every user.
+      if (prefix === '/workspaces') {
+        return /\/workspaces\/[^/]+/.test(routePath);
+      }
+      return true;
+    });
   }
 
   private async resolveWorkspaceId(request: {
