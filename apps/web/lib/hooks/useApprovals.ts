@@ -13,7 +13,7 @@ export function usePendingApprovals() {
   const workspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   return useQuery({
     queryKey: approvalKeys.pending(workspaceId!),
-    queryFn: () => apiClient.get('/approvals', { params: { workspaceId, status: 'pending_approval' } }),
+    queryFn: () => apiClient.get('/approvals/pending', { params: { workspaceId } }),
     enabled: !!workspaceId,
   });
 }
