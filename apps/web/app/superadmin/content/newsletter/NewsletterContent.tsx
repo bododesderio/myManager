@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface Subscriber {
   id: string;
@@ -19,9 +20,9 @@ export function NewsletterContent() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/v1/admin/newsletter/subscribers?limit=200');
-      if (!res.ok) throw new Error('Failed to load newsletter subscribers');
-      const data = (await res.json()) as { items?: Subscriber[] };
+      const data = await apiClient.get<{ items?: Subscriber[] }>(
+        '/admin/newsletter/subscribers?limit=200',
+      );
       setSubscribers(data.items ?? []);
     } catch {
       toast({ title: 'Could not load subscribers', variant: 'error' });

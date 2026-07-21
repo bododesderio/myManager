@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/providers/ToastProvider";
 import { FileUpload } from "@/components/FileUpload";
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface BrandConfig {
   app_name: string;
@@ -36,18 +37,12 @@ export function BrandContent() {
 
   const load = useCallback(async () => {
     try {
-      const [brandRes, themeRes] = await Promise.all([
-        fetch("/api/v1/cms/brand"),
-        fetch("/api/v1/cms/theme"),
-      ]);
-      if (!brandRes.ok || !themeRes.ok)
-        throw new Error("Failed to load brand settings");
       const [brandData, themeData] = await Promise.all([
-        brandRes.json(),
-        themeRes.json(),
+        apiClient.get<BrandConfig>("/cms/brand"),
+        apiClient.get<ThemeConfig>("/cms/theme"),
       ]);
-      setBrand(brandData as BrandConfig);
-      setTheme(themeData as ThemeConfig);
+      setBrand(brandData);
+      setTheme(themeData);
     } catch {
       toast({ title: "Could not load brand configuration", variant: "error" });
     } finally {
@@ -63,20 +58,10 @@ export function BrandContent() {
     if (!brand || !theme) return;
     setSaving(true);
     try {
-      const [brandRes, themeRes] = await Promise.all([
-        fetch("/api/v1/admin/cms/brand", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(brand),
-        }),
-        fetch("/api/v1/admin/cms/theme", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(theme),
-        }),
+      await Promise.all([
+        apiClient.patch("/admin/cms/brand", brand),
+        apiClient.patch("/admin/cms/theme", theme),
       ]);
-      if (!brandRes.ok || !themeRes.ok)
-        throw new Error("Failed to save brand configuration");
       toast({ title: "Brand config saved", variant: "success" });
     } catch {
       toast({ title: "Failed to save brand config", variant: "error" });

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import styles from './page.module.css';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -256,8 +257,7 @@ export default function AdminThemeSettingsPage() {
 
   async function applyPreset(id: string) {
     try {
-      const res = await fetch(`/api/v1/admin/theme/apply-preset/${id}`, { method: 'POST' });
-      if (!res.ok) throw new Error('Failed to apply preset');
+      await apiClient.post(`/admin/theme/apply-preset/${id}`);
       setActivePresetId(id);
       const preset = PRESETS.find((p) => p.id === id);
       if (preset) setColors({ ...preset.colors });
@@ -269,11 +269,7 @@ export default function AdminThemeSettingsPage() {
   async function handleSaveTheme() {
     setSaving(true);
     try {
-      await fetch('/api/v1/admin/theme', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ colors, darkColors, typography, radius, density }),
-      });
+      await apiClient.put('/admin/theme', { colors, darkColors, typography, radius, density });
     } catch {
       toast({ title: 'Failed to save theme', variant: 'error' });
     } finally {
@@ -293,11 +289,7 @@ export default function AdminThemeSettingsPage() {
     const name = prompt('Preset name:');
     if (!name) return;
     try {
-      await fetch('/api/v1/admin/theme/presets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, colors, darkColors, typography, radius, density }),
-      });
+      await apiClient.post('/admin/theme/presets', { name, colors, darkColors, typography, radius, density });
     } catch {
       toast({ title: 'Failed to save preset', variant: 'error' });
     }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -242,9 +243,9 @@ export function CredentialsContent() {
       const results = await Promise.all(
         sections.map(async (section) => {
           try {
-            const res = await fetch(`/api/v1/admin/system-config?category=${section.category}`);
-            if (!res.ok) return [];
-            const json = (await res.json()) as { configs: ConfigEntry[] };
+            const json = await apiClient.get<{ configs: ConfigEntry[] }>(
+              `/admin/system-config?category=${section.category}`,
+            );
             return json.configs ?? [];
           } catch {
             return [];
@@ -272,12 +273,7 @@ export function CredentialsContent() {
 
   async function handleSave(key: string, value: string) {
     try {
-      const res = await fetch(`/api/v1/admin/system-config/${encodeURIComponent(key)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ value }),
-      });
-      if (!res.ok) throw new Error('Failed to save');
+      await apiClient.put(`/admin/system-config/${encodeURIComponent(key)}`, { value });
       setConfigs((prev) => ({ ...prev, [key]: value }));
       toast({ title: `${key} saved`, variant: 'success' });
     } catch {

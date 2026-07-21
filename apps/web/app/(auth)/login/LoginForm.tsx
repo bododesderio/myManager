@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { getErrorMessage } from '@/lib/utils/error-messages';
+import { apiClient } from '@/lib/api/client';
 import { loginSchema } from '@mymanager/validators';
 
 function getSafeRedirectUrl(url: string | null): string {
@@ -58,16 +59,15 @@ export function LoginForm() {
       const loginBody_req: Record<string, string> = { email, password };
       if (needs2FA && totpCode) loginBody_req.totp_code = totpCode;
 
-      const loginRes = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginBody_req),
-      });
-      const loginBody = await loginRes.json();
-
-      if (!loginRes.ok) {
-        const body = loginBody;
-        // Handle validation errors array from NestJS
+      let loginBody: any;
+      try {
+        // skipAuthRefresh: a 401 here means bad credentials, not an expired
+        // session, so surface it instead of triggering the refresh/redirect path.
+        loginBody = await apiClient.post('/auth/login', loginBody_req, {
+          skipAuthRefresh: true,
+        });
+      } catch (body: any) {
+        // apiClient rejects with the normalized error body (NestJS shape).
         if (body?.errors?.length) {
           setError(body.errors.join('. '));
         } else if (body?.message) {

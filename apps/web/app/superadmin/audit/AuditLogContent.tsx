@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface AuditEntry {
   id: string;
@@ -52,9 +53,7 @@ export function AuditLogContent() {
       params.set('page', String(page));
       params.set('limit', String(limit));
 
-      const res = await fetch(`/api/v1/admin/audit?${params.toString()}`);
-      if (!res.ok) throw new Error('Failed to load audit log');
-      const json = (await res.json()) as AuditResponse;
+      const json = await apiClient.get<AuditResponse>(`/admin/audit?${params.toString()}`);
       setData(json);
     } catch {
       toast({ title: 'Could not load audit log', variant: 'error' });
@@ -65,9 +64,7 @@ export function AuditLogContent() {
 
   const loadActions = useCallback(async () => {
     try {
-      const res = await fetch('/api/v1/admin/audit/actions');
-      if (!res.ok) return;
-      const json = (await res.json()) as { actions: string[] };
+      const json = await apiClient.get<{ actions: string[] }>('/admin/audit/actions');
       setActions(json.actions ?? []);
     } catch {
       // ignore
@@ -107,9 +104,9 @@ export function AuditLogContent() {
       if (fromDate) params.set('from', fromDate);
       if (toDate) params.set('to', toDate);
 
-      const res = await fetch(`/api/v1/admin/audit/export?${params.toString()}`);
-      if (!res.ok) throw new Error('Export failed');
-      const blob = await res.blob();
+      const blob = await apiClient.get<Blob>(`/admin/audit/export?${params.toString()}`, {
+        responseType: 'blob',
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

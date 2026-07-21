@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { apiClient } from '@/lib/api/client';
 
 type FieldType =
   | 'TEXT'
@@ -56,12 +57,7 @@ function useAutoSave() {
       if (existing) clearTimeout(existing);
       timersRef.current[fieldId] = setTimeout(async () => {
         try {
-          const res = await fetch(`/api/v1/admin/cms/fields/${fieldId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value }),
-          });
-          if (!res.ok) throw new Error('Failed to auto-save field');
+          await apiClient.patch(`/admin/cms/fields/${fieldId}`, { value });
         } catch {
           toast({ title: 'Auto-save failed', variant: 'error' });
         }
@@ -182,9 +178,7 @@ export function PageEditorContent({ slug }: { slug: string }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`/api/v1/admin/cms/pages/${slug}`);
-      if (!res.ok) throw new Error('Failed to load page');
-      const data = (await res.json()) as CmsPageData;
+      const data = await apiClient.get<CmsPageData>(`/admin/cms/pages/${slug}`);
       setPageData(data);
     } catch {
       toast({ title: 'Could not load page editor', variant: 'error' });
@@ -212,12 +206,7 @@ export function PageEditorContent({ slug }: { slug: string }) {
     });
 
     try {
-      const res = await fetch(`/api/v1/admin/cms/sections/${sectionId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_visible: !current }),
-      });
-      if (!res.ok) throw new Error('Failed to update section');
+      await apiClient.patch(`/admin/cms/sections/${sectionId}`, { is_visible: !current });
     } catch {
       toast({ title: 'Failed to update visibility', variant: 'error' });
     }

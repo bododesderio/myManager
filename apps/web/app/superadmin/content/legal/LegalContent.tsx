@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface LegalDoc {
   id: string;
@@ -28,12 +29,10 @@ export function LegalContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/admin/cms/pages?type=legal');
-      if (!res.ok) throw new Error('Failed to load legal pages');
-      const data = (await res.json()) as { items?: LegalDoc[] };
+      const data = await apiClient.get<{ items?: LegalDoc[] }>('/admin/cms/pages?type=legal');
       setDocs(data.items ?? []);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Could not load legal pages';
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'Could not load legal pages';
       setError(msg);
       toast({ title: msg, variant: 'error' });
       setDocs([]);
@@ -60,18 +59,13 @@ export function LegalContent() {
     if (!editingDoc) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/v1/admin/cms/pages/${editingDoc.slug}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: editedBody }),
-      });
-      if (!res.ok) throw new Error('Failed to save legal page');
+      await apiClient.patch(`/admin/cms/pages/${editingDoc.slug}`, { body: editedBody });
       toast({ title: 'Legal page saved', variant: 'success' });
       setEditingDoc(null);
       setEditedBody('');
       await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Save failed';
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'Save failed';
       toast({ title: msg, variant: 'error' });
     } finally {
       setSaving(false);
@@ -83,19 +77,14 @@ export function LegalContent() {
       setToggling(doc.id);
       const newStatus = doc.status === 'published' ? 'draft' : 'published';
       try {
-        const res = await fetch(`/api/v1/admin/cms/pages/${doc.slug}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus }),
-        });
-        if (!res.ok) throw new Error('Failed to update status');
+        await apiClient.patch(`/admin/cms/pages/${doc.slug}`, { status: newStatus });
         toast({
           title: `Page ${newStatus === 'published' ? 'published' : 'moved to draft'}`,
           variant: 'success',
         });
         await load();
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Status update failed';
+      } catch (err: any) {
+        const msg = err?.message || err?.error?.message || 'Status update failed';
         toast({ title: msg, variant: 'error' });
       } finally {
         setToggling(null);

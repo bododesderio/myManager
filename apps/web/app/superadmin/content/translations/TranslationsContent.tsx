@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import styles from './TranslationsContent.module.css';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface TranslationKey {
   id: string;
@@ -42,19 +43,17 @@ export function TranslationsContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/admin/translations');
-      if (!res.ok) throw new Error('Failed to load translations');
-      const data = (await res.json()) as {
+      const data = await apiClient.get<{
         items?: TranslationKey[];
         languages?: LanguageSummary[];
-      };
+      }>('/admin/translations');
       setTranslations(data.items ?? []);
       setLanguages(
         data.languages ??
           SUPPORTED_LANGUAGES.map((l) => ({ ...l, progress: 0, keyCount: 0 })),
       );
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Could not load translations';
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'Could not load translations';
       setError(msg);
       toast({ title: msg, variant: 'error' });
     } finally {
@@ -95,15 +94,10 @@ export function TranslationsContent() {
       if (!editingLang) return;
       setSaving(true);
       try {
-        const res = await fetch(`/api/v1/admin/translations/${translationId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            language: editingLang,
-            value: editedValues[translationId] ?? '',
-          }),
+        await apiClient.patch(`/admin/translations/${translationId}`, {
+          language: editingLang,
+          value: editedValues[translationId] ?? '',
         });
-        if (!res.ok) throw new Error('Failed to save translation');
         toast({ title: 'Translation updated', variant: 'success' });
         // Update local state
         setTranslations((prev) =>
@@ -113,8 +107,8 @@ export function TranslationsContent() {
               : t,
           ),
         );
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Save failed';
+      } catch (err: any) {
+        const msg = err?.message || err?.error?.message || 'Save failed';
         toast({ title: msg, variant: 'error' });
       } finally {
         setSaving(false);
@@ -130,10 +124,9 @@ export function TranslationsContent() {
       const updates = Object.entries(editedValues).map(([id, value]) => ({ id, value }));
       const results = await Promise.allSettled(
         updates.map((update) =>
-          fetch(`/api/v1/admin/translations/${update.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ language: editingLang, value: update.value }),
+          apiClient.patch(`/admin/translations/${update.id}`, {
+            language: editingLang,
+            value: update.value,
           }),
         ),
       );
@@ -144,8 +137,8 @@ export function TranslationsContent() {
         toast({ title: 'All translations saved', variant: 'success' });
       }
       await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Save failed';
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'Save failed';
       toast({ title: msg, variant: 'error' });
     } finally {
       setSaving(false);

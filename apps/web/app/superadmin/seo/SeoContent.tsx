@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface BrandResponse {
   id: string;
@@ -49,9 +50,10 @@ export function SeoContent() {
 
   const load = useCallback(async () => {
     try {
-      const [brandRes, pagesRes] = await Promise.all([fetch('/api/v1/cms/brand'), fetch('/api/v1/admin/cms/pages')]);
-      if (!brandRes.ok || !pagesRes.ok) throw new Error('Failed to load SEO settings');
-      const [brandData, pagesData] = await Promise.all([brandRes.json(), pagesRes.json()]);
+      const [brandData, pagesData] = await Promise.all([
+        apiClient.get('/cms/brand'),
+        apiClient.get('/admin/cms/pages'),
+      ]);
       const seo = ((brandData as BrandResponse).config?.seo as Partial<GlobalSeoState> | undefined) ?? {};
       setBrand(brandData as BrandResponse);
       setGlobalSeo({
@@ -85,17 +87,12 @@ export function SeoContent() {
     if (!brand) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/v1/admin/cms/brand', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          config: {
-            ...brand.config,
-            seo: globalSeo,
-          },
-        }),
+      await apiClient.patch('/admin/cms/brand', {
+        config: {
+          ...brand.config,
+          seo: globalSeo,
+        },
       });
-      if (!res.ok) throw new Error('Failed to save SEO settings');
       setBrand((prev) => (prev ? { ...prev, config: { ...prev.config, seo: globalSeo } } : prev));
       toast({ title: 'Global SEO saved', variant: 'success' });
     } catch {
@@ -107,18 +104,13 @@ export function SeoContent() {
 
   async function savePageSeo(page: CmsPage) {
     try {
-      const res = await fetch(`/api/v1/admin/cms/pages/${page.slug}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: page.title,
-          meta_title: page.meta_title || null,
-          meta_desc: page.meta_desc || null,
-          og_image: page.og_image || null,
-          is_published: page.is_published,
-        }),
+      await apiClient.patch(`/admin/cms/pages/${page.slug}`, {
+        title: page.title,
+        meta_title: page.meta_title || null,
+        meta_desc: page.meta_desc || null,
+        og_image: page.og_image || null,
+        is_published: page.is_published,
       });
-      if (!res.ok) throw new Error('Failed to save page SEO');
       toast({ title: `Saved SEO for /${page.slug}`, variant: 'success' });
     } catch {
       toast({ title: `Failed to save SEO for /${page.slug}`, variant: 'error' });

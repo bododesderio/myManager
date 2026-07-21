@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CLOSED_WON' | 'CLOSED_LOST';
 
@@ -40,9 +41,7 @@ export function LeadsContent() {
     setLoading(true);
     try {
       const query = statusFilter === 'ALL' ? '' : `?status=${statusFilter}`;
-      const res = await fetch(`/api/v1/admin/leads${query}`);
-      if (!res.ok) throw new Error('Failed to load leads');
-      const data = (await res.json()) as { items?: Lead[] };
+      const data = await apiClient.get<{ items?: Lead[] }>(`/admin/leads${query}`);
       setLeads(data.items ?? []);
     } catch {
       toast({ title: 'Could not load leads', variant: 'error' });
@@ -63,13 +62,7 @@ export function LeadsContent() {
 
   async function updateLead(id: string, updates: Partial<Lead>) {
     try {
-      const res = await fetch(`/api/v1/admin/leads/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
-      if (!res.ok) throw new Error('Failed to update lead');
-      const updated = (await res.json()) as Lead;
+      const updated = await apiClient.patch<Lead>(`/admin/leads/${id}`, updates);
       setLeads((prev) => prev.map((lead) => (lead.id === id ? updated : lead)));
       toast({ title: 'Lead updated', variant: 'success' });
     } catch {

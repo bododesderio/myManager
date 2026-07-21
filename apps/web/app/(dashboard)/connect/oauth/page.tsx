@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 export default function OAuthCallbackPage() {
   const searchParams = useSearchParams();
@@ -25,23 +26,20 @@ export default function OAuthCallbackPage() {
 
     async function complete() {
       try {
-        const res = await fetch(`/api/v1/social-accounts/callback/${platform}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, state, workspaceId: searchParams.get('workspaceId') || '' }),
+        await apiClient.post(`/social-accounts/callback/${platform}`, {
+          code,
+          state,
+          workspaceId: searchParams.get('workspaceId') || '',
         });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.message || 'OAuth callback failed');
-        }
         setStatus('success');
         setMessage('Account connected successfully!');
         addToast({ type: 'success', message: 'Social account connected!' });
         setTimeout(() => router.push('/settings/accounts'), 2000);
       } catch (err: any) {
         setStatus('error');
-        setMessage(err.message || 'Failed to connect account.');
-        addToast({ type: 'error', message: err.message || 'Failed to connect account.' });
+        const msg = err?.message || err?.error?.message || 'Failed to connect account.';
+        setMessage(msg);
+        addToast({ type: 'error', message: msg });
       }
     }
 

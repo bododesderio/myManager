@@ -11,11 +11,8 @@ const DEFAULT_UGX_RATE = 3_750;
 
 async function fetchUGXRate(): Promise<number> {
   try {
-    const res = await fetch('/api/v1/exchange-rates/UGX');
-    if (res.ok) {
-      const data = await res.json();
-      return data.rate ?? DEFAULT_UGX_RATE;
-    }
+    const data = await apiClient.get<{ rate?: number }>('/exchange-rates/UGX');
+    return data?.rate ?? DEFAULT_UGX_RATE;
   } catch {
     // fallback to default
   }

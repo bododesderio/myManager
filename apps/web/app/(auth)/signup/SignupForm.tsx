@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { apiClient } from '@/lib/api/client';
 import { PASSWORD_RULES, registerSchema } from '@mymanager/validators';
 
 type AccountType = 'individual' | 'company';
@@ -76,10 +77,11 @@ export default function SignupForm() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      // skipAuthRefresh: a 4xx here is a registration error, not an expired
+      // session — surface it rather than triggering the refresh/redirect path.
+      await apiClient.post(
+        '/auth/register',
+        {
           accountType,
           firstName,
           lastName,
@@ -94,13 +96,12 @@ export default function SignupForm() {
           referralSource,
           planSlug: selectedPlan,
           billingCycle,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
+        },
+        { skipAuthRefresh: true },
+      );
       setStep((accountType === 'company' ? 4 : 3) as Step);
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || err?.error?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -111,17 +112,9 @@ export default function SignupForm() {
     setResendingVerification(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/auth/resend-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to resend verification email');
-      }
+      await apiClient.post('/auth/resend-verification', { email }, { skipAuthRefresh: true });
     } catch (err: any) {
-      setError(err.message || 'Failed to resend verification email');
+      setError(err?.message || err?.error?.message || 'Failed to resend verification email');
     } finally {
       setResendingVerification(false);
     }

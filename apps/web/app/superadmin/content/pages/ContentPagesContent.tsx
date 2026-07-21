@@ -5,6 +5,7 @@ import type { Route } from 'next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface CmsPage {
   id: string;
@@ -22,9 +23,7 @@ export function ContentPagesContent() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/v1/admin/cms/pages');
-      if (!res.ok) throw new Error('Failed to load pages');
-      const data = (await res.json()) as CmsPage[];
+      const data = await apiClient.get<CmsPage[]>('/admin/cms/pages');
       setPages(data);
     } catch {
       toast({ title: 'Could not load CMS pages', variant: 'error' });

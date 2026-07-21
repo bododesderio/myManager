@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
+import { apiClient } from '@/lib/api/client';
 
 interface FaqItem {
   id: string;
@@ -28,9 +29,7 @@ export function FaqContent() {
   const loadItems = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/admin/faq');
-      if (!res.ok) throw new Error('Failed to load FAQ');
-      const data = (await res.json()) as FaqItem[];
+      const data = await apiClient.get<FaqItem[]>('/admin/faq');
       setItems(data);
     } catch {
       toast({ title: 'Could not load FAQ items', variant: 'error' });
@@ -61,17 +60,11 @@ export function FaqContent() {
   async function saveEdit() {
     if (!editingId) return;
     try {
-      const res = await fetch(`/api/v1/admin/faq/${editingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: editForm.question,
-          answer: editForm.answer,
-          page: editForm.page || undefined,
-        }),
+      const updated = await apiClient.patch<FaqItem>(`/admin/faq/${editingId}`, {
+        question: editForm.question,
+        answer: editForm.answer,
+        page: editForm.page || undefined,
       });
-      if (!res.ok) throw new Error('Failed to update FAQ');
-      const updated = (await res.json()) as FaqItem;
       setItems((prev) => prev.map((item) => (item.id === editingId ? updated : item)));
       setEditingId(null);
       toast({ title: 'FAQ updated', variant: 'success' });
@@ -84,13 +77,9 @@ export function FaqContent() {
     const item = items.find((entry) => entry.id === id);
     if (!item) return;
     try {
-      const res = await fetch(`/api/v1/admin/faq/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_visible: !item.is_visible }),
+      const updated = await apiClient.patch<FaqItem>(`/admin/faq/${id}`, {
+        is_visible: !item.is_visible,
       });
-      if (!res.ok) throw new Error('Failed to toggle FAQ visibility');
-      const updated = (await res.json()) as FaqItem;
       setItems((prev) => prev.map((entry) => (entry.id === id ? updated : entry)));
     } catch {
       toast({ title: 'Failed to update visibility', variant: 'error' });
@@ -107,19 +96,10 @@ export function FaqContent() {
     const target = current[swapIndex];
 
     try {
-      const [sourceRes, targetRes] = await Promise.all([
-        fetch(`/api/v1/admin/faq/${source.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_index: target.order_index }),
-        }),
-        fetch(`/api/v1/admin/faq/${target.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_index: source.order_index }),
-        }),
+      await Promise.all([
+        apiClient.patch(`/admin/faq/${source.id}`, { order_index: target.order_index }),
+        apiClient.patch(`/admin/faq/${target.id}`, { order_index: source.order_index }),
       ]);
-      if (!sourceRes.ok || !targetRes.ok) throw new Error('Failed to reorder FAQ');
       await loadItems();
     } catch {
       toast({ title: 'Failed to reorder FAQ items', variant: 'error' });
@@ -129,19 +109,13 @@ export function FaqContent() {
   async function addItem() {
     if (!newItem || !newItem.question.trim() || !newItem.answer.trim()) return;
     try {
-      const res = await fetch('/api/v1/admin/faq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: newItem.question,
-          answer: newItem.answer,
-          page: newItem.page || undefined,
-          order_index: items.length,
-          is_visible: true,
-        }),
+      const created = await apiClient.post<FaqItem>('/admin/faq', {
+        question: newItem.question,
+        answer: newItem.answer,
+        page: newItem.page || undefined,
+        order_index: items.length,
+        is_visible: true,
       });
-      if (!res.ok) throw new Error('Failed to create FAQ');
-      const created = (await res.json()) as FaqItem;
       setItems((prev) => [...prev, created]);
       setNewItem(null);
       toast({ title: 'FAQ item added', variant: 'success' });
@@ -153,8 +127,7 @@ export function FaqContent() {
   async function deleteItem(id: string) {
     if (!confirm('Delete this FAQ item?')) return;
     try {
-      const res = await fetch(`/api/v1/admin/faq/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete FAQ');
+      await apiClient.delete(`/admin/faq/${id}`);
       setItems((prev) => prev.filter((item) => item.id !== id));
       toast({ title: 'FAQ item deleted', variant: 'success' });
     } catch {

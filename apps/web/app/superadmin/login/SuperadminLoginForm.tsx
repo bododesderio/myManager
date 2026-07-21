@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '@/lib/api/client';
 import styles from './SuperadminLoginForm.module.css';
 
 export function SuperadminLoginForm() {
@@ -22,23 +23,20 @@ export function SuperadminLoginForm() {
     try {
       // Pre-flight: verify credentials and is_superadmin against the API directly so
       // we can refuse non-superadmin accounts BEFORE setting any session cookie.
-      const probe = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          ...(needs2FA && totpCode ? { totp_code: totpCode } : {}),
-        }),
-      });
-      const probeBody = await probe.json().catch(() => ({}));
-
-      if (!probe.ok) {
-        if (probeBody?.user?.requiresTwoFactor) {
+      let probeBody: any;
+      try {
+        // skipAuthRefresh: a 401 here is bad credentials, not an expired session.
+        probeBody = await apiClient.post(
+          '/auth/login',
+          { email, password, ...(needs2FA && totpCode ? { totp_code: totpCode } : {}) },
+          { skipAuthRefresh: true },
+        );
+      } catch (body: any) {
+        if (body?.user?.requiresTwoFactor) {
           setNeeds2FA(true);
           setError('Enter your 6-digit two-factor code to continue.');
         } else {
-          setError(probeBody?.message || 'Invalid credentials.');
+          setError(body?.message || 'Invalid credentials.');
         }
         setLoading(false);
         return;

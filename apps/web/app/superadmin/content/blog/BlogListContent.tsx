@@ -5,6 +5,7 @@ import type { Route } from 'next';
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface BlogPost {
   id: string;
@@ -24,9 +25,7 @@ export function BlogListContent() {
   const loadPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/admin/blog');
-      if (!res.ok) throw new Error('Failed to load blog posts');
-      const data = (await res.json()) as { data?: BlogPost[] };
+      const data = await apiClient.get<{ data?: BlogPost[] }>('/admin/blog');
       setPosts(data.data ?? []);
     } catch {
       toast({ title: 'Could not load blog posts', variant: 'error' });
@@ -43,8 +42,7 @@ export function BlogListContent() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this blog post?')) return;
     try {
-      const res = await fetch(`/api/v1/admin/blog/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete blog post');
+      await apiClient.delete(`/admin/blog/${id}`);
       setPosts((prev) => prev.filter((post) => post.id !== id));
       toast({ title: 'Post deleted', variant: 'success' });
     } catch {

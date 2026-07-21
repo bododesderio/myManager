@@ -8,6 +8,7 @@ import { useToast } from '@/providers/ToastProvider';
 import { FileUpload } from '@/components/FileUpload';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface BlogForm {
   title: string;
@@ -61,9 +62,7 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
     let cancelled = false;
     async function fetchCategories() {
       try {
-        const res = await fetch('/api/v1/admin/blog/categories');
-        if (!res.ok) throw new Error('Failed to fetch categories');
-        const data = await res.json();
+        const data = await apiClient.get('/admin/blog/categories');
         if (!cancelled && Array.isArray(data) && data.length > 0) {
           setCategories(data);
         }
@@ -79,9 +78,7 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
     if (!postId) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/admin/blog/${postId}`);
-      if (!res.ok) throw new Error('Failed to load blog post');
-      const data = await res.json();
+      const data = await apiClient.get(`/admin/blog/${postId}`);
       setForm({
         title: data.title || '',
         slug: data.slug || '',
@@ -128,14 +125,9 @@ export function BlogEditorContent({ postId }: { postId?: string }) {
         published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
       };
 
-      const res = await fetch(postId ? `/api/v1/admin/blog/${postId}` : '/api/v1/admin/blog', {
-        method: postId ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error('Failed to save blog post');
-      const data = await res.json();
+      const data = postId
+        ? await apiClient.patch<{ id: string }>(`/admin/blog/${postId}`, payload)
+        : await apiClient.post<{ id: string }>('/admin/blog', payload);
       toast({ title: postId ? 'Post updated' : 'Post created', variant: 'success' });
       if (!postId) {
         router.push(`/admin/content/blog/${data.id}` as Route);

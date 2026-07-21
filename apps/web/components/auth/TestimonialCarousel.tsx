@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api/client';
 
 interface Testimonial {
   id: string;
@@ -20,9 +21,7 @@ export function TestimonialCarousel() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch('/api/v1/testimonials');
-        if (!res.ok) return;
-        const data = await res.json();
+        const data = await apiClient.get<Testimonial[]>('/testimonials');
         // Shuffle randomly
         const shuffled = [...data].sort(() => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32 - 0.5);
         setTestimonials(shuffled);

@@ -5,6 +5,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { Button, Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface EmailTemplate {
   id: string;
@@ -31,12 +32,10 @@ export function EmailTemplatesContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/admin/email-templates');
-      if (!res.ok) throw new Error('Failed to load email templates');
-      const data = (await res.json()) as { items?: EmailTemplate[] };
+      const data = await apiClient.get<{ items?: EmailTemplate[] }>('/admin/email-templates');
       setTemplates(data.items ?? []);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Could not load email templates';
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'Could not load email templates';
       setError(msg);
       toast({ title: msg, variant: 'error' });
       setTemplates([]);
@@ -68,30 +67,25 @@ export function EmailTemplatesContent() {
     setSaving(true);
     try {
       const isCreate = mode === 'create';
-      const url = isCreate
-        ? '/api/v1/admin/email-templates'
-        : `/api/v1/admin/email-templates/${editingTemplate.id}`;
-      const method = isCreate ? 'POST' : 'PATCH';
+      const payload = {
+        name: editingTemplate.name,
+        subject: editingTemplate.subject,
+        trigger: editingTemplate.trigger,
+        body: editingTemplate.body,
+      };
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: editingTemplate.name,
-          subject: editingTemplate.subject,
-          trigger: editingTemplate.trigger,
-          body: editingTemplate.body,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`Failed to ${isCreate ? 'create' : 'update'} template`);
+      if (isCreate) {
+        await apiClient.post('/admin/email-templates', payload);
+      } else {
+        await apiClient.patch(`/admin/email-templates/${editingTemplate.id}`, payload);
+      }
 
       toast({ title: `Template ${isCreate ? 'created' : 'updated'} successfully`, variant: 'success' });
       setMode('list');
       setEditingTemplate({});
       await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Save failed';
+    } catch (err: any) {
+      const msg = err?.message || err?.error?.message || 'Save failed';
       toast({ title: msg, variant: 'error' });
     } finally {
       setSaving(false);
@@ -103,12 +97,11 @@ export function EmailTemplatesContent() {
       if (!window.confirm('Are you sure you want to delete this template?')) return;
       setDeleting(id);
       try {
-        const res = await fetch(`/api/v1/admin/email-templates/${id}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Failed to delete template');
+        await apiClient.delete(`/admin/email-templates/${id}`);
         toast({ title: 'Template deleted', variant: 'success' });
         await load();
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Delete failed';
+      } catch (err: any) {
+        const msg = err?.message || err?.error?.message || 'Delete failed';
         toast({ title: msg, variant: 'error' });
       } finally {
         setDeleting(null);

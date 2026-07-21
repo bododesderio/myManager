@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { Route } from 'next';
 import { usePathname } from 'next/navigation';
+import { apiClient } from '@/lib/api/client';
 
 interface NavItem {
   label: string;
@@ -115,7 +116,7 @@ function SignOutButton() {
     const { signOut } = await import('next-auth/react');
     // Best-effort revoke server-side, then clear NextAuth cookie and route to admin login.
     try {
-      await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
+      await apiClient.post('/auth/logout', undefined, { skipAuthRefresh: true });
     } catch {
       // ignore — proceed to clear local session anyway
     }

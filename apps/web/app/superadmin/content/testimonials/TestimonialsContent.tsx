@@ -5,6 +5,7 @@ import { useToast } from '@/providers/ToastProvider';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import styles from './TestimonialsContent.module.css';
 import { Button } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface Testimonial {
   id: string;
@@ -46,9 +47,7 @@ export function TestimonialsContent() {
   const loadItems = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/admin/testimonials');
-      if (!res.ok) throw new Error('Failed to load testimonials');
-      const data = (await res.json()) as Testimonial[];
+      const data = await apiClient.get<Testimonial[]>('/admin/testimonials');
       setItems(data);
     } catch {
       toast({ title: 'Could not load testimonials', variant: 'error' });
@@ -84,15 +83,11 @@ export function TestimonialsContent() {
     };
 
     try {
-      const res = await fetch(
-        isNew ? '/api/v1/admin/testimonials' : `/api/v1/admin/testimonials/${editItem.id}`,
-        {
-          method: isNew ? 'POST' : 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        },
-      );
-      if (!res.ok) throw new Error('Failed to save testimonial');
+      if (isNew) {
+        await apiClient.post('/admin/testimonials', payload);
+      } else {
+        await apiClient.patch(`/admin/testimonials/${editItem.id}`, payload);
+      }
       await loadItems();
       setEditItem(null);
       toast({ title: isNew ? 'Testimonial added' : 'Testimonial updated', variant: 'success' });
@@ -104,8 +99,7 @@ export function TestimonialsContent() {
   async function deleteItem(id: string) {
     if (!confirm('Delete this testimonial?')) return;
     try {
-      const res = await fetch(`/api/v1/admin/testimonials/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete testimonial');
+      await apiClient.delete(`/admin/testimonials/${id}`);
       setItems((prev) => prev.filter((item) => item.id !== id));
       toast({ title: 'Testimonial deleted', variant: 'success' });
     } catch {

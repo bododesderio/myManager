@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { apiClient } from '@/lib/api/client';
 
 interface NavLinkItem {
   id: string;
@@ -42,9 +43,7 @@ export function NavLinksContent() {
   const loadLinks = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/admin/cms/nav-links');
-      if (!res.ok) throw new Error('Failed to load navigation links');
-      const data = (await res.json()) as NavLinkItem[];
+      const data = await apiClient.get<NavLinkItem[]>('/admin/cms/nav-links');
       setLinks(data);
     } catch {
       toast({ title: 'Could not load navigation links', variant: 'error' });
@@ -79,19 +78,10 @@ export function NavLinksContent() {
     const target = group[swapIndex];
 
     try {
-      const [sourceRes, targetRes] = await Promise.all([
-        fetch(`/api/v1/admin/cms/nav-links/${source.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_index: target.order_index }),
-        }),
-        fetch(`/api/v1/admin/cms/nav-links/${target.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_index: source.order_index }),
-        }),
+      await Promise.all([
+        apiClient.patch(`/admin/cms/nav-links/${source.id}`, { order_index: target.order_index }),
+        apiClient.patch(`/admin/cms/nav-links/${target.id}`, { order_index: source.order_index }),
       ]);
-      if (!sourceRes.ok || !targetRes.ok) throw new Error('Failed to reorder navigation');
       await loadLinks();
     } catch {
       toast({ title: 'Failed to reorder links', variant: 'error' });
@@ -100,13 +90,9 @@ export function NavLinksContent() {
 
   async function toggleVisibility(link: NavLinkItem) {
     try {
-      const res = await fetch(`/api/v1/admin/cms/nav-links/${link.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_visible: !link.is_visible }),
+      const updated = await apiClient.patch<NavLinkItem>(`/admin/cms/nav-links/${link.id}`, {
+        is_visible: !link.is_visible,
       });
-      if (!res.ok) throw new Error('Failed to update nav link');
-      const updated = (await res.json()) as NavLinkItem;
       setLinks((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
     } catch {
       toast({ title: 'Failed to update visibility', variant: 'error' });
@@ -126,15 +112,11 @@ export function NavLinksContent() {
     };
 
     try {
-      const res = await fetch(
-        isNew ? '/api/v1/admin/cms/nav-links' : `/api/v1/admin/cms/nav-links/${editItem.id}`,
-        {
-          method: isNew ? 'POST' : 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        },
-      );
-      if (!res.ok) throw new Error('Failed to save nav link');
+      if (isNew) {
+        await apiClient.post('/admin/cms/nav-links', payload);
+      } else {
+        await apiClient.patch(`/admin/cms/nav-links/${editItem.id}`, payload);
+      }
       await loadLinks();
       setEditItem(null);
       toast({ title: isNew ? 'Link added' : 'Link updated', variant: 'success' });
@@ -146,8 +128,7 @@ export function NavLinksContent() {
   async function deleteItem(id: string) {
     if (!confirm('Delete this nav link?')) return;
     try {
-      const res = await fetch(`/api/v1/admin/cms/nav-links/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete nav link');
+      await apiClient.delete(`/admin/cms/nav-links/${id}`);
       setLinks((prev) => prev.filter((link) => link.id !== id));
       toast({ title: 'Link deleted', variant: 'success' });
     } catch {

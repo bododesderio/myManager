@@ -108,8 +108,15 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Handle 401 - try refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Handle 401 - try refresh.
+    // `skipAuthRefresh` opts a request out of this: credential submissions
+    // (login/register) legitimately return 401 on bad input, and must surface
+    // that to the caller rather than triggering a refresh + redirect loop.
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.skipAuthRefresh
+    ) {
       originalRequest._retry = true;
 
       try {

@@ -5,6 +5,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { apiClient } from '@/lib/api/client';
 
 interface BrandFeatures {
   maintenance_mode: boolean;
@@ -26,9 +27,7 @@ export function SystemSettingsContent() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/v1/admin/cms/brand');
-      if (!res.ok) throw new Error('Failed to load settings');
-      const json = (await res.json()) as BrandData;
+      const json = await apiClient.get<BrandData>('/admin/cms/brand');
       setBrand(json);
     } catch {
       toast({ title: 'Could not load system settings', variant: 'error' });
@@ -56,12 +55,7 @@ export function SystemSettingsContent() {
     if (!brand) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/v1/admin/cms/brand', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(brand),
-      });
-      if (!res.ok) throw new Error('Failed to save');
+      await apiClient.patch('/admin/cms/brand', brand);
       toast({ title: 'Settings saved', variant: 'success' });
     } catch {
       toast({ title: 'Could not save settings', variant: 'error' });
