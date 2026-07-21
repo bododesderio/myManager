@@ -77,11 +77,19 @@ Turborepo + pnpm 9.15.4 workspaces.
 - ~~error.tsx/loading.tsx gaps~~ → filled where missing.
 
 **MEDIUM — still open**
-- **73 raw `fetch()` calls** still bypass `lib/api/client.ts` (its auth-refresh +
-  CSRF interceptors) — incl. LoginForm/SignupForm. NOT yet migrated: it's a
-  large, auth-flow-touching change that needs its own careful, tested pass.
+- ~~73 raw `fetch()` calls bypass `lib/api/client.ts`~~ → DONE 2026-07-21
+  (commit 2100819): 26 files migrated to `apiClient`, 0 raw `/api/v1` fetches
+  remain. Added `skipAuthRefresh` opt-out for credential POSTs.
+  ⚠️ login/signup submit paths need a **manual smoke test** on the live stack
+  (can't be exercised by build/e2e here).
 - `any` types in `app/`/`lib/`; broaden `@mymanager/ui` adoption (the package
   exists as of Jul 20 but most components are still local).
+
+## API responses are NOT envelope-wrapped
+`TransformInterceptor` exists but is **never registered** (main.ts wires only
+`MetricsInterceptor`; no `APP_INTERCEPTOR`). The API returns raw bodies, so
+`apiClient`'s `{success,data}` unwrap branch never fires — it returns the body
+verbatim. Don't assume a `{success,data}` envelope when reading API responses.
 
 **Unverified**
 - Whether the web composer converts local→UTC correctly before sending
