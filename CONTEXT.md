@@ -55,10 +55,14 @@ Turborepo + pnpm 9.15.4 workspaces.
 - PR #10 — dark-mode auth card fix + Playwright E2E infra
 
 ## Known issues (open — full detail in `docs/audit-2026-07-20.md`)
-**HIGH**
-- Puppeteer launches a full Chromium per PDF (`report-generator.worker.ts:69`).
-- `RefreshToken` model (`schema.prisma:239-253`) is dead (0 refs) while `Session`
-  serves as refresh-token storage. Decide: migrate auth onto it or drop it.
+**HIGH — both RESOLVED 2026-07-21 (commit 3e7f803)**
+- ~~Puppeteer per-PDF Chromium~~ → pooled (`browser-pool.ts`), plus hardened
+  two concurrency bugs (launch-race overshoot, stranded waiter).
+- ~~Dead `RefreshToken` model / `Session` doubling as token store~~ → refresh
+  tokens migrated to `refresh_tokens` with rotation + **reuse detection**
+  (replay → revoke whole family). `Session` model + `sessions` table dropped
+  (migration `20260721000000`). NOTE: deploy logs out active API refresh
+  sessions once.
 
 **MEDIUM**
 - Analytics aggregated in Node memory, not SQL.
@@ -72,12 +76,16 @@ Turborepo + pnpm 9.15.4 workspaces.
   `scheduled_at`. API side is correct (`timestamptz` in UTC); needs a frontend check.
 
 ## Next steps
-1. Continue Phase 2 durables: Puppeteer pool, SQL analytics aggregation, extract
-   `packages/ui`, broaden validator adoption beyond auth forms.
-2. Test coverage: still ~18 suites for 43 modules — OAuth flows, scheduling, and
-   several platform workers remain uncovered. Extend the new E2E harness to more
-   critical flows (login submit, signup, checkout).
-3. Address HIGH audit items (RefreshToken decision, Puppeteer per-PDF Chromium).
+1. Continue Phase 2 durables: SQL analytics aggregation, extract `packages/ui`,
+   broaden validator adoption beyond auth forms.
+2. Test coverage: now 26 API suites / 272 tests. OAuth flows, scheduling still
+   thin. Extend the E2E harness to more critical flows (login submit, signup,
+   checkout).
+3. MEDIUM audit items: analytics-in-memory → SQL, register the 4 unused guards
+   (plan/quota enforcement at HTTP layer), web `error.tsx`/API-client cleanup.
+4. Fix repo-wide broken ESLint: `import/no-unused-modules` needs an `.eslintrc`
+   (or drop the rule) under flat config — currently `pnpm lint` errors on every
+   file.
 
 ## Active branches
 - `main`: stable, all work lands here directly
