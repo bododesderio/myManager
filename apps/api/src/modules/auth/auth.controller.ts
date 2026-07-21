@@ -143,6 +143,10 @@ export class AuthController {
 
   @Public()
   @Post('reset-password')
+  // Token *consumption* must be at least as throttled as issuance (forgot-password
+  // is 3/15min). Left on the global 100/min default it was a 20x-looser brute-force
+  // surface against the reset token than the endpoint that hands it out.
+  @Throttle({ long: { ttl: 900000, limit: 10 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password with token' })
   async resetPassword(@Body() body: ResetPasswordDto) {
@@ -152,6 +156,7 @@ export class AuthController {
 
   @Public()
   @Post('verify-email')
+  @Throttle({ long: { ttl: 900000, limit: 10 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify email address with token' })
   async verifyEmail(@Body() body: VerifyEmailDto) {
@@ -203,6 +208,7 @@ export class AuthController {
 
   @Public()
   @Post('google/callback')
+  @Throttle({ long: { ttl: 900000, limit: 20 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Handle Google OAuth callback' })
   async googleCallback(
@@ -216,6 +222,7 @@ export class AuthController {
 
   @Public()
   @Post('apple/callback')
+  @Throttle({ long: { ttl: 900000, limit: 20 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Handle Apple OAuth callback' })
   async appleCallback(

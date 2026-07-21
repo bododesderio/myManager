@@ -8,7 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../prisma.service';
 
-type QuotaType = 'posts' | 'accounts' | 'seats' | 'storage' | 'aiCredits' | 'scheduledQueue' | 'projects';
+export type QuotaType = 'posts' | 'accounts' | 'seats' | 'storage' | 'aiCredits' | 'scheduledQueue' | 'projects';
 
 @Injectable()
 export class QuotaGuard implements CanActivate {

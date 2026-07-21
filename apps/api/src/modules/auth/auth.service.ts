@@ -25,6 +25,14 @@ interface AuthTokens {
 /** TTL for the password-changed Redis key (24 hours). */
 const PWD_CHANGED_TTL = 86400;
 
+/**
+ * A valid bcrypt hash (cost 12) of a random string that no password will match.
+ * Login compares against this when the email is unknown, so an attacker cannot
+ * tell a non-existent account (fast, no hashing) from a wrong password (slow,
+ * one bcrypt) by response timing. The cost must match SALT_ROUNDS.
+ */
+const DUMMY_PASSWORD_HASH = '$2b$12$nLqCk0Kg/QxTCVaL5rrcv.E/ogukZbpwPns8/.Z0h/6O/HDxqFyli';
+
 @Injectable()
 export class AuthService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(AuthService.name);
@@ -109,12 +117,15 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
   async login(email: string, password: string, totpCode?: string): Promise<AuthTokens> {
     const user = await this.repository.findUserByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash || '');
-    if (!isPasswordValid) {
+    // Always run one bcrypt comparison — against a dummy hash when the email is
+    // unknown — so response timing does not distinguish "no such account" from
+    // "wrong password" (account enumeration via timing side-channel).
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user?.password_hash || DUMMY_PASSWORD_HASH,
+    );
+    if (!user || !isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
@@ -137,7 +148,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
         ? this.decryptTotpSecret(userWithPrefs.preferences.totp_secret)
         : null;
 
-      if (!secret || !this.verifyTotpCode(secret, totpCode)) {
+      if (!secret || !(await this.verifyTotpCode(user.id, secret, totpCode))) {
         throw new UnauthorizedException('Invalid 2FA code');
       }
 
@@ -289,7 +300,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     }
 
     const secret = this.decryptTotpSecret(user.preferences.totp_secret);
-    const isValid = this.verifyTotpCode(secret, code);
+    const isValid = await this.verifyTotpCode(userId, secret, code);
 
     if (isValid) {
       await this.repository.enableTwoFactor(userId);
@@ -306,7 +317,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     }
 
     const secret = this.decryptTotpSecret(user.preferences.totp_secret);
-    const isValid = this.verifyTotpCode(secret, code);
+    const isValid = await this.verifyTotpCode(userId, secret, code);
 
     if (!isValid) {
       throw new UnauthorizedException('Invalid 2FA code');
@@ -514,7 +525,19 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     return decryptSecret(encryptedSecret);
   }
 
-  private verifyTotpCode(secret: string, code: string): boolean {
+  /**
+   * Verify a TOTP code for a user, with a ±TOTP_WINDOW step tolerance.
+   *
+   * Two hardening measures over a naive check:
+   * - Constant-time comparison (`crypto.timingSafeEqual`) so a matching prefix
+   *   can't be inferred from timing.
+   * - Single-use replay guard: the matched counter is atomically claimed in
+   *   Redis (SET NX), so a code observed on the wire cannot be replayed within
+   *   its ~90s validity window. A second presentation of the same code fails.
+   */
+  private async verifyTotpCode(userId: string, secret: string, code: string): Promise<boolean> {
+    if (!/^\d{6}$/.test(code)) return false;
+
     const period = 30;
     const digits = 6;
     const time = Math.floor(Date.now() / 1000 / period);
@@ -536,9 +559,32 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
         (hash[offset + 3] & 0xff);
 
       const otp = (binary % Math.pow(10, digits)).toString().padStart(digits, '0');
-      if (otp === code) return true;
+      if (this.constantTimeEquals(otp, code)) {
+        return this.claimTotpCounter(userId, counter, period);
+      }
     }
 
     return false;
+  }
+
+  private constantTimeEquals(a: string, b: string): boolean {
+    const ab = Buffer.from(a);
+    const bb = Buffer.from(b);
+    if (ab.length !== bb.length) return false;
+    return crypto.timingSafeEqual(ab, bb);
+  }
+
+  /** Atomically claim a (user, counter) pair so a code is usable only once.
+   *  Returns false if it was already used within its validity window (replay). */
+  private async claimTotpCounter(userId: string, counter: number, period: number): Promise<boolean> {
+    const ttl = (this.TOTP_WINDOW * 2 + 1) * period;
+    const result = await getSharedRedis().set(
+      `auth:totp_used:${userId}:${counter}`,
+      '1',
+      'EX',
+      ttl,
+      'NX',
+    );
+    return result === 'OK';
   }
 }

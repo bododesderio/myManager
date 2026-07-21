@@ -2,21 +2,44 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PlanGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const targets = [context.getHandler(), context.getClass()];
+    const requiredPlans = this.reflector.getAllAndOverride<string[]>('requiredPlans', targets);
+    const requiredFeature = this.reflector.getAllAndOverride<string>('requiredFeature', targets);
+    const quotaType = this.reflector.getAllAndOverride<string>('quotaType', targets);
+
+    // Resolve the plan (two DB queries) only when a downstream check needs it —
+    // @RequirePlan (here), @RequireFeature (FeatureGuard) or @RequireQuota
+    // (QuotaGuard). Routes with none of these pay nothing for this guard.
+    if (!requiredPlans && !requiredFeature && !quotaType) return true;
+
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-
-    if (!user) return true;
+    if (!user) return true; // public/unauthenticated route
 
     const plan = await this.resolvePlan(user.id);
     request.plan = plan;
+
+    if (requiredPlans && requiredPlans.length > 0) {
+      const slug = (plan as { slug?: string }).slug;
+      if (!slug || !requiredPlans.includes(slug)) {
+        throw new ForbiddenException(
+          `This action requires one of the following plans: ${requiredPlans.join(', ')}. Please upgrade your plan.`,
+        );
+      }
+    }
 
     return true;
   }

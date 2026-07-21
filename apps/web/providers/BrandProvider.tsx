@@ -5,6 +5,8 @@
  * every page on the next request without a code deploy.
  */
 
+import { validateHexColor } from '@/lib/brand-color';
+
 const FALLBACK_BRAND = {
   primary_color: '#6D5AE8',
   primary_dark: '#4A36D4',
@@ -39,9 +41,15 @@ async function fetchBrand(): Promise<BrandConfig> {
   }
 }
 
+/**
+ * Lighten/darken a validated six-digit hex color by `percent` (-100..100).
+ *
+ * Pre-condition: `hex` must already be a validated #RRGGBB value from
+ * validateHexColor(). If that invariant is violated the function falls back to
+ * the default primary rather than propagating a potentially unsafe string.
+ */
 function shade(hex: string, percent: number): string {
-  // Lighten/darken a hex color by `percent` (-100..100). Defensive for non-hex input.
-  if (!/^#?[0-9a-fA-F]{6}$/.test(hex.replace('#', ''))) return hex;
+  if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return FALLBACK_BRAND.primary_color;
   const h = hex.replace('#', '');
   const r = parseInt(h.slice(0, 2), 16);
   const g = parseInt(h.slice(2, 4), 16);
@@ -61,12 +69,23 @@ function shade(hex: string, percent: number): string {
 
 export async function BrandStyleInjector() {
   const brand = await fetchBrand();
-  const primary = brand.primary_color ?? FALLBACK_BRAND.primary_color;
-  const primaryDark = brand.primary_dark ?? shade(primary, -20);
-  const primaryLight = brand.primary_light ?? shade(primary, 80);
-  const secondary = brand.secondary_color ?? primaryDark;
-  const accent = brand.accent_color ?? FALLBACK_BRAND.accent_color;
 
+  // [SECURITY] Every API-supplied color must pass strict hex validation before
+  // interpolation into the dangerouslySetInnerHTML <style> block.
+  //
+  // Attack blocked: a malicious superadmin could set a brand color like
+  //   `red;} body { display:none }`  or  `</style><script>alert(1)</script>`
+  // which would escape the CSS property context when interpolated raw.
+  // validateHexColor rejects anything that is not exactly `#` + 6 hex digits,
+  // so no semicolons, curly braces, angle brackets, or spaces can pass through.
+  const primary = validateHexColor(brand.primary_color, FALLBACK_BRAND.primary_color);
+  const primaryDark = validateHexColor(brand.primary_dark, shade(primary, -20));
+  const primaryLight = validateHexColor(brand.primary_light, shade(primary, 80));
+  const secondary = validateHexColor(brand.secondary_color, primaryDark);
+  const accent = validateHexColor(brand.accent_color, FALLBACK_BRAND.accent_color);
+
+  // All values passed to shade() below are already validated — shade() only
+  // receives `primary` which was accepted by validateHexColor above.
   const css = `
     :root {
       --color-primary: ${primary};

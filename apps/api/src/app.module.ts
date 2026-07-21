@@ -9,6 +9,9 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { WorkspaceMemberGuard } from './common/guards/workspace-member.guard';
 import { WorkspaceRoleGuard } from './common/guards/workspace-role.guard';
 import { CsrfGuard } from './common/guards/csrf.guard';
+import { PlanGuard } from './guards/plan.guard';
+import { FeatureGuard } from './guards/feature.guard';
+import { QuotaGuard } from './guards/quota.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
@@ -143,6 +146,16 @@ import { MetricsController } from './metrics.controller';
     // MUST run after WorkspaceMemberGuard, which populates request.workspaceMember.
     // Opt-in: no-ops unless a route carries @WorkspaceRoles().
     { provide: APP_GUARD, useClass: WorkspaceRoleGuard },
+    // Plan-tier / quota enforcement. Order matters: PlanGuard populates
+    // request.plan (and enforces @RequirePlan), FeatureGuard reads it for
+    // @RequireFeature, QuotaGuard reads it plus request.workspaceMember for
+    // @RequireQuota. All three are opt-in — they no-op on routes without the
+    // matching decorator, and PlanGuard skips its DB lookups entirely then.
+    // (ApiKeyGuard is deliberately NOT global: it *requires* a Bearer mm_ key
+    //  and is applied per-route via @UseGuards on the public-API surface.)
+    { provide: APP_GUARD, useClass: PlanGuard },
+    { provide: APP_GUARD, useClass: FeatureGuard },
+    { provide: APP_GUARD, useClass: QuotaGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

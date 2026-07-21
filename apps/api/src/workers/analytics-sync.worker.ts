@@ -1,4 +1,5 @@
 import { Job } from 'bullmq';
+import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import axios from 'axios';
 import { decryptSecret } from '../common/crypto/crypto.util';
@@ -11,6 +12,8 @@ interface AnalyticsSyncJobData {
 }
 
 export class AnalyticsSyncWorker {
+  private readonly logger = new Logger(AnalyticsSyncWorker.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async process(job: Job<AnalyticsSyncJobData>): Promise<void> {
@@ -132,7 +135,9 @@ export class AnalyticsSyncWorker {
         clicks: 0,
         engagements: likes + comments,
       };
-    } catch {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`[youtube] metrics fetch failed for video ${videoId}: ${message}`);
       return {};
     }
   }
@@ -153,7 +158,9 @@ export class AnalyticsSyncWorker {
         shares: all.SAVE ?? 0,
         reach: 0,
       };
-    } catch {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`[pinterest] metrics fetch failed for pin ${pinId}: ${message}`);
       return {};
     }
   }
@@ -178,7 +185,9 @@ export class AnalyticsSyncWorker {
         clicks: 0,
         engagements: likes + comments + shares,
       };
-    } catch {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`[threads] metrics fetch failed for media ${mediaId}: ${message}`);
       return {};
     }
   }
@@ -206,7 +215,9 @@ export class AnalyticsSyncWorker {
         shares: 0,
         reach: 0,
       };
-    } catch {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`[google-business] metrics fetch failed for ${postId}: ${message}`);
       return {};
     }
   }

@@ -6,6 +6,7 @@ import {
   IsIn,
   IsArray,
   ArrayNotEmpty,
+  ArrayMaxSize,
   Min,
   Max,
   IsOptional,
@@ -83,6 +84,7 @@ export class BulkDeleteMediaDto {
   })
   @IsArray()
   @ArrayNotEmpty({ message: 'mediaIds must contain at least one ID' })
+  @ArrayMaxSize(200, { message: 'mediaIds cannot contain more than 200 IDs per request' })
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
   mediaIds!: string[];

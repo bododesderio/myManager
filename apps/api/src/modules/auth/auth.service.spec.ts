@@ -1,6 +1,12 @@
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { AuthService } from './auth.service';
+import { getSharedRedis } from '../../common/redis/shared-redis';
+
+jest.mock('../../common/redis/shared-redis', () => ({
+  getSharedRedis: jest.fn(),
+}));
 
 describe('AuthService.login', () => {
   function createService() {
@@ -144,5 +150,64 @@ describe('AuthService.refreshTokens — rotation & reuse detection', () => {
 
     expect(repository.revokeRefreshToken).toHaveBeenCalledTimes(1);
     expect(repository.revokeRefreshToken.mock.calls[0][0]).toMatch(/^[a-f0-9]{64}$/);
+  });
+});
+
+describe('AuthService.verifyTotpCode — replay guard & constant-time', () => {
+  const secret = '3132333435363738393031323334353637383930'; // valid hex
+
+  function totpFor(counter: number): string {
+    const buffer = Buffer.alloc(8);
+    buffer.writeBigUInt64BE(BigInt(counter));
+    const hash = crypto.createHmac('sha1', Buffer.from(secret, 'hex')).update(buffer).digest();
+    const offset = hash[hash.length - 1] & 0xf;
+    const binary =
+      ((hash[offset] & 0x7f) << 24) |
+      ((hash[offset + 1] & 0xff) << 16) |
+      ((hash[offset + 2] & 0xff) << 8) |
+      (hash[offset + 3] & 0xff);
+    return (binary % 1_000_000).toString().padStart(6, '0');
+  }
+  const currentCode = () => totpFor(Math.floor(Date.now() / 1000 / 30));
+
+  function makeService(redisSet: jest.Mock) {
+    (getSharedRedis as jest.Mock).mockReturnValue({ set: redisSet });
+    return new AuthService({} as any, {} as any, { get: jest.fn() } as any);
+  }
+
+  const call = (s: AuthService, code: string) =>
+    (s as any).verifyTotpCode('u1', secret, code) as Promise<boolean>;
+
+  it('accepts a valid code once, then rejects the replay', async () => {
+    const set = jest.fn().mockResolvedValueOnce('OK').mockResolvedValueOnce(null);
+    const service = makeService(set);
+    const code = currentCode();
+
+    await expect(call(service, code)).resolves.toBe(true);
+    await expect(call(service, code)).resolves.toBe(false); // replay
+    expect(set).toHaveBeenCalledWith(
+      expect.stringMatching(/^auth:totp_used:u1:\d+$/),
+      '1',
+      'EX',
+      expect.any(Number),
+      'NX',
+    );
+  });
+
+  it('rejects a malformed code without touching Redis', async () => {
+    const set = jest.fn();
+    const service = makeService(set);
+
+    await expect(call(service, '12345')).resolves.toBe(false); // too short
+    await expect(call(service, 'abcdef')).resolves.toBe(false); // non-digit
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  it('rejects an incorrect 6-digit code', async () => {
+    const set = jest.fn().mockResolvedValue('OK');
+    const service = makeService(set);
+    const wrong = ((Number(currentCode()) + 1) % 1_000_000).toString().padStart(6, '0');
+
+    await expect(call(service, wrong)).resolves.toBe(false);
   });
 });

@@ -4,6 +4,7 @@ import {
   isAuthRoute,
   isDashboardRoute,
 } from '../lib/auth/route-access.ts';
+import { validateHexColor } from '../lib/brand-color.ts';
 
 const preferencesResponse = {
   language: 'en',
@@ -135,5 +136,44 @@ assert.deepEqual(
   reportFormErrors({ name: 'Q2', dateFrom: '2026-04-01', dateTo: '2026-04-30' }),
   { name: '', dateFrom: '', dateTo: '' },
 );
+
+// ─── validateHexColor (BrandProvider XSS guard) ───────────────────────────
+// Verifies that the CSS injection gate accepts only #RRGGBB and rejects every
+// value that could escape the <style dangerouslySetInnerHTML> property context.
+const FALLBACK = '#6D5AE8';
+
+// Valid inputs
+assert.equal(validateHexColor('#6D5AE8', FALLBACK), '#6D5AE8', 'uppercase hex accepted');
+assert.equal(validateHexColor('#ff5c7a', FALLBACK), '#ff5c7a', 'lowercase hex accepted');
+assert.equal(validateHexColor('#10B981', FALLBACK), '#10B981', 'mixed case accepted');
+assert.equal(validateHexColor('#000000', FALLBACK), '#000000', 'black accepted');
+assert.equal(validateHexColor('#FFFFFF', FALLBACK), '#FFFFFF', 'white accepted');
+
+// Short-form (#RGB) is rejected — shade() cannot handle 3-digit inputs safely
+assert.equal(validateHexColor('#FAB', FALLBACK), FALLBACK, '3-digit hex rejected');
+assert.equal(validateHexColor('#fff', FALLBACK), FALLBACK, '3-digit lowercase rejected');
+
+// CSS injection payloads — must all be rejected
+assert.equal(
+  validateHexColor('red;} body{background:url(javascript:void(0))}', FALLBACK),
+  FALLBACK,
+  'CSS break-out payload rejected',
+);
+assert.equal(
+  validateHexColor('</style><script>alert(1)</script>', FALLBACK),
+  FALLBACK,
+  'style element escape rejected',
+);
+assert.equal(validateHexColor('red', FALLBACK), FALLBACK, 'named color rejected');
+assert.equal(validateHexColor('rgb(0,0,0)', FALLBACK), FALLBACK, 'rgb() rejected');
+assert.equal(validateHexColor('hsl(0,0%,0%)', FALLBACK), FALLBACK, 'hsl() rejected');
+assert.equal(validateHexColor('#6D5AE8;color:red', FALLBACK), FALLBACK, 'trailing injection rejected');
+assert.equal(validateHexColor('6D5AE8', FALLBACK), FALLBACK, 'missing # rejected');
+assert.equal(validateHexColor('#6D5AE', FALLBACK), FALLBACK, '5-digit hex rejected');
+assert.equal(validateHexColor('#6D5AE88', FALLBACK), FALLBACK, '7-digit hex rejected');
+assert.equal(validateHexColor('', FALLBACK), FALLBACK, 'empty string rejected');
+assert.equal(validateHexColor(null, FALLBACK), FALLBACK, 'null rejected');
+assert.equal(validateHexColor(undefined, FALLBACK), FALLBACK, 'undefined rejected');
+assert.equal(validateHexColor(123456, FALLBACK), FALLBACK, 'number rejected');
 
 console.log('web tests passed');
