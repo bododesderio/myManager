@@ -7,9 +7,9 @@ export class GoogleBusinessWorker extends BasePublishingWorker {
   async buildPayload(post: Record<string, any>, account: Record<string, any>): Promise<PlatformPayload> {
     return {
       caption: post.caption as string,
-      mediaUrls: post.media?.map((m: any) => m.mediaAsset.url) || [],
-      contentType: post.contentType as string,
-      platformOptions: { ...post.platformOptions?.gbp, locationName: account.platformAccountId },
+      mediaUrls: post.media?.map((m: any) => m.media_asset.url) || [],
+      contentType: post.content_type as string,
+      platformOptions: { ...post.platform_options?.gbp, locationName: account.platform_user_id },
     };
   }
 

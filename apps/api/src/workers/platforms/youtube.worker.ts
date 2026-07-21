@@ -8,9 +8,9 @@ export class YouTubeWorker extends BasePublishingWorker {
   async buildPayload(post: Record<string, any>, _account: Record<string, any>): Promise<PlatformPayload> {
     return {
       caption: post.caption as string,
-      mediaUrls: ((post.media as any[])?.map((m: any) => m.mediaAsset.url) || []) as string[],
-      contentType: post.contentType as string,
-      platformOptions: (post.platformOptions as any)?.youtube || {},
+      mediaUrls: ((post.media as any[])?.map((m: any) => m.media_asset.url) || []) as string[],
+      contentType: post.content_type as string,
+      platformOptions: (post.platform_options as any)?.youtube || {},
     };
   }
 

@@ -8,10 +8,10 @@ export class XWorker extends BasePublishingWorker {
   async buildPayload(post: Record<string, any>, _account: Record<string, any>): Promise<PlatformPayload> {
     return {
       caption: (post.caption as string).substring(0, 280),
-      mediaUrls: (post.media?.map((m: any) => m.mediaAsset.url) || []) as string[],
-      contentType: post.contentType as string,
-      platformOptions: post.platformOptions?.x || {},
-      linkUrl: post.linkUrl as string | undefined,
+      mediaUrls: (post.media?.map((m: any) => m.media_asset.url) || []) as string[],
+      contentType: post.content_type as string,
+      platformOptions: post.platform_options?.x || {},
+      linkUrl: post.link_url as string | undefined,
     };
   }
 
