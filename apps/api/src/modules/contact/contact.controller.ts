@@ -22,11 +22,14 @@ export class ContactController {
   @SuperAdmin()
   @ApiOperation({ summary: 'List contact leads' })
   async listLeads(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('status') status?: string,
   ) {
-    return this.contactService.listLeads(+page, +limit, status);
+    // Coerce with a fallback: an omitted `page` was reaching Prisma as `+undefined`
+    // → NaN → `skip: NaN`, which threw PrismaClientValidationError (500). The
+    // dashboard's `?limit=5` call (no page) hit this on every load.
+    return this.contactService.listLeads(Number(page) || 1, Number(limit) || 20, status);
   }
 
   @Patch('admin/leads/:id')

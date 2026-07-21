@@ -18,18 +18,21 @@ export class ContactService {
   }
 
   async listLeads(page: number = 1, limit: number = 20, status?: string) {
-    const skip = (page - 1) * limit;
+    // Guard against NaN/invalid callers so `skip`/`take` are always valid Ints.
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 20;
+    const skip = (safePage - 1) * safeLimit;
     const where = status ? { status: status as LeadStatus } : {};
     const [items, total] = await Promise.all([
       this.prisma.contactLead.findMany({
         where,
         skip,
-        take: limit,
+        take: safeLimit,
         orderBy: { created_at: 'desc' },
       }),
       this.prisma.contactLead.count({ where }),
     ]);
-    return { items, total, page, limit };
+    return { items, total, page: safePage, limit: safeLimit };
   }
 
   async updateLead(

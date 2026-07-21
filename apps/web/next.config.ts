@@ -42,7 +42,13 @@ const nextConfig: NextConfig = {
       "connect-src 'self' http: https: ws: wss:",
       "media-src 'self' data: blob: https:",
       "worker-src 'self' blob:",
-      'upgrade-insecure-requests',
+      // Force HTTPS in production (good for TLS deploys), but never in dev and
+      // never when explicitly disabled. Without this guard the directive upgrades
+      // every request to https://, and on an HTTP origin (localhost, a plain
+      // preview) that breaks all navigation with ERR_SSL_PROTOCOL_ERROR.
+      ...(process.env.NODE_ENV === 'production' && process.env.DISABLE_HTTPS_UPGRADE !== '1'
+        ? ['upgrade-insecure-requests']
+        : []),
     ].join('; ');
 
     return [
