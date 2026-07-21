@@ -39,7 +39,9 @@ export class NotificationWorker {
 
     for (let i = 0; i < messages.length; i += batchSize) {
       const batch = messages.slice(i, i + batchSize);
-      let tickets: Array<{ status: string; id?: string; details?: { error?: string }; message?: string }> = [];
+      // Assigned in the try; the catch always `continue`s, so any read below is
+      // reached only when the request succeeded. No useless initializer.
+      let tickets: Array<{ status: string; id?: string; details?: { error?: string }; message?: string }>;
       try {
         const response = await axios.post(this.expoPushUrl, batch, {
           headers: { 'Content-Type': 'application/json' },

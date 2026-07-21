@@ -101,7 +101,7 @@ export class MediaProcessorWorker {
 
   private async processVideo(mediaId: string, r2Key: string): Promise<void> {
     if (!(await this.hasFfmpeg())) {
-      // eslint-disable-next-line no-console
+       
       console.warn(`Skipping video processing for ${mediaId}: ffmpeg not available in PATH`);
       return;
     }
@@ -204,7 +204,7 @@ export class MediaProcessorWorker {
           }
         } catch (err) {
           // Caption generation is best-effort; never fail the whole job over it.
-          // eslint-disable-next-line no-console
+           
           console.warn('Whisper caption generation failed:', (err as Error).message);
         }
       }

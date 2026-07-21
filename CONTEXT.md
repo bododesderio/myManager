@@ -83,9 +83,12 @@ Turborepo + pnpm 9.15.4 workspaces.
    checkout).
 3. MEDIUM audit items: analytics-in-memory → SQL, register the 4 unused guards
    (plan/quota enforcement at HTTP layer), web `error.tsx`/API-client cleanup.
-4. Fix repo-wide broken ESLint: `import/no-unused-modules` needs an `.eslintrc`
-   (or drop the rule) under flat config — currently `pnpm lint` errors on every
-   file.
+
+## ESLint (fixed 2026-07-21)
+`pnpm lint` works again. The API's `import/no-unused-modules` rule was removed:
+it's broken under ESLint 9 flat config and misreported DI-wired providers as
+unused (300+ false positives). API now lints clean (0 problems); web has 2
+pre-existing benign warnings.
 
 ## Active branches
 - `main`: stable, all work lands here directly

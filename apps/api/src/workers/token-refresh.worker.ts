@@ -1,6 +1,5 @@
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma.service';
-import * as crypto from 'crypto';
 import axios from 'axios';
 import { encryptSecret, decryptSecret } from '../common/crypto/crypto.util';
 
