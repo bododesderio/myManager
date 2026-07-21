@@ -4,7 +4,11 @@ import { AuditService } from './audit.service';
 
 @ApiTags('Audit')
 @ApiBearerAuth()
-@Controller('audit')
+// Superadmin audit log. Served under `admin/` to match its only consumer
+// (the web Audit Log page calls /admin/audit, /admin/audit/actions,
+// /admin/audit/export) and the sibling admin controllers. Previously
+// `@Controller('audit')`, which 404'd every request from that page.
+@Controller('admin/audit')
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
