@@ -2,13 +2,16 @@
 Last updated: 2026-07-21
 
 ## Current task
-No open PR — work now lands **directly on `main`**. GitHub Actions has been
-removed entirely (see decision below), so there is no CI gate; verify locally
-before pushing.
+No open PR — work lands **directly on `main`** (GitHub Actions removed; no CI
+gate, verify locally before pushing).
 
-Most recent work (this session): fixed a dark-mode white-on-white regression in
-the auth cards and stood up Playwright E2E to guard it (PR #10, merged), then
-removed all GitHub Actions workflows.
+The entire `docs/audit-2026-07-20.md` HIGH + MEDIUM backlog is now cleared
+(2026-07-21). This session, in order: dark-mode auth-card fix + Playwright E2E
+(PR #10); removed GitHub Actions; both HIGH items (browser pool, refresh-token
+reuse detection); ESLint repair; all MEDIUM items (auth hardening, plan/quota
+guards, brand XSS, analytics, route coverage); and the 60+ `fetch()` → `apiClient`
+migration. All verified: API tsc/lint clean + 284 tests; web tsc/lint clean +
+build + e2e green.
 
 ## Stack
 Turborepo + pnpm 9.15.4 workspaces.
@@ -76,14 +79,16 @@ Turborepo + pnpm 9.15.4 workspaces.
 - ~~Brand-color XSS (M2)~~ → strict `validateHexColor` gate.
 - ~~error.tsx/loading.tsx gaps~~ → filled where missing.
 
-**MEDIUM — still open**
-- ~~73 raw `fetch()` calls bypass `lib/api/client.ts`~~ → DONE 2026-07-21
-  (commit 2100819): 26 files migrated to `apiClient`, 0 raw `/api/v1` fetches
-  remain. Added `skipAuthRefresh` opt-out for credential POSTs.
-  ⚠️ login/signup submit paths need a **manual smoke test** on the live stack
-  (can't be exercised by build/e2e here).
-- `any` types in `app/`/`lib/`; broaden `@mymanager/ui` adoption (the package
-  exists as of Jul 20 but most components are still local).
+- ~~73 raw `fetch()` calls bypass `lib/api/client.ts`~~ → DONE (commit 2100819):
+  26 files migrated to `apiClient`, 0 raw `/api/v1` fetches remain; added
+  `skipAuthRefresh` opt-out for credential POSTs. ⚠️ login/signup submit paths
+  need a **manual smoke test** on the live stack (not exercisable by build/e2e).
+
+**Still open (smaller / needs product input)**
+- Apply the now-live `@RequirePlan`/`@RequireFeature`/`@RequireQuota` decorators
+  to real routes, and define the tier limit keys QuotaGuard reads — product config.
+- `any` types in `app/`/`lib/`; broaden `@mymanager/ui` adoption (package exists
+  as of Jul 20 but most components still local).
 
 ## API responses are NOT envelope-wrapped
 `TransformInterceptor` exists but is **never registered** (main.ts wires only
@@ -96,13 +101,12 @@ verbatim. Don't assume a `{success,data}` envelope when reading API responses.
   `scheduled_at`. API side is correct (`timestamptz` in UTC); needs a frontend check.
 
 ## Next steps
-1. Continue Phase 2 durables: SQL analytics aggregation, extract `packages/ui`,
-   broaden validator adoption beyond auth forms.
-2. Test coverage: now 26 API suites / 272 tests. OAuth flows, scheduling still
-   thin. Extend the E2E harness to more critical flows (login submit, signup,
-   checkout).
-3. MEDIUM audit items: analytics-in-memory → SQL, register the 4 unused guards
-   (plan/quota enforcement at HTTP layer), web `error.tsx`/API-client cleanup.
+1. **Manual smoke test of login/signup** on the live NestJS + NextAuth stack
+   (the one gap automated checks can't close after the fetch migration).
+2. Apply plan/quota decorators to real routes + define tier limits (product).
+3. Test coverage: now **28 API suites / 284 tests**. OAuth flows + scheduling
+   still thin. Extend the E2E harness to real flows (login submit, signup, checkout).
+4. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
 
 ## ESLint (fixed 2026-07-21)
 `pnpm lint` works again. The API's `import/no-unused-modules` rule was removed:
