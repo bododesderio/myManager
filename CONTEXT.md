@@ -1,7 +1,42 @@
 # Project Context
 Last updated: 2026-07-21
 
-## Current task
+## Current task — RESUME HERE (2026-07-21 eve)
+Mid **live full-stack audit**. Stopped for the day (usage limits). Everything is
+committed and pushed to `main`; working tree clean.
+
+**Where we stopped:** Rebuilt the whole stack from scratch (fresh DB), verified
+reproducible, and live-tested as the demo user. Found the **user dashboard was
+fully broken** by a chain of 3 pre-existing bugs (all now fixed + committed).
+Last action: rebuilt web with the approvals fix and restarted the server —
+**still need to reload `/home` in the browser to confirm 0 dashboard errors**,
+then sweep the rest of the user-facing pages (analytics, media, calendar,
+compose, campaigns, projects, settings, drafts, templates, team, conversations).
+
+**Bugs found & fixed via live testing this session (commits 24e6881 → 2ae6cb9):**
+- `/admin/leads` 500 (missing-`page` → `skip:NaN`) — `24e6881`
+- CSP `upgrade-insecure-requests` broke non-HTTPS — `24e6881`
+- Admin cold-load 401 race + refresh stampede (tripped my own reuse-detection) — `e97b93c`
+- Audit log 404 (`/admin/audit` path) — `3691965`
+- **User dashboard**: `GET /workspaces` 403 (guard) + returned membership rows
+  not workspaces (wrong id → 403 everywhere) + `/posts?status=draft` 500 (enum
+  case) — `903368b`
+- `/approvals` → `/approvals/pending` path — `2ae6cb9`
+
+**Still to check:** `/approvals` 404 fix in browser; the rest of the user pages;
+`icon-192.png` 404 (cosmetic, all pages); theme page generic `<title>`; dead
+seed files (`demo/superadmin/dashboard-data.seed.ts` — unused, divergent).
+
+### How to bring the stack back up (resume)
+```
+docker compose up -d postgres redis            # env: root .env has NEXTAUTH_SECRET
+cd apps/api && npx prisma migrate deploy && SUPERADMIN_PASSWORD=Superadmin123 npx prisma db seed
+pnpm --filter @mymanager/api dev               # API :3001 (nest watch)
+cd apps/web && DISABLE_HTTPS_UPGRADE=1 NEXTAUTH_SECRET=... AUTH_SECRET=... NEXTAUTH_URL=http://localhost:3000 API_URL=http://localhost:3001 npm run build && pnpm start   # :3000
+```
+Logins: superadmin `admin@mymanager.app`/`Superadmin123`; demo `demo@mymanager.app`/**`Demo1234`** (NOT Demo12345). Dev `.env`/`.env.local`/root `.env` exist (gitignored). Run the browser over **http** with `DISABLE_HTTPS_UPGRADE=1` (prod build; dev mode breaks on the CSP eval).
+
+## Prior task context
 No open PR — work lands **directly on `main`** (GitHub Actions removed; no CI
 gate, verify locally before pushing).
 
