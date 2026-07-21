@@ -13,6 +13,25 @@ export function getAccessToken() {
   return accessToken;
 }
 
+// Auth-readiness gate. The in-memory access token is populated by AuthSync only
+// after the NextAuth session resolves. Requests fired on a fresh page load can
+// race ahead of that and go out tokenless → 401 → refresh → redirect bounce.
+// Authenticated requests wait (bounded) for auth to settle so the bearer token
+// is attached first.
+let authSettled = false;
+let resolveAuthSettled: () => void = () => {};
+const authSettledPromise = new Promise<void>((resolve) => {
+  resolveAuthSettled = resolve;
+});
+
+/** Called by AuthSync once the session status is known (authenticated or not). */
+export function markAuthSettled() {
+  if (!authSettled) {
+    authSettled = true;
+    resolveAuthSettled();
+  }
+}
+
 /**
  * Fetch a CSRF token from the server (double-submit cookie pattern).
  * The server sets the `_csrf` cookie and returns the token in the body.
@@ -43,6 +62,33 @@ export function clearCsrfToken() {
   csrfToken = null;
 }
 
+// Single-flight refresh. A dashboard can fire many authed requests at once; if
+// the access token has expired they all 401 together. Without deduplication each
+// one POSTs /auth/refresh, stampeding the endpoint (which is rate-limited) and
+// logging the user out. Concurrent 401s now share one refresh and retry with the
+// resulting token.
+let refreshPromise: Promise<string | null> | null = null;
+
+function refreshAccessToken(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post('/api/v1/auth/refresh', {}, { withCredentials: true })
+      .then((res) => {
+        const token = res.data?.accessToken ?? null;
+        setAccessToken(token);
+        return token;
+      })
+      .catch(() => {
+        setAccessToken(null);
+        return null;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 const apiClient = axios.create({
   baseURL: '/api/v1',
   withCredentials: true,
@@ -53,6 +99,16 @@ const apiClient = axios.create({
 
 // Request interceptor: attach bearer token and CSRF token
 apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  // Wait for the session to settle so the bearer token (if any) is set — unless
+  // this is a pre-auth request (login/register) that must never block on it.
+  // Bounded by a timeout so a stuck session can't hang requests forever.
+  if (!authSettled && !(config as { skipAuthRefresh?: boolean }).skipAuthRefresh) {
+    await Promise.race([
+      authSettledPromise,
+      new Promise((resolve) => setTimeout(resolve, 3000)),
+    ]);
+  }
+
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -119,25 +175,16 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      try {
-        const refreshRes = await axios.post(
-          '/api/v1/auth/refresh',
-          {},
-          { withCredentials: true },
-        );
+      // Shared refresh: concurrent 401s await one in-flight call, not N.
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return apiClient(originalRequest);
+      }
 
-        const newToken = refreshRes.data?.accessToken;
-        if (newToken) {
-          setAccessToken(newToken);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return apiClient(originalRequest);
-        }
-      } catch {
-        // Refresh failed — user needs to re-login
-        setAccessToken(null);
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login?error=session_expired';
-        }
+      // Refresh failed — user needs to re-login.
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login?error=session_expired';
       }
     }
 
