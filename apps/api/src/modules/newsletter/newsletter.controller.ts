@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Body, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { NewsletterService } from './newsletter.service';
 import { Public } from '../../common/decorators/public.decorator';
@@ -20,8 +28,8 @@ export class NewsletterController {
   @SuperAdmin()
   @ApiOperation({ summary: 'List all newsletter subscribers' })
   async listSubscribers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
     return this.newsletterService.listSubscribers(+page, +limit);
   }

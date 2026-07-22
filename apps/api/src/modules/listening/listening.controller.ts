@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Req,
+  DefaultValuePipe,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getRequestWorkspaceId } from '../../common/http/request-context';
@@ -32,7 +43,7 @@ export class ListeningController {
   @Get('mentions')
   @ApiOperation({ summary: 'List brand mentions' })
   async listMentions(@Query('workspaceId') workspaceId: string, @Query('platform') platform?: string,
-    @Query('page') page: number = 1, @Query('limit') limit: number = 20) {
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1, @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number = 20) {
     return this.listeningService.listMentions(workspaceId, platform, page, limit);
   }
 

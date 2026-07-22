@@ -24,11 +24,22 @@ export class UsersRepository {
   }
 
   async findPreferences(userId: string) {
-    return this.prisma.userPreferences.findUnique({ where: { user_id: userId } });
+    // Lazily initialise a defaults row (all columns have schema defaults) so a
+    // user who has never saved preferences still gets a valid record instead of
+    // a 404. Idempotent via the unique user_id constraint.
+    return this.prisma.userPreferences.upsert({
+      where: { user_id: userId },
+      update: {},
+      create: { user_id: userId },
+    });
   }
 
   async updatePreferences(userId: string, data: Record<string, unknown>) {
-    return this.prisma.userPreferences.update({ where: { user_id: userId }, data });
+    return this.prisma.userPreferences.upsert({
+      where: { user_id: userId },
+      update: data,
+      create: { user_id: userId, ...data },
+    });
   }
 
   async disableTwoFactor(userId: string) {

@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Req,
+  DefaultValuePipe,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
@@ -12,7 +24,7 @@ export class TemplatesController {
 
   @Get()
   @ApiOperation({ summary: 'List post templates' })
-  async list(@Query('workspaceId') workspaceId: string, @Query('page') page: number = 1, @Query('limit') limit: number = 20) {
+  async list(@Query('workspaceId') workspaceId: string, @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number, @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number) {
     return this.templatesService.list(workspaceId, page, limit);
   }
 
