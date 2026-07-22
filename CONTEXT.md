@@ -1,10 +1,37 @@
 # Project Context
 Last updated: 2026-07-22
 
-## Current task — live full-stack audit: USER-PAGE SWEEP COMPLETE (2026-07-22)
+## Current task — live full-stack audit: USER + SUPERADMIN SWEEPS COMPLETE (2026-07-22)
+Live-tested every user-facing AND superadmin page. All user pages + all
+fixable superadmin pages render clean (only the cosmetic `icon-192.png` 404
+remains). Everything committed to `main`; working tree clean.
+
+**Superadmin sweep (2026-07-22, commit 7d2ef80).** Fixed: credentials 429 (10
+parallel system-config calls → 1); stock-images 500 (decrypt threw on plaintext
+config → tolerant now); billing/leads 404+crash (`/admin/sales-leads` →
+`/sales-leads` + asArray); settings brand 404+crash (read `/cms/brand`, feature
+flags normalised from real BrandConfig fields). Hardened workspaces/overrides/
+plans list parsing with asArray. **Clean superadmin pages:** dashboard, users,
+plans, queue, api-health, audit, seo, brand, content/{pages,blog,faq,leads,legal,
+nav-links,newsletter,testimonials}, settings/{theme,credentials,stock-images},
+billing/leads, settings.
+
+**Superadmin — genuinely MISSING backend endpoints (pages render empty, no crash;
+need backend work, NOT path typos):**
+- `GET /admin/workspaces` — no admin workspace-list endpoint exists at all.
+- `GET /admin/billing` — API splits this across `/billing/admin/mrr`,
+  `/billing/admin/plan-distribution`, `/billing/admin/failed-payments`,
+  `/billing/admin/mrr-history`; frontend `useAdminBilling` wants one aggregate.
+- `GET /admin/billing/overrides` — only `POST /billing/admin/override` exists.
+- `GET /admin/email-templates` (content/emails) — no route anywhere.
+- `GET /admin/translations` (content/translations) — no route anywhere.
+- Minor: middleware gates `/superadmin/login` itself (bounces logged-out users
+  to `/login`); `/superadmin/settings/theme` has a generic `<title>`.
+
+## Prior: USER-PAGE SWEEP COMPLETE (2026-07-22)
 Live-tested every user-facing dashboard page as the demo user. **All 15 pages
 now render clean** — the only console noise left anywhere is the cosmetic
-`icon-192.png` 404. Everything committed to `main`; working tree clean.
+`icon-192.png` 404.
 
 **Pages swept & confirmed clean (2026-07-22):** home, analytics, calendar,
 compose, drafts, projects, campaigns, templates, media, team, reports,
@@ -156,14 +183,19 @@ verbatim. Don't assume a `{success,data}` envelope when reading API responses.
 
 ## Next steps
 1. ~~Manual smoke test of login/signup~~ ✅ done 2026-07-22 (fresh login → clean /home).
-2. **Sweep superadmin pages** live (only user pages done this pass) — the same
-   two systemic patterns (pagination NaN, wrong array key) may lurk there too.
-3. Add `icon-192.png` (or drop the manifest ref) to kill the last console 404.
-4. Apply plan/quota decorators to real routes + define tier limits (product).
-5. Test coverage: now **31 API suites / 292 tests**. Add regression tests for the
+2. ~~Sweep superadmin pages~~ ✅ done 2026-07-22 (commit 7d2ef80).
+3. **Build the 5 missing superadmin backend endpoints** (see the "genuinely
+   MISSING" list above): admin workspace list, billing overview aggregate,
+   billing-overrides list, email-templates, translations. Product decisions on
+   response shapes needed — the frontend pages already exist and expect data.
+4. Add `icon-192.png` (or drop the manifest ref) to kill the last console 404.
+5. Apply plan/quota decorators to real routes + define tier limits (product).
+6. Test coverage: now **31 API suites / 292 tests**. Add regression tests for the
    pagination-default 500 (call a list endpoint with no page/limit) and the
    asArray parsing. OAuth flows + scheduling still thin.
-6. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
+7. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
+8. Minor: exempt `/superadmin/login` from the middleware auth gate; give
+   `/superadmin/settings/theme` a proper `<title>`.
 
 ## ESLint (fixed 2026-07-21)
 `pnpm lint` works again. The API's `import/no-unused-modules` rule was removed:
