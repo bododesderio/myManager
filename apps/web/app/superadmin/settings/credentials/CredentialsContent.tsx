@@ -240,24 +240,18 @@ export function CredentialsContent() {
 
   const loadConfigs = useCallback(async () => {
     try {
-      const results = await Promise.all(
-        sections.map(async (section) => {
-          try {
-            const json = await apiClient.get<{ configs: ConfigEntry[] }>(
-              `/admin/system-config?category=${section.category}`,
-            );
-            return json.configs ?? [];
-          } catch {
-            return [];
-          }
-        }),
+      // Single request for ALL categories, grouped client-side. Fetching each
+      // category separately fired 10 parallel requests that tripped the API's
+      // short-window throttle (3 req/s) → most returned 429. The endpoint
+      // returns a flat array of entries (each carrying its own category).
+      const json = await apiClient.get<ConfigEntry[] | { configs: ConfigEntry[] }>(
+        '/admin/system-config',
       );
+      const entries = Array.isArray(json) ? json : (json?.configs ?? []);
 
       const map: Record<string, string | null> = {};
-      for (const entries of results) {
-        for (const entry of entries) {
-          map[entry.key] = entry.value;
-        }
+      for (const entry of entries) {
+        map[entry.key] = entry.value;
       }
       setConfigs(map);
     } catch {

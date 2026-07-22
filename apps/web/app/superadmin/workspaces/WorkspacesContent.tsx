@@ -3,10 +3,11 @@
 import { useAdminWorkspaces } from '@/lib/hooks/useAdmin';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 export function WorkspacesContent() {
   const { data, isLoading } = useAdminWorkspaces();
-  const workspaces = data?.workspaces ?? data ?? [];
+  const workspaces = asArray<any>(data, 'workspaces', 'data');
 
   return (
     <div className="space-y-6">

@@ -19,6 +19,34 @@ interface BrandData {
   [key: string]: unknown;
 }
 
+const FEATURE_DEFAULTS: BrandFeatures = {
+  maintenance_mode: false,
+  registration_open: true,
+  show_blog: true,
+  show_affiliate: false,
+};
+
+/**
+ * The BrandConfig row exposes `maintenance_mode` as a flat column; the other
+ * flags live inside its free-form `config` JSON. Normalise both into a single
+ * `features` object the UI can toggle uniformly. (Before this, the page read a
+ * non-existent nested `features` object and crashed on the flat payload.)
+ */
+function toFeatures(raw: Record<string, unknown>): BrandFeatures {
+  const config = (raw.config as Record<string, unknown> | undefined) ?? {};
+  const pick = (k: keyof BrandFeatures): boolean => {
+    if (typeof raw[k] === 'boolean') return raw[k] as boolean;
+    if (typeof config[k] === 'boolean') return config[k] as boolean;
+    return FEATURE_DEFAULTS[k];
+  };
+  return {
+    maintenance_mode: pick('maintenance_mode'),
+    registration_open: pick('registration_open'),
+    show_blog: pick('show_blog'),
+    show_affiliate: pick('show_affiliate'),
+  };
+}
+
 export function SystemSettingsContent() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -27,8 +55,10 @@ export function SystemSettingsContent() {
 
   const load = useCallback(async () => {
     try {
-      const json = await apiClient.get<BrandData>('/admin/cms/brand');
-      setBrand(json);
+      // Read via the public /cms/brand endpoint (there is no GET /admin/cms/brand;
+      // only the PATCH write below lives under /admin). Matches BrandContent/SeoContent.
+      const json = await apiClient.get<Record<string, unknown>>('/cms/brand');
+      setBrand({ ...json, features: toFeatures(json) });
     } catch {
       toast({ title: 'Could not load system settings', variant: 'error' });
     } finally {
@@ -55,7 +85,15 @@ export function SystemSettingsContent() {
     if (!brand) return;
     setSaving(true);
     try {
-      await apiClient.patch('/admin/cms/brand', brand);
+      // Persist to real BrandConfig fields: maintenance_mode is a flat column;
+      // the remaining flags are merged into the `config` JSON. Sending the whole
+      // brand object (with the synthetic `features` key) would break Prisma.
+      const { maintenance_mode, ...configFlags } = brand.features;
+      const existingConfig = (brand.config as Record<string, unknown> | undefined) ?? {};
+      await apiClient.patch('/admin/cms/brand', {
+        maintenance_mode,
+        config: { ...existingConfig, ...configFlags },
+      });
       toast({ title: 'Settings saved', variant: 'success' });
     } catch {
       toast({ title: 'Could not save settings', variant: 'error' });

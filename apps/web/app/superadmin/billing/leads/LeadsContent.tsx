@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useAdminLeads } from '@/lib/hooks/useAdmin';
+import { asArray } from '@/lib/utils/as-array';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
 
@@ -14,7 +15,7 @@ const statusStyles: Record<string, string> = {
 
 export function LeadsContent() {
   const { data, isLoading } = useAdminLeads();
-  const leads = data?.leads ?? data ?? [];
+  const leads = asArray<any>(data, 'data', 'leads');
 
   return (
     <div className="space-y-6">

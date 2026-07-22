@@ -4,10 +4,11 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { useAdminPlans } from '@/lib/hooks/useAdmin';
 import { StatCardSkeletonGrid } from '@/components/skeletons/StatCardSkeleton';
+import { asArray } from '@/lib/utils/as-array';
 
 export function PlansContent() {
   const { data, isLoading } = useAdminPlans();
-  const plans = data?.plans ?? data ?? [];
+  const plans = asArray<any>(data, 'plans', 'data');
 
   return (
     <div className="space-y-6">

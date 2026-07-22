@@ -6,13 +6,14 @@ import { useAdminOverrides, useCreateOverride } from '@/lib/hooks/useAdmin';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 export function OverridesContent() {
   const { data, isLoading } = useAdminOverrides();
   const createOverride = useCreateOverride();
   const { toast } = useToast();
 
-  const overrides = data?.overrides ?? data ?? [];
+  const overrides = asArray<any>(data, 'overrides', 'data');
 
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({

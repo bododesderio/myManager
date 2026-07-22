@@ -96,7 +96,7 @@ export function useCreateOverride() {
 export function useAdminLeads() {
   return useQuery({
     queryKey: adminKeys.leads(),
-    queryFn: () => apiClient.get('/admin/sales-leads'),
+    queryFn: () => apiClient.get('/sales-leads'),
   });
 }
 

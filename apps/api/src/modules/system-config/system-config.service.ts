@@ -65,6 +65,13 @@ export class SystemConfigService {
   }
 
   private decrypt(encrypted: string): string {
-    return decryptSecret(encrypted);
+    // Tolerate values that aren't in the iv:authTag:ciphertext format — e.g.
+    // configs seeded directly as plaintext rather than written via upsert().
+    // Without this, findAll() 500s for the whole category on a single legacy row.
+    try {
+      return decryptSecret(encrypted);
+    } catch {
+      return encrypted;
+    }
   }
 }
