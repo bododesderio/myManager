@@ -72,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getCmsPage('features');
   const hero = getFields(page, 'feat_hero');
   return {
-    title: hero.meta_title || 'Features — myManager',
+    title: hero.meta_title || 'Features',
     description: hero.meta_description || 'Explore all the features that make myManager the best social media management tool.',
   };
 }

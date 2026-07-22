@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getCmsPage('about');
   const hero = getFields(page, 'hero');
   return {
-    title: hero.meta_title || 'About — myManager',
+    title: hero.meta_title || 'About',
     description: hero.meta_description || 'Learn about the team and mission behind myManager.',
   };
 }

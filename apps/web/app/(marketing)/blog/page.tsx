@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getCmsPage('blog');
   const hero = getFields(page, 'blog_hero');
   return {
-    title: hero.meta_title || 'Blog — myManager',
+    title: hero.meta_title || 'Blog',
     description: hero.meta_description || 'Tips, guides, and insights on social media management.',
   };
 }

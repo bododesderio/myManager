@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getCmsPage('contact');
   const hero = getFields(page, 'contact_hero');
   return {
-    title: hero.meta_title || 'Contact — myManager',
+    title: hero.meta_title || 'Contact',
     description: hero.meta_description || 'Get in touch with the myManager team.',
   };
 }
