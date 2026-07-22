@@ -11,6 +11,7 @@ import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const ROLES = ['owner', 'admin', 'editor', 'viewer'] as const;
 
@@ -22,7 +23,7 @@ export function TeamContent() {
   const removeMember = useRemoveMember();
   const { addToast } = useToast();
 
-  const members: any[] = (data as any)?.members || (data as any) || [];
+  const members: any[] = asArray<any>(data, 'members', 'data');
 
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');

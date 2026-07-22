@@ -7,6 +7,7 @@ import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const REPORT_PLATFORMS = ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'youtube'];
 
@@ -35,7 +36,7 @@ export function ReportsContent() {
     platforms: [] as string[],
   });
 
-  const reports: any[] = (data as any)?.reports || (data as any) || [];
+  const reports: any[] = asArray<any>(data, 'reports', 'data');
 
   function togglePlatform(platform: string) {
     setFormData((prev) => ({

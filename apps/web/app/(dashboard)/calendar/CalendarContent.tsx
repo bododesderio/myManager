@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePostCalendar } from '@/lib/hooks/usePosts';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -47,7 +48,7 @@ export function CalendarContent() {
 
   const { data, isLoading } = usePostCalendar(startDate, endDate);
 
-  const posts = useMemo(() => (data as any)?.posts || (data as any) || [], [data]);
+  const posts = useMemo(() => asArray<any>(data, 'posts', 'data'), [data]);
 
   const postsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};

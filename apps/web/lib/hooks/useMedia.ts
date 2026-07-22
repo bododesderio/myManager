@@ -10,7 +10,7 @@ export const mediaKeys = {
     [...mediaKeys.all, 'list', workspaceId, filters] as const,
 };
 
-export function useMedia(filters: { type?: string; page?: number; per_page?: number; search?: string } = {}) {
+export function useMedia(filters: { type?: string; page?: number; limit?: number; search?: string } = {}) {
   const workspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   return useQuery({
     queryKey: mediaKeys.list(workspaceId!, filters),

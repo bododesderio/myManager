@@ -7,6 +7,7 @@ import { usePosts } from '@/lib/hooks/usePosts';
 import { StatCardSkeleton } from '@/components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 type Tab = 'overview' | 'members' | 'posts';
 
@@ -17,8 +18,8 @@ export function ProjectDetailContent({ id }: { id: string }) {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
   const project: any = projectData || {};
-  const members: any[] = (membersData as any)?.members || (membersData as any) || [];
-  const posts: any[] = (postsData as any)?.posts || (postsData as any) || [];
+  const members: any[] = asArray<any>(membersData, 'members', 'data');
+  const posts: any[] = asArray<any>(postsData, 'posts', 'data');
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'overview', label: 'Overview' },

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useMedia, useUploadMedia, useDeleteMedia } from '@/lib/hooks/useMedia';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const TYPE_FILTERS = [
   { label: 'All Types', value: '' },
@@ -46,17 +47,24 @@ export function MediaContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const perPage = 24;
+  // NOTE: server-side search is not implemented on GET /media (the DTO only
+  // accepts workspaceId/type/page/limit, and forbidNonWhitelisted would 400 on
+  // a `search` param). Filter client-side over the loaded page instead.
   const { data, isLoading, isError, error, refetch } = useMedia({
     type: typeFilter || undefined,
     page,
-    per_page: perPage,
-    search: search || undefined,
+    limit: perPage,
   });
   const uploadMedia = useUploadMedia();
   const deleteMedia = useDeleteMedia();
   const { addToast } = useToast();
 
-  const mediaItems = (data as any)?.media || (data as any)?.items || (data as any) || [];
+  const allMediaItems = asArray<any>(data, 'media', 'items', 'data');
+  const mediaItems = search
+    ? allMediaItems.filter((i: any) =>
+        (i.name || i.fileName || i.file_name || '').toLowerCase().includes(search.toLowerCase()),
+      )
+    : allMediaItems;
   const total = (data as any)?.total || (data as any)?.pagination?.total || 0;
   const storageUsed = (data as any)?.storageUsed || (data as any)?.storage_used || 0;
   const storageLimit = (data as any)?.storageLimit || (data as any)?.storage_limit || 0;

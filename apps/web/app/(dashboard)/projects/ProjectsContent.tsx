@@ -6,6 +6,7 @@ import { useProjects, useDeleteProject, useCreateProject } from '@/lib/hooks/use
 import { useToast } from '@/providers/ToastProvider';
 import { CardGridSkeleton } from '@/components/skeletons/CardSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 export function ProjectsContent() {
   const { data, isLoading } = useProjects();
@@ -36,7 +37,7 @@ export function ProjectsContent() {
     );
   }
 
-  const projects: any[] = (data as any)?.projects || (data as any) || [];
+  const projects: any[] = asArray<any>(data, 'projects', 'data');
 
   function handleDelete(id: string) {
     setDeletingId(id);

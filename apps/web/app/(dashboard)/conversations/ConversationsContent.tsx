@@ -7,6 +7,7 @@ import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const PLATFORMS = ['all', 'facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'youtube'] as const;
 
@@ -48,8 +49,8 @@ export function ConversationsContent() {
   const assignMutation = useAssignComment();
   const { addToast } = useToast();
 
-  const comments: any[] = (data as any)?.comments || (data as any) || [];
-  const members: any[] = (membersData as any)?.members || (membersData as any) || [];
+  const comments: any[] = asArray<any>(data, 'comments', 'data');
+  const members: any[] = asArray<any>(membersData, 'members', 'data');
 
   function handleReply(commentId: string) {
     if (!replyText.trim()) return;

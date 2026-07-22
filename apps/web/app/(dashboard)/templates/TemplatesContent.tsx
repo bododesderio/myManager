@@ -6,6 +6,7 @@ import { useTemplates, useDeleteTemplate } from '@/lib/hooks/useTemplates';
 import { useToast } from '@/providers/ToastProvider';
 import { CardGridSkeleton } from '@/components/skeletons/CardSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const PLATFORM_BADGES: Record<string, string> = {
   twitter: 'bg-sky-100 text-sky-700',
@@ -22,7 +23,7 @@ export function TemplatesContent() {
   const { addToast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const templates = (data as any)?.templates || (data as any) || [];
+  const templates = asArray<any>(data, 'templates', 'data');
 
   function handleDelete(id: string) {
     setDeletingId(id);

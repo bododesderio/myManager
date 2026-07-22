@@ -10,6 +10,7 @@ import {
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const PLATFORM_BADGES: Record<string, string> = {
   twitter: 'bg-sky-100 text-sky-700',
@@ -41,7 +42,7 @@ export function ApprovalsContent() {
   const requestRevision = useRequestRevision();
   const { addToast } = useToast();
 
-  const approvals: any[] = (data as any)?.posts || (data as any)?.approvals || (data as any) || [];
+  const approvals: any[] = asArray<any>(data, 'posts', 'approvals', 'data');
 
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
   const [commentAction, setCommentAction] = useState<'reject' | 'revision' | null>(null);

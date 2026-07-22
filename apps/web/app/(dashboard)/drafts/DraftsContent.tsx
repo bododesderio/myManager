@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePosts, useDeletePost } from '@/lib/hooks/usePosts';
+import { asArray } from '@/lib/utils/as-array';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
@@ -36,7 +37,7 @@ export function DraftsContent() {
   const { addToast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const drafts = (data as any)?.posts || (data as any) || [];
+  const drafts = asArray<any>(data, 'data', 'posts');
 
   function handleDelete(id: string) {
     setDeletingId(id);

@@ -7,6 +7,7 @@ import { useCampaigns, useDeleteCampaign } from '@/lib/hooks/useCampaigns';
 import { useToast } from '@/providers/ToastProvider';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
@@ -21,7 +22,7 @@ export function CampaignsContent() {
   const { addToast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const campaigns: any[] = (data as any)?.campaigns || (data as any) || [];
+  const campaigns: any[] = asArray<any>(data, 'campaigns', 'data');
 
   function handleDelete(id: string) {
     setDeletingId(id);

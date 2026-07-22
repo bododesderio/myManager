@@ -15,6 +15,7 @@ import { useToast } from '@/providers/ToastProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
 import styles from './BioContent.module.css';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 interface BioLink {
   id: string;
@@ -38,7 +39,7 @@ export function BioContent() {
   const { addToast } = useToast();
   const workspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
 
-  const pages: any[] = (data as any)?.pages || (data as any) || [];
+  const pages: any[] = asArray<any>(data, 'pages', 'data');
   const bioPage = pages.length > 0 ? pages[0] : null;
 
   const [title, setTitle] = useState('');

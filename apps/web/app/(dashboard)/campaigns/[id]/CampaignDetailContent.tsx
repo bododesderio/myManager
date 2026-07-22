@@ -6,6 +6,7 @@ import { usePosts } from '@/lib/hooks/usePosts';
 import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { StatCardSkeleton } from '@/components/skeletons/StatCardSkeleton';
 import { Card } from '@mymanager/ui';
+import { asArray } from '@/lib/utils/as-array';
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
@@ -27,7 +28,7 @@ export function CampaignDetailContent({ id }: { id: string }) {
   const { data: postsData, isLoading: postsLoading } = usePosts({ campaignId: id });
 
   const campaign: any = campaignData || {};
-  const posts: any[] = (postsData as any)?.posts || (postsData as any) || [];
+  const posts: any[] = asArray<any>(postsData, 'posts', 'data');
 
   return (
     <div className="space-y-6">
