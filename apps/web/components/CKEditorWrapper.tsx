@@ -43,6 +43,10 @@ export default function CKEditorWrapper({
         editor={ClassicEditor}
         data={value}
         config={{
+          // Free open-source usage of CKEditor 5 (v44+ requires a license key
+          // even for GPL). 'GPL' unlocks the editor with no key to buy and no
+          // usage/telemetry limits; it commits the app to GPL-compatible terms.
+          licenseKey: 'GPL',
           plugins: [
             Essentials,
             Paragraph,
