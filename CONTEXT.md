@@ -1,31 +1,43 @@
 # Project Context
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
-## Current task — RESUME HERE (2026-07-21 eve)
-Mid **live full-stack audit**. Stopped for the day (usage limits). Everything is
-committed and pushed to `main`; working tree clean.
+## Current task — live full-stack audit: USER-PAGE SWEEP COMPLETE (2026-07-22)
+Live-tested every user-facing dashboard page as the demo user. **All 15 pages
+now render clean** — the only console noise left anywhere is the cosmetic
+`icon-192.png` 404. Everything committed to `main`; working tree clean.
 
-**Where we stopped:** Rebuilt the whole stack from scratch (fresh DB), verified
-reproducible, and live-tested as the demo user. Found the **user dashboard was
-fully broken** by a chain of 3 pre-existing bugs (all now fixed + committed).
-Last action: rebuilt web with the approvals fix and restarted the server —
-**still need to reload `/home` in the browser to confirm 0 dashboard errors**,
-then sweep the rest of the user-facing pages (analytics, media, calendar,
-compose, campaigns, projects, settings, drafts, templates, team, conversations).
+**Pages swept & confirmed clean (2026-07-22):** home, analytics, calendar,
+compose, drafts, projects, campaigns, templates, media, team, reports,
+conversations, settings, approvals, bio.
 
-**Bugs found & fixed via live testing this session (commits 24e6881 → 2ae6cb9):**
-- `/admin/leads` 500 (missing-`page` → `skip:NaN`) — `24e6881`
-- CSP `upgrade-insecure-requests` broke non-HTTPS — `24e6881`
-- Admin cold-load 401 race + refresh stampede (tripped my own reuse-detection) — `e97b93c`
-- Audit log 404 (`/admin/audit` path) — `3691965`
-- **User dashboard**: `GET /workspaces` 403 (guard) + returned membership rows
-  not workspaces (wrong id → 403 everywhere) + `/posts?status=draft` 500 (enum
-  case) — `903368b`
-- `/approvals` → `/approvals/pending` path — `2ae6cb9`
+**Bugs found & fixed this session (commits 85a9131, cbc3294, 9404620):**
+- **Systemic API 500** — 11 list endpoints (approvals, campaigns, reports,
+  templates, newsletter, publishing, webhooks, listening, sales-leads, rss,
+  comments) 500'd when called with no `page`/`limit` (exactly how the web calls
+  them). TS default params + `ValidationPipe({transform,enableImplicitConversion})`
+  → absent param coerced to `NaN` → Prisma `skip:NaN,take:NaN`. Fixed with the
+  codebase-standard `DefaultValuePipe+ParseIntPipe`. (This is the same
+  `skip:NaN` class as the earlier `/admin/leads` fix — now swept API-wide.)
+- **Systemic web crash** — dashboards read arrays with `(data?.key||data||[])`
+  but the API returns them under `.data` (or bare). The wrong-key fallback hit
+  `.map`/`.slice` on the wrapper object → TypeError → error boundary (white
+  screen on /home, /drafts; empty widgets elsewhere). Added `lib/utils/as-array.ts`
+  and applied across 13 page components.
+- **Media 400** — web sent `per_page`, API DTO whitelists `limit`
+  (`forbidNonWhitelisted`). Aligned to `limit`; moved unsupported `search` to
+  client-side filtering.
+- **Settings 404** — `GET/PUT /users/preferences` 404'd for any user without a
+  preferences row (fresh signups). Repo now upserts a defaults row.
 
-**Still to check:** `/approvals` 404 fix in browser; the rest of the user pages;
-`icon-192.png` 404 (cosmetic, all pages); theme page generic `<title>`; dead
-seed files (`demo/superadmin/dashboard-data.seed.ts` — unused, divergent).
+**Still to check (deferred):** `icon-192.png` 404 (cosmetic, all pages — add the
+asset or drop the manifest ref); theme page generic `<title>`; dead seed files
+(`demo/superadmin/dashboard-data.seed.ts` — unused, divergent); superadmin-side
+page sweep (only user pages done this pass).
+
+**Verified this session:** apiClient already single-flights token refresh
+(`lib/api/client.ts:65-89`) — the 401/429 storms seen on reload are stale-session
+decay + endpoint throttle from repeated unauthenticated navigations, NOT a live
+stampede bug. Login/signup submit smoke test PASSED (fresh login → clean /home).
 
 ### How to bring the stack back up (resume)
 ```
@@ -65,6 +77,13 @@ Turborepo + pnpm 9.15.4 workspaces.
 - `pnpm build` — pin is `NODE_ENV=production next build`; builds 3/3 tasks
 
 ## Recent decisions
+- **2026-07-22** — Two systemic bug patterns fixed audit-wide. (1) API: paginated
+  list controllers must use `@Query('page', new DefaultValuePipe(1), ParseIntPipe)`
+  — a bare TS default (`page = 1`) is silently coerced to `NaN` by the global
+  `ValidationPipe({transform,enableImplicitConversion})` when the param is absent,
+  producing Prisma `skip:NaN` 500s. (2) Web: never `.map`/`.slice` an API payload
+  directly; go through `asArray(data, ...keys)` — response collection shapes are
+  inconsistent (bare array vs `{data,pagination}` vs `{data,nextCursor}`).
 - **2026-07-21** — **Removed all GitHub Actions workflows** (ci, preview,
   deploy-api, deploy-web, eas-build). The Actions account is billing-locked, so
   every run failed before starting and blocked PRs. Team commits directly to
@@ -136,12 +155,15 @@ verbatim. Don't assume a `{success,data}` envelope when reading API responses.
   `scheduled_at`. API side is correct (`timestamptz` in UTC); needs a frontend check.
 
 ## Next steps
-1. **Manual smoke test of login/signup** on the live NestJS + NextAuth stack
-   (the one gap automated checks can't close after the fetch migration).
-2. Apply plan/quota decorators to real routes + define tier limits (product).
-3. Test coverage: now **28 API suites / 284 tests**. OAuth flows + scheduling
-   still thin. Extend the E2E harness to real flows (login submit, signup, checkout).
-4. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
+1. ~~Manual smoke test of login/signup~~ ✅ done 2026-07-22 (fresh login → clean /home).
+2. **Sweep superadmin pages** live (only user pages done this pass) — the same
+   two systemic patterns (pagination NaN, wrong array key) may lurk there too.
+3. Add `icon-192.png` (or drop the manifest ref) to kill the last console 404.
+4. Apply plan/quota decorators to real routes + define tier limits (product).
+5. Test coverage: now **31 API suites / 292 tests**. Add regression tests for the
+   pagination-default 500 (call a list endpoint with no page/limit) and the
+   asArray parsing. OAuth flows + scheduling still thin.
+6. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
 
 ## ESLint (fixed 2026-07-21)
 `pnpm lint` works again. The API's `import/no-unused-modules` rule was removed:
