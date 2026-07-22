@@ -26,6 +26,23 @@ import styles from './HomeContent.module.css';
 
 // ─── Helpers ──────────────────────────────────────────────
 
+/**
+ * Coerce an API payload to an array, tolerating either a bare array or an
+ * object wrapper (`{ [key]: [...] }`). Anything else — including an error
+ * body or unexpected object — yields `[]` so a single widget's bad payload
+ * can never `.slice`-crash the whole dashboard.
+ */
+function asArray<T = any>(value: unknown, ...keys: string[]): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === 'object') {
+    for (const key of keys) {
+      const inner = (value as Record<string, unknown>)[key];
+      if (Array.isArray(inner)) return inner as T[];
+    }
+  }
+  return [];
+}
+
 function getDateRange(days: number) {
   const end = new Date();
   const start = new Date();
@@ -126,14 +143,18 @@ export function HomeContent() {
   const requestRevision = useRequestRevision();
 
   const overview = analytics.data as any;
-  const recentPosts = ((feed.data as any)?.posts || (feed.data as any) || []).slice(0, 4);
-  const scheduledPosts = ((scheduled.data as any)?.posts || (scheduled.data as any) || []).slice(0, 5);
-  const calendarData = ((calendarPosts.data as any)?.posts || (calendarPosts.data as any) || []);
-  const approvalItems = (Array.isArray(pendingApprovals.data) ? pendingApprovals.data : (pendingApprovals.data as any)?.items || []).slice(0, 3);
-  const approvalCount = Array.isArray(pendingApprovals.data) ? pendingApprovals.data.length : (pendingApprovals.data as any)?.total ?? approvalItems.length;
-  const projectsArr = ((projects.data as any)?.projects || projects.data as any || []).slice(0, 5);
-  const membersArr = ((members.data as any)?.members || (members.data as any) || []).slice(0, 4);
-  const accountsArr = (Array.isArray(socialAccounts.data) ? socialAccounts.data : (socialAccounts.data as any)?.accounts || []);
+  const recentPosts = asArray(feed.data, 'data', 'posts').slice(0, 4);
+  const scheduledPosts = asArray(scheduled.data, 'data', 'posts').slice(0, 5);
+  const calendarData = asArray(calendarPosts.data, 'data', 'posts');
+  const approvalList = asArray(pendingApprovals.data, 'data', 'items');
+  const approvalItems = approvalList.slice(0, 3);
+  const approvalCount =
+    (pendingApprovals.data as any)?.pagination?.total ??
+    (pendingApprovals.data as any)?.total ??
+    approvalList.length;
+  const projectsArr = asArray(projects.data, 'data', 'projects').slice(0, 5);
+  const membersArr = asArray(members.data, 'members', 'data').slice(0, 4);
+  const accountsArr = asArray(socialAccounts.data, 'accounts', 'data');
 
   const subData = subscription.data as any;
   const seatUsed = subData?.seats_used ?? subData?.member_count ?? membersArr.length ?? 0;

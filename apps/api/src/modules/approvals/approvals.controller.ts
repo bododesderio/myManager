@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  Req,
+  DefaultValuePipe,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ApprovalsService } from './approvals.service';
@@ -14,8 +24,8 @@ export class ApprovalsController {
   @ApiOperation({ summary: 'List posts pending approval' })
   async listPending(
     @Query('workspaceId') workspaceId: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
   ) {
     return this.approvalsService.listPending(workspaceId, page, limit);
   }
