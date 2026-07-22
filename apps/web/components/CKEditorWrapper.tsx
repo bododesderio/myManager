@@ -21,6 +21,7 @@ import {
   SourceEditing,
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
+import { CKEDITOR_LICENSE_KEY } from '@/lib/config/editor';
 
 interface CKEditorWrapperProps {
   value: string;
@@ -43,10 +44,9 @@ export default function CKEditorWrapper({
         editor={ClassicEditor}
         data={value}
         config={{
-          // Free open-source usage of CKEditor 5 (v44+ requires a license key
-          // even for GPL). 'GPL' unlocks the editor with no key to buy and no
-          // usage/telemetry limits; it commits the app to GPL-compatible terms.
-          licenseKey: 'GPL',
+          // Free 'GPL' key by default; override via NEXT_PUBLIC_CKEDITOR_LICENSE_KEY.
+          // See lib/config/editor.ts for how to add a paid key later.
+          licenseKey: CKEDITOR_LICENSE_KEY,
           plugins: [
             Essentials,
             Paragraph,
