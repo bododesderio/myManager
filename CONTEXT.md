@@ -34,9 +34,9 @@ persists through the UI.
 **Superadmin minor/known issues still open:**
 - Middleware gates `/superadmin/login` itself (bounces logged-out users to `/login`).
 - `/superadmin/settings/theme` has a generic `<title>`.
-- **CKEditor** (email-template body editor) throws `license-key-missing` — the
-  rich-text Visual editor needs a CKEditor license key set; body saves empty
-  until then. Pre-existing, unrelated to the endpoint work.
+- ~~CKEditor `license-key-missing`~~ → FIXED 2026-07-22 (commit 7226a1b): set
+  `licenseKey: 'GPL'` in CKEditorWrapper. Email-template body now saves real HTML.
+  NOTE: 'GPL' commits the app to GPL-compatible terms (no key purchased).
 
 ## Prior: USER-PAGE SWEEP COMPLETE (2026-07-22)
 Live-tested every user-facing dashboard page as the demo user. **All 15 pages
@@ -196,7 +196,7 @@ verbatim. Don't assume a `{success,data}` envelope when reading API responses.
 2. ~~Sweep superadmin pages~~ ✅ done 2026-07-22 (commit 7d2ef80).
 3. ~~Build the 5 missing superadmin backend endpoints~~ ✅ done 2026-07-22 (commit 8a3132e).
 4. Add `icon-192.png` (or drop the manifest ref) to kill the last console 404.
-5. Set a CKEditor license key (email-template body editor throws license-key-missing).
+5. ~~Set a CKEditor license key~~ ✅ done 2026-07-22 (used free 'GPL' key, commit 7226a1b).
 6. Apply plan/quota decorators to real routes + define tier limits (product).
 7. Test coverage: now **35 API suites / 308 tests** (added regression specs for
    the 5 new admin endpoints, commit f25a797). Still worth adding: a
