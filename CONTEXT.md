@@ -198,9 +198,10 @@ verbatim. Don't assume a `{success,data}` envelope when reading API responses.
 4. Add `icon-192.png` (or drop the manifest ref) to kill the last console 404.
 5. Set a CKEditor license key (email-template body editor throws license-key-missing).
 6. Apply plan/quota decorators to real routes + define tier limits (product).
-7. Test coverage: now **31 API suites / 292 tests**. Add regression tests for the
-   pagination-default 500 (call a list endpoint with no page/limit), asArray
-   parsing, and the 5 new admin endpoints. OAuth flows + scheduling still thin.
+7. Test coverage: now **35 API suites / 308 tests** (added regression specs for
+   the 5 new admin endpoints, commit f25a797). Still worth adding: a
+   pagination-default 500 guard (call a list endpoint with no page/limit) and
+   asArray parsing on the web side. OAuth flows + scheduling still thin.
 8. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
 9. Minor: exempt `/superadmin/login` from the middleware auth gate; give
    `/superadmin/settings/theme` a proper `<title>`.
