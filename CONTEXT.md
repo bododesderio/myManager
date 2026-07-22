@@ -1,7 +1,37 @@
 # Project Context
 Last updated: 2026-07-22
 
-## Current task — live full-stack audit: USER + SUPERADMIN SWEEPS COMPLETE (2026-07-22)
+## Current task — FULL end-to-end live audit (every role/flow), IN PROGRESS (2026-07-22 pm)
+Rebuilt everything clean. Working through: A marketing → B visitor journey →
+C individual user → D agency admin → E team member → F superadmin CMS → G nav.
+Then: UI redesign. Fix-immediately, commit-per-fix. All on `main`, tree clean.
+
+**DONE & GREEN:**
+- **A. Marketing site** — favicon+PWA icons (killed icon-192 404 site-wide),
+  landing+subpage title doubling, canonical, dead footer links; all 8 pages 0 errors.
+  Commits 55133d6, 0a32275, 4e430d0.
+- **B. Visitor journey** — individual + company signup work end-to-end to
+  email-verify → login → dashboard. Fixed: signup showed hardcoded WRONG plan
+  prices (now fetches /plans) [0a31b02]; cross-user workspace leak / 403 burst on
+  shared-browser re-login (WorkspaceUserGuard) [5ea733d]; signup workspaces
+  dropped account_type/owner_id/industry/team_size/referral_source [df6f52b].
+- **C (partial). Media uploads** — broadened formats (added HEIC/HEIF/AVIF/BMP/
+  TIFF/WebM; SVG excluded for XSS) + video-aware per-category caps (img 25MB,
+  video 512MB) [eec709a]. Compose page renders clean.
+
+**RESUME HERE (C onward):** compose→actual post create/schedule/draft; connect
+socials UI (OAuth round-trip needs provider creds — verify UI/init only);
+calendar/drafts/templates/approvals actions; **D** agency admin team mgmt + add
+members (agency@mymanager.app / Agency1234); **E** team member scoped view
+(amara@acme.app etc / member1234); **F** superadmin CMS editing of landing
+content (admin@ / Superadmin123); **G** nav/sidebar consistency + empty states.
+
+**Payment-gated (can't fully test locally):** Flutterwave checkout (no sandbox
+keys); real OAuth social connects (no provider app creds). Verify UI + init only.
+**Dev limitation:** email verification link not deliverable (no email provider) —
+mark users verified via DB to continue a flow.
+
+## Prior task — USER + SUPERADMIN SWEEPS COMPLETE (2026-07-22)
 Live-tested every user-facing AND superadmin page. All user pages + all
 fixable superadmin pages render clean (only the cosmetic `icon-192.png` 404
 remains). Everything committed to `main`; working tree clean.
