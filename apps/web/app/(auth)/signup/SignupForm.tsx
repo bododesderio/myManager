@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api/client';
@@ -8,6 +8,34 @@ import { PASSWORD_RULES, registerSchema } from '@mymanager/validators';
 
 type AccountType = 'individual' | 'company';
 type Step = 1 | 2 | 3 | 4;
+
+interface PlanOption {
+  slug: string;
+  name: string;
+  monthly: number;
+  annual: number;
+  features: string[];
+}
+
+/** Map an API plan to the compact 4-bullet shape the signup step renders. */
+function toPlanOption(p: any): PlanOption {
+  const lim = p.limits ?? {};
+  const feat = p.features ?? {};
+  const orUnlimited = (n: unknown, unit: string) =>
+    !n || Number(n) === 0 ? `Unlimited ${unit}` : `${n} ${unit}`;
+  return {
+    slug: p.slug,
+    name: p.name,
+    monthly: Number(p.price_monthly_usd ?? 0),
+    annual: Number(p.price_annual_usd ?? 0),
+    features: [
+      orUnlimited(lim.accounts, 'social accounts'),
+      orUnlimited(lim.posts, 'posts/month'),
+      `${lim.storage_gb ?? 0}GB storage`,
+      feat.analytics_days ? `${feat.analytics_days}-day analytics` : 'Basic analytics',
+    ],
+  };
+}
 
 const COUNTRIES = ['Uganda', 'Kenya', 'Nigeria', 'Tanzania', 'Ghana', 'Other'];
 const TEAM_SIZES = ['Just me', '2–5', '6–15', '16–50', '50+'];
@@ -39,6 +67,29 @@ export default function SignupForm() {
   const [selectedPlan, setSelectedPlan] = useState('free');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const [resendingVerification, setResendingVerification] = useState(false);
+
+  // Plans come from the API (same source as the /pricing page) so signup can
+  // never show prices/limits that drift from what the pricing page advertises.
+  const [plans, setPlans] = useState<PlanOption[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .get<any>('/plans')
+      .then((res) => {
+        const raw: any[] = Array.isArray(res) ? res : (res?.data ?? []);
+        const mapped = raw
+          .filter((p) => p.slug !== 'custom' && p.is_active !== false)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+          .map(toPlanOption);
+        if (!cancelled) setPlans(mapped);
+      })
+      .catch(() => {
+        /* leave plans empty; the Free plan is always selectable via the default */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const totalSteps = accountType === 'company' ? 4 : 3;
 
@@ -328,12 +379,7 @@ export default function SignupForm() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  { slug: 'free', name: 'Free', price: 0, features: ['3 social accounts', '10 posts/month', '500MB storage', 'Basic analytics'] },
-                  { slug: 'starter', name: 'Starter', price: billingCycle === 'monthly' ? 15 : 12, features: ['10 social accounts', '100 posts/month', '5GB storage', 'Advanced analytics'] },
-                  { slug: 'pro', name: 'Pro', price: billingCycle === 'monthly' ? 39 : 30, features: ['25 social accounts', 'Unlimited posts', '25GB storage', 'AI credits included'] },
-                  { slug: 'enterprise', name: 'Enterprise', price: billingCycle === 'monthly' ? 99 : 77, features: ['Unlimited accounts', 'Unlimited posts', '100GB storage', 'Team features + API'] },
-                ].map((plan) => (
+                {plans.map((p) => ({ slug: p.slug, name: p.name, price: billingCycle === 'monthly' ? p.monthly : p.annual, features: p.features })).map((plan) => (
                   <button
                     key={plan.slug}
                     onClick={() => setSelectedPlan(plan.slug)}
