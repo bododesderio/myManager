@@ -415,6 +415,64 @@ export class BillingService {
     return { mrr, totalActiveSubscriptions: totalSubs, planBreakdown };
   }
 
+  /** Aggregated billing overview for the superadmin dashboard (/admin/billing). */
+  async getAdminBillingOverview() {
+    const [mrr, activeSubscriptions, revenueBreakdown, plans, transactions] = await Promise.all([
+      this.repository.calculateMRR(),
+      this.repository.countActiveSubscriptions(),
+      this.repository.getPlanRevenueBreakdown(),
+      this.repository.getAllPlans(),
+      this.repository.getRecentTransactions(10),
+    ]);
+
+    const planName = new Map((plans as any[]).map((p) => [p.id, p.name]));
+    const subscriptionsByPlan = (revenueBreakdown as any[]).map((r) => ({
+      plan: planName.get(r.plan_id) ?? 'Unknown',
+      count: r._count.id,
+      revenue: Number(r._sum?.billing_amount ?? 0),
+    }));
+
+    const recentTransactions = (transactions as any[]).map((t) => ({
+      id: t.id,
+      user: t.workspace?.owner?.email ?? t.workspace?.name ?? t.plan_name ?? '—',
+      amount: Number(t.amount),
+      status: t.status,
+      date: t.created_at,
+    }));
+
+    return { mrr, activeSubscriptions, subscriptionsByPlan, recentTransactions };
+  }
+
+  async listBillingOverrides() {
+    const overrides = await this.repository.listBillingOverrides();
+    const wsIds = [...new Set((overrides as any[]).map((o) => o.workspace_id).filter(Boolean))];
+    const names = await this.repository.findWorkspaceNames(wsIds as string[]);
+    return {
+      data: (overrides as any[]).map((o) => ({
+        id: o.id,
+        workspaceName: o.workspace_id ? (names.get(o.workspace_id) ?? o.workspace_id) : '—',
+        type: o.type,
+        details: o.details,
+        expiresAt: o.expires_at,
+      })),
+    };
+  }
+
+  async createBillingOverride(adminId: string, data: {
+    workspaceId?: string;
+    type: string;
+    details: string;
+    expiresAt?: string | null;
+  }) {
+    return this.repository.createBillingOverride({
+      workspace_id: data.workspaceId || null,
+      type: data.type,
+      details: data.details,
+      expires_at: data.expiresAt ? new Date(data.expiresAt) : null,
+      created_by: adminId,
+    });
+  }
+
   async createPlanOverride(adminId: string, data: {
     userId: string;
     planId: string;

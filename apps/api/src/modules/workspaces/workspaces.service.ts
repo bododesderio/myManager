@@ -20,6 +20,22 @@ export class WorkspacesService {
     return memberships.map((m) => ({ ...m.workspace, role: m.role }));
   }
 
+  /** Superadmin listing of all workspaces for /admin/workspaces. */
+  async listAllForAdmin(page: number, limit: number) {
+    const offset = (page - 1) * limit;
+    const [rows, total] = await this.repository.findAllForAdmin(offset, limit);
+    const data = (rows as any[]).map((ws) => ({
+      id: ws.id,
+      name: ws.name,
+      ownerEmail: ws.owner?.email ?? '—',
+      plan: ws.subscriptions?.[0]?.plan?.name ?? 'Free',
+      memberCount: ws._count?.members ?? 0,
+      postCount: ws._count?.posts ?? 0,
+      createdAt: ws.created_at,
+    }));
+    return { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  }
+
   async create(userId: string, data: { name: string; slug?: string }) {
     const slug = data.slug || data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     const existing = await this.repository.findBySlug(slug);

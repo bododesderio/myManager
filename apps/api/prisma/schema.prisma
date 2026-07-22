@@ -387,6 +387,23 @@ model PlanOverride {
   @@map("plan_overrides")
 }
 
+/**
+ * Superadmin billing overrides (discounts, comps, custom terms) applied to a
+ * workspace. Distinct from PlanOverride, which swaps a user's whole plan.
+ * workspace_id is a soft reference (free-text in the admin form), so no FK.
+ */
+model BillingOverride {
+  id           String    @id @default(uuid())
+  workspace_id String?
+  type         String
+  details      String
+  expires_at   DateTime?
+  created_by   String?
+  created_at   DateTime  @default(now())
+
+  @@map("billing_overrides")
+}
+
 model SalesLead {
   id           String   @id @default(uuid())
   name         String
@@ -1470,6 +1487,19 @@ model Translation {
 
   @@unique([locale, namespace, key])
   @@map("translations")
+}
+
+/** Superadmin-editable transactional email templates. */
+model EmailTemplate {
+  id         String   @id @default(uuid())
+  name       String
+  subject    String
+  trigger    String   @unique
+  body       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("email_templates")
 }
 
 // ═══════════════════════════════════════════════════════════

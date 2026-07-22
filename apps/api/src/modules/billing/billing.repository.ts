@@ -190,6 +190,24 @@ export class BillingRepository {
     });
   }
 
+  /** Active-sub count + summed billing amount per plan, for the admin overview. */
+  async getPlanRevenueBreakdown() {
+    return this.prisma.subscription.groupBy({
+      by: ['plan_id'],
+      where: { status: 'ACTIVE' },
+      _count: { id: true },
+      _sum: { billing_amount: true },
+    });
+  }
+
+  async getRecentTransactions(limit: number) {
+    return this.prisma.billingHistory.findMany({
+      take: limit,
+      orderBy: { created_at: 'desc' },
+      include: { workspace: { select: { name: true, owner: { select: { email: true } } } } },
+    });
+  }
+
   async createOverride(data: {
     user_id: string;
     plan_id: string;
@@ -202,6 +220,29 @@ export class BillingRepository {
 
   async getAllPlans() {
     return this.prisma.plan.findMany();
+  }
+
+  async listBillingOverrides() {
+    return this.prisma.billingOverride.findMany({ orderBy: { created_at: 'desc' } });
+  }
+
+  async createBillingOverride(data: {
+    workspace_id: string | null;
+    type: string;
+    details: string;
+    expires_at: Date | null;
+    created_by: string;
+  }) {
+    return this.prisma.billingOverride.create({ data });
+  }
+
+  async findWorkspaceNames(ids: string[]): Promise<Map<string, string>> {
+    if (ids.length === 0) return new Map();
+    const rows = await this.prisma.workspace.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true },
+    });
+    return new Map(rows.map((r) => [r.id, r.name]));
   }
 
   async getMrrHistory(months: number) {

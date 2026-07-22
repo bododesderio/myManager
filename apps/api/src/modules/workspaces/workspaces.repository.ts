@@ -12,6 +12,23 @@ export class WorkspacesRepository {
     });
   }
 
+  /** Superadmin: every workspace with owner, plan, and member/post counts. */
+  async findAllForAdmin(offset: number, limit: number): Promise<[unknown[], number]> {
+    return Promise.all([
+      this.prisma.workspace.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        include: {
+          owner: { select: { email: true, name: true } },
+          subscriptions: { include: { plan: { select: { name: true } } } },
+          _count: { select: { members: true, posts: true } },
+        },
+      }),
+      this.prisma.workspace.count(),
+    ]);
+  }
+
   async findById(id: string) {
     return this.prisma.workspace.findUnique({
       where: { id },
