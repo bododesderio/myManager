@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import { WorkspaceUserGuard } from '@/components/layout/WorkspaceUserGuard';
 
 const Sidebar = dynamic(
   () => import('@/components/layout/Sidebar').then((m) => ({ default: m.Sidebar })),
@@ -33,20 +34,20 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Suspense fallback={<div className="w-16 shrink-0 border-r border-border bg-bg" />}>
-        <Sidebar />
-      </Suspense>
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Suspense fallback={<div className="h-14 border-b border-border bg-bg" />}>
-          <Topbar />
+    <WorkspaceUserGuard userId={session.user.id}>
+      <div className="flex h-screen overflow-hidden">
+        <Suspense fallback={<div className="w-16 shrink-0 border-r border-border bg-bg" />}>
+          <Sidebar />
         </Suspense>
-        <main className="flex-1 overflow-y-auto bg-bg-2 p-6">
-          <div className="animate-[fadeIn_0.3s_ease-in-out]">
-            {children}
-          </div>
-        </main>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <Suspense fallback={<div className="h-14 border-b border-border bg-bg" />}>
+            <Topbar />
+          </Suspense>
+          <main className="flex-1 overflow-y-auto bg-bg-2 p-6">
+            <div className="animate-[fadeIn_0.3s_ease-in-out]">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </WorkspaceUserGuard>
   );
 }

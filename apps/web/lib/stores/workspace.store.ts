@@ -12,8 +12,17 @@ interface Workspace {
 interface WorkspaceStore {
   activeWorkspaceId: string | null;
   workspaces: Workspace[];
+  /** The user id the persisted activeWorkspaceId belongs to. */
+  userScope: string | null;
   setActiveWorkspace: (id: string) => void;
   setWorkspaces: (workspaces: Workspace[]) => void;
+  /**
+   * Bind the store to the signed-in user. If a different user is now active,
+   * the persisted workspace (from the previous user, e.g. on a shared browser)
+   * is dropped so scoped queries don't fire against a workspace this user can't
+   * access (which 403s). Called before dashboard children mount.
+   */
+  syncUser: (userId: string) => void;
   getActiveWorkspace: () => Workspace | undefined;
 }
 
@@ -22,7 +31,13 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
     (set, get) => ({
       activeWorkspaceId: null,
       workspaces: [],
+      userScope: null,
       setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
+      syncUser: (userId) => {
+        if (get().userScope !== userId) {
+          set({ userScope: userId, activeWorkspaceId: null, workspaces: [] });
+        }
+      },
       setWorkspaces: (workspaces) => {
         const state = get();
         set({ workspaces });
@@ -45,7 +60,10 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
     }),
     {
       name: 'mymanager-workspace',
-      partialize: (state) => ({ activeWorkspaceId: state.activeWorkspaceId }),
+      partialize: (state) => ({
+        activeWorkspaceId: state.activeWorkspaceId,
+        userScope: state.userScope,
+      }),
     },
   ),
 );
