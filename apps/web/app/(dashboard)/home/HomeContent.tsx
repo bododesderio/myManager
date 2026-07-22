@@ -13,6 +13,7 @@ import { useWorkspaceMembers } from '@/lib/hooks/useWorkspaces';
 import { useSubscription } from '@/lib/hooks/useBilling';
 import { useSocialAccounts } from '@/lib/hooks/useSocialAccounts';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
+import { asArray } from '@/lib/utils/as-array';
 import {
   Eye,
   FileText,
@@ -25,23 +26,6 @@ import {
 import styles from './HomeContent.module.css';
 
 // ─── Helpers ──────────────────────────────────────────────
-
-/**
- * Coerce an API payload to an array, tolerating either a bare array or an
- * object wrapper (`{ [key]: [...] }`). Anything else — including an error
- * body or unexpected object — yields `[]` so a single widget's bad payload
- * can never `.slice`-crash the whole dashboard.
- */
-function asArray<T = any>(value: unknown, ...keys: string[]): T[] {
-  if (Array.isArray(value)) return value as T[];
-  if (value && typeof value === 'object') {
-    for (const key of keys) {
-      const inner = (value as Record<string, unknown>)[key];
-      if (Array.isArray(inner)) return inner as T[];
-    }
-  }
-  return [];
-}
 
 function getDateRange(days: number) {
   const end = new Date();
