@@ -16,17 +16,27 @@ plans, queue, api-health, audit, seo, brand, content/{pages,blog,faq,leads,legal
 nav-links,newsletter,testimonials}, settings/{theme,credentials,stock-images},
 billing/leads, settings.
 
-**Superadmin — genuinely MISSING backend endpoints (pages render empty, no crash;
-need backend work, NOT path typos):**
-- `GET /admin/workspaces` — no admin workspace-list endpoint exists at all.
-- `GET /admin/billing` — API splits this across `/billing/admin/mrr`,
-  `/billing/admin/plan-distribution`, `/billing/admin/failed-payments`,
-  `/billing/admin/mrr-history`; frontend `useAdminBilling` wants one aggregate.
-- `GET /admin/billing/overrides` — only `POST /billing/admin/override` exists.
-- `GET /admin/email-templates` (content/emails) — no route anywhere.
-- `GET /admin/translations` (content/translations) — no route anywhere.
-- Minor: middleware gates `/superadmin/login` itself (bounces logged-out users
-  to `/login`); `/superadmin/settings/theme` has a generic `<title>`.
+**Superadmin — the 5 missing endpoints are now BUILT (2026-07-22, commit 8a3132e).**
+All render clean with real data; no frontend changes were needed (the pages
+already called these paths):
+- `GET /admin/workspaces` — WorkspacesService.listAllForAdmin.
+- `GET /admin/billing` — BillingService.getAdminBillingOverview (MRR, subs,
+  per-plan revenue, recent transactions).
+- `GET/POST /admin/billing/overrides` — new **BillingOverride** model (the page's
+  workspace-discount shape didn't fit user-scoped PlanOverride).
+- `GET/POST/PATCH/DELETE /admin/email-templates` — new **EmailTemplate** model.
+- `GET/PATCH /admin/translations` — pivots per-locale Translation rows into
+  key-groups (group id = base64url(namespace+key)).
+Migration `20260722082153_add_billing_overrides_and_email_templates`. Writes are
+CSRF-protected (frontend apiClient handles it). Verified: email-template create
+persists through the UI.
+
+**Superadmin minor/known issues still open:**
+- Middleware gates `/superadmin/login` itself (bounces logged-out users to `/login`).
+- `/superadmin/settings/theme` has a generic `<title>`.
+- **CKEditor** (email-template body editor) throws `license-key-missing` — the
+  rich-text Visual editor needs a CKEditor license key set; body saves empty
+  until then. Pre-existing, unrelated to the endpoint work.
 
 ## Prior: USER-PAGE SWEEP COMPLETE (2026-07-22)
 Live-tested every user-facing dashboard page as the demo user. **All 15 pages
@@ -184,17 +194,15 @@ verbatim. Don't assume a `{success,data}` envelope when reading API responses.
 ## Next steps
 1. ~~Manual smoke test of login/signup~~ ✅ done 2026-07-22 (fresh login → clean /home).
 2. ~~Sweep superadmin pages~~ ✅ done 2026-07-22 (commit 7d2ef80).
-3. **Build the 5 missing superadmin backend endpoints** (see the "genuinely
-   MISSING" list above): admin workspace list, billing overview aggregate,
-   billing-overrides list, email-templates, translations. Product decisions on
-   response shapes needed — the frontend pages already exist and expect data.
+3. ~~Build the 5 missing superadmin backend endpoints~~ ✅ done 2026-07-22 (commit 8a3132e).
 4. Add `icon-192.png` (or drop the manifest ref) to kill the last console 404.
-5. Apply plan/quota decorators to real routes + define tier limits (product).
-6. Test coverage: now **31 API suites / 292 tests**. Add regression tests for the
-   pagination-default 500 (call a list endpoint with no page/limit) and the
-   asArray parsing. OAuth flows + scheduling still thin.
-7. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
-8. Minor: exempt `/superadmin/login` from the middleware auth gate; give
+5. Set a CKEditor license key (email-template body editor throws license-key-missing).
+6. Apply plan/quota decorators to real routes + define tier limits (product).
+7. Test coverage: now **31 API suites / 292 tests**. Add regression tests for the
+   pagination-default 500 (call a list endpoint with no page/limit), asArray
+   parsing, and the 5 new admin endpoints. OAuth flows + scheduling still thin.
+8. Remaining Phase 2 durables: extract `packages/ui`, `any`-type cleanup.
+9. Minor: exempt `/superadmin/login` from the middleware auth gate; give
    `/superadmin/settings/theme` a proper `<title>`.
 
 ## ESLint (fixed 2026-07-21)
