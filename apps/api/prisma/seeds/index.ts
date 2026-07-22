@@ -893,11 +893,11 @@ async function seedNavLinks() {
     { label: 'About', href: '/about', placement: 'main_nav', order_index: 2 },
     { label: 'Blog', href: '/blog', placement: 'main_nav', order_index: 3 },
     // Footer - Product
+    // NOTE: only link pages that exist. Changelog/Roadmap/API-docs were seeded
+    // here but have no routes (they 404'd in the footer). Re-add via the
+    // superadmin nav-links UI once those pages are built.
     { label: 'Features', href: '/features', placement: 'footer_product', order_index: 0 },
     { label: 'Pricing', href: '/pricing', placement: 'footer_product', order_index: 1 },
-    { label: 'Changelog', href: '/changelog', placement: 'footer_product', order_index: 2 },
-    { label: 'Roadmap', href: '/roadmap', placement: 'footer_product', order_index: 3 },
-    { label: 'API docs', href: '/docs', placement: 'footer_product', order_index: 4 },
     // Footer - Company
     { label: 'About us', href: '/about', placement: 'footer_company', order_index: 0 },
     { label: 'Blog', href: '/blog', placement: 'footer_company', order_index: 1 },
