@@ -35,8 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getCmsPage('landing');
   const hero = getFields(page, 'hero');
   return {
-    title: hero.meta_title || 'myManager — Social Media Management Platform',
+    // `absolute` bypasses the layout's "%s | myManager" template — the landing
+    // title already contains the brand, so the template would double it.
+    title: { absolute: hero.meta_title || 'myManager — Social Media Management Platform' },
     description: hero.meta_description || 'Plan, schedule, and analyze your social media content across all platforms from one dashboard.',
+    alternates: { canonical: '/' },
   };
 }
 
