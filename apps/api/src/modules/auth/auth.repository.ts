@@ -50,6 +50,10 @@ export class AuthRepository {
     name: string;
     workspaceName: string;
     workspaceSlug: string;
+    accountType?: 'individual' | 'company';
+    industry?: string;
+    teamSize?: string;
+    referralSource?: string;
     planSlug?: string;
     billingCycle?: string;
     emailVerificationTokenHash: string;
@@ -66,7 +70,15 @@ export class AuthRepository {
       });
 
       const workspace = await tx.workspace.create({
-        data: { name: data.workspaceName, slug: data.workspaceSlug },
+        data: {
+          name: data.workspaceName,
+          slug: data.workspaceSlug,
+          owner_id: user.id,
+          account_type: data.accountType === 'company' ? 'COMPANY' : 'INDIVIDUAL',
+          industry: data.industry ?? null,
+          team_size: data.teamSize ?? null,
+          referral_source: data.referralSource ?? null,
+        },
       });
 
       await tx.workspaceMember.create({
