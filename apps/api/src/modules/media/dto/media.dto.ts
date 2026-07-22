@@ -15,20 +15,50 @@ import {
 /**
  * Allowed MIME types for media uploads.
  */
-export const ALLOWED_MIME_TYPES = [
+// Images: broad modern coverage incl. HEIC/HEIF (default iPhone photos) and
+// AVIF. SVG is intentionally excluded — it can carry scripts and is an XSS risk
+// when served back. Videos: the formats the platforms actually accept.
+export const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
   'image/png',
   'image/gif',
   'image/webp',
+  'image/avif',
+  'image/heic',
+  'image/heif',
+  'image/bmp',
+  'image/tiff',
+] as const;
+
+export const ALLOWED_VIDEO_TYPES = [
   'video/mp4',
-  'video/quicktime',
-  'application/pdf',
+  'video/quicktime', // .mov
+  'video/webm',
+] as const;
+
+export const ALLOWED_DOCUMENT_TYPES = ['application/pdf'] as const;
+
+export const ALLOWED_MIME_TYPES = [
+  ...ALLOWED_IMAGE_TYPES,
+  ...ALLOWED_VIDEO_TYPES,
+  ...ALLOWED_DOCUMENT_TYPES,
 ] as const;
 
 export type AllowedMimeType = (typeof ALLOWED_MIME_TYPES)[number];
 
-/** 50 MB in bytes */
-export const MAX_FILE_SIZE = 50 * 1024 * 1024;
+// Per-category size caps — videos get a much larger budget than images.
+export const MAX_IMAGE_SIZE = 25 * 1024 * 1024; // 25 MB
+export const MAX_VIDEO_SIZE = 512 * 1024 * 1024; // 512 MB
+export const MAX_DOCUMENT_SIZE = 25 * 1024 * 1024; // 25 MB
+/** Absolute ceiling the DTO enforces; per-category limits are checked in the service. */
+export const MAX_FILE_SIZE = MAX_VIDEO_SIZE;
+
+/** The size cap that applies to a given content type. */
+export function maxSizeForContentType(contentType: string): number {
+  if ((ALLOWED_VIDEO_TYPES as readonly string[]).includes(contentType)) return MAX_VIDEO_SIZE;
+  if ((ALLOWED_DOCUMENT_TYPES as readonly string[]).includes(contentType)) return MAX_DOCUMENT_SIZE;
+  return MAX_IMAGE_SIZE;
+}
 
 export class GetPresignedUploadUrlDto {
   @ApiProperty({ description: 'Workspace the media belongs to' })
@@ -54,13 +84,13 @@ export class GetPresignedUploadUrlDto {
   contentType!: AllowedMimeType;
 
   @ApiProperty({
-    description: 'File size in bytes (max 50 MB)',
+    description: 'File size in bytes (images ≤25 MB, videos ≤512 MB)',
     example: 1048576,
   })
   @IsNumber()
   @Min(1, { message: 'fileSize must be at least 1 byte' })
   @Max(MAX_FILE_SIZE, {
-    message: `fileSize must not exceed ${MAX_FILE_SIZE} bytes (50 MB)`,
+    message: `fileSize must not exceed ${MAX_FILE_SIZE / (1024 * 1024)} MB`,
   })
   fileSize!: number;
 }

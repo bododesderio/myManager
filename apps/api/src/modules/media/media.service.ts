@@ -7,6 +7,11 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MediaRepository } from './media.repository';
+import {
+  maxSizeForContentType,
+  ALLOWED_VIDEO_TYPES,
+  ALLOWED_DOCUMENT_TYPES,
+} from './dto/media.dto';
 
 @Injectable()
 export class MediaService {
@@ -68,6 +73,18 @@ export class MediaService {
     contentType: string;
     fileSize: number;
   }) {
+    // Per-category cap: videos get a far larger budget than images (see media.dto).
+    const cap = maxSizeForContentType(data.contentType);
+    if (data.fileSize > cap) {
+      const mb = Math.round(cap / (1024 * 1024));
+      const kind = ALLOWED_VIDEO_TYPES.includes(data.contentType as never)
+        ? 'videos'
+        : ALLOWED_DOCUMENT_TYPES.includes(data.contentType as never)
+          ? 'documents'
+          : 'images';
+      throw new BadRequestException(`File too large: ${kind} must not exceed ${mb} MB`);
+    }
+
     const storageUsage = await this.repository.getStorageUsedBytes(data.workspaceId);
     const storageLimit = await this.repository.getStorageLimitBytes(data.workspaceId);
     if (storageUsage + BigInt(data.fileSize) > storageLimit) {

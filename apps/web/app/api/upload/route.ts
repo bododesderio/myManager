@@ -32,8 +32,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Keep in step with the API's media allow-list (apps/api media.dto.ts).
     const allowedTypes = [
       'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'image/avif', 'image/heic', 'image/heif', 'image/bmp', 'image/tiff',
       'video/mp4', 'video/quicktime', 'video/webm',
     ];
 
