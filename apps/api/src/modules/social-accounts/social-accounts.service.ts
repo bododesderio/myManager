@@ -24,6 +24,13 @@ interface OAuthConfig {
    * request without a code_challenge; X (OAuth 2.0) requires it too.
    */
   pkce?: boolean;
+  /**
+   * Whether the token endpoint requires HTTP Basic auth
+   * (`Authorization: Basic base64(clientId:clientSecret)`) instead of the
+   * client_secret in the form body. X's confidential client and Pinterest v5
+   * both mandate this on token exchange AND refresh.
+   */
+  basicAuth?: boolean;
 }
 
 @Injectable()
@@ -56,6 +63,7 @@ export class SocialAccountsService {
         clientSecret: this.configService.get('TWITTER_CLIENT_SECRET')!,
         scopes: ['tweet.read', 'tweet.write', 'users.read', 'offline.access'],
         pkce: true,
+        basicAuth: true,
       },
       linkedin: {
         authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
@@ -89,6 +97,8 @@ export class SocialAccountsService {
         clientId: this.configService.get('PINTEREST_APP_ID')!,
         clientSecret: this.configService.get('PINTEREST_APP_SECRET')!,
         scopes: ['boards:read', 'pins:read', 'pins:write'],
+        // Pinterest v5 mandates HTTP Basic auth on /v5/oauth/token.
+        basicAuth: true,
       },
       youtube: {
         authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -180,9 +190,9 @@ export class SocialAccountsService {
       body.code_verifier = storedState.codeVerifier;
     }
 
-    if (resolvedPlatform === 'x') {
-      // X's confidential-client token endpoint requires HTTP Basic auth and
-      // rejects client_secret in the body.
+    if (config.basicAuth) {
+      // X's confidential client and Pinterest v5 require HTTP Basic auth on the
+      // token endpoint and reject client_secret in the body.
       delete body.client_secret;
       headers.Authorization =
         'Basic ' +
@@ -247,15 +257,27 @@ export class SocialAccountsService {
     const config = this.platformConfigs[account.platform_id];
     const decryptedRefreshToken = this.decryptToken(account.refresh_token_encrypted);
 
+    const refreshHeaders: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    const refreshBody: Record<string, string> = {
+      [config.clientIdParam ?? 'client_id']: config.clientId,
+      client_secret: config.clientSecret,
+      refresh_token: decryptedRefreshToken,
+      grant_type: 'refresh_token',
+    };
+    if (config.basicAuth) {
+      // Same Basic-auth requirement as the initial exchange (X, Pinterest).
+      delete refreshBody.client_secret;
+      refreshHeaders.Authorization =
+        'Basic ' +
+        Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+    }
+
     const response = await fetch(config.tokenUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        [config.clientIdParam ?? 'client_id']: config.clientId,
-        client_secret: config.clientSecret,
-        refresh_token: decryptedRefreshToken,
-        grant_type: 'refresh_token',
-      }).toString(),
+      headers: refreshHeaders,
+      body: new URLSearchParams(refreshBody).toString(),
     });
 
     const tokens = (await response.json()) as { access_token: string; refresh_token?: string; expires_in?: number };
@@ -326,6 +348,7 @@ export class SocialAccountsService {
       picture?: { data?: { url?: string } } | string;
       profile_picture_url?: string;
       profile_image_url?: string;
+      profile_image?: string; // Pinterest v5 /user_account
       data?: {
         // X (Twitter) v2 wraps the user object directly under `data`…
         id?: string;
@@ -341,7 +364,10 @@ export class SocialAccountsService {
       typeof data.picture === 'string' ? data.picture : data.picture?.data?.url;
 
     return {
-      id: data.id || data.sub || data.data?.id || data.data?.user?.open_id || 'unknown',
+      // Pinterest v5 /user_account exposes no numeric id — username is the
+      // stable identifier, so it seeds platform_user_id (avoids two Pinterest
+      // accounts colliding on 'unknown' in the same workspace).
+      id: data.id || data.sub || data.data?.id || data.data?.user?.open_id || data.username || 'unknown',
       username:
         data.username ||
         data.data?.username ||
@@ -360,6 +386,7 @@ export class SocialAccountsService {
         pictureUrl ||
         data.profile_picture_url ||
         data.profile_image_url ||
+        data.profile_image ||
         data.data?.profile_image_url ||
         data.data?.user?.avatar_url ||
         '',
