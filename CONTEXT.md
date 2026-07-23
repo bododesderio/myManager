@@ -37,8 +37,9 @@ unrelated Docker container (`rooibok-site-umami-1`, maps `0.0.0.0:3001->3000`)
 grabbed :3001 during a nest watch-restart window (`EADDRINUSE`). The web was
 **rebuilt with `API_URL=http://localhost:3011` baked** (Next bakes the
 `rewrites()` destination at BUILD time — a runtime API_URL is ignored). Bring-up
-now: `PORT=3011 pnpm --filter @mymanager/api dev`; build+start web with
-`API_URL=http://localhost:3011`. To restore the canonical :3001, free the port
+now: `PORT=3011 pnpm --filter @mymanager/api dev`; **build** web with BOTH
+`API_URL=http://localhost:3011` AND `DISABLE_HTTPS_UPGRADE=1` (both bake at build
+time), then start with the same env. To restore the canonical :3001, free the port
 (`docker stop rooibok-site-umami-1` — I was blocked from doing this by the
 permission classifier) then rebuild the web without API_URL (defaults to :3001).
 
@@ -63,10 +64,27 @@ owner/admin). Plan was resolved per-user → a MEMBER of a paid workspace saw
 "Free"; now /billing/subscription resolves by ?workspaceId (workspace-scoped
 plan), so members see the real Enterprise plan + features. Verified live.
 
-**RESUME HERE (F, G, + C-tail):** **F** superadmin CMS editing (admin@ /
-Superadmin123); **G** nav/sidebar consistency + empty states. Social round-trip
-(C-tail) still blocked on provider-side redirect-URI + test-user setup. Pinterest
-[551597f] wired but blocked on trial-access secret.
+**F — DONE (verified 2026-07-23).** Superadmin CMS editing works end-to-end: FAQ
+item edit (question + CKEditor answer) persisted to DB; CKEditor loads clean
+(GPL-license fix holds). **Fixed a build-config miss:** the CSP
+`upgrade-insecure-requests` is baked at BUILD time and my earlier builds omitted
+`DISABLE_HTTPS_UPGRADE=1` → the admin sidebar prefetched RSC over https →
+~20 `ERR_SSL_PROTOCOL_ERROR` per superadmin page. **Set `DISABLE_HTTPS_UPGRADE=1`
+in the BUILD env (not just start)** → superadmin pages now 0 errors. (Local-only;
+prod runs https and wants the directive.)
+
+**G — partial [11cb3b2].** Content sub-nav (ContentLayout) linked to legacy
+`/admin/content/*` (301→/superadmin) → redundant redirect + active-highlight
+never matched (`pathname===href` compared /superadmin vs /admin). Pointed hrefs
+at /superadmin/content/*. **Remaining G:** other `/admin/*` refs in superadmin are
+API paths (`/api/v1/admin/*` — CORRECT, leave); `/superadmin/settings/theme`
+generic <title>; `/superadmin/login` still middleware-gated; broad empty-state pass.
+
+**RESUME HERE:** finish **G** (empty states + the two minor superadmin items
+above). Social round-trip (C-tail) blocked on provider-side redirect-URI +
+test-user setup. Pinterest [551597f] blocked on trial-access secret. Google OAuth
+creds pending (client covers google-business+youtube; redirect
+`http://localhost:3000/connect/oauth`, JS origin `http://localhost:3000`).
 
 **Payment-gated (can't fully test locally):** Flutterwave checkout (no sandbox
 keys). Social OAuth: initiate verified live; round-trip pending provider-side
