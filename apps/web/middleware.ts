@@ -14,7 +14,10 @@ export function middleware(request: NextRequest) {
     request.cookies.get('__Secure-next-auth.session-token')?.value;
 
   const isPortalRoute = pathname.startsWith('/portal');
-  const isSuperadminRoute = pathname.startsWith('/superadmin');
+  // The superadmin sign-in page must stay reachable while logged out — otherwise
+  // the "unauthenticated superadmin route → /login" gate below bounces it away.
+  const isSuperadminLogin = pathname === '/superadmin/login';
+  const isSuperadminRoute = pathname.startsWith('/superadmin') && !isSuperadminLogin;
   const isLegacyAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
   const isUserRoute = pathname.startsWith('/user');
   const isProtectedDashboardRoute = isDashboardRoute(pathname);
