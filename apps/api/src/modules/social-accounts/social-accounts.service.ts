@@ -14,6 +14,16 @@ interface OAuthConfig {
   clientId: string;
   clientSecret: string;
   scopes: string[];
+  /**
+   * The OAuth parameter name carrying the client identifier. Every provider
+   * uses `client_id` except TikTok, whose v2 endpoints require `client_key`.
+   */
+  clientIdParam?: 'client_id' | 'client_key';
+  /**
+   * Whether the provider requires PKCE (S256). TikTok rejects the authorize
+   * request without a code_challenge; X (OAuth 2.0) requires it too.
+   */
+  pkce?: boolean;
 }
 
 @Injectable()
@@ -45,13 +55,17 @@ export class SocialAccountsService {
         clientId: this.configService.get('TWITTER_CLIENT_ID')!,
         clientSecret: this.configService.get('TWITTER_CLIENT_SECRET')!,
         scopes: ['tweet.read', 'tweet.write', 'users.read', 'offline.access'],
+        pkce: true,
       },
       linkedin: {
         authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
         tokenUrl: 'https://www.linkedin.com/oauth/v2/accessToken',
         clientId: this.configService.get('LINKEDIN_CLIENT_ID')!,
         clientSecret: this.configService.get('LINKEDIN_CLIENT_SECRET')!,
-        scopes: ['r_liteprofile', 'w_member_social', 'r_organization_social'],
+        // LinkedIn migrated to OpenID Connect. The legacy r_liteprofile /
+        // r_organization_social scopes are no longer granted to new apps and
+        // cause an "unauthorized_scope_error" at the authorize step.
+        scopes: ['openid', 'profile', 'email', 'w_member_social'],
       },
       tiktok: {
         authUrl: 'https://www.tiktok.com/v2/auth/authorize/',
@@ -59,6 +73,8 @@ export class SocialAccountsService {
         clientId: this.configService.get('TIKTOK_CLIENT_KEY')!,
         clientSecret: this.configService.get('TIKTOK_CLIENT_SECRET')!,
         scopes: ['user.info.basic', 'video.publish', 'video.upload'],
+        clientIdParam: 'client_key',
+        pkce: true,
       },
       'google-business': {
         authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -100,56 +116,94 @@ export class SocialAccountsService {
     if (!config) throw new BadRequestException(`Unsupported platform: ${platform}`);
 
     const state = crypto.randomBytes(32).toString('hex');
-    await this.repository.storeOAuthState(state, { platform, userId, workspaceId, redirectUri });
+
+    // PKCE (S256): a per-request verifier is stored server-side and its SHA-256
+    // challenge is sent to the provider. TikTok rejects the authorize request
+    // without it; X requires it too.
+    const codeVerifier = config.pkce ? crypto.randomBytes(32).toString('base64url') : undefined;
+    await this.repository.storeOAuthState(state, {
+      platform,
+      userId,
+      workspaceId,
+      redirectUri,
+      codeVerifier,
+    });
 
     const params = new URLSearchParams({
-      client_id: config.clientId,
+      [config.clientIdParam ?? 'client_id']: config.clientId,
       redirect_uri: redirectUri,
       response_type: 'code',
       scope: config.scopes.join(' '),
       state,
     });
 
-    if (platform === 'x') {
-      params.set('code_challenge', state);
-      params.set('code_challenge_method', 'plain');
+    if (config.pkce && codeVerifier) {
+      const codeChallenge = crypto
+        .createHash('sha256')
+        .update(codeVerifier)
+        .digest('base64url');
+      params.set('code_challenge', codeChallenge);
+      params.set('code_challenge_method', 'S256');
     }
 
     return { authorizationUrl: `${config.authUrl}?${params.toString()}` };
   }
 
-  async handleOAuthCallback(platform: string, code: string, state: string, workspaceId: string) {
+  async handleOAuthCallback(code: string, state: string, workspaceId: string, platform?: string) {
     const storedState = await this.repository.getOAuthState(state);
     if (!storedState) throw new BadRequestException('Invalid or expired OAuth state');
-    if (storedState.platform !== platform) {
+    // The platform is authoritative from the server-stored state; a caller-
+    // supplied value (legacy per-platform route) must only ever confirm it.
+    if (platform && storedState.platform !== platform) {
       throw new BadRequestException('OAuth state does not match requested platform');
     }
     if (workspaceId && storedState.workspaceId && workspaceId !== storedState.workspaceId) {
       throw new BadRequestException('Workspace mismatch for OAuth callback');
     }
 
-    const config = this.platformConfigs[platform];
+    const resolvedPlatform = storedState.platform;
+    const config = this.platformConfigs[resolvedPlatform];
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    const body: Record<string, string> = {
+      [config.clientIdParam ?? 'client_id']: config.clientId,
+      client_secret: config.clientSecret,
+      code,
+      grant_type: 'authorization_code',
+      redirect_uri: storedState.redirectUri,
+    };
+
+    if (config.pkce && storedState.codeVerifier) {
+      // Complete PKCE with the verifier minted at the authorize step.
+      body.code_verifier = storedState.codeVerifier;
+    }
+
+    if (resolvedPlatform === 'x') {
+      // X's confidential-client token endpoint requires HTTP Basic auth and
+      // rejects client_secret in the body.
+      delete body.client_secret;
+      headers.Authorization =
+        'Basic ' +
+        Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+    }
+
     const tokenResponse = await fetch(config.tokenUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: config.clientId,
-        client_secret: config.clientSecret,
-        code,
-        grant_type: 'authorization_code',
-        redirect_uri: storedState.redirectUri,
-      }).toString(),
+      headers,
+      body: new URLSearchParams(body).toString(),
     });
 
     const tokens = (await tokenResponse.json()) as { access_token: string; refresh_token?: string; expires_in?: number };
     const encryptedAccessToken = this.encryptToken(tokens.access_token);
     const encryptedRefreshToken = tokens.refresh_token ? this.encryptToken(tokens.refresh_token) : null;
 
-    const profile = await this.fetchPlatformProfile(platform, tokens.access_token);
+    const profile = await this.fetchPlatformProfile(resolvedPlatform, tokens.access_token);
 
     const account = await this.repository.upsert({
       workspace_id: storedState.workspaceId,
-      platform_id: platform,
+      platform_id: resolvedPlatform,
       platform_user_id: profile.id,
       platform_username: profile.username,
       display_name: profile.displayName,
@@ -197,7 +251,7 @@ export class SocialAccountsService {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id: config.clientId,
+        [config.clientIdParam ?? 'client_id']: config.clientId,
         client_secret: config.clientSecret,
         refresh_token: decryptedRefreshToken,
         grant_type: 'refresh_token',
@@ -248,8 +302,11 @@ export class SocialAccountsService {
       facebook: 'https://graph.facebook.com/v21.0/me?fields=id,name,picture',
       instagram: 'https://graph.facebook.com/v21.0/me?fields=id,username,name,profile_picture_url',
       x: 'https://api.twitter.com/2/users/me?user.fields=profile_image_url',
-      linkedin: 'https://api.linkedin.com/v2/me',
-      tiktok: 'https://open.tiktokapis.com/v2/user/info/',
+      // OpenID Connect userinfo — replaces the deprecated /v2/me (r_liteprofile).
+      linkedin: 'https://api.linkedin.com/v2/userinfo',
+      // TikTok requires an explicit `fields` allowlist or the endpoint 400s.
+      tiktok:
+        'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name',
       'google-business': 'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
       pinterest: 'https://api.pinterest.com/v5/user_account',
       youtube: 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
@@ -261,20 +318,51 @@ export class SocialAccountsService {
     });
     const data = (await response.json()) as {
       id?: string;
+      sub?: string; // LinkedIn OIDC subject id
       name?: string;
       username?: string;
       email?: string;
-      picture?: { data?: { url?: string } };
+      // Facebook returns picture as an object; LinkedIn OIDC as a string URL.
+      picture?: { data?: { url?: string } } | string;
       profile_picture_url?: string;
       profile_image_url?: string;
-      data?: { user?: { open_id?: string; display_name?: string } };
+      data?: {
+        // X (Twitter) v2 wraps the user object directly under `data`…
+        id?: string;
+        name?: string;
+        username?: string;
+        profile_image_url?: string;
+        // …TikTok nests it one level deeper under `data.user`.
+        user?: { open_id?: string; display_name?: string; avatar_url?: string };
+      };
     };
 
+    const pictureUrl =
+      typeof data.picture === 'string' ? data.picture : data.picture?.data?.url;
+
     return {
-      id: data.id || data.data?.user?.open_id || 'unknown',
-      username: data.username || data.name || data.data?.user?.display_name || '',
-      displayName: data.name || data.username || data.data?.user?.display_name || '',
-      avatarUrl: data.picture?.data?.url || data.profile_picture_url || data.profile_image_url || '',
+      id: data.id || data.sub || data.data?.id || data.data?.user?.open_id || 'unknown',
+      username:
+        data.username ||
+        data.data?.username ||
+        data.name ||
+        data.data?.name ||
+        data.data?.user?.display_name ||
+        '',
+      displayName:
+        data.name ||
+        data.data?.name ||
+        data.username ||
+        data.data?.username ||
+        data.data?.user?.display_name ||
+        '',
+      avatarUrl:
+        pictureUrl ||
+        data.profile_picture_url ||
+        data.profile_image_url ||
+        data.data?.profile_image_url ||
+        data.data?.user?.avatar_url ||
+        '',
     };
   }
 

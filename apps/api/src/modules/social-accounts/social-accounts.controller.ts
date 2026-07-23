@@ -42,13 +42,24 @@ export class SocialAccountsController {
     );
   }
 
-  @Post('callback/:platform')
-  @ApiOperation({ summary: 'Handle OAuth callback from social platform' })
+  @Post('callback')
+  @ApiOperation({
+    summary:
+      'Handle OAuth callback — platform is resolved from the stored state, so the redirect URI stays static and registerable.',
+  })
   async handleCallback(
+    @Body() body: { code: string; state: string; workspaceId: string },
+  ) {
+    return this.socialAccountsService.handleOAuthCallback(body.code, body.state, body.workspaceId);
+  }
+
+  @Post('callback/:platform')
+  @ApiOperation({ summary: 'Handle OAuth callback (legacy per-platform path)' })
+  async handleCallbackForPlatform(
     @Param('platform') platform: string,
     @Body() body: { code: string; state: string; workspaceId: string },
   ) {
-    return this.socialAccountsService.handleOAuthCallback(platform, body.code, body.state, body.workspaceId);
+    return this.socialAccountsService.handleOAuthCallback(body.code, body.state, body.workspaceId, platform);
   }
 
   @Get(':id')

@@ -1,50 +1,123 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
 import { apiClient } from '@/lib/api/client';
+import { usePlatforms } from '@/lib/hooks/usePlatforms';
+import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 
-export default function OAuthCallbackPage() {
+/* ------------------------------------------------------------------ */
+/*  Coloured dot per platform (matches the composer palette).          */
+/* ------------------------------------------------------------------ */
+const PLATFORM_COLORS: Record<string, string> = {
+  facebook: 'bg-blue-600',
+  instagram: 'bg-pink-500',
+  x: 'bg-black',
+  twitter: 'bg-sky-500',
+  linkedin: 'bg-blue-700',
+  tiktok: 'bg-gray-900',
+  threads: 'bg-gray-800',
+  pinterest: 'bg-red-600',
+  youtube: 'bg-red-500',
+  'google-business': 'bg-emerald-600',
+};
+
+// A single, STATIC redirect URI (no per-request query params) so it can be
+// registered verbatim in each provider's developer console. The platform and
+// workspace are recovered from the server-stored OAuth `state`.
+function redirectUri() {
+  return `${window.location.origin}/connect/oauth`;
+}
+
+export default function OAuthConnectPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { addToast } = useToast();
+
+  const code = searchParams.get('code');
+  const state = searchParams.get('state');
+  const oauthError = searchParams.get('error');
+  const platformParam = searchParams.get('platform');
+
+  // `code` + `state` present ⇒ the provider redirected back to us; run the
+  // callback. Otherwise this is the entry point ⇒ show the platform picker.
+  const isCallback = Boolean(code && state) || Boolean(oauthError);
+
+  return isCallback ? (
+    <CallbackView
+      code={code}
+      state={state}
+      oauthError={oauthError}
+      oauthErrorDescription={searchParams.get('error_description')}
+      router={router}
+      addToast={addToast}
+    />
+  ) : (
+    <PickerView initialPlatform={platformParam} addToast={addToast} />
+  );
+}
+
+/* ================================================================== */
+/*  Callback — exchange the code for tokens via the API.               */
+/* ================================================================== */
+function CallbackView({
+  code,
+  state,
+  oauthError,
+  oauthErrorDescription,
+  router,
+  addToast,
+}: {
+  code: string | null;
+  state: string | null;
+  oauthError: string | null;
+  oauthErrorDescription: string | null;
+  router: ReturnType<typeof useRouter>;
+  addToast: ReturnType<typeof useToast>['addToast'];
+}) {
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Processing...');
+  const ran = useRef(false);
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    const state = searchParams.get('state');
-    const platform = searchParams.get('platform');
+    if (ran.current) return; // guard against React double-invoke
+    ran.current = true;
 
-    if (!code || !state || !platform) {
+    // The provider denied consent or errored before issuing a code.
+    if (oauthError) {
+      setStatus('error');
+      setMessage(oauthErrorDescription || `Authorisation failed: ${oauthError}`);
+      return;
+    }
+    if (!code || !state) {
       setStatus('error');
       setMessage('Missing OAuth parameters.');
       return;
     }
 
-    async function complete() {
+    (async () => {
       try {
-        await apiClient.post(`/social-accounts/callback/${platform}`, {
+        await apiClient.post('/social-accounts/callback', {
           code,
           state,
-          workspaceId: searchParams.get('workspaceId') || '',
+          workspaceId: activeWorkspaceId || '',
         });
         setStatus('success');
         setMessage('Account connected successfully!');
         addToast({ type: 'success', message: 'Social account connected!' });
-        setTimeout(() => router.push('/settings/accounts'), 2000);
+        setTimeout(() => router.push('/settings/accounts'), 1500);
       } catch (err: any) {
         setStatus('error');
-        const msg = err?.message || err?.error?.message || 'Failed to connect account.';
+        const msg =
+          err?.response?.data?.message || err?.message || 'Failed to connect account.';
         setMessage(msg);
         addToast({ type: 'error', message: msg });
       }
-    }
-
-    complete();
-  }, [searchParams, router, addToast]);
+    })();
+  }, [code, state, oauthError, oauthErrorDescription, activeWorkspaceId, router, addToast]);
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -83,6 +156,100 @@ export default function OAuthCallbackPage() {
           </>
         )}
       </Card>
+    </div>
+  );
+}
+
+/* ================================================================== */
+/*  Picker — start an OAuth flow for a chosen platform.                */
+/* ================================================================== */
+function PickerView({
+  initialPlatform,
+  addToast,
+}: {
+  initialPlatform: string | null;
+  addToast: ReturnType<typeof useToast>['addToast'];
+}) {
+  const { data: platforms, isLoading } = usePlatforms();
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  const [connecting, setConnecting] = useState<string | null>(null);
+
+  async function startConnect(slug: string) {
+    if (!activeWorkspaceId) {
+      addToast({ type: 'error', message: 'No workspace selected.' });
+      return;
+    }
+    setConnecting(slug);
+    try {
+      const res = await apiClient.post<{ authorizationUrl: string }>(
+        `/social-accounts/connect/${slug}`,
+        { workspaceId: activeWorkspaceId, redirectUri: redirectUri() },
+      );
+
+      const url = (res as any)?.authorizationUrl ?? (res as any)?.data?.authorizationUrl;
+      if (!url) throw new Error('No authorization URL returned.');
+      window.location.href = url;
+    } catch (err: any) {
+      setConnecting(null);
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Could not start the connection. This platform may not be configured yet.';
+      addToast({ type: 'error', message: msg });
+    }
+  }
+
+  // Auto-start when arriving via a "Reconnect" link (?platform=x, no code).
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current) return;
+    if (!initialPlatform || isLoading || !activeWorkspaceId) return;
+    autoStarted.current = true;
+    startConnect(initialPlatform);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPlatform, isLoading, activeWorkspaceId]);
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div>
+        <h1 className="font-heading text-2xl font-bold">Connect an account</h1>
+        <p className="mt-1 text-sm text-text-2">
+          Choose a platform to authorise. You&apos;ll be redirected to sign in and grant access,
+          then brought back here.
+        </p>
+      </div>
+
+      {isLoading ? (
+        <div className="py-12 text-center text-sm text-text-2">Loading platforms...</div>
+      ) : !platforms || platforms.length === 0 ? (
+        <Card className="p-8 text-center text-sm text-text-2">
+          No platforms are available to connect right now.
+        </Card>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {platforms.map((p) => {
+            const dot = PLATFORM_COLORS[p.slug.toLowerCase()] ?? 'bg-gray-500';
+            const busy = connecting === p.slug;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                disabled={Boolean(connecting)}
+                onClick={() => startConnect(p.slug)}
+                className="flex items-center justify-between rounded-brand border border-border bg-bg px-5 py-4 text-left shadow-sm transition hover:border-primary disabled:opacity-50"
+              >
+                <span className="flex items-center gap-3">
+                  <span className={`inline-block h-3 w-3 rounded-full ${dot}`} />
+                  <span className="font-medium">{p.name}</span>
+                </span>
+                <span className="text-sm text-primary">
+                  {busy ? 'Redirecting…' : 'Connect'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
