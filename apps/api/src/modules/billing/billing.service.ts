@@ -41,8 +41,13 @@ export class BillingService {
     }
   }
 
-  async getSubscription(userId: string) {
-    const subscription = await this.repository.findActiveSubscription(userId);
+  async getSubscription(userId: string, workspaceId?: string) {
+    // Prefer the workspace's subscription (a plan is workspace-scoped, so every
+    // member sees it); fall back to the caller's own for workspace-agnostic
+    // calls. Membership on workspaceId is already enforced by WorkspaceMemberGuard.
+    const subscription = workspaceId
+      ? await this.repository.findActiveSubscriptionByWorkspace(workspaceId)
+      : await this.repository.findActiveSubscription(userId);
     if (!subscription) {
       const freePlan = await this.repository.findPlanBySlug('free');
       return { plan: freePlan, status: 'free', subscription: null };

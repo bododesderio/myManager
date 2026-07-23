@@ -67,7 +67,10 @@ export class WorkspacesController {
   }
 
   @Get(':id/members')
-  @WorkspaceRoles('OWNER', 'ADMIN')
+  // Any active member may READ the roster — the web derives the current user's
+  // role and seat usage from this list on every dashboard load, and teammate
+  // visibility within a workspace is expected. Mutations below stay OWNER/ADMIN.
+  @WorkspaceRoles('OWNER', 'ADMIN', 'MEMBER')
   @ApiOperation({ summary: 'List workspace members' })
   async listMembers(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const userId = (req as unknown as { user: { id: string } }).user.id;

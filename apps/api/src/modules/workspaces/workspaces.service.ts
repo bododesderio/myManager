@@ -88,7 +88,10 @@ export class WorkspacesService {
   // controller, but a member roster and role mutations are too sensitive to rely
   // on a single guard registration. This service must be safe to call directly.
   async listMembers(workspaceId: string, userId: string) {
-    await this.ensureAdminAccess(workspaceId, userId);
+    // Any active member may read the roster (the web derives the current user's
+    // role and seat usage from it on every dashboard load). Mutations elsewhere
+    // still require ensureAdminAccess / ensureOwnerAccess.
+    await this.ensureMemberAccess(workspaceId, userId);
     return this.repository.findMembers(workspaceId);
   }
 
@@ -182,6 +185,13 @@ export class WorkspacesService {
     }));
 
     return { data: activity, period: { days, since: since.toISOString() } };
+  }
+
+  private async ensureMemberAccess(workspaceId: string, userId: string) {
+    const member = await this.repository.findMember(workspaceId, userId);
+    if (!member) {
+      throw new ForbiddenException('You are not a member of this workspace');
+    }
   }
 
   private async ensureAdminAccess(workspaceId: string, userId: string) {

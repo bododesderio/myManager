@@ -15,6 +15,16 @@ export class BillingRepository {
     });
   }
 
+  // A plan belongs to the WORKSPACE, not the individual user — every member
+  // must see the same plan. Resolving by workspace_id fixes members of a paid
+  // workspace seeing "Free" (their own user_id has no subscription row).
+  async findActiveSubscriptionByWorkspace(workspaceId: string) {
+    return this.prisma.subscription.findFirst({
+      where: { workspace_id: workspaceId, status: { in: ['ACTIVE', 'CANCELLING'] } },
+      include: { plan: true },
+    });
+  }
+
   async findCancellingSubscription(userId: string) {
     return this.prisma.subscription.findFirst({
       where: { user_id: userId, status: 'CANCELLING' },

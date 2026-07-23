@@ -28,9 +28,12 @@ export class BillingController {
   @Get('subscription')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current subscription details' })
-  async getSubscription(@Req() req: Request) {
+  async getSubscription(
+    @Req() req: Request,
+    @Query('workspaceId') workspaceId?: string,
+  ) {
     const userId = (req as unknown as { user: { id: string } }).user.id;
-    return this.billingService.getSubscription(userId);
+    return this.billingService.getSubscription(userId, workspaceId);
   }
 
   @Post('subscribe')
