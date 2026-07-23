@@ -44,7 +44,20 @@ editing (admin@ / Superadmin123); **G** nav/sidebar consistency + empty states.
 keys). Social OAuth: initiate verified live; round-trip pending provider-side
 redirect-URI registration + Sandbox test users (user action, not code).
 
+**Pinterest** [551597f, 2026-07-23] — provider was already in the OAuth registry
+but had two bugs now fixed: (1) token exchange used body-secret; Pinterest v5
+mandates HTTP Basic auth — generalized the X-only Basic-auth branch to a
+`basicAuth` flag (X+Pinterest, incl. refresh); (2) profile mapping used
+'unknown' id (Pinterest `/v5/user_account` has no numeric id) + missed the
+`profile_image` avatar — username now seeds platform_user_id. App id 1593428 set
+in `apps/api/.env`. **[BLOCKED]** App secret is "Unavailable while trial access
+pending" — round-trip untestable until Pinterest grants trial/standard access.
+
 **Pending external inputs (blockers, user-side):**
+- **Pinterest App secret** — pending Pinterest trial-access approval; set
+  `PINTEREST_APP_SECRET` in apps/api/.env once issued. Register redirect URI
+  `http://localhost:3000/connect/oauth` on the app (developers.pinterest.com/apps/1593428).
+  Note: `pins:write` may require standard-access approval beyond trial.
 - **Public domain** — NOT yet owned. Needed for the X app's required Website URL,
   TOS/Privacy URLs, and generally for prod OAuth redirect URIs. Until then, X app
   setup + any prod OAuth is blocked; local uses `http://localhost:3000`.
