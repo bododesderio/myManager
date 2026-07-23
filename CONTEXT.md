@@ -32,13 +32,41 @@ Then: UI redesign. Fix-immediately, commit-per-fix. All on `main`, tree clean.
   `apps/api/.env` (TikTok+LinkedIn full; **X values are OAuth 1.0a — need the
   OAuth 2.0 Client ID/Secret**).
 
-**RESUME HERE (C onward):** finish a real social round-trip once the user
-registers redirect URI `http://localhost:3000/connect/oauth` per provider +
-adds Sandbox test users (TikTok/X); then compose→post create/schedule/draft with
-a connected account; calendar/drafts/templates/approvals actions; **D** agency
-admin team mgmt + add members (agency@mymanager.app / Agency1234); **E** team
-member scoped view (amara@acme.app etc / member1234); **F** superadmin CMS
-editing (admin@ / Superadmin123); **G** nav/sidebar consistency + empty states.
+**⚠ PORT NOTE (2026-07-23):** the API now runs on **:3011**, not :3001 — an
+unrelated Docker container (`rooibok-site-umami-1`, maps `0.0.0.0:3001->3000`)
+grabbed :3001 during a nest watch-restart window (`EADDRINUSE`). The web was
+**rebuilt with `API_URL=http://localhost:3011` baked** (Next bakes the
+`rewrites()` destination at BUILD time — a runtime API_URL is ignored). Bring-up
+now: `PORT=3011 pnpm --filter @mymanager/api dev`; build+start web with
+`API_URL=http://localhost:3011`. To restore the canonical :3001, free the port
+(`docker stop rooibok-site-umami-1` — I was blocked from doing this by the
+permission classifier) then rebuild the web without API_URL (defaults to :3001).
+
+**Dashboard "blinking" — FIXED [b3e0e89].** Root cause: when the API refresh
+token died but the NextAuth cookie was still valid, every 401 → /auth/refresh
+(401) → redirect /login → middleware bounced /login→/home (cookie present) →
+refetch → 401 … an infinite loop (~5 refresh/s, 985 429s, constant re-render).
+Fix: on a HARD refresh failure (refresh returns 401) sign out of NextAuth first
+so /login sticks; transient 429/network no longer force-logout. Global (in
+apiClient) → fixes every dashboard.
+
+**D — DONE [6116f0c].** Agency team mgmt was broken 5 ways (empty member cells;
+role vocab owner/admin/editor/viewer vs enum OWNER/ADMIN/MEMBER; role change
+PUT→404 (route is PATCH); Sidebar hid Team/Approvals for the OWNER via
+case-mismatched role gate; 0/5 seats). All fixed + verified live (role change
+round-trips to DB). Backend normalizes/validates role (400 not 500). Login false
+"Unable to create a session" error also fixed [61cbeae] — verify via /api/auth/session.
+
+**E — DONE [7ebf154].** MEMBER hit 403 on /members (needed for role+seat
+derivation) → now any active member can READ the roster (mutations stay
+owner/admin). Plan was resolved per-user → a MEMBER of a paid workspace saw
+"Free"; now /billing/subscription resolves by ?workspaceId (workspace-scoped
+plan), so members see the real Enterprise plan + features. Verified live.
+
+**RESUME HERE (F, G, + C-tail):** **F** superadmin CMS editing (admin@ /
+Superadmin123); **G** nav/sidebar consistency + empty states. Social round-trip
+(C-tail) still blocked on provider-side redirect-URI + test-user setup. Pinterest
+[551597f] wired but blocked on trial-access secret.
 
 **Payment-gated (can't fully test locally):** Flutterwave checkout (no sandbox
 keys). Social OAuth: initiate verified live; round-trip pending provider-side
