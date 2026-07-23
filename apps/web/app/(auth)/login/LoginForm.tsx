@@ -86,7 +86,7 @@ export function LoginForm() {
         return;
       }
 
-      const result = await signIn('credentials', {
+      await signIn('credentials', {
         email,
         password,
         ...(needs2FA && totpCode ? { totp_code: totpCode } : {}),
@@ -94,14 +94,18 @@ export function LoginForm() {
         redirect: false,
       });
 
-      if (!result || result.error) {
+      // Don't trust signIn's returned `error` alone — Auth.js v5 can misreport a
+      // credentials sign-in as failed even when the session cookie was set,
+      // stranding a logged-in user on /login with a false error. The session
+      // endpoint is the source of truth.
+      const sessionRes = await fetch('/api/auth/session');
+      const session = await sessionRes.json();
+
+      if (!session?.user) {
         setError('Unable to create a session. Please try again.');
         setLoading(false);
         return;
       }
-
-      const sessionRes = await fetch('/api/auth/session');
-      const session = await sessionRes.json();
 
       // Single login page — credentials decide the destination.
       if (session?.user?.is_superadmin) {
