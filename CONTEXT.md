@@ -82,9 +82,15 @@ generic <title>; `/superadmin/login` still middleware-gated; broad empty-state p
 
 **RESUME HERE:** finish **G** (empty states + the two minor superadmin items
 above). Social round-trip (C-tail) blocked on provider-side redirect-URI +
-test-user setup. Pinterest [551597f] blocked on trial-access secret. Google OAuth
-creds pending (client covers google-business+youtube; redirect
-`http://localhost:3000/connect/oauth`, JS origin `http://localhost:3000`).
+test-user setup. Pinterest [551597f] blocked on trial-access secret. **Google OAuth — WIRED &
+VERIFIED (2026-07-23):** Web client creds (project mymanager-503306) in gitignored
+apps/api/.env (`GOOGLE_CLIENT_ID`/`SECRET`); covers google-business + youtube.
+Redirect `http://localhost:3000/connect/oauth` + JS origin `http://localhost:3000`
+registered. Initiate verified to build a valid accounts.google.com authorize URL
+(right client_id/redirect/scope) — the **first provider ready for a live
+round-trip.** Caveat: if the consent screen is in "Testing", add your Google
+account as a test user; business.manage/youtube scopes may warn "unverified app"
+(fine for testing).
 
 **Payment-gated (can't fully test locally):** Flutterwave checkout (no sandbox
 keys). Social OAuth: initiate verified live; round-trip pending provider-side
