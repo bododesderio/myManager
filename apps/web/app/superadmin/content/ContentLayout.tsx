@@ -8,26 +8,26 @@ const navSections = [
   {
     label: 'Content',
     items: [
-      { label: 'Pages', href: '/admin/content/pages' },
-      { label: 'Blog Posts', href: '/admin/content/blog' },
-      { label: 'FAQ', href: '/admin/content/faq' },
-      { label: 'Testimonials', href: '/admin/content/testimonials' },
+      { label: 'Pages', href: '/superadmin/content/pages' },
+      { label: 'Blog Posts', href: '/superadmin/content/blog' },
+      { label: 'FAQ', href: '/superadmin/content/faq' },
+      { label: 'Testimonials', href: '/superadmin/content/testimonials' },
     ],
   },
   {
     label: 'Site Config',
     items: [
-      { label: 'Nav Links', href: '/admin/content/nav-links' },
-      { label: 'Email Templates', href: '/admin/content/emails' },
-      { label: 'Translations', href: '/admin/content/translations' },
-      { label: 'Legal', href: '/admin/content/legal' },
+      { label: 'Nav Links', href: '/superadmin/content/nav-links' },
+      { label: 'Email Templates', href: '/superadmin/content/emails' },
+      { label: 'Translations', href: '/superadmin/content/translations' },
+      { label: 'Legal', href: '/superadmin/content/legal' },
     ],
   },
   {
     label: 'Leads & Subscribers',
     items: [
-      { label: 'Newsletter', href: '/admin/content/newsletter' },
-      { label: 'Contact Leads', href: '/admin/content/leads' },
+      { label: 'Newsletter', href: '/superadmin/content/newsletter' },
+      { label: 'Contact Leads', href: '/superadmin/content/leads' },
     ],
   },
 ];
