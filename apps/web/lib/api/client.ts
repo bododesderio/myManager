@@ -67,26 +67,58 @@ export function clearCsrfToken() {
 // one POSTs /auth/refresh, stampeding the endpoint (which is rate-limited) and
 // logging the user out. Concurrent 401s now share one refresh and retry with the
 // resulting token.
-let refreshPromise: Promise<string | null> | null = null;
+let refreshPromise: Promise<RefreshResult> | null = null;
 
-function refreshAccessToken(): Promise<string | null> {
+interface RefreshResult {
+  token: string | null;
+  /**
+   * True only when the refresh endpoint rejected the refresh token itself
+   * (401) — i.e. the session is genuinely dead. Transient failures (429
+   * back-pressure, network blips) leave this false so a hiccup never
+   * force-logs-out an otherwise-valid session.
+   */
+  hardFail: boolean;
+}
+
+function refreshAccessToken(): Promise<RefreshResult> {
   if (!refreshPromise) {
     refreshPromise = axios
       .post('/api/v1/auth/refresh', {}, { withCredentials: true })
       .then((res) => {
         const token = res.data?.accessToken ?? null;
         setAccessToken(token);
-        return token;
+        return { token, hardFail: false };
       })
-      .catch(() => {
+      .catch((err) => {
         setAccessToken(null);
-        return null;
+        return { token: null, hardFail: err?.response?.status === 401 };
       })
       .finally(() => {
         refreshPromise = null;
       });
   }
   return refreshPromise;
+}
+
+// One-way latch: once the API refresh token is rejected we tear the session
+// down exactly once. Concurrent 401s that lose the single-flight race must NOT
+// each fire their own refresh/redirect — that (plus a still-valid NextAuth
+// cookie bouncing /login → /home) is what produced the infinite
+// 401→refresh→redirect loop that hammered the API and flickered the dashboard.
+let sessionTerminating = false;
+
+async function terminateSession(): Promise<void> {
+  if (sessionTerminating || typeof window === 'undefined') return;
+  sessionTerminating = true;
+  setAccessToken(null);
+  // Clear the NextAuth session cookie FIRST; otherwise middleware treats the
+  // user as authenticated and redirects /login back to /home, relooping.
+  try {
+    const { signOut } = await import('next-auth/react');
+    await signOut({ callbackUrl: '/login?error=session_expired' });
+  } catch {
+    window.location.href = '/login?error=session_expired';
+  }
 }
 
 const apiClient = axios.create({
@@ -173,18 +205,26 @@ apiClient.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.skipAuthRefresh
     ) {
+      // Session already being torn down — don't refresh/redirect again, just
+      // let this request fail while the sign-out navigation completes.
+      if (sessionTerminating) {
+        return Promise.reject(error.response?.data ?? error);
+      }
+
       originalRequest._retry = true;
 
       // Shared refresh: concurrent 401s await one in-flight call, not N.
-      const newToken = await refreshAccessToken();
+      const { token: newToken, hardFail } = await refreshAccessToken();
       if (newToken) {
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       }
 
-      // Refresh failed — user needs to re-login.
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login?error=session_expired';
+      // Only a rejected refresh token (hardFail) means the session is dead —
+      // sign out of NextAuth so /login sticks instead of bouncing to /home.
+      // Transient failures fall through and simply reject (React Query backs off).
+      if (hardFail) {
+        await terminateSession();
       }
     }
 
