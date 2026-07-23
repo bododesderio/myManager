@@ -43,6 +43,16 @@ editing (admin@ / Superadmin123); **G** nav/sidebar consistency + empty states.
 **Payment-gated (can't fully test locally):** Flutterwave checkout (no sandbox
 keys). Social OAuth: initiate verified live; round-trip pending provider-side
 redirect-URI registration + Sandbox test users (user action, not code).
+
+**Pending external inputs (blockers, user-side):**
+- **Public domain** — NOT yet owned. Needed for the X app's required Website URL,
+  TOS/Privacy URLs, and generally for prod OAuth redirect URIs. Until then, X app
+  setup + any prod OAuth is blocked; local uses `http://localhost:3000`.
+- **X OAuth 2.0 Client ID/Secret** — must set the X app to "Web App … Confidential
+  client" + "Read and write" to mint these; the creds provided so far are OAuth
+  1.0a (wrong type). Replace `TWITTER_CLIENT_ID/SECRET` in apps/api/.env once minted.
+- **Register redirect URI** `http://localhost:3000/connect/oauth` on TikTok /
+  LinkedIn / X consoles; add Sandbox test users (TikTok/X).
 **Dev limitation:** email verification link not deliverable (no email provider) —
 mark users verified via DB to continue a flow.
 
