@@ -101,4 +101,12 @@ export class SocialAccountsController {
   async listPlatforms() {
     return this.socialAccountsService.listSupportedPlatforms();
   }
+
+  @Get('platforms/configured')
+  @ApiOperation({ summary: 'Platform slugs whose OAuth credentials are configured' })
+  async listConfiguredPlatforms(@Query('workspaceId') _workspaceId: string) {
+    // _workspaceId is required by WorkspaceMemberGuard (route is under the
+    // /social-accounts workspace-scoped prefix); the result itself is global.
+    return { configured: this.socialAccountsService.getConfiguredPlatforms() };
+  }
 }

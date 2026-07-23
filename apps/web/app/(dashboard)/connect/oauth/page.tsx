@@ -5,24 +5,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
 import { apiClient } from '@/lib/api/client';
-import { usePlatforms } from '@/lib/hooks/usePlatforms';
+import { usePlatforms, useConfiguredPlatforms, normalizePlatformSlug } from '@/lib/hooks/usePlatforms';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
-
-/* ------------------------------------------------------------------ */
-/*  Coloured dot per platform (matches the composer palette).          */
-/* ------------------------------------------------------------------ */
-const PLATFORM_COLORS: Record<string, string> = {
-  facebook: 'bg-blue-600',
-  instagram: 'bg-pink-500',
-  x: 'bg-black',
-  twitter: 'bg-sky-500',
-  linkedin: 'bg-blue-700',
-  tiktok: 'bg-gray-900',
-  threads: 'bg-gray-800',
-  pinterest: 'bg-red-600',
-  youtube: 'bg-red-500',
-  'google-business': 'bg-emerald-600',
-};
+import { PlatformIcon } from '@/components/icons/PlatformIcon';
 
 // A single, STATIC redirect URI (no per-request query params) so it can be
 // registered verbatim in each provider's developer console. The platform and
@@ -172,7 +157,11 @@ function PickerView({
 }) {
   const { data: platforms, isLoading } = usePlatforms();
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  const { data: configured } = useConfiguredPlatforms(activeWorkspaceId);
   const [connecting, setConnecting] = useState<string | null>(null);
+
+  const configuredSet = new Set(configured ?? []);
+  const isConfigured = (slug: string) => configuredSet.has(normalizePlatformSlug(slug));
 
   async function startConnect(slug: string) {
     if (!activeWorkspaceId) {
@@ -227,27 +216,44 @@ function PickerView({
         </Card>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
-          {platforms.map((p) => {
-            const dot = PLATFORM_COLORS[p.slug.toLowerCase()] ?? 'bg-gray-500';
-            const busy = connecting === p.slug;
-            return (
-              <button
-                key={p.id}
-                type="button"
-                disabled={Boolean(connecting)}
-                onClick={() => startConnect(p.slug)}
-                className="flex items-center justify-between rounded-brand border border-border bg-bg px-5 py-4 text-left shadow-sm transition hover:border-primary disabled:opacity-50"
-              >
-                <span className="flex items-center gap-3">
-                  <span className={`inline-block h-3 w-3 rounded-full ${dot}`} />
-                  <span className="font-medium">{p.name}</span>
-                </span>
-                <span className="text-sm text-primary">
-                  {busy ? 'Redirecting…' : 'Connect'}
-                </span>
-              </button>
-            );
-          })}
+          {[...platforms]
+            // Connectable platforms first, "coming soon" after; stable by name.
+            .sort((a, b) => {
+              const d = Number(isConfigured(b.slug)) - Number(isConfigured(a.slug));
+              return d !== 0 ? d : a.name.localeCompare(b.name);
+            })
+            .map((p) => {
+              const ready = isConfigured(p.slug);
+              const busy = connecting === p.slug;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  disabled={!ready || Boolean(connecting)}
+                  aria-disabled={!ready}
+                  onClick={() => ready && startConnect(p.slug)}
+                  className={`flex items-center justify-between rounded-brand border px-5 py-4 text-left shadow-sm transition ${
+                    ready
+                      ? 'border-border bg-bg hover:border-primary disabled:opacity-50'
+                      : 'cursor-not-allowed border-border bg-bg-2 opacity-60'
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <PlatformIcon platform={p.slug} size={22} />
+                    <span className="font-medium">{p.name}</span>
+                  </span>
+                  {ready ? (
+                    <span className="text-sm text-primary">
+                      {busy ? 'Redirecting…' : 'Connect'}
+                    </span>
+                  ) : (
+                    <span className="rounded-badge bg-bg px-2 py-0.5 text-[11px] font-medium text-text-muted">
+                      Coming soon
+                    </span>
+                  )}
+                </button>
+              );
+            })}
         </div>
       )}
     </div>

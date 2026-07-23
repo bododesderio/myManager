@@ -9,21 +9,7 @@ import { useUploadMedia } from '@/lib/hooks/useMedia';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
-
-/* ------------------------------------------------------------------ */
-/*  Platform icon helper (simple coloured dot + label fallback)        */
-/* ------------------------------------------------------------------ */
-const PLATFORM_COLORS: Record<string, string> = {
-  facebook: 'bg-blue-600',
-  instagram: 'bg-pink-500',
-  x: 'bg-black',
-  twitter: 'bg-sky-500',
-  linkedin: 'bg-blue-700',
-  tiktok: 'bg-gray-900',
-  threads: 'bg-gray-800',
-  pinterest: 'bg-red-600',
-  youtube: 'bg-red-500',
-};
+import { PlatformIcon } from '@/components/icons/PlatformIcon';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -227,8 +213,6 @@ export function ComposeContent() {
           <div className="mt-3 flex flex-wrap gap-2">
             {activeAccounts.map((account) => {
               const selected = selectedAccountIds.has(account.id);
-              const colorDot =
-                PLATFORM_COLORS[account.platform.toLowerCase()] ?? 'bg-gray-500';
               return (
                 <button
                   key={account.id}
@@ -250,7 +234,7 @@ export function ComposeContent() {
                       unoptimized
                     />
                   ) : (
-                    <span className={`inline-block h-3 w-3 rounded-full ${colorDot}`} />
+                    <PlatformIcon platform={account.platform} size={18} />
                   )}
                   <span>{account.display_name || account.platform_username}</span>
                   <span className="text-xs text-text-muted capitalize">
@@ -477,15 +461,11 @@ export function ComposeContent() {
               {activeAccounts
                 .filter((a) => selectedAccountIds.has(a.id))
                 .map((account) => {
-                  const colorDot =
-                    PLATFORM_COLORS[account.platform.toLowerCase()] ?? 'bg-gray-500';
                   return (
                     <div key={account.id} className="space-y-2">
                       {/* Platform badge */}
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`inline-block h-3 w-3 rounded-full ${colorDot}`}
-                        />
+                        <PlatformIcon platform={account.platform} size={16} />
                         <span className="text-xs font-semibold uppercase tracking-wide text-text-2">
                           {account.platform}
                         </span>

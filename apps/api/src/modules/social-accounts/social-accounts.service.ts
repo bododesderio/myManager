@@ -121,9 +121,29 @@ export class SocialAccountsService {
     return this.repository.findByWorkspace(workspaceId);
   }
 
+  /**
+   * The public platform slug is underscored (`google_business`) but the OAuth
+   * config + publishing workers use the hyphenated form (`google-business`).
+   * Normalize so a connect request from the web resolves its config.
+   */
+  private normalizePlatform(slug: string): string {
+    return slug.replace(/_/g, '-');
+  }
+
+  /** Platform slugs (hyphenated form) whose OAuth client id AND secret are set. */
+  getConfiguredPlatforms(): string[] {
+    return Object.entries(this.platformConfigs)
+      .filter(([, c]) => Boolean(c.clientId) && Boolean(c.clientSecret))
+      .map(([slug]) => slug);
+  }
+
   async initiateOAuth(platform: string, userId: string, workspaceId: string, redirectUri: string) {
-    const config = this.platformConfigs[platform];
+    const normalizedPlatform = this.normalizePlatform(platform);
+    const config = this.platformConfigs[normalizedPlatform];
     if (!config) throw new BadRequestException(`Unsupported platform: ${platform}`);
+    // From here on, use the normalized slug so state, token exchange, profile
+    // fetch, and the stored platform_id all agree (matches publishing workers).
+    platform = normalizedPlatform;
 
     const state = crypto.randomBytes(32).toString('hex');
 

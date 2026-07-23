@@ -14,10 +14,12 @@ describe('SocialAccountsService.initiateOAuth', () => {
     LINKEDIN_CLIENT_SECRET: 'li-secret',
     TWITTER_CLIENT_ID: 'x-id',
     TWITTER_CLIENT_SECRET: 'x-secret',
-    FACEBOOK_APP_ID: 'fb-id',
-    FACEBOOK_APP_SECRET: 'fb-secret',
+    // Facebook creds intentionally unset — facebook/instagram/threads are the
+    // "not configured" case exercised by getConfiguredPlatforms.
     PINTEREST_APP_ID: 'pin-id',
     PINTEREST_APP_SECRET: 'pin-secret',
+    GOOGLE_CLIENT_ID: 'g-id',
+    GOOGLE_CLIENT_SECRET: 'g-secret',
   };
 
   function createService() {
@@ -99,6 +101,27 @@ describe('SocialAccountsService.initiateOAuth', () => {
     const { authorizationUrl } = await service.initiateOAuth('tiktok', 'u1', 'w1', REDIRECT);
     const url = new URL(authorizationUrl);
     expect(url.searchParams.get('redirect_uri')).toBe(REDIRECT);
+  });
+
+  it('normalizes the underscored public slug (google_business) to the hyphenated config key', async () => {
+    const { service, stored } = await createService();
+    // The web sends the platform table slug `google_business`; the OAuth config
+    // key is `google-business`. Must resolve (not throw "Unsupported platform").
+    const { authorizationUrl } = await service.initiateOAuth('google_business', 'u1', 'w1', REDIRECT);
+    const url = new URL(authorizationUrl);
+    expect(url.origin + url.pathname).toBe('https://accounts.google.com/o/oauth2/v2/auth');
+    expect(url.searchParams.get('client_id')).toBe('g-id');
+    // The stored platform is the normalized (hyphenated) form used everywhere else.
+    expect(stored[0].platform).toBe('google-business');
+  });
+
+  it('getConfiguredPlatforms returns only slugs with both id and secret set', async () => {
+    const { service } = await createService();
+    const configured = service.getConfiguredPlatforms();
+    // ENV has TikTok/LinkedIn/X/Google/Pinterest creds; NOT Facebook.
+    expect(configured).toEqual(expect.arrayContaining(['tiktok', 'linkedin', 'x', 'google-business', 'pinterest']));
+    expect(configured).not.toContain('facebook');
+    expect(configured).not.toContain('instagram');
   });
 });
 

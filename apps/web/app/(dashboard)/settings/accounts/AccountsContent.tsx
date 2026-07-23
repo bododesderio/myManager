@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSocialAccounts, useDisconnectSocialAccount } from '@/lib/hooks/useSocialAccounts';
 import { useToast } from '@/providers/ToastProvider';
 import { ServiceUnavailableInline } from '@/components/status/ServiceUnavailable';
+import { PlatformIcon } from '@/components/icons/PlatformIcon';
 import { Card } from '@mymanager/ui';
 
 export default function AccountsContent() {
@@ -58,8 +59,10 @@ export default function AccountsContent() {
               key={account.id}
               className="flex items-center justify-between rounded-brand border border-border bg-bg px-5 py-4 shadow-sm"
             >
-              <div>
-                <p className="font-medium">{account.platform}</p>
+              <div className="flex items-start gap-3">
+                <PlatformIcon platform={account.platform} size={28} className="mt-0.5 shrink-0" />
+                <div>
+                <p className="font-medium capitalize">{account.platform}</p>
                 <p className="text-sm text-text-2">
                   {account.username ?? account.account_name}
                   {account.connected_at && (
@@ -90,6 +93,7 @@ export default function AccountsContent() {
                     />
                   </div>
                 )}
+                </div>
               </div>
               <button
                 onClick={() => handleDisconnect(account.id, account.platform)}
