@@ -1,5 +1,5 @@
 # Project Context
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 ## Current task — FULL end-to-end live audit (every role/flow), IN PROGRESS (2026-07-22 pm)
 Rebuilt everything clean. Working through: A marketing → B visitor journey →
@@ -18,16 +18,31 @@ Then: UI redesign. Fix-immediately, commit-per-fix. All on `main`, tree clean.
 - **C (partial). Media uploads** — broadened formats (added HEIC/HEIF/AVIF/BMP/
   TIFF/WebM; SVG excluded for XSS) + video-aware per-category caps (img 25MB,
   video 512MB) [eec709a]. Compose page renders clean.
+- **C. Social OAuth connect** [f9c4af0] — the connect flow had **no initiate
+  step** (Connect button → callback-only page; nothing could connect, any
+  platform). Built the platform picker at `/connect/oauth`; static registerable
+  redirect_uri (`/connect/oauth`), platform+workspace recovered from server
+  `state`; platform-agnostic `POST /social-accounts/callback`. Fixed provider
+  contracts: TikTok `client_key`+S256 PKCE+user/info fields; LinkedIn OIDC scopes
+  +`/v2/userinfo`; X PKCE code_verifier+Basic-auth token. Spec added. **Live:
+  TikTok initiate reaches its login/consent page** (client_key + PKCE accepted).
+  Note: compose Save Draft/Schedule/Publish all require ≥1 selected account
+  (backend `CreatePostDto @ArrayMinSize(1)`) — so post-create flows are testable
+  only once an account is actually connected. Provider creds in gitignored
+  `apps/api/.env` (TikTok+LinkedIn full; **X values are OAuth 1.0a — need the
+  OAuth 2.0 Client ID/Secret**).
 
-**RESUME HERE (C onward):** compose→actual post create/schedule/draft; connect
-socials UI (OAuth round-trip needs provider creds — verify UI/init only);
-calendar/drafts/templates/approvals actions; **D** agency admin team mgmt + add
-members (agency@mymanager.app / Agency1234); **E** team member scoped view
-(amara@acme.app etc / member1234); **F** superadmin CMS editing of landing
-content (admin@ / Superadmin123); **G** nav/sidebar consistency + empty states.
+**RESUME HERE (C onward):** finish a real social round-trip once the user
+registers redirect URI `http://localhost:3000/connect/oauth` per provider +
+adds Sandbox test users (TikTok/X); then compose→post create/schedule/draft with
+a connected account; calendar/drafts/templates/approvals actions; **D** agency
+admin team mgmt + add members (agency@mymanager.app / Agency1234); **E** team
+member scoped view (amara@acme.app etc / member1234); **F** superadmin CMS
+editing (admin@ / Superadmin123); **G** nav/sidebar consistency + empty states.
 
 **Payment-gated (can't fully test locally):** Flutterwave checkout (no sandbox
-keys); real OAuth social connects (no provider app creds). Verify UI + init only.
+keys). Social OAuth: initiate verified live; round-trip pending provider-side
+redirect-URI registration + Sandbox test users (user action, not code).
 **Dev limitation:** email verification link not deliverable (no email provider) —
 mark users verified via DB to continue a flow.
 
