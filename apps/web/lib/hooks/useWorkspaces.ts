@@ -97,7 +97,8 @@ export function useUpdateMemberRole() {
   const workspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   return useMutation({
     mutationFn: ({ memberId, role }: { memberId: string; role: string }) =>
-      apiClient.put(`/workspaces/${workspaceId}/members/${memberId}/role`, { role }),
+      // Backend route is PATCH (workspaces.controller `@Patch(':id/members/:memberId/role')`).
+      apiClient.patch(`/workspaces/${workspaceId}/members/${memberId}/role`, { role }),
     onSuccess: () => {
       if (workspaceId) {
         queryClient.invalidateQueries({ queryKey: workspaceKeys.members(workspaceId) });

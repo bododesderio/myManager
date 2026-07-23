@@ -48,7 +48,9 @@ function useUserRole(): string {
   const membersArr = (members.data as any)?.members ?? (members.data as any) ?? [];
   const email = session?.user?.email;
   const member = membersArr.find?.((m: any) => m.email === email || m.user?.email === email);
-  return member?.role ?? (session as any)?.user?.role ?? 'member';
+  // API roles are uppercase (OWNER/ADMIN/MEMBER); nav/plan gates compare
+  // lowercase. Normalize so role-gated items (Team, Approvals) actually show.
+  return (member?.role ?? (session as any)?.user?.role ?? 'member').toLowerCase();
 }
 
 function useCurrentPlan(): string {
@@ -79,8 +81,15 @@ export function Sidebar() {
   const projectCount = Array.isArray(projects.data) ? projects.data.length
     : (projects.data as any)?.total ?? (projects.data as any)?.length ?? 0;
 
+  // Members query shares its cache key with useUserRole's — no extra request.
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  const membersQuery = useWorkspaceMembers(activeWorkspaceId);
+  const membersCount = (
+    (membersQuery.data as any)?.members ?? (membersQuery.data as any) ?? []
+  ).length;
+
   const subData = subscription.data as any;
-  const seatUsed = subData?.seats_used ?? subData?.member_count ?? 0;
+  const seatUsed = subData?.seats_used ?? subData?.member_count ?? membersCount ?? 0;
   const seatLimit = subData?.seats_limit ?? subData?.seat_limit ?? 5;
   const planLabel = subData?.plan?.name ?? subData?.plan_name ?? 'Free';
 

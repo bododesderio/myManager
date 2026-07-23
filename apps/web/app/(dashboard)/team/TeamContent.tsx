@@ -13,7 +13,14 @@ import { TableSkeleton } from '@/components/skeletons/TableSkeleton';
 import { Card } from '@mymanager/ui';
 import { asArray } from '@/lib/utils/as-array';
 
-const ROLES = ['owner', 'admin', 'editor', 'viewer'] as const;
+// Canonical WorkspaceRole enum (apps/api prisma). OWNER is not assignable via
+// the UI; invites/role-changes may only set ADMIN or MEMBER.
+const ASSIGNABLE_ROLES = ['ADMIN', 'MEMBER'] as const;
+
+function roleLabel(role: string): string {
+  const r = (role || '').toUpperCase();
+  return r.charAt(0) + r.slice(1).toLowerCase();
+}
 
 export function TeamContent() {
   const workspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -26,7 +33,7 @@ export function TeamContent() {
   const members: any[] = asArray<any>(data, 'members', 'data');
 
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('editor');
+  const [inviteRole, setInviteRole] = useState('MEMBER');
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
@@ -39,7 +46,7 @@ export function TeamContent() {
         onSuccess: () => {
           addToast({ type: 'success', message: `Invitation sent to ${inviteEmail}.` });
           setInviteEmail('');
-          setInviteRole('editor');
+          setInviteRole('MEMBER');
           setShowInviteForm(false);
         },
         onError: () => {
@@ -121,9 +128,9 @@ export function TeamContent() {
                 onChange={(e) => setInviteRole(e.target.value)}
                 className="mt-1 block rounded-brand border border-border px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               >
-                {ROLES.map((r) => (
+                {ASSIGNABLE_ROLES.map((r) => (
                   <option key={r} value={r}>
-                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                    {roleLabel(r)}
                   </option>
                 ))}
               </select>
@@ -170,35 +177,46 @@ export function TeamContent() {
             <tbody className="divide-y">
               {members.map((member: any) => {
                 const memberId = member.id || member.userId || member.user_id;
-                const isOwner = (member.role || '').toLowerCase() === 'owner';
+                // The API nests identity under `user`; fall back to any flat keys.
+                const name = member.user?.name || member.name || '';
+                const email = member.user?.email || member.email || '';
+                const role = (member.role || '').toUpperCase();
+                const isOwner = role === 'OWNER';
 
                 return (
-                  <tr key={memberId || member.email} className="hover:bg-bg-2">
+                  <tr key={memberId || email} className="hover:bg-bg-2">
                     <td className="px-6 py-4">
-                      <p className="font-medium">{member.name || member.email}</p>
-                      {member.name && (
-                        <p className="text-sm text-text-2">{member.email}</p>
+                      <p className="font-medium">{name || email || '—'}</p>
+                      {name && email && (
+                        <p className="text-sm text-text-2">{email}</p>
                       )}
                     </td>
                     <td className="px-6 py-4">
                       {isOwner ? (
-                        <span className="text-sm font-medium capitalize">{member.role}</span>
+                        <span className="text-sm font-medium">{roleLabel(role)}</span>
                       ) : (
                         <select
-                          value={member.role}
+                          value={role}
                           onChange={(e) => handleRoleChange(memberId, e.target.value)}
                           className="rounded-brand border border-border px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         >
-                          {ROLES.filter((r) => r !== 'owner').map((r) => (
+                          {ASSIGNABLE_ROLES.map((r) => (
                             <option key={r} value={r}>
-                              {r.charAt(0).toUpperCase() + r.slice(1)}
+                              {roleLabel(r)}
                             </option>
                           ))}
                         </select>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-text-2">
-                      {member.joinedAt || member.joined_at || member.createdAt || member.created_at || '—'}
+                      {(() => {
+                        const raw = member.joinedAt || member.joined_at || member.createdAt || member.created_at;
+                        if (!raw) return '—';
+                        const d = new Date(raw);
+                        return isNaN(d.getTime())
+                          ? '—'
+                          : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                      })()}
                     </td>
                     <td className="px-6 py-4">
                       {!isOwner && (

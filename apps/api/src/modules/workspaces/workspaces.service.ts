@@ -3,8 +3,25 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { WorkspacesRepository } from './workspaces.repository';
+
+// Assignable via invite / role-change. OWNER is deliberately excluded — the
+// only WorkspaceRole values Prisma accepts are OWNER/ADMIN/MEMBER, and OWNER
+// transfer is not exposed here. Normalizing (case-insensitive) turns a stray
+// value into a clean 400 instead of a Prisma enum 500.
+const ASSIGNABLE_ROLES = ['ADMIN', 'MEMBER'];
+
+function normalizeAssignableRole(role: string): string {
+  const normalized = (role || '').toUpperCase();
+  if (!ASSIGNABLE_ROLES.includes(normalized)) {
+    throw new BadRequestException(
+      `Invalid role "${role}". Must be one of: ${ASSIGNABLE_ROLES.join(', ')}.`,
+    );
+  }
+  return normalized;
+}
 
 @Injectable()
 export class WorkspacesService {
@@ -77,13 +94,15 @@ export class WorkspacesService {
 
   async inviteMember(workspaceId: string, inviterId: string, email: string, role: string) {
     await this.ensureAdminAccess(workspaceId, inviterId);
-    const invite = await this.repository.createInvite(workspaceId, email, role, inviterId);
+    const normalizedRole = normalizeAssignableRole(role);
+    const invite = await this.repository.createInvite(workspaceId, email, normalizedRole, inviterId);
     return invite;
   }
 
   async updateMemberRole(workspaceId: string, memberId: string, role: string, actorId: string) {
     await this.ensureOwnerAccess(workspaceId, actorId);
-    return this.repository.updateMemberRole(workspaceId, memberId, role);
+    const normalizedRole = normalizeAssignableRole(role);
+    return this.repository.updateMemberRole(workspaceId, memberId, normalizedRole);
   }
 
   async removeMember(workspaceId: string, memberId: string, actorId: string) {
