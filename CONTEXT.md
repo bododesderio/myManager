@@ -73,16 +73,22 @@ item edit (question + CKEditor answer) persisted to DB; CKEditor loads clean
 in the BUILD env (not just start)** → superadmin pages now 0 errors. (Local-only;
 prod runs https and wants the directive.)
 
-**G — partial [11cb3b2].** Content sub-nav (ContentLayout) linked to legacy
+**G — DONE [11cb3b2, 3ef184f].** Content sub-nav (ContentLayout) linked to legacy
 `/admin/content/*` (301→/superadmin) → redundant redirect + active-highlight
-never matched (`pathname===href` compared /superadmin vs /admin). Pointed hrefs
-at /superadmin/content/*. **Remaining G:** other `/admin/*` refs in superadmin are
-API paths (`/api/v1/admin/*` — CORRECT, leave); `/superadmin/settings/theme`
-generic <title>; `/superadmin/login` still middleware-gated; broad empty-state pass.
+never matched; pointed hrefs at /superadmin/content/*. Theme page `<title>` fixed
+via sibling layout.tsx ("Admin - Theme Editor"). /superadmin/login exempted from
+the middleware gate (it's a backwards-compat redirect to the single /login;
+now lands superadmins on next=/superadmin/dashboard). Empty-state sweep: all main
+list pages already render empty states (calendar's is its grid) — no gaps. NOTE:
+other `/admin/*` refs in superadmin are API paths (`/api/v1/admin/*` — CORRECT).
 
-**RESUME HERE:** finish **G** (empty states + the two minor superadmin items
-above). Social round-trip (C-tail) blocked on provider-side redirect-URI +
-test-user setup. Pinterest [551597f] blocked on trial-access secret. **Google OAuth — WIRED &
+**AUDIT A→G COMPLETE (2026-07-23).** All seven flows swept + fixed live.
+**RESUME HERE:** only external-blocked / product-config items remain — (1) social
+round-trips (C-tail) need provider-side redirect-URI + test-user setup; Google is
+ready to test now (Settings→Accounts→Connect→Google). (2) Apply plan/quota
+decorators to real routes + define tier limits (product). (3) Optional: extract
+`packages/ui`, `any`-type cleanup.
+Pinterest [551597f] blocked on trial-access secret. **Google OAuth — WIRED &
 VERIFIED (2026-07-23):** Web client creds (project mymanager-503306) in gitignored
 apps/api/.env (`GOOGLE_CLIENT_ID`/`SECRET`); covers google-business + youtube.
 Redirect `http://localhost:3000/connect/oauth` + JS origin `http://localhost:3000`
