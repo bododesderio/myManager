@@ -105,6 +105,9 @@ model User {
   name              String
   first_name        String     @default("")
   last_name         String     @default("")
+  phone             String?
+  job_title         String?
+  country           String?
   password_hash     String?
   avatar_url        String?
   email_verified    Boolean    @default(false)
@@ -431,6 +434,7 @@ model Workspace {
   account_type    WorkspaceAccountType @default(INDIVIDUAL)
   industry        String?
   team_size       String?
+  website         String?
   referral_source String?
   created_at      DateTime             @default(now())
   updated_at      DateTime             @updatedAt
@@ -716,7 +720,11 @@ model SocialAccount {
   last_used_at            DateTime?
 
   workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
-  platform  Platform  @relation(fields: [platform_id], references: [id])
+  // platform_id stores the catalogue *slug* (e.g. `google_business`), which is
+  // what Post.platforms and the publishing workers match against — so the FK
+  // references platforms.slug, not the UUID id. Referencing id here meant no
+  // social account could ever be inserted (the slug never matches a UUID).
+  platform  Platform  @relation(fields: [platform_id], references: [slug], onUpdate: Cascade, onDelete: Restrict)
 
   @@unique([workspace_id, platform_id, platform_user_id])
   @@map("social_accounts")

@@ -3,6 +3,7 @@ import {
   IsString,
   IsOptional,
   IsIn,
+  IsUrl,
   MinLength,
   MaxLength,
   Matches,
@@ -60,6 +61,24 @@ export class RegisterDto {
   @Matches(PASSWORD_RULES[2][0], { message: PASSWORD_RULES[2][1] })
   password!: string;
 
+  @ApiPropertyOptional({ description: 'International phone, e.g. +256700000000' })
+  @IsOptional()
+  @IsString()
+  @Matches(/^[+]?[\d\s()-]{7,20}$/, { message: 'Enter a valid phone number' })
+  phone?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  jobTitle?: string;
+
+  @ApiPropertyOptional({ description: 'IANA timezone, e.g. Africa/Kampala' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  timezone?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -71,6 +90,12 @@ export class RegisterDto {
   @IsString()
   @MaxLength(200)
   companyName?: string;
+
+  @ApiPropertyOptional({ description: 'Company website URL (company accounts)' })
+  @IsOptional()
+  @IsUrl({}, { message: 'Enter a valid website URL' })
+  @MaxLength(200)
+  website?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

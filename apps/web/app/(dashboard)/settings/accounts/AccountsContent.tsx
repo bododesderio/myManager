@@ -62,7 +62,7 @@ export default function AccountsContent() {
               <div className="flex items-start gap-3">
                 <PlatformIcon platform={account.platform} size={28} className="mt-0.5 shrink-0" />
                 <div>
-                <p className="font-medium capitalize">{account.platform}</p>
+                <p className="font-medium capitalize">{account.platform_name ?? account.platform}</p>
                 <p className="text-sm text-text-2">
                   {account.username ?? account.account_name}
                   {account.connected_at && (
@@ -87,7 +87,7 @@ export default function AccountsContent() {
                 {account.status && account.status !== 'active' && (
                   <div className="mt-2">
                     <ServiceUnavailableInline
-                      message={`${account.platform} token ${account.status}. Posts to this account are paused until you reconnect.`}
+                      message={`${account.platform_name ?? account.platform} token ${account.status}. Posts to this account are paused until you reconnect.`}
                       actionHref={`/connect/oauth?platform=${encodeURIComponent(account.platform)}`}
                       actionLabel="Reconnect"
                     />

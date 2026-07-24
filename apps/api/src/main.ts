@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import { AppModule } from './app.module';
 import { GlobalHttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -8,6 +10,13 @@ import { requestTracingMiddleware } from './common/http/request-tracing.middlewa
 import { validateEnv } from './common/config/env.validation';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+
+// JSON.stringify cannot serialize BigInt, which Prisma returns for columns like
+// media_assets.size_bytes — without this, any endpoint returning such a row 500s
+// with "Do not know how to serialize a BigInt". Numbers are safe for our ranges.
+(BigInt.prototype as unknown as { toJSON: () => number }).toJSON = function () {
+  return Number(this as unknown as bigint);
+};
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -32,11 +41,21 @@ async function bootstrap() {
     }
   }
 
-  const app = await NestFactory.create(AppModule, { logger: ['error', 'warn', 'log'] });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: ['error', 'warn', 'log'],
+  });
 
   app.use(helmet());
   app.use(cookieParser());
   app.use(requestTracingMiddleware);
+
+  // Serve locally-stored uploads (STORAGE_DRIVER=local). In production media is
+  // served from R2's public URL, so this is a no-op there. CORP is relaxed to
+  // cross-origin so the web origin can load <img>/<video> from the API origin.
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+    setHeaders: (res) => res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'),
+  });
 
   app.setGlobalPrefix('api/v1', {
     exclude: [

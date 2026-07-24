@@ -60,16 +60,34 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     lastName: string;
     email: string;
     password: string;
+    phone?: string;
+    jobTitle?: string;
+    timezone?: string;
     country?: string;
     companyName?: string;
     workspaceName?: string;
     workspaceSlug?: string;
+    website?: string;
     industry?: string;
     teamSize?: string;
     referralSource?: string;
     planSlug?: string;
     billingCycle?: 'monthly' | 'annual';
   }): Promise<AuthTokens & { workspaceId: string }> {
+    // Company accounts must supply the business-oriented fields. This mirrors the
+    // shared registerSchema superRefine so the API is authoritative even for
+    // callers that bypass the web form.
+    if (data.accountType === 'company') {
+      const missing = (['phone', 'jobTitle', 'website', 'companyName'] as const).filter(
+        (f) => !data[f] || String(data[f]).trim().length === 0,
+      );
+      if (missing.length > 0) {
+        throw new BadRequestException(
+          `Company accounts require: ${missing.join(', ')}`,
+        );
+      }
+    }
+
     const existingUser = await this.repository.findUserByEmail(data.email);
     if (existingUser) {
       throw new ConflictException('An account with this email already exists');
@@ -95,9 +113,16 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       email: data.email,
       passwordHash: hashedPassword,
       name: fullName,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone,
+      jobTitle: data.jobTitle,
+      country: data.country,
+      timezone: data.timezone,
       workspaceName,
       workspaceSlug,
       accountType: data.accountType,
+      website: data.website,
       industry: data.industry,
       teamSize: data.teamSize,
       referralSource: data.referralSource,

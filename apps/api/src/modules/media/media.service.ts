@@ -20,6 +20,7 @@ export class MediaService {
   private readonly publicUrl: string;
   private readonly useLocalStorage: boolean;
   private readonly localStoragePath: string;
+  private readonly localPublicUrl: string;
   private readonly logger = new Logger(MediaService.name);
 
   constructor(
@@ -43,12 +44,16 @@ export class MediaService {
       this.publicUrl = this.configService.get('CLOUDFLARE_R2_PUBLIC_URL')!;
       this.useLocalStorage = false;
       this.localStoragePath = '';
+      this.localPublicUrl = '';
     } else {
       this.s3Client = null;
       this.bucketName = '';
       this.publicUrl = '';
       this.useLocalStorage = true;
       this.localStoragePath = this.configService.get('LOCAL_STORAGE_PATH', './uploads');
+      // Absolute base for locally-served files so the web origin can load them
+      // via <img>/<video> directly from the API (served at /uploads/*).
+      this.localPublicUrl = this.configService.get('MEDIA_PUBLIC_URL', 'http://localhost:3011');
       this.logger.warn('CLOUDFLARE_R2_ACCESS_KEY not set — using local file storage');
 
       // Ensure local uploads directory exists
@@ -136,6 +141,79 @@ export class MediaService {
     });
 
     return { uploadUrl, mediaId: mediaAsset.id, r2Key: fileKey };
+  }
+
+  /**
+   * Direct server-side upload: receives the file bytes (multipart), writes them
+   * to local disk or R2, and records the asset. Replaces the presigned-URL flow
+   * for clients that upload through the API — the presigned flow left local
+   * storage with a DB row but no file on disk (the bytes had nowhere to go).
+   */
+  async uploadDirect(
+    userId: string,
+    workspaceId: string,
+    file: { originalname: string; mimetype: string; size: number; buffer: Buffer },
+  ) {
+    if (!file || !file.buffer) throw new BadRequestException('No file provided');
+
+    const cap = maxSizeForContentType(file.mimetype);
+    if (file.size > cap) {
+      const mb = Math.round(cap / (1024 * 1024));
+      const kind = ALLOWED_VIDEO_TYPES.includes(file.mimetype as never)
+        ? 'videos'
+        : ALLOWED_DOCUMENT_TYPES.includes(file.mimetype as never)
+          ? 'documents'
+          : 'images';
+      throw new BadRequestException(`File too large: ${kind} must not exceed ${mb} MB`);
+    }
+
+    const storageUsage = await this.repository.getStorageUsedBytes(workspaceId);
+    const storageLimit = await this.repository.getStorageLimitBytes(workspaceId);
+    if (storageUsage + BigInt(file.size) > storageLimit) {
+      throw new BadRequestException('Storage quota exceeded');
+    }
+
+    const fileExt = file.originalname.split('.').pop() || 'bin';
+    const fileKey = `media/${workspaceId}/${crypto.randomUUID()}.${fileExt}`;
+
+    let url: string;
+    if (this.useLocalStorage) {
+      const dest = path.join(this.localStoragePath, fileKey);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.writeFileSync(dest, file.buffer);
+      url = `${this.localPublicUrl}/uploads/${fileKey}`;
+    } else {
+      await this.s3Client!.send(
+        new PutObjectCommand({
+          Bucket: this.bucketName,
+          Key: fileKey,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          ContentLength: file.size,
+        }),
+      );
+      url = `${this.publicUrl}/${fileKey}`;
+    }
+
+    const asset = await this.repository.create({
+      workspace_id: workspaceId,
+      user_id: userId,
+      filename: file.originalname,
+      mime_type: file.mimetype,
+      size_bytes: BigInt(file.size),
+      r2_key: fileKey,
+      url,
+    });
+
+    // size_bytes is a Prisma BigInt, which JSON.stringify cannot serialize —
+    // return a plain, response-safe shape (the web reads id/url).
+    return {
+      id: asset.id,
+      url: asset.url,
+      filename: asset.filename,
+      mime_type: asset.mime_type,
+      size_bytes: Number(asset.size_bytes),
+    };
   }
 
   async confirmUpload(mediaId: string, workspaceId: string, r2Key: string) {

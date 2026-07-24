@@ -40,6 +40,17 @@ function toPlanOption(p: any): PlanOption {
 const COUNTRIES = ['Uganda', 'Kenya', 'Nigeria', 'Tanzania', 'Ghana', 'Other'];
 const TEAM_SIZES = ['Just me', '2–5', '6–15', '16–50', '50+'];
 const INDUSTRIES = ['Marketing Agency', 'E-commerce', 'Technology', 'Media', 'Education', 'Healthcare', 'Finance', 'Other'];
+const REFERRAL_SOURCES = ['Google search', 'Twitter / X', 'LinkedIn', 'Facebook / Instagram', 'Friend / colleague', 'Blog / article', 'Other'];
+const TIMEZONES = ['Africa/Kampala', 'Africa/Nairobi', 'Africa/Lagos', 'Africa/Accra', 'Africa/Cairo', 'Africa/Johannesburg', 'Europe/London', 'America/New_York', 'America/Los_Angeles', 'UTC'];
+
+/** Best-effort browser timezone, falling back to UTC. */
+function detectTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+}
 
 export default function SignupForm() {
   const router = useRouter();
@@ -53,15 +64,19 @@ export default function SignupForm() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const [country, setCountry] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [teamSize, setTeamSize] = useState('');
+  const [referralSource, setReferralSource] = useState('');
 
   // Step 2 fields (company only)
   const [workspaceName, setWorkspaceName] = useState('');
   const [workspaceSlug, setWorkspaceSlug] = useState('');
   const [industry, setIndustry] = useState('');
-  const [referralSource, setReferralSource] = useState('');
+  const [website, setWebsite] = useState('');
+  const [timezone, setTimezone] = useState(detectTimezone);
 
   // Step 3 fields
   const [selectedPlan, setSelectedPlan] = useState('free');
@@ -110,10 +125,14 @@ export default function SignupForm() {
       lastName,
       email,
       password,
+      phone: phone || undefined,
+      jobTitle: jobTitle || undefined,
       country: country || undefined,
+      timezone: timezone || undefined,
       companyName: accountType === 'company' ? companyName || undefined : undefined,
       workspaceName: accountType === 'company' ? workspaceName || undefined : undefined,
       workspaceSlug: accountType === 'company' ? workspaceSlug || undefined : undefined,
+      website: accountType === 'company' ? website || undefined : undefined,
       industry: accountType === 'company' ? industry || undefined : undefined,
       teamSize: accountType === 'company' ? teamSize || undefined : undefined,
       referralSource: referralSource || undefined,
@@ -138,13 +157,17 @@ export default function SignupForm() {
           lastName,
           email,
           password,
+          phone: phone || undefined,
+          jobTitle: jobTitle || undefined,
           country,
+          timezone: timezone || undefined,
           companyName: accountType === 'company' ? companyName : undefined,
           workspaceName: accountType === 'company' ? workspaceName : undefined,
           workspaceSlug: accountType === 'company' ? workspaceSlug : undefined,
+          website: accountType === 'company' ? website || undefined : undefined,
           industry: accountType === 'company' ? industry : undefined,
           teamSize: accountType === 'company' ? teamSize : undefined,
-          referralSource,
+          referralSource: referralSource || undefined,
           planSlug: selectedPlan,
           billingCycle,
         },
@@ -191,7 +214,11 @@ export default function SignupForm() {
     emailValid &&
     password.length >= 8 &&
     country &&
-    (accountType === 'individual' || (companyName.trim().length >= 2 && teamSize));
+    (accountType === 'individual' ||
+      (companyName.trim().length >= 2 &&
+        teamSize &&
+        phone.trim().length > 0 &&
+        jobTitle.trim().length > 0));
 
   return (
     <div className="w-full max-w-md">
@@ -293,6 +320,25 @@ export default function SignupForm() {
                 )}
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="tel"
+                  aria-label="Phone number"
+                  autoComplete="tel"
+                  placeholder={accountType === 'company' ? 'Phone number' : 'Phone (optional)'}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                <input
+                  type="text"
+                  aria-label="Job title"
+                  autoComplete="organization-title"
+                  placeholder={accountType === 'company' ? 'Job title' : 'Job title (optional)'}
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  className="px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+              </div>
+
               <select value={country} onChange={(e) => setCountry(e.target.value)}
                 className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
                 <option value="">Select country</option>
@@ -306,6 +352,12 @@ export default function SignupForm() {
                   {TEAM_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               )}
+
+              <select value={referralSource} onChange={(e) => setReferralSource(e.target.value)}
+                className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                <option value="">How did you hear about us? (optional)</option>
+                {REFERRAL_SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
 
               <button
                 onClick={nextStep}
@@ -348,13 +400,43 @@ export default function SignupForm() {
                 {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
               </select>
 
+              <div>
+                <input
+                  type="url"
+                  inputMode="url"
+                  aria-label="Business website"
+                  placeholder="Business website (https://example.com)"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent" />
+                {website && !/^https?:\/\/.+\..+/.test(website) && (
+                  <p className="mt-1 text-xs text-red-600">Enter a full URL, e.g. https://example.com</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs text-text-2 mb-1 block">Timezone (used for scheduling)</label>
+                <select value={timezone} onChange={(e) => setTimezone(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-bg text-text border border-border rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent">
+                  {[timezone, ...TIMEZONES.filter((t) => t !== timezone)].map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="bg-blue-50 text-blue-700 text-sm p-3 rounded-lg">
                 You&apos;ll be registered as Workspace Owner with full admin rights.
               </div>
 
               <div className="flex gap-3">
                 <button onClick={prevStep} className="px-6 py-2.5 border border-border text-text rounded-lg text-sm hover:bg-bg-2">Back</button>
-                <button onClick={nextStep} className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)]">Continue</button>
+                <button
+                  onClick={nextStep}
+                  disabled={!website.trim() || !/^https?:\/\/.+\..+/.test(website)}
+                  className="flex-1 py-2.5 bg-[var(--color-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Continue
+                </button>
               </div>
             </div>
           )}

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSocialAccounts } from '@/lib/hooks/useSocialAccounts';
 import { usePlatforms } from '@/lib/hooks/usePlatforms';
 import { useCreatePost, usePublishPost } from '@/lib/hooks/usePosts';
-import { useUploadMedia } from '@/lib/hooks/useMedia';
+import { useUploadMedia, useMedia } from '@/lib/hooks/useMedia';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
@@ -17,6 +17,7 @@ import { PlatformIcon } from '@/components/icons/PlatformIcon';
 interface SocialAccount {
   id: string;
   platform: string;
+  platform_name?: string;
   display_name: string;
   platform_username: string;
   avatar_url: string | null;
@@ -68,8 +69,16 @@ export function ComposeContent() {
   const [scheduledAt, setScheduledAt] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Add an existing library asset to the selection (dedup by id).
+  const addFromLibrary = useCallback((asset: { id: string; url: string; name: string }) => {
+    setUploadedMedia((prev) =>
+      prev.some((m) => m.id === asset.id) ? prev : [...prev, asset],
+    );
+  }, []);
 
   /* --- Derived --- */
   const accounts: SocialAccount[] = (accountsData as any)?.data ?? (accountsData as any) ?? [];
@@ -236,9 +245,9 @@ export function ComposeContent() {
                   ) : (
                     <PlatformIcon platform={account.platform} size={18} />
                   )}
-                  <span>{account.display_name || account.platform_username}</span>
+                  <span>{account.display_name || account.platform_username || account.platform_name || account.platform}</span>
                   <span className="text-xs text-text-muted capitalize">
-                    {account.platform}
+                    {account.platform_name ?? account.platform}
                   </span>
                 </button>
               );
@@ -320,6 +329,16 @@ export function ComposeContent() {
               e.target.value = '';
             }}
           />
+
+          <div className="mt-3 text-center">
+            <button
+              type="button"
+              onClick={() => setLibraryOpen(true)}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Or select from library
+            </button>
+          </div>
 
           {uploadMedia.isPending && (
             <div className="mt-2 flex items-center gap-2 text-xs text-text-2" role="status" aria-live="polite">
@@ -467,7 +486,7 @@ export function ComposeContent() {
                       <div className="flex items-center gap-2">
                         <PlatformIcon platform={account.platform} size={16} />
                         <span className="text-xs font-semibold uppercase tracking-wide text-text-2">
-                          {account.platform}
+                          {account.platform_name ?? account.platform}
                         </span>
                       </div>
 
@@ -485,18 +504,20 @@ export function ComposeContent() {
                             />
                           ) : (
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-border text-xs font-bold text-text-2">
-                              {(account.display_name || account.platform_username)
+                              {(account.display_name || account.platform_username || account.platform_name || account.platform)
                                 .charAt(0)
                                 .toUpperCase()}
                             </div>
                           )}
                           <div>
                             <p className="text-sm font-semibold leading-tight">
-                              {account.display_name || account.platform_username}
+                              {account.display_name || account.platform_username || account.platform_name || account.platform}
                             </p>
-                            <p className="text-xs text-text-muted">
-                              @{account.platform_username}
-                            </p>
+                            {account.platform_username ? (
+                              <p className="text-xs text-text-muted">@{account.platform_username}</p>
+                            ) : (
+                              <p className="text-xs text-text-muted">{account.platform_name ?? account.platform}</p>
+                            )}
                           </div>
                         </div>
 
@@ -539,6 +560,122 @@ export function ComposeContent() {
             </div>
           )}
         </Card>
+      </div>
+
+      {libraryOpen && (
+        <LibraryPicker
+          existingIds={uploadedMedia.map((m) => m.id)}
+          onAdd={addFromLibrary}
+          onClose={() => setLibraryOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Library picker — choose already-uploaded assets for this post.     */
+/* ------------------------------------------------------------------ */
+function LibraryPicker({
+  existingIds,
+  onAdd,
+  onClose,
+}: {
+  existingIds: string[];
+  onAdd: (asset: { id: string; url: string; name: string }) => void;
+  onClose: () => void;
+}) {
+  const { data, isLoading } = useMedia({ type: 'image', limit: 60 });
+  const assets: any[] = Array.isArray(data) ? data : ((data as any)?.data ?? []);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+
+  const toggle = (id: string) =>
+    setPicked((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const addSelected = () => {
+    assets
+      .filter((a) => picked.has(a.id))
+      .forEach((a) => onAdd({ id: a.id, url: a.url, name: a.filename ?? a.name ?? 'media' }));
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-brand bg-bg shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <h3 className="font-heading text-sm font-semibold">Media library</h3>
+          <button type="button" onClick={onClose} className="text-text-muted hover:text-text" aria-label="Close">
+            &times;
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4">
+          {isLoading ? (
+            <p className="py-10 text-center text-sm text-text-2">Loading…</p>
+          ) : assets.length === 0 ? (
+            <p className="py-10 text-center text-sm text-text-2">
+              No media yet. Upload from your device first.
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {assets.map((a) => {
+                const isPicked = picked.has(a.id);
+                const already = existingIds.includes(a.id);
+                return (
+                  <button
+                    key={a.id}
+                    type="button"
+                    disabled={already}
+                    onClick={() => toggle(a.id)}
+                    className={`relative aspect-square overflow-hidden rounded-brand border-2 transition ${
+                      isPicked ? 'border-primary' : 'border-transparent'
+                    } ${already ? 'cursor-not-allowed opacity-40' : 'hover:border-primary/60'}`}
+                    title={already ? 'Already added' : a.filename}
+                  >
+                    {a.url ? (
+                      <Image src={a.url} alt={a.filename ?? 'media'} fill className="object-cover" unoptimized />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center bg-bg-2 text-[10px] text-text-muted">
+                        {a.filename}
+                      </span>
+                    )}
+                    {isPicked && (
+                      <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end gap-3 border-t border-border px-5 py-3">
+          <button type="button" onClick={onClose} className="rounded-brand border border-border px-4 py-2 text-sm hover:bg-bg-2">
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={addSelected}
+            disabled={picked.size === 0}
+            className="rounded-brand bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
+          >
+            Add{picked.size > 0 ? ` ${picked.size}` : ''}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -48,9 +48,16 @@ export class AuthRepository {
     email: string;
     passwordHash: string;
     name: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    jobTitle?: string;
+    country?: string;
+    timezone?: string;
     workspaceName: string;
     workspaceSlug: string;
     accountType?: 'individual' | 'company';
+    website?: string;
     industry?: string;
     teamSize?: string;
     referralSource?: string;
@@ -65,6 +72,13 @@ export class AuthRepository {
           email: data.email,
           password_hash: data.passwordHash,
           name: data.name,
+          // first_name/last_name/phone/job_title/country were previously dropped
+          // at signup — the columns existed but nothing wrote them.
+          first_name: data.firstName ?? '',
+          last_name: data.lastName ?? '',
+          phone: data.phone ?? null,
+          job_title: data.jobTitle ?? null,
+          country: data.country ?? null,
           email_verified: false,
         },
       });
@@ -75,6 +89,7 @@ export class AuthRepository {
           slug: data.workspaceSlug,
           owner_id: user.id,
           account_type: data.accountType === 'company' ? 'COMPANY' : 'INDIVIDUAL',
+          website: data.website ?? null,
           industry: data.industry ?? null,
           team_size: data.teamSize ?? null,
           referral_source: data.referralSource ?? null,
@@ -94,7 +109,7 @@ export class AuthRepository {
           user_id: user.id,
           language: 'en',
           currency: 'USD',
-          timezone: 'UTC',
+          timezone: data.timezone || 'UTC',
           theme: 'system',
         },
       });

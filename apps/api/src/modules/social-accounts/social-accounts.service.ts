@@ -118,7 +118,30 @@ export class SocialAccountsService {
   }
 
   async listByWorkspace(workspaceId: string) {
-    return this.repository.findByWorkspace(workspaceId);
+    const rows = await this.repository.findByWorkspace(workspaceId);
+    const now = Date.now();
+    // Flatten to the shape the web expects: `platform` is a slug STRING (used
+    // for the icon + reconnect link), with the human name exposed separately.
+    // The joined relation object would crash PlatformIcon's `platform.toLowerCase()`.
+    return rows.map((r) => ({
+      id: r.id,
+      platform: r.platform_id,
+      platform_name: r.platform?.name ?? r.platform_id,
+      // Both name pairs are exposed because the web reads them under different
+      // keys: Compose uses display_name/platform_username, the accounts page
+      // uses account_name/username.
+      display_name: r.display_name,
+      platform_username: r.platform_username,
+      account_name: r.display_name || null,
+      username: r.platform_username || null,
+      avatar_url: r.avatar_url,
+      is_active: r.is_active,
+      status:
+        r.token_expires_at && r.token_expires_at.getTime() < now ? 'expired' : 'active',
+      connected_at: r.connected_at,
+      token_expires_at: r.token_expires_at,
+      metadata: r.metadata,
+    }));
   }
 
   /**
@@ -231,9 +254,15 @@ export class SocialAccountsService {
 
     const profile = await this.fetchPlatformProfile(resolvedPlatform, tokens.access_token);
 
+    // Persist the catalogue slug (underscored, e.g. `google_business`) — that is
+    // the platforms.slug the FK references and the value Post.platforms / the
+    // publishing workers match against. `resolvedPlatform` is the hyphenated
+    // OAuth-config form; convert it back to the public slug for storage.
+    const catalogueSlug = resolvedPlatform.replace(/-/g, '_');
+
     const account = await this.repository.upsert({
       workspace_id: storedState.workspaceId,
-      platform_id: resolvedPlatform,
+      platform_id: catalogueSlug,
       platform_user_id: profile.id,
       platform_username: profile.username,
       display_name: profile.displayName,
@@ -369,6 +398,8 @@ export class SocialAccountsService {
       profile_picture_url?: string;
       profile_image_url?: string;
       profile_image?: string; // Pinterest v5 /user_account
+      // Google Business Profile /v1/accounts returns a list, not a user object.
+      accounts?: Array<{ name?: string; accountName?: string }>;
       data?: {
         // X (Twitter) v2 wraps the user object directly under `data`…
         id?: string;
@@ -387,13 +418,21 @@ export class SocialAccountsService {
       // Pinterest v5 /user_account exposes no numeric id — username is the
       // stable identifier, so it seeds platform_user_id (avoids two Pinterest
       // accounts colliding on 'unknown' in the same workspace).
-      id: data.id || data.sub || data.data?.id || data.data?.user?.open_id || data.username || 'unknown',
+      id:
+        data.id ||
+        data.sub ||
+        data.data?.id ||
+        data.data?.user?.open_id ||
+        data.accounts?.[0]?.name || // Google Business: e.g. "accounts/123456789"
+        data.username ||
+        'unknown',
       username:
         data.username ||
         data.data?.username ||
         data.name ||
         data.data?.name ||
         data.data?.user?.display_name ||
+        data.accounts?.[0]?.accountName ||
         '',
       displayName:
         data.name ||
@@ -401,6 +440,7 @@ export class SocialAccountsService {
         data.username ||
         data.data?.username ||
         data.data?.user?.display_name ||
+        data.accounts?.[0]?.accountName ||
         '',
       avatarUrl:
         pictureUrl ||

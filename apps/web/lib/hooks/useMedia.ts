@@ -26,10 +26,14 @@ export function useUploadMedia() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('workspaceId', workspaceId!);
-      return apiClient.post('/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // workspaceId goes in the QUERY, not the body: NestJS guards run before
+      // multer parses the multipart body, so the server can only read the
+      // workspace from the query string.
+      return apiClient.post(
+        `/media/upload?workspaceId=${encodeURIComponent(workspaceId!)}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: mediaKeys.all });

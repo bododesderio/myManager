@@ -7,8 +7,11 @@ import {
   Param,
   Query,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MediaService } from './media.service';
 import {
@@ -36,8 +39,25 @@ export class MediaController {
     );
   }
 
+  // Direct multipart upload. workspaceId MUST come as a query param (not the
+  // body): NestJS guards run before multer parses multipart, so WorkspaceMemberGuard
+  // can only resolve the workspace from the query/params, never the file body.
   @Post('upload')
-  @ApiOperation({ summary: 'Get a presigned upload URL' })
+  @ApiOperation({ summary: 'Upload a media file (multipart)' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: 200 * 1024 * 1024 } }),
+  )
+  async uploadFile(
+    @Req() req: Request,
+    @UploadedFile() file: { originalname: string; mimetype: string; size: number; buffer: Buffer },
+  ) {
+    const userId = (req as unknown as { user: { id: string } }).user.id;
+    return this.mediaService.uploadDirect(userId, getRequestWorkspaceId(req), file);
+  }
+
+  @Post('presign')
+  @ApiOperation({ summary: 'Get a presigned upload URL (R2 direct-to-storage)' })
   async getUploadUrl(
     @Req() req: Request,
     @Body() body: GetPresignedUploadUrlDto,

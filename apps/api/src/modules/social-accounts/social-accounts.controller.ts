@@ -13,6 +13,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getRequestUserId, getRequestWorkspaceId } from '../../common/http/request-context';
+import { SkipWorkspaceCheck } from '../../common/decorators';
 import { SocialAccountsService } from './social-accounts.service';
 
 @ApiTags('Social Accounts')
@@ -43,6 +44,7 @@ export class SocialAccountsController {
   }
 
   @Post('callback')
+  @SkipWorkspaceCheck()
   @ApiOperation({
     summary:
       'Handle OAuth callback — platform is resolved from the stored state, so the redirect URI stays static and registerable.',
@@ -54,6 +56,7 @@ export class SocialAccountsController {
   }
 
   @Post('callback/:platform')
+  @SkipWorkspaceCheck()
   @ApiOperation({ summary: 'Handle OAuth callback (legacy per-platform path)' })
   async handleCallbackForPlatform(
     @Param('platform') platform: string,

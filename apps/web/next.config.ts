@@ -26,21 +26,26 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.dev' },
       { protocol: 'https', hostname: '*.cloudflare.com' },
+      // Local media served by the API (STORAGE_DRIVER=local, dev only).
+      { protocol: 'http', hostname: 'localhost' },
     ],
   },
   async headers() {
+    // In local/preview (HTTPS upgrade disabled) media is served over http from
+    // the API origin; production stays https-only.
+    const httpMedia = process.env.DISABLE_HTTPS_UPGRADE === '1' ? ' http:' : '';
     const contentSecurityPolicy = [
       "default-src 'self'",
       "base-uri 'self'",
       "frame-ancestors 'none'",
       "object-src 'none'",
       "form-action 'self'",
-      "img-src 'self' data: blob: https:",
+      `img-src 'self' data: blob: https:${httpMedia}`,
       "style-src 'self' 'unsafe-inline'",
       "script-src 'self' 'unsafe-inline'",
       "font-src 'self' data: https:",
       "connect-src 'self' http: https: ws: wss:",
-      "media-src 'self' data: blob: https:",
+      `media-src 'self' data: blob: https:${httpMedia}`,
       "worker-src 'self' blob:",
       // Force HTTPS in production (good for TLS deploys), but never in dev and
       // never when explicitly disabled. Without this guard the directive upgrades

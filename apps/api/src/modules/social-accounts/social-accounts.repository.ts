@@ -29,7 +29,8 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
       where: { workspace_id: workspaceId, is_active: true },
       select: {
         id: true,
-        platform: true,
+        platform_id: true,
+        platform: { select: { slug: true, name: true } },
         platform_username: true,
         display_name: true,
         avatar_url: true,

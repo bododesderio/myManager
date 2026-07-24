@@ -52,22 +52,49 @@ export const signupSchema = z.object({
  * the server accepts. Client validation that is STRICTER than the server blocks
  * legitimate input, which is worse than no client validation at all.
  */
-export const registerSchema = z.object({
-  accountType: z.enum(['individual', 'company']),
-  firstName: z.string().min(1, 'First name is required').max(100),
-  lastName: z.string().min(1, 'Last name is required').max(100),
-  email: z.string().email('Enter a valid email address'),
-  password: passwordSchema,
-  country: z.string().max(100).optional(),
-  companyName: z.string().max(200).optional(),
-  workspaceName: z.string().max(200).optional(),
-  workspaceSlug: z.string().max(200).optional(),
-  industry: z.string().max(100).optional(),
-  teamSize: z.string().max(50).optional(),
-  referralSource: z.string().max(200).optional(),
-  planSlug: z.string().optional(),
-  billingCycle: z.enum(['monthly', 'annual']).optional(),
-});
+/** Permissive international phone: optional +, then 7–20 digits/space/()-. */
+export const phoneSchema = z
+  .string()
+  .regex(/^[+]?[\d\s()-]{7,20}$/, 'Enter a valid phone number');
+
+export const registerSchema = z
+  .object({
+    accountType: z.enum(['individual', 'company']),
+    firstName: z.string().min(1, 'First name is required').max(100),
+    lastName: z.string().min(1, 'Last name is required').max(100),
+    email: z.string().email('Enter a valid email address'),
+    password: passwordSchema,
+    phone: phoneSchema.optional().or(z.literal('')),
+    jobTitle: z.string().max(100).optional(),
+    country: z.string().max(100).optional(),
+    companyName: z.string().max(200).optional(),
+    workspaceName: z.string().max(200).optional(),
+    workspaceSlug: z.string().max(200).optional(),
+    website: z.string().url('Enter a valid website URL (https://…)').max(200).optional().or(z.literal('')),
+    industry: z.string().max(100).optional(),
+    teamSize: z.string().max(50).optional(),
+    timezone: z.string().max(100).optional(),
+    referralSource: z.string().max(200).optional(),
+    planSlug: z.string().optional(),
+    billingCycle: z.enum(['monthly', 'annual']).optional(),
+  })
+  // Company accounts must supply the business-oriented fields; individuals may
+  // leave them blank. Kept in sync with the API's register() company checks.
+  .superRefine((val, ctx) => {
+    if (val.accountType !== 'company') return;
+    const required: Array<[keyof typeof val, string]> = [
+      ['phone', 'Phone number is required for company accounts'],
+      ['jobTitle', 'Job title is required for company accounts'],
+      ['website', 'Business website is required for company accounts'],
+      ['companyName', 'Company name is required'],
+    ];
+    for (const [field, message] of required) {
+      const v = val[field];
+      if (typeof v !== 'string' || v.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field as string], message });
+      }
+    }
+  });
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1),

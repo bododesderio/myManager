@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../../prisma.service';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { SKIP_WORKSPACE_CHECK_KEY } from '../decorators/skip-workspace-check.decorator';
 
 /**
  * Route prefixes that operate on workspace-scoped data. If a request matches one
@@ -58,6 +59,17 @@ export class WorkspaceMemberGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) return true;
+
+    // Routes whose authoritative workspace is recovered server-side (not from the
+    // request) opt out of workspace resolution here — e.g. the OAuth callback,
+    // which reads its workspace from the server-stored `state`. JWT auth still
+    // applies; only the fail-closed workspace requirement is skipped. Membership
+    // was already enforced at the workspace-guarded step that minted the state.
+    const skipWorkspaceCheck = this.reflector.getAllAndOverride<boolean>(
+      SKIP_WORKSPACE_CHECK_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (skipWorkspaceCheck) return true;
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;

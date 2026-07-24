@@ -138,10 +138,27 @@ describe('AuthService.register', () => {
       ...validInput,
       accountType: 'company',
       companyName: 'Acme & Co. Ltd',
+      // Company accounts now require these business fields.
+      phone: '+256700000000',
+      jobTitle: 'Director',
+      website: 'https://acme.example',
     } as any);
 
     const arg = repository.createUserWithWorkspace.mock.calls[0][0];
     expect(arg.workspaceSlug).toMatch(/^[a-z0-9-]+$/);
     expect(arg.workspaceSlug).not.toMatch(/(^-|-$)/);
+  });
+
+  it('rejects a company account missing the required business fields', async () => {
+    const { service } = createService();
+
+    await expect(
+      service.register({
+        ...validInput,
+        accountType: 'company',
+        companyName: 'Acme',
+        // no phone / jobTitle / website
+      } as any),
+    ).rejects.toThrow(/Company accounts require/);
   });
 });
