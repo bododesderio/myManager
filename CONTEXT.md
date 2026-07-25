@@ -1,6 +1,24 @@
 # Project Context
 Last updated: 2026-07-25
 
+## ▶ RESUME THE STACK (2026-07-25) — now a single self-contained command
+All local Docker (containers, project images mymanager-api/web/worker, volumes,
+network) was **fully torn down** at end of session. To bring it back:
+```
+cd /Data/Projects/myManager && docker compose up -d --build
+```
+This now does EVERYTHING on its own — builds all 3 images, then on api boot runs
+`prisma migrate deploy` **and** the idempotent seed (plans, platforms, brand/
+theme, CMS, superadmin/demo/agency+team logins), and creates volumes (incl. a new
+`uploads_data` for media). Verified cold: 6 migrations + full seed, api+web
+healthy. Needs the gitignored `.env` (NEXTAUTH_SECRET) + `apps/api/.env`
+(JWT_SECRET/ENCRYPTION_KEY/OAuth creds) present — both still on this machine; keys
+listed in `.env.example`. Logins: superadmin admin@mymanager.app/Superadmin123,
+demo demo@mymanager.app/Demo1234, agency Agency1234, team member*1234*.
+Canonical ports 5432/6379/3001/3000 — on THIS shared box those collide with other
+projects; use a ports-only compose override (see `mymanager-local-stack-*` memory)
+or stop the conflicting containers. Commit 742008a wired all this.
+
 ## ▶ NEXT SESSION STARTS HERE (2026-07-25) — build Per-Platform Content Adaptation
 **Plan APPROVED, not yet coded:** `docs/plan-per-platform-content-adaptation.md`.
 Feature: one master post → per-platform tailored captions (AI-rewritten to each
