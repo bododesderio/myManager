@@ -57,4 +57,10 @@ EXPOSE 3001
 
 USER node
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node --import tsx dist/main.js"]
+# On every boot: apply pending migrations, then run the idempotent seed
+# (upserts + existence-guarded creates — safe to re-run), then start the API.
+# This makes a fresh `docker compose up -d --build` fully self-contained:
+# schema + baseline data (plans, platforms, brand/theme, CMS, superadmin/demo/
+# agency logins) exist with no manual steps. Seed is run via the local tsx
+# binary directly so it doesn't depend on `prisma db seed` command resolution.
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node_modules/.bin/tsx prisma/seeds/index.ts && node --import tsx dist/main.js"]
