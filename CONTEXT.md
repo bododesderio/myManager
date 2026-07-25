@@ -327,9 +327,19 @@ Turborepo + pnpm 9.15.4 workspaces.
 `apiClient`'s `{success,data}` unwrap branch never fires — it returns the body
 verbatim. Don't assume a `{success,data}` envelope when reading API responses.
 
-**Unverified**
-- Whether the web composer converts local→UTC correctly before sending
-  `scheduled_at`. API side is correct (`timestamptz` in UTC); needs a frontend check.
+**Verified (2026-07-25)**
+- **Composer local→UTC conversion is CORRECT.** Live test as Amina (box @ GMT+3
+  EAT): datetime-local `2026-07-26T15:30` → web POSTs `scheduledAt:
+  "2026-07-26T12:30:00.000Z"` (−3h) → DB stores `2026-07-26 12:30:00+00`,
+  status SCHEDULED. Payload field is `scheduledAt` (camelCase).
+- **End-to-end post-create works with a real connected account.** Save Draft with
+  the Google Business account selected + 2 library images → `POST /api/v1/posts`
+  201 → DB row DRAFT with 2 `post_media` rows + `platforms:{google_business}`.
+  Payload: `{workspaceId, caption, platforms[], contentType, mediaIds[],
+  scheduledAt?}`. NOTE: **Save Draft resets the composer** (account deselected,
+  caption + media cleared) — rebuild state before a follow-up Schedule/Publish.
+  (Test posts were deleted after — a SCHEDULED post targets the REAL Google
+  account and the worker would try to publish it.)
 
 ## Next steps
 1. ~~Manual smoke test of login/signup~~ ✅ done 2026-07-22 (fresh login → clean /home).
