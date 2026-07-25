@@ -1,7 +1,7 @@
 # Project Context
-Last updated: 2026-07-24 (evening)
+Last updated: 2026-07-25
 
-## ▶ RESUME HERE (2026-07-24 evening) — 3 features shipped, 1 needs browser-verify
+## ▶ RESUME HERE (2026-07-25) — library picker verified; all 3 features fully live
 Stack on **alternate ports** (box is shared with other projects): postgres **5442**,
 redis **6389**, API **3011**, web **3010**. Bring-up recipe: `.claude/memory/mymanager-local-stack-and-live-findings.md`.
 Test client: **amina@kampalamedia.co.ug / Kampala2026** (COMPANY, workspace `kampala-media-collective`, has a connected Google account + a draft with 3 photos).
@@ -11,7 +11,7 @@ Test client: **amina@kampalamedia.co.ug / Kampala2026** (COMPANY, workspace `kam
 2. **Registration fields expanded** — phone, jobTitle, website, timezone, referralSource (surfaced); required-for-company (3-layer: form + Zod superRefine + service). first_name/last_name/country were dropped at signup — now persisted. New cols on users (phone/job_title/country) + workspaces (website), migration `20260724150000`.
 3. **Media upload FIXED** (never worked before) — direct multipart upload replaces the unwired presigned flow; API serves `/uploads/*`; verified device-upload of 3 photos → thumbnails → attached to a draft. Global BigInt→JSON polyfill in main.ts. Empty `@` handle fixed. Details: `.claude/memory/mymanager-media-upload.md`.
 
-**⏳ FIRST THING TOMORROW:** the **"select from library" picker** in compose (`ComposeContent.tsx` `LibraryPicker`) is BUILT + typechecks clean but **NOT browser-verified** — the web wasn't rebuilt after adding it. Rebuild web (`DISABLE_HTTPS_UPGRADE=1 API_URL=http://localhost:3011 pnpm --filter @mymanager/web build`), restart on :3010 (`fuser -k 3010/tcp` first — NEVER `pkill -f "next start"`, it kills other projects), then open /compose as Amina → "Or select from library" → confirm the grid loads + adds. `GET /media` list now works (BigInt fix).
+**✅ DONE (2026-07-25):** the **"select from library" picker** in compose (`ComposeContent.tsx` `LibraryPicker`) is now **browser-verified live as Amina**: web rebuilt with the picker, /compose → "Or select from library" opens the modal, `GET /media` returns her 3 real images (photo1/2/3.png), multi-select shows checkmarks + "Add N" count, Add attaches to the Media area (imgs decode 120×80 from `http://localhost:3011/uploads/media/*`), and **dedup works** — reopening disables already-attached tiles ("Already added", opacity-40). 0 app console errors. (Note: a JS `fetch()` to /uploads trips CSP `connect-src` — that's expected; `<img>` loads are fine.)
 
 **Also pending:** rotate the Google account password (shared in chat 2026-07-24). Account-less drafts still blocked (composer + `@ArrayMinSize(1)`) — product decision.
 
