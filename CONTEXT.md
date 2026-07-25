@@ -1,7 +1,19 @@
 # Project Context
 Last updated: 2026-07-25
 
-## ▶ RESUME HERE (2026-07-25) — library picker verified; all 3 features fully live
+## ▶ NEXT SESSION STARTS HERE (2026-07-25) — build Per-Platform Content Adaptation
+**Plan APPROVED, not yet coded:** `docs/plan-per-platform-content-adaptation.md`.
+Feature: one master post → per-platform tailored captions (AI-rewritten to each
+platform's content-type rules + char limits), premium-tier aware.
+**Locked decisions:** (1) storage = `platform_options[slug]` JSON; (2) premium =
+hybrid (auto-detect where API exposes it + user-declared toggle override);
+(3) over-limit = auto thread-split on X/Threads, trim+warn elsewhere.
+**Start at Phase 0:** canonical capability spec in `packages/constants` + seed the
+DB `platforms` table from it; retire the 3 duplicate limit maps (DB, `packages/
+utils/platform-limits.ts`, inline `ai.service.ts:71-74`). Milestone M1 = Phases
+0→3+5 without threading; M2 = Phase 4 threading. See the plan doc for full detail.
+
+## ▶ Prior resume (2026-07-25) — library picker verified; all 3 features fully live
 Stack on **alternate ports** (box is shared with other projects): postgres **5442**,
 redis **6389**, API **3011**, web **3010**. Bring-up recipe: `.claude/memory/mymanager-local-stack-and-live-findings.md`.
 Test client: **amina@kampalamedia.co.ug / Kampala2026** (COMPANY, workspace `kampala-media-collective`, has a connected Google account + a draft with 3 photos).
