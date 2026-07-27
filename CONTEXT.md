@@ -19,17 +19,31 @@ Canonical ports 5432/6379/3001/3000 — on THIS shared box those collide with ot
 projects; use a ports-only compose override (see `mymanager-local-stack-*` memory)
 or stop the conflicting containers. Commit 742008a wired all this.
 
-## ▶ NEXT SESSION STARTS HERE (2026-07-25) — build Per-Platform Content Adaptation
-**Plan APPROVED, not yet coded:** `docs/plan-per-platform-content-adaptation.md`.
-Feature: one master post → per-platform tailored captions (AI-rewritten to each
-platform's content-type rules + char limits), premium-tier aware.
-**Locked decisions:** (1) storage = `platform_options[slug]` JSON; (2) premium =
-hybrid (auto-detect where API exposes it + user-declared toggle override);
-(3) over-limit = auto thread-split on X/Threads, trim+warn elsewhere.
-**Start at Phase 0:** canonical capability spec in `packages/constants` + seed the
-DB `platforms` table from it; retire the 3 duplicate limit maps (DB, `packages/
-utils/platform-limits.ts`, inline `ai.service.ts:71-74`). Milestone M1 = Phases
-0→3+5 without threading; M2 = Phase 4 threading. See the plan doc for full detail.
+## ▶ NEXT SESSION STARTS HERE (2026-07-27) — Per-Platform Content Adaptation, Phase 2
+Plan: `docs/plan-per-platform-content-adaptation.md` (Phase 0 + Phase 1 checked off there).
+**Stack is currently UP** on canonical ports (postgres 5432, redis 6379, api 3001,
+web 3000) via `docker compose up -d --build`. Migration `20260727120000` is applied.
+
+**✅ Phase 0 DONE (commit 4481656)** — one canonical capability registry
+`packages/constants/platform-capabilities.ts` (`PLATFORM_CAPABILITIES` +
+`resolveEffectiveLimits`/`getCaptionLimit`/`DEFAULT_CAPTION_LIMIT`; adds
+supportsThreads/hashtagLimit/linkHandling/premium). Was **FOUR** disagreeing sources
+(the runtime seed `prisma/seeds/index.ts` had its own map; standalone `platforms.seed.ts`
+deleted). All derive from it now: utils/platform-limits.ts (thin adapter), seed
+(fills content_types/limits JSON), ai.service (getCaptionLimit), ComposeContent
+(DEFAULT_CAPTION_LIMIT). `constants` is a BUILT pkg — rebuild after edits.
+
+**✅ Phase 1 DONE (commit 999dc3b)** — hybrid premium. `social_accounts.premium_override
+Boolean?` (null=auto). X callback auto-detects via `verified_type`; others 'unknown';
+callback now persists `scopes` too. `PUT /social-accounts/:id/premium`; list/get expose
+is_premium/premium_available/premium_override. Web: tri-state tier control + badge in
+Settings→Accounts. Live-verified with an X fixture.
+
+**▶ NEXT — Phase 2:** per-platform caption/thread storage. Extend typed
+`platform_options[slug]` (`packages/types/platform-options.ts`) with `caption?: string`
++ `thread?: string[]`, fall back to master `caption`; thread through
+`posts.service.create/update`, `PostVersion`, and each per-platform BullMQ worker.
+Milestone M1 = Phases 0→3+5 (no threading); M2 = Phase 4 threading.
 
 ## ▶ Prior resume (2026-07-25) — library picker verified; all 3 features fully live
 Stack on **alternate ports** (box is shared with other projects): postgres **5442**,
