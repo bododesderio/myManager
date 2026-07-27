@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { PLATFORM_CAPABILITIES } from '@mymanager/constants';
 
 const prisma = new PrismaClient();
 
@@ -236,27 +237,64 @@ async function seedPlans() {
 
 // ─── Platforms ────────────────────────────────────────────
 async function seedPlatforms() {
-  const platforms = [
-    { slug: 'facebook', name: 'Facebook', display_name: 'Facebook', color: '#1877F2', phase: 1, api_version: 'v18.0', auth_type: 'oauth2', max_caption_chars: 63206, max_images: 10, max_file_size_mb: 100, max_video_duration_sec: 14400, min_image_width: 600, min_image_height: 315 },
-    { slug: 'instagram', name: 'Instagram', display_name: 'Instagram', color: '#E4405F', phase: 1, api_version: 'v18.0', auth_type: 'oauth2', max_caption_chars: 2200, max_images: 10, max_file_size_mb: 100, max_video_duration_sec: 5400, min_image_width: 320, min_image_height: 320 },
-    { slug: 'x', name: 'X / Twitter', display_name: 'X / Twitter', color: '#111111', phase: 1, api_version: 'v2', auth_type: 'oauth2', max_caption_chars: 280, max_images: 4, max_file_size_mb: 15, max_video_duration_sec: 140, min_image_width: 600, min_image_height: 335 },
-    { slug: 'linkedin', name: 'LinkedIn', display_name: 'LinkedIn', color: '#0A66C2', phase: 1, api_version: 'v2', auth_type: 'oauth2', max_caption_chars: 3000, max_images: 9, max_file_size_mb: 200, max_video_duration_sec: 600, min_image_width: 552, min_image_height: 276 },
-    { slug: 'tiktok', name: 'TikTok', display_name: 'TikTok', color: '#111111', phase: 1, api_version: 'v2', auth_type: 'oauth2', max_caption_chars: 2200, max_images: 1, max_file_size_mb: 500, max_video_duration_sec: 600, min_image_width: 720, min_image_height: 1280 },
-    { slug: 'google_business', name: 'Google Business Profile', display_name: 'Google Business Profile', color: '#4285F4', phase: 1, api_version: 'v1', auth_type: 'oauth2', max_caption_chars: 1500, max_images: 10, max_file_size_mb: 25, max_video_duration_sec: 30, min_image_width: 250, min_image_height: 250 },
-    { slug: 'pinterest', name: 'Pinterest', display_name: 'Pinterest', color: '#E60023', phase: 2, api_version: 'v5', auth_type: 'oauth2', max_caption_chars: 500, max_images: 1, max_file_size_mb: 20, max_video_duration_sec: 900, min_image_width: 600, min_image_height: 600 },
-    { slug: 'youtube', name: 'YouTube', display_name: 'YouTube', color: '#FF0000', phase: 2, api_version: 'v3', auth_type: 'oauth2', max_caption_chars: 5000, max_images: 1, max_file_size_mb: 256000, max_video_duration_sec: 43200, min_image_width: 1280, min_image_height: 720 },
-    { slug: 'whatsapp', name: 'WhatsApp Business', display_name: 'WhatsApp Business', color: '#25D366', phase: 2, api_version: 'v18.0', auth_type: 'oauth2', max_caption_chars: 1024, max_images: 1, max_file_size_mb: 16, max_video_duration_sec: 180, min_image_width: 0, min_image_height: 0 },
-    { slug: 'threads', name: 'Threads', display_name: 'Threads', color: '#111111', phase: 2, api_version: 'v1', auth_type: 'oauth2', max_caption_chars: 500, max_images: 10, max_file_size_mb: 100, max_video_duration_sec: 300, min_image_width: 320, min_image_height: 320 },
-  ];
+  // Presentation-only metadata (branding + API surface). ALL limits and
+  // content-type data are derived from the canonical capability registry in
+  // `@mymanager/constants` — do NOT reintroduce limit numbers here.
+  const presentation: Record<string, { name: string; display_name: string; color: string; phase: number; api_version: string; auth_type: string }> = {
+    facebook:        { name: 'Facebook',                display_name: 'Facebook',                color: '#1877F2', phase: 1, api_version: 'Graph API v21',       auth_type: 'oauth2' },
+    instagram:       { name: 'Instagram',               display_name: 'Instagram',               color: '#E4405F', phase: 1, api_version: 'Graph API v21',       auth_type: 'oauth2' },
+    x:               { name: 'X / Twitter',             display_name: 'X / Twitter',             color: '#111111', phase: 1, api_version: 'API v2',              auth_type: 'oauth2_pkce' },
+    linkedin:        { name: 'LinkedIn',                display_name: 'LinkedIn',                color: '#0A66C2', phase: 1, api_version: 'UGC Posts API v2',     auth_type: 'oauth2' },
+    tiktok:          { name: 'TikTok',                  display_name: 'TikTok',                  color: '#111111', phase: 1, api_version: 'Content Posting API',  auth_type: 'oauth2' },
+    google_business: { name: 'Google Business Profile', display_name: 'Google Business Profile', color: '#4285F4', phase: 1, api_version: 'My Business API v4.9', auth_type: 'oauth2' },
+    pinterest:       { name: 'Pinterest',               display_name: 'Pinterest',               color: '#E60023', phase: 2, api_version: 'API v5',              auth_type: 'oauth2' },
+    youtube:         { name: 'YouTube',                 display_name: 'YouTube',                 color: '#FF0000', phase: 2, api_version: 'Data API v3',         auth_type: 'oauth2' },
+    whatsapp:        { name: 'WhatsApp Business',        display_name: 'WhatsApp Business',       color: '#25D366', phase: 2, api_version: 'Business Cloud API',   auth_type: 'system_user_token' },
+    threads:         { name: 'Threads',                 display_name: 'Threads',                 color: '#111111', phase: 2, api_version: 'Threads API',         auth_type: 'oauth2' },
+  };
+
+  const platforms = Object.values(PLATFORM_CAPABILITIES).map((cap) => {
+    const meta = presentation[cap.slug];
+    return {
+      slug: cap.slug,
+      name: meta.name,
+      display_name: meta.display_name,
+      color: meta.color,
+      phase: meta.phase,
+      api_version: meta.api_version,
+      auth_type: meta.auth_type,
+      max_caption_chars: cap.captionLimit,
+      max_images: cap.maxImages,
+      max_file_size_mb: cap.maxFileSizeMb,
+      max_video_duration_sec: cap.maxVideoSec,
+      min_image_width: cap.minImageWidth,
+      min_image_height: cap.minImageHeight,
+      content_types: cap.contentTypes,
+      // Richer caps not covered by the flat columns; GET /platforms exposes these.
+      limits: {
+        supports_threads: cap.supportsThreads,
+        hashtag_limit: cap.hashtagLimit,
+        link_handling: cap.linkHandling,
+        ...(cap.premium ? { premium: cap.premium } : {}),
+      },
+    };
+  });
 
   for (const p of platforms) {
     await prisma.platform.upsert({
       where: { slug: p.slug },
-      update: { name: p.name, display_name: p.display_name, color: p.color, phase: p.phase },
+      update: {
+        name: p.name, display_name: p.display_name, color: p.color, phase: p.phase,
+        api_version: p.api_version, auth_type: p.auth_type,
+        max_caption_chars: p.max_caption_chars, max_images: p.max_images,
+        max_file_size_mb: p.max_file_size_mb, max_video_duration_sec: p.max_video_duration_sec,
+        min_image_width: p.min_image_width, min_image_height: p.min_image_height,
+        content_types: p.content_types, limits: p.limits,
+      },
       create: { ...p, is_active: true },
     });
   }
-  console.log('  ✓ 10 platforms');
+  console.log(`  ✓ ${platforms.length} platforms (from capability registry)`);
 }
 
 // ─── Users + Workspaces ───────────────────────────────────

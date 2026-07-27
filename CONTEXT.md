@@ -1,5 +1,5 @@
 # Project Context
-Last updated: 2026-07-25
+Last updated: 2026-07-27
 
 ## ▶ RESUME THE STACK (2026-07-25) — now a single self-contained command
 All local Docker (containers, project images mymanager-api/web/worker, volumes,

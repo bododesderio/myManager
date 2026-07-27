@@ -5,6 +5,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "dependencies": {
+    "@mymanager/constants": "workspace:*",
     "@mymanager/types": "workspace:*"
   }
 }

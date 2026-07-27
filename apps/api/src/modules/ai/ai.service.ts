@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
 import axios from 'axios';
+import { getCaptionLimit } from '@mymanager/constants';
 import { AiRepository } from './ai.repository';
 
 @Injectable()
@@ -68,11 +69,7 @@ export class AiService {
     this.ensureAiConfigured();
     await this.checkCredits(userId, data.workspaceId);
 
-    const platformLimits: Record<string, number> = {
-      facebook: 63206, instagram: 2200, x: 280, linkedin: 3000,
-      tiktok: 2200, threads: 500, pinterest: 500,
-    };
-    const maxChars = data.maxLength || platformLimits[data.platform] || 2200;
+    const maxChars = data.maxLength || getCaptionLimit(data.platform);
     const tone = data.tone || 'professional';
     const language = data.language || 'English';
 

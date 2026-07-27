@@ -9,6 +9,7 @@ import { useUploadMedia, useMedia } from '@/lib/hooks/useMedia';
 import { useWorkspaceStore } from '@/lib/stores/workspace.store';
 import { useToast } from '@/providers/ToastProvider';
 import { Card } from '@mymanager/ui';
+import { DEFAULT_CAPTION_LIMIT } from '@mymanager/constants';
 import { PlatformIcon } from '@/components/icons/PlatformIcon';
 
 /* ------------------------------------------------------------------ */
@@ -55,9 +56,9 @@ export function ComposeContent() {
   }
 
   function getActiveCharLimit(selectedPlatforms: string[]): number {
-    if (selectedPlatforms.length === 0) return 2200;
+    if (selectedPlatforms.length === 0) return DEFAULT_CAPTION_LIMIT;
     return Math.min(
-      ...selectedPlatforms.map((p) => platformLimits[p.toLowerCase()] ?? 2200),
+      ...selectedPlatforms.map((p) => platformLimits[p.toLowerCase()] ?? DEFAULT_CAPTION_LIMIT),
     );
   }
 

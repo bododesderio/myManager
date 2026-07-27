@@ -50,7 +50,20 @@ non-threading platforms over the limit fall back to trim + warn.
 
 ## Phases
 
-### Phase 0 — One capabilities registry (foundation)
+### Phase 0 — One capabilities registry (foundation) ✅ DONE 2026-07-27
+Implemented in `packages/constants/platform-capabilities.ts` (`PLATFORM_CAPABILITIES`
++ `resolveEffectiveLimits` + `getCaptionLimit` + `DEFAULT_CAPTION_LIMIT`). It was
+**four** disagreeing sources, not three (the runtime seed `prisma/seeds/index.ts`
+had its own inline map). All now derive from the registry:
+- `packages/utils/platform-limits.ts` → thin adapter (no data of its own).
+- `prisma/seeds/index.ts` seedPlatforms → derives rows + fills `content_types`/`limits`
+  JSON (supports_threads, hashtag_limit, link_handling, premium); presentation
+  (color/api_version/auth_type/phase) stays local. Orphaned `platforms.seed.ts` deleted.
+- `ai.service.ts` inline map → `getCaptionLimit(platform)`.
+- `ComposeContent.tsx` `2200` literals → `DEFAULT_CAPTION_LIMIT`.
+Verified live: DB seeded from registry, `GET /platforms` serves content_types + limits.premium.
+
+_Original scope:_
 Collapse the 3 limit sources into a canonical typed spec in `packages/constants`,
 keyed by slug: `contentTypes[]`, `captionLimit`, `maxImages`, `maxVideoSec`, min
 image dims, **`supportsThreads`**, `hashtagLimit`, `linkHandling`, and
