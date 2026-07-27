@@ -81,6 +81,16 @@ export class SocialAccountsController {
     return this.socialAccountsService.update(id, getRequestWorkspaceId(req), body);
   }
 
+  @Put(':id/premium')
+  @ApiOperation({ summary: 'Set the premium override for an account (true/false/null=auto)' })
+  async setPremium(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
+    @Body() body: { premium: boolean | null },
+  ) {
+    return this.socialAccountsService.setPremium(id, getRequestWorkspaceId(req), body.premium ?? null);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Disconnect a social account' })
   async disconnectAccount(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {

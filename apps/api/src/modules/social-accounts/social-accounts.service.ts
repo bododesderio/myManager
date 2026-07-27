@@ -5,8 +5,30 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+import { PLATFORM_CAPABILITIES } from '@mymanager/constants';
 import { SocialAccountsRepository } from './social-accounts.repository';
 import { encryptSecret, decryptSecret } from '../../common/crypto/crypto.util';
+
+/** Auto-detected premium standing of a connected account. */
+export type DetectedTier = 'free' | 'premium' | 'unknown';
+
+/** True when the platform's registry entry defines a premium uplift (X today). */
+export function platformHasPremium(slug: string): boolean {
+  return !!PLATFORM_CAPABILITIES[slug as keyof typeof PLATFORM_CAPABILITIES]?.premium;
+}
+
+/**
+ * Hybrid premium resolution: an explicit user override always wins; otherwise
+ * fall back to the tier auto-detected at OAuth time (metadata.detected_tier).
+ */
+export function accountIsPremium(account: {
+  premium_override?: boolean | null;
+  metadata?: unknown;
+}): boolean {
+  if (account.premium_override != null) return account.premium_override;
+  const detected = (account.metadata as { detected_tier?: DetectedTier } | null)?.detected_tier;
+  return detected === 'premium';
+}
 
 interface OAuthConfig {
   authUrl: string;
@@ -141,6 +163,11 @@ export class SocialAccountsService {
       connected_at: r.connected_at,
       token_expires_at: r.token_expires_at,
       metadata: r.metadata,
+      // Premium (Phase 1): whether this platform even has a premium tier, the
+      // raw user override, and the resolved effective flag the UI renders.
+      premium_available: platformHasPremium(r.platform_id),
+      premium_override: r.premium_override,
+      is_premium: accountIsPremium(r),
     }));
   }
 
@@ -248,7 +275,7 @@ export class SocialAccountsService {
       body: new URLSearchParams(body).toString(),
     });
 
-    const tokens = (await tokenResponse.json()) as { access_token: string; refresh_token?: string; expires_in?: number };
+    const tokens = (await tokenResponse.json()) as { access_token: string; refresh_token?: string; expires_in?: number; scope?: string };
     const encryptedAccessToken = this.encryptToken(tokens.access_token);
     const encryptedRefreshToken = tokens.refresh_token ? this.encryptToken(tokens.refresh_token) : null;
 
@@ -260,6 +287,15 @@ export class SocialAccountsService {
     // OAuth-config form; convert it back to the public slug for storage.
     const catalogueSlug = resolvedPlatform.replace(/-/g, '_');
 
+    // Granted scopes (space-delimited in the token response) were previously
+    // dropped; persist them so Phase 1+ can reason about account capabilities.
+    const grantedScopes = tokens.scope ? tokens.scope.split(/\s+/).filter(Boolean) : [];
+
+    // Hybrid premium — auto-detect where the provider exposes it. Realistically
+    // X only, via verified_type ('blue'/'business' = paid). Everyone else is
+    // recorded as 'unknown' so the user toggle is the only signal.
+    const detectedTier: DetectedTier = this.detectTier(catalogueSlug, profile.verifiedType);
+
     const account = await this.repository.upsert({
       workspace_id: storedState.workspaceId,
       platform_id: catalogueSlug,
@@ -270,6 +306,8 @@ export class SocialAccountsService {
       access_token_encrypted: encryptedAccessToken,
       refresh_token_encrypted: encryptedRefreshToken,
       token_expires_at: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : null,
+      scopes: grantedScopes,
+      metadata: { detected_tier: detectedTier },
       is_active: true,
     });
 
@@ -281,7 +319,11 @@ export class SocialAccountsService {
     const account = await this.repository.findById(id, workspaceId);
     if (!account) throw new NotFoundException('Social account not found');
     const { access_token_encrypted: _access_token_encrypted, refresh_token_encrypted: _refresh_token_encrypted, ...safe } = account;
-    return safe;
+    return {
+      ...safe,
+      premium_available: platformHasPremium(account.platform_id),
+      is_premium: accountIsPremium(account),
+    };
   }
 
   async update(id: string, workspaceId: string, data: { metadata?: Record<string, unknown> }) {
@@ -368,11 +410,15 @@ export class SocialAccountsService {
     username: string;
     displayName: string;
     avatarUrl: string;
+    // X exposes `verified_type` ('blue' | 'business' | 'government' | 'none');
+    // undefined for every other provider (premium is not auto-detectable there).
+    verifiedType?: string;
   }> {
     const profileEndpoints: Record<string, string> = {
       facebook: 'https://graph.facebook.com/v21.0/me?fields=id,name,picture',
       instagram: 'https://graph.facebook.com/v21.0/me?fields=id,username,name,profile_picture_url',
-      x: 'https://api.twitter.com/2/users/me?user.fields=profile_image_url',
+      // verified_type drives Phase 1 premium auto-detection for X.
+      x: 'https://api.twitter.com/2/users/me?user.fields=profile_image_url,verified_type',
       // OpenID Connect userinfo — replaces the deprecated /v2/me (r_liteprofile).
       linkedin: 'https://api.linkedin.com/v2/userinfo',
       // TikTok requires an explicit `fields` allowlist or the endpoint 400s.
@@ -406,6 +452,7 @@ export class SocialAccountsService {
         name?: string;
         username?: string;
         profile_image_url?: string;
+        verified_type?: string;
         // …TikTok nests it one level deeper under `data.user`.
         user?: { open_id?: string; display_name?: string; avatar_url?: string };
       };
@@ -450,6 +497,37 @@ export class SocialAccountsService {
         data.data?.profile_image_url ||
         data.data?.user?.avatar_url ||
         '',
+      verifiedType: data.data?.verified_type,
+    };
+  }
+
+  /**
+   * Map a freshly-connected account to a premium tier. Only X is
+   * auto-detectable (verified_type); every other provider returns 'unknown',
+   * leaving the user toggle as the sole premium signal.
+   */
+  private detectTier(catalogueSlug: string, verifiedType?: string): DetectedTier {
+    if (!platformHasPremium(catalogueSlug)) return 'unknown';
+    if (catalogueSlug === 'x') {
+      if (!verifiedType) return 'unknown';
+      // 'blue' = X Premium, 'business' = Verified Organizations — both lift limits.
+      return verifiedType === 'blue' || verifiedType === 'business' ? 'premium' : 'free';
+    }
+    return 'unknown';
+  }
+
+  /**
+   * User-declared premium override (Settings → Accounts). `true`/`false` pins
+   * the account; `null` clears the override and defers to auto-detection.
+   */
+  async setPremium(id: string, workspaceId: string, premium: boolean | null) {
+    const updated = await this.repository.update(id, workspaceId, { premium_override: premium });
+    if (!updated) throw new NotFoundException('Social account not found');
+    return {
+      id: updated.id,
+      premium_override: updated.premium_override,
+      is_premium: accountIsPremium(updated),
+      premium_available: platformHasPremium(updated.platform_id),
     };
   }
 

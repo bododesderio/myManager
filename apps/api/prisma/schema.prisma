@@ -715,6 +715,10 @@ model SocialAccount {
   token_expires_at        DateTime?
   scopes                  String[]
   metadata                Json      @default("{}")
+  // Hybrid premium (per-platform adaptation Phase 1): null = follow the
+  // auto-detected tier in metadata.detected_tier; true/false = user override
+  // that always wins. Drives resolveEffectiveLimits() for premium-aware limits.
+  premium_override        Boolean?
   is_active               Boolean   @default(true)
   connected_at            DateTime  @default(now())
   last_used_at            DateTime?

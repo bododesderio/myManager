@@ -2,7 +2,7 @@
 
 import type { Route } from 'next';
 import Link from 'next/link';
-import { useSocialAccounts, useDisconnectSocialAccount } from '@/lib/hooks/useSocialAccounts';
+import { useSocialAccounts, useDisconnectSocialAccount, useSetAccountPremium } from '@/lib/hooks/useSocialAccounts';
 import { useToast } from '@/providers/ToastProvider';
 import { ServiceUnavailableInline } from '@/components/status/ServiceUnavailable';
 import { PlatformIcon } from '@/components/icons/PlatformIcon';
@@ -11,6 +11,7 @@ import { Card } from '@mymanager/ui';
 export default function AccountsContent() {
   const { data: accounts, isLoading } = useSocialAccounts();
   const disconnect = useDisconnectSocialAccount();
+  const setPremium = useSetAccountPremium();
   const { addToast } = useToast();
 
   const handleDisconnect = (id: string, platform: string) => {
@@ -19,6 +20,17 @@ export default function AccountsContent() {
       onSuccess: () => addToast({ type: 'success', message: `${platform} disconnected.` }),
       onError: () => addToast({ type: 'error', message: `Failed to disconnect ${platform}.` }),
     });
+  };
+
+  // null = follow auto-detection, true = force premium, false = force standard.
+  const handlePremiumChange = (id: string, value: string) => {
+    const premium = value === 'auto' ? null : value === 'premium';
+    setPremium.mutate(
+      { id, premium },
+      {
+        onError: () => addToast({ type: 'error', message: 'Failed to update premium status.' }),
+      },
+    );
   };
 
   if (isLoading) {
@@ -62,7 +74,14 @@ export default function AccountsContent() {
               <div className="flex items-start gap-3">
                 <PlatformIcon platform={account.platform} size={28} className="mt-0.5 shrink-0" />
                 <div>
-                <p className="font-medium capitalize">{account.platform_name ?? account.platform}</p>
+                <p className="font-medium capitalize">
+                  {account.platform_name ?? account.platform}
+                  {account.is_premium && (
+                    <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 align-middle">
+                      Premium
+                    </span>
+                  )}
+                </p>
                 <p className="text-sm text-text-2">
                   {account.username ?? account.account_name}
                   {account.connected_at && (
@@ -91,6 +110,25 @@ export default function AccountsContent() {
                       actionHref={`/connect/oauth?platform=${encodeURIComponent(account.platform)}`}
                       actionLabel="Reconnect"
                     />
+                  </div>
+                )}
+                {account.premium_available && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <label htmlFor={`premium-${account.id}`} className="text-xs text-text-2">
+                      Account tier
+                    </label>
+                    <select
+                      id={`premium-${account.id}`}
+                      value={account.premium_override == null ? 'auto' : account.premium_override ? 'premium' : 'standard'}
+                      onChange={(e) => handlePremiumChange(account.id, e.target.value)}
+                      disabled={setPremium.isPending}
+                      className="rounded-brand border border-border bg-bg px-2 py-1 text-xs disabled:opacity-50"
+                    >
+                      <option value="auto">Auto-detect</option>
+                      <option value="premium">Premium</option>
+                      <option value="standard">Standard</option>
+                    </select>
+                    <span className="text-xs text-text-muted">raises character &amp; media limits</span>
                   </div>
                 )}
                 </div>

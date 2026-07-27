@@ -72,7 +72,19 @@ image dims, **`supportsThreads`**, `hashtagLimit`, `linkHandling`, and
 UI keeps reading `GET /platforms`. Delete the `2200` fallbacks
 (`ComposeContent.tsx:58,60`, `ai.service.ts:75`) and the inline AI map.
 
-### Phase 1 — Effective limits + hybrid premium
+### Phase 1 — Effective limits + hybrid premium ✅ DONE 2026-07-27
+Implemented + live-verified. `social_accounts.premium_override Boolean?` (migration
+20260727120000) = user override (null→auto). Auto-detect at OAuth callback: X reads
+`verified_type` (blue/business→premium), others→`metadata.detected_tier='unknown'`;
+callback now also persists `scopes` (was dropped). Helpers in social-accounts.service:
+`platformHasPremium(slug)`, `accountIsPremium(account)` (override wins else
+detected_tier==='premium'), feeding the registry's `resolveEffectiveLimits(slug,isPremium)`.
+`PUT /social-accounts/:id/premium {premium:boolean|null}`; list/get expose
+`is_premium`/`premium_available`/`premium_override`. Web: `useSetAccountPremium` +
+Settings→Accounts premium badge + tri-state tier control (shown only where premium_available).
+Verified live with an X fixture: auto→is_premium=true; override=false→false; override=null→true.
+
+_Original scope:_
 - `social_accounts.metadata.tier` (or an `account_tier` column) drives premium.
 - Auto-detect at OAuth callback where feasible (realistically **X only** via
   `verified_type` on `users/me`); persist `scopes` + capability data (currently

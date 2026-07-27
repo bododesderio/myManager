@@ -27,3 +27,18 @@ export function useDisconnectSocialAccount() {
     },
   });
 }
+
+/**
+ * Set a connected account's premium override.
+ * `premium: null` clears the override and defers to auto-detection.
+ */
+export function useSetAccountPremium() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, premium }: { id: string; premium: boolean | null }) =>
+      apiClient.put(`/social-accounts/${id}/premium`, { premium }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: socialAccountKeys.all });
+    },
+  });
+}

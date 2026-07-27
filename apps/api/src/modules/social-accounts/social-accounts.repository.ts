@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { getSharedRedis } from '../../common/redis/shared-redis';
 
@@ -37,6 +38,7 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
         is_active: true,
         token_expires_at: true,
         metadata: true,
+        premium_override: true,
         connected_at: true,
       },
       orderBy: { connected_at: 'asc' },
@@ -61,6 +63,8 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
     access_token_encrypted: string;
     refresh_token_encrypted: string | null;
     token_expires_at: Date | null;
+    scopes?: string[];
+    metadata?: Prisma.InputJsonValue;
     is_active: boolean;
   }) {
     return this.prisma.socialAccount.upsert({
@@ -78,6 +82,10 @@ export class SocialAccountsRepository implements OnModuleInit, OnModuleDestroy {
         access_token_encrypted: data.access_token_encrypted,
         refresh_token_encrypted: data.refresh_token_encrypted,
         token_expires_at: data.token_expires_at,
+        // Re-detect on every reconnect; premium_override (the user's choice) is
+        // a separate column and is intentionally left untouched here.
+        ...(data.scopes ? { scopes: data.scopes } : {}),
+        ...(data.metadata ? { metadata: data.metadata } : {}),
         is_active: data.is_active,
         last_used_at: new Date(),
       },
