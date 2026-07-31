@@ -6,7 +6,25 @@ import {
   resolvePlatformCaption,
   resolvePlatformSegments,
   mergePlatformAdaptations,
+  getPlatformCapability,
+  getCaptionLimit,
 } from '@mymanager/constants';
+
+describe('registry slug-form tolerance (GBP underscore vs hyphen)', () => {
+  it('resolves the GBP capability from either slug form', () => {
+    expect(getPlatformCapability('google_business')?.slug).toBe('google_business');
+    expect(getPlatformCapability('google-business')?.slug).toBe('google_business');
+  });
+
+  it('returns GBP’s real caption limit (1500), not the 2200 default, for the hyphen form', () => {
+    expect(getCaptionLimit('google-business')).toBe(1500);
+    expect(getCaptionLimit('google_business')).toBe(1500);
+  });
+
+  it('still returns undefined for a genuinely unknown platform', () => {
+    expect(getPlatformCapability('myspace')).toBeUndefined();
+  });
+});
 
 describe('per-platform adaptation contract (Phase 2)', () => {
   describe('resolvePlatformCaption', () => {

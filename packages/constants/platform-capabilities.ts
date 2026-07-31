@@ -194,9 +194,18 @@ export const PLATFORM_CAPABILITIES: Record<PlatformSlug, PlatformCapability> = {
   },
 };
 
-/** Registry lookup by slug; undefined for an unknown platform. */
+/**
+ * Registry lookup by slug. Tolerates both slug forms in circulation: the public
+ * catalogue / DB uses the underscored slug (`google_business`) while the OAuth,
+ * queue and publishing layers use the hyphenated form (`google-business`). Any
+ * caller — whichever world it lives in — resolves the same capability. Returns
+ * undefined for a genuinely unknown platform.
+ */
 export function getPlatformCapability(slug: string): PlatformCapability | undefined {
-  return PLATFORM_CAPABILITIES[slug as PlatformSlug];
+  return (
+    PLATFORM_CAPABILITIES[slug as PlatformSlug] ??
+    PLATFORM_CAPABILITIES[slug.replace(/-/g, '_') as PlatformSlug]
+  );
 }
 
 /**
