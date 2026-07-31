@@ -1,3 +1,7 @@
+/**
+ * @author Bodo Desderio <rooiboktechltd@gmail.com>
+ * @copyright 2026 Rooibok Technologies. All rights reserved.
+ */
 import Link from 'next/link';
 import Image from 'next/image';
 import { MobileNavMenu } from './MobileNavMenu';
@@ -43,6 +47,7 @@ export async function MarketingNavbar() {
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2">
+          <Image src="/images/icon.png" alt="" width={28} height={28} priority className="rounded-[7px]" />
           <span className="text-[18px] font-extrabold text-text"><span className="text-primary">my</span>Manager</span>
         </Link>
 
