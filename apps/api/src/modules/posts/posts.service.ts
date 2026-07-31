@@ -1,3 +1,7 @@
+/**
+ * @author Bodo Desderio <rooiboktechltd@gmail.com>
+ * @copyright 2026 Rooibok Technologies. All rights reserved.
+ */
 import {
   Injectable,
   NotFoundException,
@@ -5,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bullmq';
+import { mergePlatformAdaptations, PlatformAdaptation } from '@mymanager/constants';
 import { PostsRepository } from './posts.repository';
 
 @Injectable()
@@ -64,6 +69,7 @@ export class PostsService {
     linkPreviewOverride?: Record<string, unknown>;
     firstCommentText?: string;
     platformOptions?: Record<string, unknown>;
+    platformCaptions?: Record<string, PlatformAdaptation>;
     hashtagIds?: string[];
   }) {
     const status = data.scheduledAt ? 'SCHEDULED' : 'DRAFT';
@@ -79,7 +85,10 @@ export class PostsService {
       link_url: data.linkUrl,
       link_preview_override: data.linkPreviewOverride,
       first_comment_text: data.firstCommentText,
-      platform_options: data.platformOptions,
+      platform_options: mergePlatformAdaptations(
+        data.platformOptions as Record<string, Record<string, unknown> | undefined> | undefined,
+        data.platformCaptions,
+      ),
     });
 
     if (data.mediaIds?.length) {
@@ -111,6 +120,21 @@ export class PostsService {
 
     if (['PUBLISHED', 'PUBLISHING'].includes(post.status)) {
       throw new BadRequestException('Cannot edit a published or publishing post');
+    }
+
+    // Fold per-platform adaptations into the platform_options column, merging
+    // over whatever the post already stores so editing one platform's caption
+    // never drops another platform's extras. Strip the camelCase input keys —
+    // repository.update writes straight to Prisma, which only knows columns.
+    if (data.platformCaptions || data.platformOptions) {
+      data.platform_options = mergePlatformAdaptations(
+        (data.platformOptions ?? post.platform_options) as
+          | Record<string, Record<string, unknown> | undefined>
+          | undefined,
+        data.platformCaptions,
+      );
+      delete data.platformCaptions;
+      delete data.platformOptions;
     }
 
     const updated = await this.repository.update(id, workspaceId, data);

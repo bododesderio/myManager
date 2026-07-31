@@ -1,3 +1,7 @@
+/**
+ * @author Bodo Desderio <rooiboktechltd@gmail.com>
+ * @copyright 2026 Rooibok Technologies. All rights reserved.
+ */
 import { PlatformSlug } from './platforms';
 import { ContentTypeSlug } from './content-types';
 
@@ -220,4 +224,87 @@ export function resolveEffectiveLimits(
 /** Effective caption limit only — the common case for counters and AI prompts. */
 export function getCaptionLimit(slug: string, isPremium = false): number {
   return resolveEffectiveLimits(slug, isPremium)?.captionLimit ?? DEFAULT_CAPTION_LIMIT;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Phase 2 — per-platform content adaptation storage contract
+ *
+ * A post carries one master `caption`. Any platform may override it with a
+ * tailored caption and, on threading platforms (X, Threads), a pre-split
+ * `segments` list. Overrides live under `platform_options[slug]` — keyed by the
+ * CANONICAL platform slug (`google-business`, not a worker's local `gbp` key) —
+ * alongside that platform's other extras (pageId, event data, …).
+ *
+ * These resolvers fall back to the master caption when no override exists, so
+ * publish behaviour is unchanged until a caller writes an adaptation. Phase 3
+ * (AI adapt) writes into this contract; Phase 4 (threaded workers) reads it.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Per-platform caption/thread override stored under `platform_options[slug]`. */
+export interface PlatformAdaptation {
+  /** Tailored caption for this platform; falls back to the master caption. */
+  caption?: string;
+  /** Pre-split thread segments for threading platforms (X, Threads). */
+  segments?: string[];
+}
+
+/** Keys the adaptation contract owns inside `platform_options[slug]`. */
+export const PLATFORM_ADAPTATION_KEYS = ['caption', 'segments'] as const;
+
+type PlatformOptionsMap =
+  | Record<string, Record<string, unknown> | undefined>
+  | null
+  | undefined;
+
+/** Resolve the caption to publish on `slug`: per-platform override ?? master. */
+export function resolvePlatformCaption(
+  masterCaption: string,
+  platformOptions: PlatformOptionsMap,
+  slug: string,
+): string {
+  const override = platformOptions?.[slug]?.caption;
+  return typeof override === 'string' && override.trim().length > 0
+    ? override
+    : masterCaption;
+}
+
+/** Pre-split thread segments for `slug`, or null when none / not a thread platform. */
+export function resolvePlatformSegments(
+  platformOptions: PlatformOptionsMap,
+  slug: string,
+): string[] | null {
+  if (!getPlatformCapability(slug)?.supportsThreads) return null;
+  const segments = platformOptions?.[slug]?.segments;
+  return Array.isArray(segments) &&
+    segments.length > 0 &&
+    segments.every((s) => typeof s === 'string')
+    ? (segments as string[])
+    : null;
+}
+
+/**
+ * Fold per-platform adaptations into an existing `platform_options` map without
+ * disturbing each platform's non-adaptation extras. Blank captions and empty
+ * segment lists are stripped so storage stays clean (publish falls back to the
+ * master caption). Returns a new object; inputs are not mutated.
+ */
+export function mergePlatformAdaptations(
+  existing: PlatformOptionsMap,
+  adaptations: Record<string, PlatformAdaptation> | null | undefined,
+): Record<string, Record<string, unknown>> {
+  const out: Record<string, Record<string, unknown>> = {};
+  for (const [slug, opts] of Object.entries(existing ?? {})) {
+    if (opts) out[slug] = { ...opts };
+  }
+  for (const [slug, adaptation] of Object.entries(adaptations ?? {})) {
+    const target = { ...(out[slug] ?? {}) };
+    const caption = adaptation?.caption;
+    if (typeof caption === 'string' && caption.trim().length > 0) target.caption = caption;
+    else delete target.caption;
+    const segments = adaptation?.segments;
+    if (Array.isArray(segments) && segments.length > 0) target.segments = segments;
+    else delete target.segments;
+    out[slug] = target;
+  }
+  return out;
 }

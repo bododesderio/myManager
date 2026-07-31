@@ -1,3 +1,7 @@
+/**
+ * @author Bodo Desderio <rooiboktechltd@gmail.com>
+ * @copyright 2026 Rooibok Technologies. All rights reserved.
+ */
 import {
   IsString,
   IsOptional,
@@ -66,6 +70,19 @@ export class CreatePostDto {
   @IsOptional()
   @IsObject()
   platformOptions?: Record<string, unknown>;
+
+  /**
+   * Per-platform content adaptation, keyed by canonical platform slug
+   * (e.g. `x`, `google-business`). Each entry may override the master caption
+   * and, on threading platforms, supply pre-split `segments`. Folded into
+   * `platform_options[slug]` by the service.
+   */
+  @ApiPropertyOptional({
+    description: 'Per-platform caption/segment overrides, keyed by platform slug',
+  })
+  @IsOptional()
+  @IsObject()
+  platformCaptions?: Record<string, { caption?: string; segments?: string[] }>;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()

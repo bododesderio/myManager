@@ -1,3 +1,7 @@
+/**
+ * @author Bodo Desderio <rooiboktechltd@gmail.com>
+ * @copyright 2026 Rooibok Technologies. All rights reserved.
+ */
 import {
   IsString,
   IsOptional,
@@ -53,4 +57,12 @@ export class UpdatePostDto {
   @IsOptional()
   @IsObject()
   platformOptions?: Record<string, unknown>;
+
+  /** Per-platform caption/segment overrides, keyed by canonical platform slug. */
+  @ApiPropertyOptional({
+    description: 'Per-platform caption/segment overrides, keyed by platform slug',
+  })
+  @IsOptional()
+  @IsObject()
+  platformCaptions?: Record<string, { caption?: string; segments?: string[] }>;
 }
