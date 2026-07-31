@@ -19,10 +19,27 @@ Canonical ports 5432/6379/3001/3000 — on THIS shared box those collide with ot
 projects; use a ports-only compose override (see `mymanager-local-stack-*` memory)
 or stop the conflicting containers. Commit 742008a wired all this.
 
-## ▶ NEXT SESSION STARTS HERE (2026-07-27) — Per-Platform Content Adaptation, Phase 2
-Plan: `docs/plan-per-platform-content-adaptation.md` (Phase 0 + Phase 1 checked off there).
-**Stack is currently UP** on canonical ports (postgres 5432, redis 6379, api 3001,
-web 3000) via `docker compose up -d --build`. Migration `20260727120000` is applied.
+## ▶ NEXT SESSION STARTS HERE (2026-07-31) — Per-Platform Content Adaptation, Phase 3
+Plan: `docs/plan-per-platform-content-adaptation.md`; **Phase 3 draft plan (awaiting
+approval): `docs/plan-phase-3-ai-adapt.md`.** Phases 0/1/2 DONE + the GBP registry
+slug fix. Next action: review/approve Phase 3, then implement `POST /ai/caption/adapt`.
+Phase 3 open questions to answer first: model (opus-5 vs sonnet-5), credit cost
+(flat 1 vs per-platform), auto `1/n` thread suffixes.
+
+**Shipped 2026-07-31 (3 commits on main):**
+- `6f6b390` — real myManager brand icons (favicon, app/icon, apple-icon, PWA
+  192/512 maskable, transparent nav mark + wordmark). Masters under `brand/`.
+  **This resolves the long-standing `icon-192.png` 404.** Brand purple `#664BEF`.
+- `ca38de5` — **Phase 2 DONE**: per-platform caption/thread storage. `constants`
+  resolvers (`resolvePlatformCaption`/`resolvePlatformSegments`/`mergePlatformAdaptations`),
+  `platformCaptions` on Create/UpdatePostDto, service folds into `platform_options[slug]`.
+  Adaptations keyed by CANONICAL (hyphen) slug. 11 tests.
+- `5376b27` — **GBP slug fix**: registry was underscore-only (`google_business`),
+  so `getCaptionLimit('google-business')` returned 2200 not 1500. `getPlatformCapability`
+  now normalizes hyphen→underscore at the single lookup boundary. The two-slug design
+  (underscore=DB/public, hyphen=OAuth/queue/worker) is INTENTIONAL — not a bug. 334/334 green.
+
+**Stack**: bring up with `docker compose up -d --build` (canonical ports 5432/6379/3001/3000).
 
 **✅ Phase 0 DONE (commit 4481656)** — one canonical capability registry
 `packages/constants/platform-capabilities.ts` (`PLATFORM_CAPABILITIES` +
